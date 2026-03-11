@@ -70,6 +70,7 @@
 #include "i2c_bus_manager.h"
 #include "hardware_pins.h"
 #include "console_logger.h"
+#include "kona_metadata.h"
 
 static const char* TAG = "main";
 
@@ -112,8 +113,27 @@ static char s_description_buffer[TTS_DESCRIPTION_BUFFER_SIZE];
 static color_result_t s_last_result;
 static bool s_has_last_result = false;
 
-// Next swatch index for quad-press Kona scan workflow
+// Next swatch index for Kona scan workflow
 static uint16_t s_kona_scan_index = 0;
+static bool s_kona_scan_active = false;
+
+static void speak_kona_swatch_prompt(uint16_t index)
+{
+    if (index >= KONA_SWATCH_METADATA_COUNT)
+    {
+        ESP_LOGW(TAG, "Kona metadata index out of range: %u", index);
+        return;
+    }
+
+    const kona_swatch_info_t& info = KONA_SWATCH_METADATA[index];
+    tts_speak("Capture swatch %d of %d. Panel %s, index %d, ID %d, name %s. Press button to capture, or double click to cancel.",
+              index + 1,
+              KONA_SWATCH_TOTAL,
+              info.panel,
+              info.panel_index,
+              info.id,
+              info.name);
+}
 
 /**
  * @brief Announce battery level and estimated time to full
@@ -466,9 +486,6 @@ static void perform_measurement(void)
 
 /**
  * @brief Capture one Kona swatch record and emit KONA_SCAN_CSV log row.
- *
- * Quad press advances through a fixed 365-swatch sequence. Host tooling can map
- * this sequence to metadata from kona_365_sensor_ready.csv.
  */
 static void capture_kona_swatch(void)
 {
@@ -479,24 +496,24 @@ static void capture_kona_swatch(void)
         return;
     }
 
-    if (s_kona_scan_index >= KONA_SWATCH_TOTAL)
+    if (s_kona_scan_index >= KONA_SWATCH_TOTAL || s_kona_scan_index >= KONA_SWATCH_METADATA_COUNT)
     {
         ESP_LOGI(TAG, "Kona scan sequence complete (%u swatches)", KONA_SWATCH_TOTAL);
         tts_speak("Kona scan is complete");
+        s_kona_scan_active = false;
         return;
     }
 
     const uint16_t swatch_number = static_cast<uint16_t>(s_kona_scan_index + 1);
+    const kona_swatch_info_t& info = KONA_SWATCH_METADATA[s_kona_scan_index];
 
     char swatch_id[KONA_SWATCH_ID_BUFFER_SIZE] = {0};
     char swatch_name[KONA_SWATCH_NAME_BUFFER_SIZE] = {0};
     snprintf(swatch_id, sizeof(swatch_id), "idx_%03u", swatch_number);
-    snprintf(swatch_name, sizeof(swatch_name), "Kona swatch %u", swatch_number);
+    snprintf(swatch_name, sizeof(swatch_name), "%s", info.name);
 
-    ESP_LOGI(TAG, "Kona scan capture %u/%u (%s, %s)",
-             swatch_number, KONA_SWATCH_TOTAL, swatch_id, swatch_name);
-
-    tts_speak("Capture swatch %d of %d", swatch_number, KONA_SWATCH_TOTAL);
+    ESP_LOGI(TAG, "Kona scan capture %u/%u (%s, panel=%s panel_index=%u id=%u name=%s)",
+             swatch_number, KONA_SWATCH_TOTAL, swatch_id, info.panel, info.panel_index, info.id, info.name);
 
     color_result_t scan_result = {};
     esp_err_t ret = color_pipeline_capture_csv(s_sensor,
@@ -522,15 +539,16 @@ static void capture_kona_swatch(void)
     s_has_last_result = true;
 
     s_kona_scan_index++;
-    tts_speak("Captured");
+    tts_speak("Captured %s, ID %d", info.name, info.id);
 
-    if (s_kona_scan_index < KONA_SWATCH_TOTAL)
+    if (s_kona_scan_index < KONA_SWATCH_TOTAL && s_kona_scan_index < KONA_SWATCH_METADATA_COUNT)
     {
-        tts_speak("Next swatch %d", s_kona_scan_index + 1);
+        speak_kona_swatch_prompt(s_kona_scan_index);
     }
     else
     {
         tts_speak("All swatches captured");
+        s_kona_scan_active = false;
     }
 }
 
@@ -773,8 +791,16 @@ extern "C" void app_main(void)
             switch (event)
             {
             case UI_EVENT_BUTTON_PRESS:
-                ESP_LOGI(TAG, "Button pressed - taking measurement");
-                perform_measurement();
+                if (s_kona_scan_active)
+                {
+                    ESP_LOGI(TAG, "Button press while Kona scan active - capture swatch");
+                    capture_kona_swatch();
+                }
+                else
+                {
+                    ESP_LOGI(TAG, "Button pressed - taking measurement");
+                    perform_measurement();
+                }
                 break;
 
             case UI_EVENT_BUTTON_LONG_PRESS:
@@ -783,8 +809,17 @@ extern "C" void app_main(void)
                 break;
 
             case UI_EVENT_BUTTON_DOUBLE:
-                ESP_LOGI(TAG, "Double press - speaking color description");
-                speak_color_description();
+                if (s_kona_scan_active)
+                {
+                    ESP_LOGI(TAG, "Double press - canceling Kona scan");
+                    s_kona_scan_active = false;
+                    tts_speak("Kona scan canceled");
+                }
+                else
+                {
+                    ESP_LOGI(TAG, "Double press - speaking color description");
+                    speak_color_description();
+                }
                 break;
 
             case UI_EVENT_BUTTON_TRIPLE:
@@ -793,16 +828,25 @@ extern "C" void app_main(void)
                 break;
 
             case UI_EVENT_BUTTON_QUAD:
-                // Quad press: capture one Kona swatch record (USB power only)
-                if (power_is_usb_connected())
-                {
-                    ESP_LOGI(TAG, "Quad press on USB power - capture Kona swatch");
-                    capture_kona_swatch();
-                }
-                else
+                if (!power_is_usb_connected())
                 {
                     ESP_LOGI(TAG, "Quad press ignored (not on USB power)");
                     tts_speak("Kona scan requires USB power");
+                    break;
+                }
+
+                if (!s_kona_scan_active)
+                {
+                    ESP_LOGI(TAG, "Quad press on USB power - start Kona scan session");
+                    s_kona_scan_active = true;
+                    s_kona_scan_index = 0;
+                    tts_speak("Starting Kona swatch scan");
+                    speak_kona_swatch_prompt(s_kona_scan_index);
+                }
+                else
+                {
+                    ESP_LOGI(TAG, "Quad press ignored, Kona scan already active");
+                    tts_speak("Kona scan already active");
                 }
                 break;
 
