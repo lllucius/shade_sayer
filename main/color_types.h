@@ -16,6 +16,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <math.h>
 
 #ifdef __cplusplus
@@ -307,31 +308,21 @@ typedef struct
 #define TCS3530_MAX_GAIN_CODE 13
 
 /**
- * @brief Convert TCS3530 gain code to multiplier value
+ * @brief Override gain scaling factors used for gain-code normalization.
  *
- * Gain multipliers for TCS3530 sensor (index corresponds to gain code 0-13):
- *   0: 0.5x, 1: 1x, 2: 2x, 3: 4x, 4: 8x, 5: 16x, 6: 32x, 7: 64x,
- *   8: 128x, 9: 256x, 10: 512x, 11: 1024x, 12: 2048x, 13: 4096x
- *
- * @param gain_code Gain code (0-13)
- * @return Gain multiplier, or 128.0f (default) for invalid codes
+ * If count is less than 14, only the first count entries are updated.
  */
-static inline float tcs3530_gain_code_to_multiplier(uint8_t gain_code)
-{
-    // Lookup table is declared inside the function to avoid separate copies
-    // in each translation unit. The compiler will optimize this for inline.
-    static const float gain_multipliers[] =
-    {
-        0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f,
-        128.0f, 256.0f, 512.0f, 1024.0f, 2048.0f, 4096.0f
-    };
+void tcs3530_set_gain_scaling_factors(const float* factors, size_t count);
 
-    if (gain_code <= TCS3530_MAX_GAIN_CODE)
-    {
-        return gain_multipliers[gain_code];
-    }
-    return 128.0f; // Default to 128x for invalid codes
-}
+/**
+ * @brief Read the active gain scaling table pointer.
+ */
+const float* tcs3530_get_gain_scaling_factors(size_t* count);
+
+/**
+ * @brief Convert TCS3530 gain code to multiplier value.
+ */
+float tcs3530_gain_code_to_multiplier(uint8_t gain_code);
 
 #ifdef __cplusplus
 }

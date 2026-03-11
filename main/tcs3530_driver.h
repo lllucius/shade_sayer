@@ -23,6 +23,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include "driver/i2c_master.h"
 #include "driver/gpio.h"
 #include "esp_err.h"
@@ -191,6 +192,11 @@ public:
     {
         return m_current_gain;
     }
+
+    /**
+     * @brief Override gain scaling multipliers used by processing pipeline.
+     */
+    static void setGainScalingFactors(const float* factors, size_t count);
 
     /**
      * @brief Set integration time
