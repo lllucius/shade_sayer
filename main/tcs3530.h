@@ -520,15 +520,22 @@
 #define TCS3530_STATUS_FINT_Msk              (1u << 2)
 #define TCS3530_STATUS_SINT_Msk              (1u << 0)
 
-// STATUS3 (0x9D)
+// STATUS2 (0x9C)
 /*
- *  bit7 ASAT_DIGITAL:  Digital saturation detected (ADC overflow)
- *  bit6 ASAT_ANALOG:   Analog saturation detected (photodiode saturation)
+ *  bit7 ASAT_DIGITAL:  ALS digital saturation detected (ADC overflow)
+ *  bit6 ASAT_ANALOG_ANY: Any ALS modulator reports analog saturation
  */
-#define TCS3530_STATUS3_ASAT_DIGITAL_Pos     7u
-#define TCS3530_STATUS3_ASAT_DIGITAL_Msk     (1u << 7)
-#define TCS3530_STATUS3_ASAT_ANALOG_Pos      6u
-#define TCS3530_STATUS3_ASAT_ANALOG_Msk      (1u << 6)
+#define TCS3530_STATUS2_ASAT_DIGITAL_Pos      7u
+#define TCS3530_STATUS2_ASAT_DIGITAL_Msk      (1u << 7)
+#define TCS3530_STATUS2_ASAT_ANALOG_ANY_Pos   6u
+#define TCS3530_STATUS2_ASAT_ANALOG_ANY_Msk   (1u << 6)
+
+// STATUS6 (0xA0)
+/*
+ *  bit7:0 ASAT_ANALOG_MOD[7:0]: Per-modulator analog saturation bits.
+ *  Non-zero indicates at least one ALS modulator saturated in analog front-end.
+ */
+#define TCS3530_STATUS6_ASAT_ANALOG_MOD_Msk   0xFFu
 
 // INTENAB (0xBA)
 /*

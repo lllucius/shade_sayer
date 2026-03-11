@@ -488,6 +488,59 @@ esp_err_t color_pipeline_identify_from_reading(const sensor_reading_t* reading,
 }
 
 #ifdef ESP_PLATFORM
+esp_err_t color_pipeline_capture_csv(TCS3530* sensor,
+                                     bool led_enabled,
+                                     const char* swatch_id,
+                                     const char* swatch_name,
+                                     color_result_t* result)
+{
+    if (!sensor)
+    {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    sensor_reading_t reading;
+    esp_err_t ret = sensor->measure(&reading);
+    if (ret != ESP_OK)
+    {
+        return ret;
+    }
+
+    color_result_t local_result;
+    color_result_t* out = result ? result : &local_result;
+    ret = color_pipeline_identify_from_reading(&reading, led_enabled, out);
+    if (ret != ESP_OK)
+    {
+        return ret;
+    }
+
+    ESP_LOGI("KONA_SCAN_CSV",
+             "%s,%s,%u,%u,%u,0x%02X,0x%02X,%lu,%lu,%lu,%lu,%lu,%lu,%lu,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%llu",
+             swatch_id ? swatch_id : "",
+             swatch_name ? swatch_name : "",
+             (unsigned int)led_enabled,
+             (unsigned int)reading.gain,
+             (unsigned int)reading.integration_ms,
+             reading.status2,
+             reading.status6,
+             (unsigned long)reading.x,
+             (unsigned long)reading.y,
+             (unsigned long)reading.z,
+             (unsigned long)reading.ir,
+             (unsigned long)reading.clear,
+             (unsigned long)reading.hgl,
+             (unsigned long)reading.hgh,
+             out->xyz.x,
+             out->xyz.y,
+             out->xyz.z,
+             out->lab.l,
+             out->lab.a,
+             out->lab.b,
+             (unsigned long long)out->timestamp_us);
+
+    return ESP_OK;
+}
+
 esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
 {
     if (!sensor || !result)

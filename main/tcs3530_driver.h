@@ -288,6 +288,7 @@ public:
 
 private:
     esp_err_t writeReg(uint8_t reg, uint8_t value);
+    esp_err_t readStatusRegs(uint8_t* status2, uint8_t* status6) const;
     esp_err_t readReg(uint8_t reg, uint8_t* value) const;
     esp_err_t readRegs(uint8_t start_reg, uint8_t* buffer, size_t length) const;
     esp_err_t writeRegs(uint8_t start_reg, const uint8_t* data, size_t length);
