@@ -300,7 +300,7 @@ sample_delay:
 
     xyz_t lab_xyz = stats->mean_xyz;
     clamp_xyz_floor(&lab_xyz);
-    xyz_to_lab(&lab_xyz, &stats->mean_lab);
+    stats->mean_lab = color_math_xyz_to_lab(lab_xyz);
 
     return ESP_OK;
 }
