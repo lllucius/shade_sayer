@@ -16,6 +16,7 @@ idf_component_register(
         "auto_calibrate.cpp"
         "i2c_bus_manager.cpp"
         "console_logger.cpp"
+        "kona_metadata.cpp"
         "tcs_glue.cpp"
     INCLUDE_DIRS
         "."
