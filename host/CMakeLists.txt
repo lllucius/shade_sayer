@@ -20,3 +20,5 @@ add_executable(color_match_host_test ${CMAKE_SOURCE_DIR}/../tests/host/color_mat
 add_executable(color_pipeline_unit_tests ${CMAKE_SOURCE_DIR}/../tests/host/color_pipeline_unit_tests.cpp ${CORE_SRCS})
 
 add_executable(test_ciede2000 ${CMAKE_SOURCE_DIR}/../tests/host/test_ciede2000.cpp ${CORE_SRCS})
+
+add_executable(test_delta_e ${CMAKE_SOURCE_DIR}/../tests/host/test_delta_e.cpp ${CORE_SRCS})

@@ -156,6 +156,10 @@ esp_err_t color_pipeline_capture_averaged(TCS3530* sensor,
  *
  * Runs an averaged capture measurement, processes it through the pipeline, and logs
  * a CSV row containing quality counts, status metadata, and averaged XYZ/Lab stats.
+ * Column order: swatch_id, swatch_name, led_enabled, gain_code, integration_ms,
+ * status2, status6, requested_samples, accepted_samples, rejected_saturated,
+ * rejected_low_signal, mean_x, mean_y, mean_z, stddev_x, stddev_y, stddev_z,
+ * mean_L, mean_a, mean_b, timestamp_us.
  *
  * @param sensor TCS3530 driver pointer
  * @param led_enabled True if LED illumination is enabled for this capture
