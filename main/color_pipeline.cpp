@@ -163,6 +163,7 @@ static const float IR_RATIO_INCANDESCENT_THRESHOLD = 2.0f;  // Below this = most
 
 // Minimum corrected luminance (Y, CIE 0-100) required for an inner sample to
 // contribute to averaged scan/identify statistics.
+// Default is 0.5, valid configurable range is 0.0-100.0.
 #ifdef ESP_PLATFORM
 static constexpr float k_capture_min_accepted_y = CONFIG_CAPTURE_MIN_ACCEPTED_Y;
 #else
@@ -674,6 +675,10 @@ esp_err_t color_pipeline_capture_csv(TCS3530* sensor,
         return ret;
     }
 
+    // CSV column order:
+    // swatch_id,swatch_name,led_enabled,gain_code,integration_ms,status2,status6,
+    // requested_samples,accepted_samples,rejected_saturated,rejected_low_signal,
+    // mean_x,mean_y,mean_z,stddev_x,stddev_y,stddev_z,mean_L,mean_a,mean_b,timestamp_us
     ESP_LOGI("KONA_SCAN_CSV",
              "%s,%s,%u,%u,%u,0x%02X,0x%02X,%u,%u,%u,%u,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%llu",
              swatch_id ? swatch_id : "",
