@@ -165,7 +165,7 @@ static const float IR_RATIO_INCANDESCENT_THRESHOLD = 2.0f;  // Below this = most
 // contribute to averaged scan/identify statistics.
 // Default is 0.5, valid configurable range is 0.0-100.0.
 #ifdef ESP_PLATFORM
-static constexpr float k_capture_min_accepted_y = CONFIG_CAPTURE_MIN_ACCEPTED_Y;
+static constexpr float k_capture_min_accepted_y = static_cast<float>(CONFIG_CAPTURE_MIN_ACCEPTED_Y_X100) / 100.0f;
 #else
 #ifndef CAPTURE_MIN_ACCEPTED_Y
 #define CAPTURE_MIN_ACCEPTED_Y 0.5f
