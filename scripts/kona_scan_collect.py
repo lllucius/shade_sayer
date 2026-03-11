@@ -31,19 +31,19 @@ CSV_HEADER = [
     "integration_ms",
     "status2",
     "status6",
-    "raw_x",
-    "raw_y",
-    "raw_z",
-    "raw_ir",
-    "raw_clear",
-    "raw_hgl",
-    "raw_hgh",
-    "xyz_x",
-    "xyz_y",
-    "xyz_z",
-    "lab_l",
-    "lab_a",
-    "lab_b",
+    "requested_samples",
+    "accepted_samples",
+    "rejected_saturated",
+    "rejected_low_signal",
+    "mean_xyz_x",
+    "mean_xyz_y",
+    "mean_xyz_z",
+    "stddev_xyz_x",
+    "stddev_xyz_y",
+    "stddev_xyz_z",
+    "mean_lab_l",
+    "mean_lab_a",
+    "mean_lab_b",
     "timestamp_us",
 ]
 
@@ -55,7 +55,7 @@ def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--port", required=True, help="Serial port (e.g. /dev/ttyACM0)")
     p.add_argument("--baud", type=int, default=115200)
-    p.add_argument("--output", default="kona_raw_captures.csv")
+    p.add_argument("--output", default="kona_avg_captures.csv")
     p.add_argument(
         "--metadata",
         default="kona_365_sensor_ready.csv",
@@ -116,7 +116,7 @@ def main() -> int:
                 continue
 
             payload = [x.strip() for x in m.group(1).split(",")]
-            # Device payload: swatch_id,swatch_name + 19 numeric fields = 21
+            # Device payload: swatch_id, swatch_name + 19 averaged/stat fields = 21
             if len(payload) != 21:
                 print(f"Skipping malformed payload ({len(payload)} fields): {line}", file=sys.stderr)
                 continue

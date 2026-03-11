@@ -154,9 +154,148 @@ typedef struct
 static ir_coefficients_t s_ir_coeff_led = {0.35f, 0.25f, 0.05f};           // LED-dominant
 static ir_coefficients_t s_ir_coeff_incandescent = {0.60f, 0.45f, 0.15f};  // Incandescent
 
+static esp_err_t apply_sensor_correction(const sensor_reading_t* reading, xyz_t* xyz);
+
 // Clear/IR ratio thresholds for interpolation
 static const float IR_RATIO_LED_THRESHOLD = 5.0f;           // Above this = mostly LED
 static const float IR_RATIO_INCANDESCENT_THRESHOLD = 2.0f;  // Below this = mostly incandescent
+
+
+// Minimum corrected luminance (Y) required for an inner sample to contribute to
+// averaged scan/identify statistics. Values below this are dominated by sensor
+// noise and are rejected for deterministic scan quality.
+static const float CAPTURE_MIN_ACCEPTED_Y = 0.5f;
+
+static void clamp_xyz_floor(xyz_t* xyz)
+{
+    if (!xyz)
+    {
+        return;
+    }
+    xyz->x = fmaxf(0.01f, xyz->x);
+    xyz->y = fmaxf(0.01f, xyz->y);
+    xyz->z = fmaxf(0.01f, xyz->z);
+}
+
+static esp_err_t capture_averaged_xyz(TCS3530* sensor,
+                                      bool led_enabled,
+                                      color_capture_stats_t* stats)
+{
+    if (!sensor || !stats)
+    {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    memset(stats, 0, sizeof(*stats));
+    stats->requested_samples = (s_config.num_samples > 0) ? s_config.num_samples : 1;
+
+    float sum_x = 0.0f;
+    float sum_y = 0.0f;
+    float sum_z = 0.0f;
+    float sum_x2 = 0.0f;
+    float sum_y2 = 0.0f;
+    float sum_z2 = 0.0f;
+
+    sensor_reading_t last_reading = {};
+    bool has_last = false;
+
+    for (uint8_t i = 0; i < stats->requested_samples; ++i)
+    {
+        sensor_reading_t reading = {};
+        esp_err_t ret = sensor->measure(&reading);
+        if (ret != ESP_OK)
+        {
+            ESP_LOGE(TAG, "Measurement failed: %s", esp_err_to_name(ret));
+            return ret;
+        }
+
+        last_reading = reading;
+        has_last = true;
+
+        if (reading.saturated)
+        {
+            stats->any_saturated = true;
+            stats->rejected_saturated++;
+        }
+
+        if (!led_enabled && reading.flicker > 0)
+        {
+            stats->flicker_detected = true;
+        }
+
+        xyz_t corrected_xyz;
+        ret = apply_sensor_correction(&reading, &corrected_xyz);
+        if (ret != ESP_OK)
+        {
+            ESP_LOGE(TAG, "apply_sensor_correction failed: %s", esp_err_to_name(ret));
+            return ret;
+        }
+
+        if (reading.saturated)
+        {
+            goto sample_delay;
+        }
+
+        if (corrected_xyz.y < CAPTURE_MIN_ACCEPTED_Y)
+        {
+            stats->rejected_low_signal++;
+            goto sample_delay;
+        }
+
+        sum_x += corrected_xyz.x;
+        sum_y += corrected_xyz.y;
+        sum_z += corrected_xyz.z;
+        sum_x2 += corrected_xyz.x * corrected_xyz.x;
+        sum_y2 += corrected_xyz.y * corrected_xyz.y;
+        sum_z2 += corrected_xyz.z * corrected_xyz.z;
+        stats->accepted_samples++;
+
+        if (stats->accepted_samples == 1)
+        {
+            stats->gain_code = reading.gain;
+            stats->integration_ms = reading.integration_ms;
+            stats->status2 = reading.status2;
+            stats->status6 = reading.status6;
+        }
+
+sample_delay:
+        if (i + 1 < stats->requested_samples && s_config.sample_delay_ms > 0)
+        {
+            tcs_delay_ms(s_config.sample_delay_ms);
+        }
+    }
+
+    if (stats->accepted_samples == 0)
+    {
+        if (has_last)
+        {
+            stats->gain_code = last_reading.gain;
+            stats->integration_ms = last_reading.integration_ms;
+            stats->status2 = last_reading.status2;
+            stats->status6 = last_reading.status6;
+        }
+        return ESP_ERR_INVALID_STATE;
+    }
+
+    const float n = static_cast<float>(stats->accepted_samples);
+    stats->mean_xyz.x = sum_x / n;
+    stats->mean_xyz.y = sum_y / n;
+    stats->mean_xyz.z = sum_z / n;
+
+    float var_x = (sum_x2 / n) - (stats->mean_xyz.x * stats->mean_xyz.x);
+    float var_y = (sum_y2 / n) - (stats->mean_xyz.y * stats->mean_xyz.y);
+    float var_z = (sum_z2 / n) - (stats->mean_xyz.z * stats->mean_xyz.z);
+
+    stats->stddev_xyz.x = sqrtf(fmaxf(0.0f, var_x));
+    stats->stddev_xyz.y = sqrtf(fmaxf(0.0f, var_y));
+    stats->stddev_xyz.z = sqrtf(fmaxf(0.0f, var_z));
+
+    xyz_t lab_xyz = stats->mean_xyz;
+    clamp_xyz_floor(&lab_xyz);
+    xyz_to_lab(&lab_xyz, &stats->mean_lab);
+
+    return ESP_OK;
+}
 
 /**
  * @brief Update the cached chromatic adaptation matrix
@@ -488,6 +627,13 @@ esp_err_t color_pipeline_identify_from_reading(const sensor_reading_t* reading,
 }
 
 #ifdef ESP_PLATFORM
+esp_err_t color_pipeline_capture_averaged(TCS3530* sensor,
+                                          bool led_enabled,
+                                          color_capture_stats_t* stats)
+{
+    return capture_averaged_xyz(sensor, led_enabled, stats);
+}
+
 esp_err_t color_pipeline_capture_csv(TCS3530* sensor,
                                      bool led_enabled,
                                      const char* swatch_id,
@@ -499,43 +645,49 @@ esp_err_t color_pipeline_capture_csv(TCS3530* sensor,
         return ESP_ERR_INVALID_ARG;
     }
 
-    sensor_reading_t reading;
-    esp_err_t ret = sensor->measure(&reading);
+    color_capture_stats_t stats = {};
+    esp_err_t ret = color_pipeline_capture_averaged(sensor, led_enabled, &stats);
     if (ret != ESP_OK)
     {
         return ret;
     }
 
-    color_result_t local_result;
+    color_result_t local_result = {};
     color_result_t* out = result ? result : &local_result;
-    ret = color_pipeline_identify_from_reading(&reading, led_enabled, out);
+    out->saturated = stats.any_saturated;
+    out->flicker_detected = stats.flicker_detected;
+    out->xyz = stats.mean_xyz;
+    clamp_xyz_floor(&out->xyz);
+    out->timestamp_us = tcs_time_us();
+
+    ret = color_pipeline_process_xyz(&out->xyz, led_enabled, out);
     if (ret != ESP_OK)
     {
         return ret;
     }
 
     ESP_LOGI("KONA_SCAN_CSV",
-             "%s,%s,%u,%u,%u,0x%02X,0x%02X,%lu,%lu,%lu,%lu,%lu,%lu,%lu,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%llu",
+             "%s,%s,%u,%u,%u,0x%02X,0x%02X,%u,%u,%u,%u,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%llu",
              swatch_id ? swatch_id : "",
              swatch_name ? swatch_name : "",
              (unsigned int)led_enabled,
-             (unsigned int)reading.gain,
-             (unsigned int)reading.integration_ms,
-             reading.status2,
-             reading.status6,
-             (unsigned long)reading.x,
-             (unsigned long)reading.y,
-             (unsigned long)reading.z,
-             (unsigned long)reading.ir,
-             (unsigned long)reading.clear,
-             (unsigned long)reading.hgl,
-             (unsigned long)reading.hgh,
-             out->xyz.x,
-             out->xyz.y,
-             out->xyz.z,
-             out->lab.l,
-             out->lab.a,
-             out->lab.b,
+             (unsigned int)stats.gain_code,
+             (unsigned int)stats.integration_ms,
+             stats.status2,
+             stats.status6,
+             (unsigned int)stats.requested_samples,
+             (unsigned int)stats.accepted_samples,
+             (unsigned int)stats.rejected_saturated,
+             (unsigned int)stats.rejected_low_signal,
+             stats.mean_xyz.x,
+             stats.mean_xyz.y,
+             stats.mean_xyz.z,
+             stats.stddev_xyz.x,
+             stats.stddev_xyz.y,
+             stats.stddev_xyz.z,
+             stats.mean_lab.l,
+             stats.mean_lab.a,
+             stats.mean_lab.b,
              (unsigned long long)out->timestamp_us);
 
     return ESP_OK;
@@ -554,102 +706,17 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
     bool led_enabled = false;
     sensor->getLed(&led_enabled);
 
-    /*
-     * Perform a complete measurement using the unified tcs3530_measure() API.
-     * This handles the entire lifecycle: trigger → wait → read → cleanup.
-     *
-     * Benefits of unified API:
-     * - Simpler calling code
-     * - Internally optimized with block register reads
-     * - Consistent timing and state management
-     * - Lower energy consumption (single SAI cycle)
-     */
-
-    auto measure_averaged_xyz = [&](xyz_t* averaged_xyz, bool* saturated, bool* flicker_detected) -> esp_err_t
-    {
-        if (!averaged_xyz || !saturated || !flicker_detected)
-        {
-            return ESP_ERR_INVALID_ARG;
-        }
-
-        uint8_t sample_count = (s_config.num_samples > 0) ? s_config.num_samples : 1;
-        *averaged_xyz = {0.0f, 0.0f, 0.0f};
-        *saturated = false;
-        *flicker_detected = false;
-
-        for (uint8_t i = 0; i < sample_count; i++)
-        {
-            sensor_reading_t reading;
-            esp_err_t ret = sensor->measure(&reading);
-            if (ret != ESP_OK)
-            {
-                ESP_LOGE(TAG, "Measurement failed: %s", esp_err_to_name(ret));
-                return ret;
-            }
-
-            // Check for saturation
-            if (reading.saturated)
-            {
-                *saturated = true;
-                // Continue processing - let application layer handle the saturated flag
-            }
-
-            // Use hardware flicker detection from the sensor reading
-            if (!led_enabled && reading.flicker > 0)
-            {
-                *flicker_detected = true;
-            }
-
-            /*
-             * Apply sensor correction (hardware gain normalization, IR compensation,
-             * and responsivity scaling). Normalization is centralized in
-             * apply_sensor_correction() to prevent double-normalization issues.
-             *
-             * Black level subtraction is also handled in apply_sensor_correction()
-             * at the correct point in the pipeline (after RESP normalization, before D65 scaling).
-             */
-            xyz_t corrected_xyz;
-            ret = apply_sensor_correction(&reading, &corrected_xyz);
-            if (ret != ESP_OK)
-            {
-                ESP_LOGE(TAG, "apply_sensor_correction failed: %s", esp_err_to_name(ret));
-                return ret;
-            }
-
-            averaged_xyz->x += corrected_xyz.x;
-            averaged_xyz->y += corrected_xyz.y;
-            averaged_xyz->z += corrected_xyz.z;
-
-            if (i + 1 < sample_count && s_config.sample_delay_ms > 0)
-            {
-                tcs_delay_ms(s_config.sample_delay_ms);
-            }
-        }
-
-        averaged_xyz->x /= sample_count;
-        averaged_xyz->y /= sample_count;
-        averaged_xyz->z /= sample_count;
-
-        // Clamp to a tiny non-zero value (0.01) to prevent "Infinite Saturation" in Lab math
-        averaged_xyz->x = fmaxf(0.01f, averaged_xyz->x);
-        averaged_xyz->y = fmaxf(0.01f, averaged_xyz->y);
-        averaged_xyz->z = fmaxf(0.01f, averaged_xyz->z);
-
-        return ESP_OK;
-    };
-
-    xyz_t sample_xyz;
-    bool saturated = false;
-    bool flicker_detected = false;
-    esp_err_t ret = measure_averaged_xyz(&sample_xyz, &saturated, &flicker_detected);
+    color_capture_stats_t capture_stats = {};
+    esp_err_t ret = color_pipeline_capture_averaged(sensor, led_enabled, &capture_stats);
     if (ret != ESP_OK)
     {
         return ret;
     }
 
-    result->saturated = saturated;
-    result->flicker_detected = flicker_detected;
-    result->xyz = sample_xyz;
+    result->saturated = capture_stats.any_saturated;
+    result->flicker_detected = capture_stats.flicker_detected;
+    result->xyz = capture_stats.mean_xyz;
+    clamp_xyz_floor(&result->xyz);
     result->timestamp_us = tcs_time_us();
 
     ESP_LOGI(TAG, "Measure XYZ (IR+Black Cor): X=%.2f Y=%.2f Z=%.2f",
@@ -701,16 +768,15 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
 
             if (set_ret == ESP_OK)
             {
-                xyz_t retry_xyz;
-                bool retry_saturated = false;
-                bool retry_flicker = false;
-                set_ret = measure_averaged_xyz(&retry_xyz, &retry_saturated, &retry_flicker);
+                color_capture_stats_t retry_stats = {};
+                set_ret = color_pipeline_capture_averaged(sensor, led_enabled, &retry_stats);
                 if (set_ret == ESP_OK)
                 {
                     color_result_t retry_result = {};
-                    retry_result.xyz = retry_xyz;
-                    retry_result.saturated = retry_saturated;
-                    retry_result.flicker_detected = retry_flicker;
+                    retry_result.xyz = retry_stats.mean_xyz;
+                    clamp_xyz_floor(&retry_result.xyz);
+                    retry_result.saturated = retry_stats.any_saturated;
+                    retry_result.flicker_detected = retry_stats.flicker_detected;
                     retry_result.timestamp_us = tcs_time_us();
 
                     set_ret = color_pipeline_process_xyz(&retry_result.xyz, led_enabled, &retry_result);
@@ -740,7 +806,7 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
         }
     }
 
-    // Retry once with shorter integration time if the result is saturated.
+// Retry once with shorter integration time if the result is saturated.
     // This helps glossy/specular objects by reducing clipping.
     if (ret == ESP_OK && result->saturated)
     {
@@ -756,16 +822,15 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
             esp_err_t set_ret = sensor->setIntegrationTime(retry_integration_ms);
             if (set_ret == ESP_OK)
             {
-                xyz_t retry_xyz;
-                bool retry_saturated = false;
-                bool retry_flicker = false;
-                set_ret = measure_averaged_xyz(&retry_xyz, &retry_saturated, &retry_flicker);
+                color_capture_stats_t retry_stats = {};
+                set_ret = color_pipeline_capture_averaged(sensor, led_enabled, &retry_stats);
                 if (set_ret == ESP_OK)
                 {
                     color_result_t retry_result = {};
-                    retry_result.xyz = retry_xyz;
-                    retry_result.saturated = retry_saturated;
-                    retry_result.flicker_detected = retry_flicker;
+                    retry_result.xyz = retry_stats.mean_xyz;
+                    clamp_xyz_floor(&retry_result.xyz);
+                    retry_result.saturated = retry_stats.any_saturated;
+                    retry_result.flicker_detected = retry_stats.flicker_detected;
                     retry_result.timestamp_us = tcs_time_us();
 
                     set_ret = color_pipeline_process_xyz(&retry_result.xyz, led_enabled, &retry_result);
@@ -810,16 +875,15 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
             esp_err_t set_ret = sensor->setGain(retry_gain);
             if (set_ret == ESP_OK)
             {
-                xyz_t retry_xyz;
-                bool retry_saturated = false;
-                bool retry_flicker = false;
-                set_ret = measure_averaged_xyz(&retry_xyz, &retry_saturated, &retry_flicker);
+                color_capture_stats_t retry_stats = {};
+                set_ret = color_pipeline_capture_averaged(sensor, led_enabled, &retry_stats);
                 if (set_ret == ESP_OK)
                 {
                     color_result_t retry_result = {};
-                    retry_result.xyz = retry_xyz;
-                    retry_result.saturated = retry_saturated;
-                    retry_result.flicker_detected = retry_flicker;
+                    retry_result.xyz = retry_stats.mean_xyz;
+                    clamp_xyz_floor(&retry_result.xyz);
+                    retry_result.saturated = retry_stats.any_saturated;
+                    retry_result.flicker_detected = retry_stats.flicker_detected;
                     retry_result.timestamp_us = tcs_time_us();
 
                     set_ret = color_pipeline_process_xyz(&retry_result.xyz, led_enabled, &retry_result);

@@ -80,7 +80,7 @@ Collects `KONA_SCAN_CSV` log lines emitted by firmware scan mode and appends the
 
 **Usage:**
 ```bash
-python3 kona_scan_collect.py --port /dev/ttyACM0 --baud 115200 --output kona_raw_captures.csv
+python3 kona_scan_collect.py --port /dev/ttyACM0 --baud 115200 --output kona_avg_captures.csv
 
 # Optional metadata mapping (default: kona_365_sensor_ready.csv)
 python3 kona_scan_collect.py --port /dev/ttyACM0 --metadata ../kona_365_sensor_ready.csv
@@ -90,7 +90,7 @@ python3 kona_scan_collect.py --port /dev/ttyACM0 --metadata ../kona_365_sensor_r
 - Reads serial output in real time
 - Filters lines tagged with `KONA_SCAN_CSV:`
 - Resolves firmware `idx_###` placeholders against `kona_365_sensor_ready.csv` when available
-- Writes panel/panel_index/id/name plus full capture telemetry
+- Writes panel/panel_index/id/name plus averaged XYZ/Lab and quality counters
 - Skips malformed lines with a warning
 
 **Requirements:**
