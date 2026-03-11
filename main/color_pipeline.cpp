@@ -206,6 +206,9 @@ static esp_err_t capture_averaged_xyz(TCS3530* sensor,
 
     sensor_reading_t last_reading = {};
     bool has_last = false;
+    xyz_t best_low_signal_xyz = {};
+    float best_low_signal_y = -1.0f;
+    bool has_best_low_signal = false;
 
     for (uint8_t i = 0; i < stats->requested_samples; ++i)
     {
@@ -247,6 +250,14 @@ static esp_err_t capture_averaged_xyz(TCS3530* sensor,
         if (corrected_xyz.y < k_capture_min_accepted_y)
         {
             stats->rejected_low_signal++;
+
+            if (!has_best_low_signal || corrected_xyz.y > best_low_signal_y)
+            {
+                best_low_signal_xyz = corrected_xyz;
+                best_low_signal_y = corrected_xyz.y;
+                has_best_low_signal = true;
+            }
+
             goto sample_delay;
         }
 
@@ -282,6 +293,28 @@ sample_delay:
             stats->status2 = last_reading.status2;
             stats->status6 = last_reading.status6;
         }
+
+        // If all samples were below the luminance acceptance floor, keep the
+        // best low-signal sample instead of failing the full capture. This
+        // avoids aborting scan workflows on very dark swatches while still
+        // preserving rejected_low_signal diagnostics.
+        if (has_best_low_signal)
+        {
+            stats->accepted_samples = 1;
+            stats->mean_xyz = best_low_signal_xyz;
+            stats->stddev_xyz = {0.0f, 0.0f, 0.0f};
+
+            xyz_t lab_xyz = stats->mean_xyz;
+            clamp_xyz_floor(&lab_xyz);
+            stats->mean_lab = color_math_xyz_to_lab(lab_xyz);
+
+            ESP_LOGW(TAG,
+                     "All samples below Y floor %.2f; using best low-signal sample (Y=%.4f)",
+                     k_capture_min_accepted_y,
+                     best_low_signal_y);
+            return ESP_OK;
+        }
+
         return ESP_ERR_INVALID_STATE;
     }
 
