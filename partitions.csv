@@ -1,0 +1,4 @@
+# Partition Table for Color Detector
+# Name,   Type, SubType, Offset,  Size,    Flags
+nvs,      data, nvs,     ,        156K,
+factory,  app,  factory, ,        3M,

@@ -1,0 +1,1634 @@
+I (15014) main: Starting automatic calibration
+I (15014) tts: Speak: Starting automatic color calibration.  Please wait.
+I (19058) auto_cal: Auto-calibration initialized with 32 max references
+I (19058) auto_cal: Default constraints: CCM[0.50-3.00], Lightness[0.01-2.00], Gamma[0.50-2.50], Sat[0.90-3.00]
+I (19063) auto_cal: Piecewise gamma: dark[0.30-2.50], light[0.50-2.00], transition[15.0-90.0]
+I (19071) auto_cal: Added reference 'Dark Gray' at index 0: Lab(12.2, 2.1, 0.0) flags=0x0c
+I (19079) auto_cal: Added reference 'White' at index 1: Lab(95.2, 0.2, -0.5) flags=0x05
+I (19087) auto_cal: Added reference 'Brights Red' at index 2: Lab(50.6, 73.4, 51.6) flags=0x04
+I (19095) auto_cal: Added reference 'Brights Green' at index 3: Lab(58.0, -55.0, 34.7) flags=0x04
+I (19104) auto_cal: Added reference 'Brights Blue' at index 4: Lab(29.9, 22.9, -52.4) flags=0x04
+I (19112) auto_cal: Added reference 'Brights Yellow' at index 5: Lab(88.5, -4.7, 85.9) flags=0x04
+I (19121) auto_cal: Added reference 'Brights Orange' at index 6: Lab(60.0, 50.9, 60.9) flags=0x04
+I (19130) auto_cal: Added reference 'Cyan' at index 7: Lab(66.6, -13.7, -43.2) flags=0x04
+I (19137) auto_cal: Added reference 'Skin' at index 8: Lab(73.8, 0.8, 15.1) flags=0x04
+I (19145) auto_cal: Added reference 'Dark Brown' at index 9: Lab(27.7, 14.4, 29.5) flags=0x24
+I (19153) auto_cal: Added reference 'Dark Taupe' at index 10: Lab(32.7, 4.7, 7.7) flags=0x24
+I (19161) auto_cal: Added reference 'Dark Green' at index 11: Lab(37.8, -37.8, 19.4) flags=0x24
+I (19170) auto_cal: Added reference 'Gray 50' at index 12: Lab(61.6, -0.3, -1.3) flags=0x16
+I (19178) auto_cal: Added reference 'Gray 20' at index 13: Lab(84.2, 0.0, -1.1) flags=0x16
+I (19186) auto_cal: Added reference 'Gray 80' at index 14: Lab(37.5, 0.6, -1.7) flags=0x16
+I (19194) auto_cal: Added reference 'Brown 1' at index 15: Lab(16.4, 9.6, 14.7) flags=0x24
+I (19202) auto_cal: Added reference 'Brown 2' at index 16: Lab(43.6, 14.5, 26.8) flags=0x04
+I (19210) auto_cal: Added reference 'Brown 3' at index 17: Lab(69.2, 3.2, 34.1) flags=0x04
+I (19218) auto_cal: Added reference 'Mid Green' at index 18: Lab(53.3, -51.4, 32.4) flags=0x04
+I (19226) auto_cal: Started calibration with 19 references
+I (19231) main: Auto-cal: Calibration started
+I (19235) tts: Speak: Calibration started
+I (21163) main: Place Dark Gray reference and press button
+I (21163) tts: Speak: Place Dark Gray reference and press button
+I (25876) ui: Single click detected
+I (25876) tcs3530: Internal LED turned ON
+I (25876) main: LED: Illumination ON for calibration measurement
+I (25979) tcs3530: FIFO before clear: 260 bytes
+I (25979) tcs3530: FIFO after clear: 0 bytes
+I (25980) tcs3530: Measurement triggered
+I (26090) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (26090) tcs3530: FIFO Status: 260 bytes available
+I (26098) tcs3530: Raw: X=2022400 Y=2041600 Z=1593344 IR=49152
+I (26098) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (26100) tcs3530: Internal LED turned OFF
+I (26104) main: LED: Illumination OFF
+I (26107) main: Raw: X=2022400 Y=2041600 Z=1593344 (gain=16.0x, int=100ms)
+I (26114) main: RESP normalized: X=435.86 Y=425.33 Z=398.34
+I (26119) auto_cal: Captured Dark Gray (1/19): XYZ(435.86, 425.33, 398.34)
+I (26126) auto_cal: Black level captured (scaled 75%): XYZ(326.90, 319.00, 298.75)
+I (26133) tts: Speak: Recorded.
+I (27222) main: Place White reference and press button
+I (27222) tts: Speak: Place White reference and press button
+I (38399) ui: Single click detected
+I (38399) tcs3530: Internal LED turned ON
+I (38399) main: LED: Illumination ON for calibration measurement
+I (38502) tcs3530: FIFO before clear: 0 bytes
+I (38502) tcs3530: FIFO after clear: 0 bytes
+I (38503) tcs3530: Measurement triggered
+I (38613) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (38613) tcs3530: FIFO Status: 260 bytes available
+I (38621) tcs3530: Raw: X=39536128 Y=39656192 Z=31588608 IR=931840
+I (38621) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (38623) tcs3530: Internal LED turned OFF
+I (38627) main: LED: Illumination OFF
+I (38630) main: Raw: X=39536128 Y=39656192 Z=31588608 (gain=16.0x, int=100ms)
+I (38637) main: RESP normalized: X=8520.72 Y=8261.71 Z=7897.15
+I (38643) auto_cal: Captured White (2/19): XYZ(8520.72, 8261.71, 7897.15)
+I (38650) tts: Speak: Recorded.
+I (39738) main: Place Brights Red reference and press button
+I (39738) tts: Speak: Place Brights Red reference and press button
+I (44482) ui: Single click detected
+I (44482) tcs3530: Internal LED turned ON
+I (44482) main: LED: Illumination ON for calibration measurement
+I (44585) tcs3530: FIFO before clear: 0 bytes
+I (44585) tcs3530: FIFO after clear: 0 bytes
+I (44586) tcs3530: Measurement triggered
+I (44696) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (44696) tcs3530: FIFO Status: 260 bytes available
+I (44704) tcs3530: Raw: X=11459072 Y=7860224 Z=2279936 IR=616448
+I (44704) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (44706) tcs3530: Internal LED turned OFF
+I (44710) main: LED: Illumination OFF
+I (44713) main: Raw: X=11459072 Y=7860224 Z=2279936 (gain=16.0x, int=100ms)
+I (44720) main: RESP normalized: X=2469.63 Y=1637.55 Z=569.98
+I (44726) auto_cal: Captured Brights Red (3/19): XYZ(2469.63, 1637.55, 569.98)
+I (44733) tts: Speak: Recorded.
+I (45821) main: Place Brights Green reference and press button
+I (45821) tts: Speak: Place Brights Green reference and press button
+I (51989) ui: Single click detected
+I (51989) tcs3530: Internal LED turned ON
+I (51989) main: LED: Illumination ON for calibration measurement
+I (52092) tcs3530: FIFO before clear: 0 bytes
+I (52092) tcs3530: FIFO after clear: 0 bytes
+I (52093) tcs3530: Measurement triggered
+I (52203) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (52203) tcs3530: FIFO Status: 260 bytes available
+I (52211) tcs3530: Raw: X=5962497 Y=10091520 Z=3767296 IR=166400
+I (52211) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (52213) tcs3530: Internal LED turned OFF
+I (52217) main: LED: Illumination OFF
+I (52220) main: Raw: X=5962497 Y=10091520 Z=3767296 (gain=16.0x, int=100ms)
+I (52227) main: RESP normalized: X=1285.02 Y=2102.40 Z=941.82
+I (52233) auto_cal: Captured Brights Green (4/19): XYZ(1285.02, 2102.40, 941.82)
+I (52240) tts: Speak: Recorded.
+I (53328) main: Place Brights Blue reference and press button
+I (53328) tts: Speak: Place Brights Blue reference and press button
+I (57522) ui: Single click detected
+I (57522) tcs3530: Internal LED turned ON
+I (57522) main: LED: Illumination ON for calibration measurement
+I (57625) tcs3530: FIFO before clear: 0 bytes
+I (57625) tcs3530: FIFO after clear: 0 bytes
+I (57626) tcs3530: Measurement triggered
+I (57736) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (57736) tcs3530: FIFO Status: 260 bytes available
+I (57744) tcs3530: Raw: X=6459905 Y=4035584 Z=11156480 IR=138752
+I (57744) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (57746) tcs3530: Internal LED turned OFF
+I (57750) main: LED: Illumination OFF
+I (57753) main: Raw: X=6459905 Y=4035584 Z=11156480 (gain=16.0x, int=100ms)
+I (57760) main: RESP normalized: X=1392.22 Y=840.75 Z=2789.12
+I (57766) auto_cal: Captured Brights Blue (5/19): XYZ(1392.22, 840.75, 2789.12)
+I (57773) tts: Speak: Recorded.
+I (58861) main: Place Brights Yellow reference and press button
+I (58861) tts: Speak: Place Brights Yellow reference and press button
+I (62972) ui: Single click detected
+I (62972) tcs3530: Internal LED turned ON
+I (62972) main: LED: Illumination ON for calibration measurement
+I (63075) tcs3530: FIFO before clear: 0 bytes
+I (63075) tcs3530: FIFO after clear: 0 bytes
+I (63076) tcs3530: Measurement triggered
+I (63186) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (63186) tcs3530: FIFO Status: 260 bytes available
+I (63194) tcs3530: Raw: X=27596545 Y=33170944 Z=4084992 IR=827392
+I (63194) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (63196) tcs3530: Internal LED turned OFF
+I (63200) main: LED: Illumination OFF
+I (63203) main: Raw: X=27596545 Y=33170944 Z=4084992 (gain=16.0x, int=100ms)
+I (63210) main: RESP normalized: X=5947.53 Y=6910.61 Z=1021.25
+I (63216) auto_cal: Captured Brights Yellow (6/19): XYZ(5947.53, 6910.61, 1021.25)
+I (63223) tts: Speak: Recorded.
+I (64312) main: Place Brights Orange reference and press button
+I (64312) tts: Speak: Place Brights Orange reference and press button
+I (68441) ui: Single click detected
+I (68441) tcs3530: Internal LED turned ON
+I (68441) main: LED: Illumination ON for calibration measurement
+I (68544) tcs3530: FIFO before clear: 0 bytes
+I (68544) tcs3530: FIFO after clear: 0 bytes
+I (68545) tcs3530: Measurement triggered
+I (68655) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (68655) tcs3530: FIFO Status: 260 bytes available
+I (68663) tcs3530: Raw: X=14746368 Y=12663808 Z=2661120 IR=664320
+I (68663) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (68665) tcs3530: Internal LED turned OFF
+I (68669) main: LED: Illumination OFF
+I (68672) main: Raw: X=14746368 Y=12663808 Z=2661120 (gain=16.0x, int=100ms)
+I (68679) main: RESP normalized: X=3178.10 Y=2638.29 Z=665.28
+I (68685) auto_cal: Captured Brights Orange (7/19): XYZ(3178.10, 2638.29, 665.28)
+I (68692) tts: Speak: Recorded.
+I (69781) main: Place Cyan reference and press button
+I (69781) tts: Speak: Place Cyan reference and press button
+I (75763) ui: Single click detected
+I (75763) tcs3530: Internal LED turned ON
+I (75763) main: LED: Illumination ON for calibration measurement
+I (75866) tcs3530: FIFO before clear: 0 bytes
+I (75866) tcs3530: FIFO after clear: 0 bytes
+I (75867) tcs3530: Measurement triggered
+I (75977) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (75977) tcs3530: FIFO Status: 260 bytes available
+I (75985) tcs3530: Raw: X=14465025 Y=12921344 Z=26667008 IR=247040
+I (75985) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (75987) tcs3530: Internal LED turned OFF
+I (75991) main: LED: Illumination OFF
+I (75994) main: Raw: X=14465025 Y=12921344 Z=26667008 (gain=16.0x, int=100ms)
+I (76001) main: RESP normalized: X=3117.46 Y=2691.95 Z=6666.75
+I (76007) auto_cal: Captured Cyan (8/19): XYZ(3117.46, 2691.95, 6666.75)
+I (76013) tts: Speak: Recorded.
+I (77102) main: Place Skin reference and press button
+I (77102) tts: Speak: Place Skin reference and press button
+I (90711) ui: Single click detected
+I (90711) tcs3530: Internal LED turned ON
+I (90711) main: LED: Illumination ON for calibration measurement
+I (90814) tcs3530: FIFO before clear: 0 bytes
+I (90814) tcs3530: FIFO after clear: 0 bytes
+I (90815) tcs3530: Measurement triggered
+I (90925) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (90925) tcs3530: FIFO Status: 260 bytes available
+I (90933) tcs3530: Raw: X=21006593 Y=22139136 Z=13209600 IR=581120
+I (90933) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (90935) tcs3530: Internal LED turned OFF
+I (90939) main: LED: Illumination OFF
+I (90942) main: Raw: X=21006593 Y=22139136 Z=13209600 (gain=16.0x, int=100ms)
+I (90949) main: RESP normalized: X=4527.28 Y=4612.32 Z=3302.40
+I (90955) auto_cal: Captured Skin (9/19): XYZ(4527.28, 4612.32, 3302.40)
+I (90961) tts: Speak: Recorded.
+I (92050) main: Place Dark Brown reference and press button
+I (92050) tts: Speak: Place Dark Brown reference and press button
+I (97577) ui: Single click detected
+I (97577) tcs3530: Internal LED turned ON
+I (97577) main: LED: Illumination ON for calibration measurement
+I (97680) tcs3530: FIFO before clear: 0 bytes
+I (97680) tcs3530: FIFO after clear: 0 bytes
+I (97681) tcs3530: Measurement triggered
+I (97791) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (97791) tcs3530: FIFO Status: 260 bytes available
+I (97799) tcs3530: Raw: X=4864001 Y=4953600 Z=1932544 IR=167424
+I (97799) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (97801) tcs3530: Internal LED turned OFF
+I (97805) main: LED: Illumination OFF
+I (97808) main: Raw: X=4864001 Y=4953600 Z=1932544 (gain=16.0x, int=100ms)
+I (97815) main: RESP normalized: X=1048.28 Y=1032.00 Z=483.14
+I (97820) auto_cal: Captured Dark Brown (10/19): XYZ(1048.28, 1032.00, 483.14)
+I (97827) tts: Speak: Recorded.
+I (98916) main: Place Dark Taupe reference and press button
+I (98916) tts: Speak: Place Dark Taupe reference and press button
+I (103669) ui: Single click detected
+I (103669) tcs3530: Internal LED turned ON
+I (103669) main: LED: Illumination ON for calibration measurement
+I (103772) tcs3530: FIFO before clear: 0 bytes
+I (103772) tcs3530: FIFO after clear: 0 bytes
+I (103773) tcs3530: Measurement triggered
+I (103883) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (103883) tcs3530: FIFO Status: 260 bytes available
+I (103891) tcs3530: Raw: X=5771776 Y=5814016 Z=3896576 IR=173824
+I (103891) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (103893) tcs3530: Internal LED turned OFF
+I (103897) main: LED: Illumination OFF
+I (103901) main: Raw: X=5771776 Y=5814016 Z=3896576 (gain=16.0x, int=100ms)
+I (103908) main: RESP normalized: X=1243.92 Y=1211.25 Z=974.14
+I (103913) auto_cal: Captured Dark Taupe (11/19): XYZ(1243.92, 1211.25, 974.14)
+I (103920) tts: Speak: Recorded.
+I (105009) main: Place Dark Green reference and press button
+I (105009) tts: Speak: Place Dark Green reference and press button
+I (109032) ui: Single click detected
+I (109032) tcs3530: Internal LED turned ON
+I (109032) main: LED: Illumination ON for calibration measurement
+I (109135) tcs3530: FIFO before clear: 0 bytes
+I (109135) tcs3530: FIFO after clear: 0 bytes
+I (109136) tcs3530: Measurement triggered
+I (109246) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (109246) tcs3530: FIFO Status: 260 bytes available
+I (109254) tcs3530: Raw: X=3937280 Y=5603840 Z=3158784 IR=105728
+I (109254) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (109256) tcs3530: Internal LED turned OFF
+I (109260) main: LED: Illumination OFF
+I (109264) main: Raw: X=3937280 Y=5603840 Z=3158784 (gain=16.0x, int=100ms)
+I (109271) main: RESP normalized: X=848.55 Y=1167.47 Z=789.70
+I (109276) auto_cal: Captured Dark Green (12/19): XYZ(848.55, 1167.47, 789.70)
+I (109283) tts: Speak: Recorded.
+I (110372) main: Place Gray 50 reference and press button
+I (110372) tts: Speak: Place Gray 50 reference and press button
+I (117801) ui: Single click detected
+I (117801) tcs3530: Internal LED turned ON
+I (117801) main: LED: Illumination ON for calibration measurement
+I (117904) tcs3530: FIFO before clear: 0 bytes
+I (117904) tcs3530: FIFO after clear: 0 bytes
+I (117905) tcs3530: Measurement triggered
+I (118015) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (118015) tcs3530: FIFO Status: 260 bytes available
+I (118023) tcs3530: Raw: X=17625088 Y=17698816 Z=13873664 IR=409344
+I (118023) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (118026) tcs3530: Internal LED turned OFF
+I (118030) main: LED: Illumination OFF
+I (118033) main: Raw: X=17625088 Y=17698816 Z=13873664 (gain=16.0x, int=100ms)
+I (118040) main: RESP normalized: X=3798.51 Y=3687.25 Z=3468.42
+I (118046) auto_cal: Captured Gray 50 (13/19): XYZ(3798.51, 3687.25, 3468.42)
+I (118053) tts: Speak: Recorded.
+I (119141) main: Place Gray 20 reference and press button
+I (119141) tts: Speak: Place Gray 20 reference and press button
+I (123163) ui: Single click detected
+I (123163) tcs3530: Internal LED turned ON
+I (123163) main: LED: Illumination ON for calibration measurement
+I (123266) tcs3530: FIFO before clear: 0 bytes
+I (123266) tcs3530: FIFO after clear: 0 bytes
+I (123267) tcs3530: Measurement triggered
+I (123377) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (123377) tcs3530: FIFO Status: 260 bytes available
+I (123385) tcs3530: Raw: X=32101632 Y=32146688 Z=25179392 IR=741632
+I (123385) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (123388) tcs3530: Internal LED turned OFF
+I (123392) main: LED: Illumination OFF
+I (123395) main: Raw: X=32101632 Y=32146688 Z=25179392 (gain=16.0x, int=100ms)
+I (123402) main: RESP normalized: X=6918.46 Y=6697.23 Z=6294.85
+I (123408) auto_cal: Captured Gray 20 (14/19): XYZ(6918.46, 6697.23, 6294.85)
+I (123415) tts: Speak: Recorded.
+I (124503) main: Place Gray 80 reference and press button
+I (124503) tts: Speak: Place Gray 80 reference and press button
+I (128324) ui: Single click detected
+I (128324) tcs3530: Internal LED turned ON
+I (128324) main: LED: Illumination ON for calibration measurement
+I (128427) tcs3530: FIFO before clear: 0 bytes
+I (128427) tcs3530: FIFO after clear: 0 bytes
+I (128428) tcs3530: Measurement triggered
+I (128538) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (128538) tcs3530: FIFO Status: 260 bytes available
+I (128546) tcs3530: Raw: X=7681280 Y=7730688 Z=6088448 IR=180224
+I (128546) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (128548) tcs3530: Internal LED turned OFF
+I (128552) main: LED: Illumination OFF
+I (128556) main: Raw: X=7681280 Y=7730688 Z=6088448 (gain=16.0x, int=100ms)
+I (128563) main: RESP normalized: X=1655.45 Y=1610.56 Z=1522.11
+I (128568) auto_cal: Captured Gray 80 (15/19): XYZ(1655.45, 1610.56, 1522.11)
+I (128575) tts: Speak: Recorded.
+I (129664) main: Place Brown 1 reference and press button
+I (129664) tts: Speak: Place Brown 1 reference and press button
+I (134197) ui: Single click detected
+I (134197) tcs3530: Internal LED turned ON
+I (134197) main: LED: Illumination ON for calibration measurement
+I (134300) tcs3530: FIFO before clear: 0 bytes
+I (134300) tcs3530: FIFO after clear: 0 bytes
+I (134301) tcs3530: Measurement triggered
+I (134411) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (134411) tcs3530: FIFO Status: 260 bytes available
+I (134419) tcs3530: Raw: X=3158272 Y=3139840 Z=1928448 IR=94720
+I (134419) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (134421) tcs3530: Internal LED turned OFF
+I (134425) main: LED: Illumination OFF
+I (134429) main: Raw: X=3158272 Y=3139840 Z=1928448 (gain=16.0x, int=100ms)
+I (134435) main: RESP normalized: X=680.66 Y=654.13 Z=482.11
+I (134441) auto_cal: Captured Brown 1 (16/19): XYZ(680.66, 654.13, 482.11)
+I (134447) tts: Speak: Recorded.
+I (135536) main: Place Brown 2 reference and press button
+I (135536) tts: Speak: Place Brown 2 reference and press button
+I (139975) ui: Single click detected
+I (139975) tcs3530: Internal LED turned ON
+I (139975) main: LED: Illumination ON for calibration measurement
+I (140078) tcs3530: FIFO before clear: 0 bytes
+I (140078) tcs3530: FIFO after clear: 0 bytes
+I (140079) tcs3530: Measurement triggered
+I (140189) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (140189) tcs3530: FIFO Status: 260 bytes available
+I (140197) tcs3530: Raw: X=7536897 Y=7609600 Z=3234304 IR=258048
+I (140197) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (140199) tcs3530: Internal LED turned OFF
+I (140203) main: LED: Illumination OFF
+I (140207) main: Raw: X=7536897 Y=7609600 Z=3234304 (gain=16.0x, int=100ms)
+I (140214) main: RESP normalized: X=1624.33 Y=1585.33 Z=808.58
+I (140219) auto_cal: Captured Brown 2 (17/19): XYZ(1624.33, 1585.33, 808.58)
+I (140226) tts: Speak: Recorded.
+I (141315) main: Place Brown 3 reference and press button
+I (141315) tts: Speak: Place Brown 3 reference and press button
+I (145141) ui: Single click detected
+I (145141) tcs3530: Internal LED turned ON
+I (145141) main: LED: Illumination ON for calibration measurement
+I (145244) tcs3530: FIFO before clear: 0 bytes
+I (145244) tcs3530: FIFO after clear: 0 bytes
+I (145245) tcs3530: Measurement triggered
+I (145355) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (145355) tcs3530: FIFO Status: 260 bytes available
+I (145363) tcs3530: Raw: X=15775745 Y=16731136 Z=6840832 IR=509184
+I (145363) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (145366) tcs3530: Internal LED turned OFF
+I (145369) main: LED: Illumination OFF
+I (145373) main: Raw: X=15775745 Y=16731136 Z=6840832 (gain=16.0x, int=100ms)
+I (145380) main: RESP normalized: X=3399.95 Y=3485.65 Z=1710.21
+I (145386) auto_cal: Captured Brown 3 (18/19): XYZ(3399.95, 3485.65, 1710.21)
+I (145392) tts: Speak: Recorded.
+I (146481) main: Place Mid Green reference and press button
+I (146481) tts: Speak: Place Mid Green reference and press button
+I (151667) ui: Single click detected
+I (151667) tcs3530: Internal LED turned ON
+I (151667) main: LED: Illumination ON for calibration measurement
+I (151770) tcs3530: FIFO before clear: 0 bytes
+I (151770) tcs3530: FIFO after clear: 0 bytes
+I (151771) tcs3530: Measurement triggered
+I (151881) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (151881) tcs3530: FIFO Status: 260 bytes available
+I (151889) tcs3530: Raw: X=5820160 Y=9372416 Z=3851776 IR=158208
+I (151889) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (151891) tcs3530: Internal LED turned OFF
+I (151895) main: LED: Illumination OFF
+I (151899) main: Raw: X=5820160 Y=9372416 Z=3851776 (gain=16.0x, int=100ms)
+I (151906) main: RESP normalized: X=1254.34 Y=1952.59 Z=962.94
+I (151911) auto_cal: Captured Mid Green (19/19): XYZ(1254.34, 1952.59, 962.94)
+I (151918) auto_cal: All measurements collected
+I (151922) main: Auto-cal: All measurements collected. Ready to optimize.
+I (151929) tts: Speak: All measurements collected. Ready to optimize.
+I (155539) tts: Speak: Recorded.
+I (156625) main: Running calibration optimization
+I (156625) tts: Speak: Optimizing.  Please wait.
+I (159104) auto_cal: White Y=8261.71 (eff=7942.71) → estimated lightness_scale=0.0720
+I (159112) auto_cal: Analytical CCM init (from 18 refs):
+I (159113) auto_cal:   X: [1.901, -0.235, -0.213]
+I (159113) auto_cal:   Y: [-0.043, 1.425, 0.076]
+I (159115) auto_cal:   Z: [-0.015, 0.123, 1.403]
+I (159120) auto_cal: === Starting optimization with 19 references ===
+I (159126) auto_cal: Initial average ΔE: 6.35
+I (159130) main: Auto-cal: Optimizing calibration parameters...
+I (159135) tts: Speak: Optimizing calibration parameters...
+I (162480) auto_cal:   PCCM linear gradients: X[-6.5780,-9.4328,-7.9160] Y[-7.3962,-5.2876,-1.8060] Z[5.2223,4.9703,2.1458]
+I (162481) auto_cal:   Adam alpha=0.0010 bc1=0.100000 bc2=0.001000
+I (162488) auto_cal: Iter   0: avg ΔE=  6.93 (best=  6.35) [R:15.1 G:6.7 B:8.7 Y:1.8]
+I (162494) auto_cal:   PCCM linear diag: [1.902, 1.426, 1.402]
+I (162499) auto_cal:   Lightness: scale=0.0770 offset=-2.99
+I (162504) auto_cal:   Saturation boost: 1.145
+I (162557) auto_cal:   PCCM linear gradients: X[22.0377,20.5581,16.2396] Y[-30.9572,-29.3710,-22.0144] Z[4.0927,3.6879,1.5070]
+I (162558) auto_cal:   Adam alpha=0.0010 bc1=0.190000 bc2=0.001999
+I (162613) auto_cal:   PCCM linear gradients: X[9.0666,6.4363,6.1636] Y[-12.6739,-9.5017,-7.2052] Z[1.5295,1.1523,-0.2003]
+I (162614) auto_cal:   Adam alpha=0.0010 bc1=0.271000 bc2=0.002997
+I (162668) auto_cal:   PCCM linear gradients: X[-16.4230,-20.0455,-16.3381] Y[16.3283,20.6690,17.7042] Z[-0.6609,-1.0264,-2.1465]
+I (162670) auto_cal:   Adam alpha=0.0010 bc1=0.343900 bc2=0.003994
+I (162724) auto_cal:   PCCM linear gradients: X[-20.5064,-24.3211,-19.8414] Y[20.0679,24.5764,20.6113] Z[0.1464,-0.1719,-1.4994]
+I (162725) auto_cal:   Adam alpha=0.0010 bc1=0.409510 bc2=0.004990
+I (162779) auto_cal:   PCCM linear gradients: X[-11.5445,-15.1746,-10.9448] Y[7.8664,12.0814,9.0897] Z[3.2055,2.9964,1.2968]
+I (162780) auto_cal:   Adam alpha=0.0010 bc1=0.468559 bc2=0.005985
+I (162834) auto_cal:   PCCM linear gradients: X[-7.9246,-11.3747,-8.5132] Y[3.4358,7.3545,6.6476] Z[4.0197,3.8757,1.6785]
+I (162835) auto_cal:   Adam alpha=0.0010 bc1=0.521703 bc2=0.006979
+I (162889) auto_cal:   PCCM linear gradients: X[9.7752,6.9606,8.4801] Y[-15.6541,-12.5358,-11.4262] Z[4.4668,4.3492,1.7047]
+I (162890) auto_cal:   Adam alpha=0.0010 bc1=0.569533 bc2=0.007972
+I (162945) auto_cal:   PCCM linear gradients: X[11.1537,8.4903,9.8503] Y[-18.4419,-15.6786,-14.1129] Z[5.2416,5.1646,2.1150]
+I (162946) auto_cal:   Adam alpha=0.0010 bc1=0.612580 bc2=0.008964
+I (163000) auto_cal:   PCCM linear gradients: X[9.1538,6.2926,9.0654] Y[-17.2265,-14.4718,-13.8550] Z[5.5566,5.5342,2.0866]
+I (163001) auto_cal:   Adam alpha=0.0010 bc1=0.651322 bc2=0.009955
+I (163055) auto_cal:   PCCM linear gradients: X[-8.0776,-11.4281,-7.8397] Y[-0.2232,2.8701,3.0951] Z[5.7864,5.8310,2.1989]
+I (163056) auto_cal:   Adam alpha=0.0010 bc1=0.686190 bc2=0.010945
+I (163063) auto_cal: Iter  10: avg ΔE=  5.46 (best=  5.45) [R:14.0 G:6.2 B:7.7 Y:1.9]
+I (163069) auto_cal:   PCCM linear diag: [1.902, 1.428, 1.398]
+I (163074) auto_cal:   Lightness: scale=0.0764 offset=-2.96
+I (163079) auto_cal:   Saturation boost: 1.096
+I (163132) auto_cal:   PCCM linear gradients: X[-9.8243,-13.2389,-9.1736] Y[1.9126,5.0504,4.7710] Z[5.5299,5.6083,2.0792]
+I (163133) auto_cal:   Adam alpha=0.0010 bc1=0.717571 bc2=0.011934
+I (163186) auto_cal:   PCCM linear gradients: X[-10.3869,-13.8338,-9.5601] Y[3.3205,6.5405,5.7704] Z[5.0700,5.1661,1.9255]
+I (163187) auto_cal:   Adam alpha=0.0010 bc1=0.745813 bc2=0.012922
+I (163241) auto_cal:   PCCM linear gradients: X[-10.1557,-13.5999,-9.3229] Y[4.0405,7.3626,6.1777] Z[4.4880,4.5772,1.7402]
+I (163242) auto_cal:   Adam alpha=0.0010 bc1=0.771232 bc2=0.013909
+I (163296) auto_cal:   PCCM linear gradients: X[-9.0966,-12.4867,-8.4512] Y[3.8679,7.2579,5.8830] Z[3.9058,3.9673,1.5614]
+I (163297) auto_cal:   Adam alpha=0.0010 bc1=0.794109 bc2=0.014895
+I (163351) auto_cal:   PCCM linear gradients: X[-7.0822,-10.3261,-6.7940] Y[2.5756,5.9373,4.6659] Z[3.4153,3.4311,1.4350]
+I (163352) auto_cal:   Adam alpha=0.0010 bc1=0.814698 bc2=0.015880
+I (163406) auto_cal:   PCCM linear gradients: X[-2.5170,-5.6012,-2.1639] Y[-0.8438,2.4283,1.0290] Z[2.3162,2.2981,0.6039]
+I (163407) auto_cal:   Adam alpha=0.0010 bc1=0.833228 bc2=0.016864
+I (163461) auto_cal:   PCCM linear gradients: X[-2.0175,-5.0530,-1.5752] Y[-1.1020,2.1234,0.5472] Z[2.0185,1.9953,0.5066]
+I (163462) auto_cal:   Adam alpha=0.0010 bc1=0.849905 bc2=0.017848
+I (163516) auto_cal:   PCCM linear gradients: X[-3.0663,-6.1064,-2.5747] Y[0.1009,3.2871,1.6599] Z[1.7066,1.6983,0.2954]
+I (163517) auto_cal:   Adam alpha=0.0010 bc1=0.864915 bc2=0.018830
+I (163571) auto_cal:   PCCM linear gradients: X[-3.6426,-6.6564,-3.1338] Y[0.6208,3.7088,2.1386] Z[1.5392,1.5476,0.1690]
+I (163572) auto_cal:   Adam alpha=0.0010 bc1=0.878423 bc2=0.019811
+I (163625) auto_cal:   PCCM linear gradients: X[41.1038,38.0771,41.6894] Y[2.7752,5.7867,4.2317] Z[2.4292,2.4800,1.0612]
+I (163626) auto_cal:   Adam alpha=0.0010 bc1=0.890581 bc2=0.020791
+I (163633) auto_cal: Iter  20: avg ΔE=  4.99 (best=  4.97) [R:12.0 G:4.9 B:7.5 Y:2.0]
+I (163639) auto_cal:   PCCM linear diag: [1.905, 1.426, 1.390]
+I (163644) auto_cal:   Lightness: scale=0.0784 offset=-2.92
+I (163650) auto_cal:   Saturation boost: 1.052
+I (163702) auto_cal:   PCCM linear gradients: X[-8.6176,-11.7695,-7.5228] Y[3.9394,6.9280,5.0204] Z[2.8534,2.9776,1.1649]
+I (163703) auto_cal:   Adam alpha=0.0010 bc1=0.901523 bc2=0.021770
+I (163757) auto_cal:   PCCM linear gradients: X[-9.3162,-12.5034,-7.8583] Y[4.1111,7.0367,4.9815] Z[3.2785,3.4566,1.2896]
+I (163757) auto_cal:   Adam alpha=0.0010 bc1=0.911371 bc2=0.022749
+I (163811) auto_cal:   PCCM linear gradients: X[-9.2063,-12.3863,-7.5698] Y[3.6261,6.4845,4.3945] Z[3.6371,3.8483,1.4057]
+I (163812) auto_cal:   Adam alpha=0.0010 bc1=0.920234 bc2=0.023726
+I (163866) auto_cal:   PCCM linear gradients: X[-8.2669,-11.4050,-6.6347] Y[2.5527,5.3799,3.3002] Z[3.9074,4.1327,1.5111]
+I (163867) auto_cal:   Adam alpha=0.0010 bc1=0.928210 bc2=0.024702
+I (163921) auto_cal:   PCCM linear gradients: X[-6.1901,-9.2075,-4.8156] Y[0.6282,3.4025,1.4935] Z[4.0951,4.3228,1.6191]
+I (163922) auto_cal:   Adam alpha=0.0010 bc1=0.935389 bc2=0.025677
+I (163975) auto_cal:   PCCM linear gradients: X[-2.5764,-5.3155,-1.8122] Y[-2.6307,-0.0250,-1.3390] Z[4.2346,4.4591,1.7397]
+I (163976) auto_cal:   Adam alpha=0.0010 bc1=0.941850 bc2=0.026652
+I (164030) auto_cal:   PCCM linear gradients: X[15.1353,12.9921,16.1569] Y[-20.8597,-18.7724,-19.8615] Z[4.7622,5.0008,2.2724]
+I (164031) auto_cal:   Adam alpha=0.0010 bc1=0.947665 bc2=0.027625
+I (164086) auto_cal:   PCCM linear gradients: X[14.8528,12.6288,16.1211] Y[-20.1194,-17.8609,-19.3701] Z[4.6387,4.8895,2.3017]
+I (164087) auto_cal:   Adam alpha=0.0010 bc1=0.952899 bc2=0.028597
+I (164141) auto_cal:   PCCM linear gradients: X[-1.8811,-4.6511,-0.9565] Y[-1.7421,1.1923,-0.7026] Z[3.7034,3.9439,1.6110]
+I (164142) auto_cal:   Adam alpha=0.0010 bc1=0.957609 bc2=0.029569
+I (164196) auto_cal:   PCCM linear gradients: X[-4.5068,-7.4379,-3.4006] Y[1.4057,4.5428,2.1901] Z[3.3107,3.5539,1.4069]
+I (164197) auto_cal:   Adam alpha=0.0010 bc1=0.961848 bc2=0.030539
+I (164203) auto_cal: Iter  30: avg ΔE=  4.62 (best=  4.62) [R:10.0 G:3.9 B:7.1 Y:1.6]
+I (164209) auto_cal:   PCCM linear diag: [1.906, 1.424, 1.382]
+I (164215) auto_cal:   Lightness: scale=0.0810 offset=-2.88
+I (164220) auto_cal:   Saturation boost: 1.013
+I (164272) auto_cal:   PCCM linear gradients: X[-5.8529,-8.8289,-4.6525] Y[2.9140,6.0711,3.5558] Z[3.0398,3.2997,1.2665]
+I (164273) auto_cal:   Adam alpha=0.0010 bc1=0.965663 bc2=0.031509
+I (164327) auto_cal:   PCCM linear gradients: X[-6.0964,-9.0108,-4.9818] Y[2.9821,5.9838,3.6585] Z[2.8727,3.1550,1.1966]
+I (164328) auto_cal:   Adam alpha=0.0010 bc1=0.969097 bc2=0.032477
+I (164381) auto_cal:   PCCM linear gradients: X[-5.3771,-8.1084,-4.4801] Y[1.9155,4.6070,2.6753] Z[2.7449,3.0389,1.1632]
+I (164382) auto_cal:   Adam alpha=0.0010 bc1=0.972187 bc2=0.033445
+I (164436) auto_cal:   PCCM linear gradients: X[-3.6652,-6.0947,-3.0565] Y[-0.1755,2.0854,0.6478] Z[2.5783,2.8510,1.1220]
+I (164437) auto_cal:   Adam alpha=0.0010 bc1=0.974968 bc2=0.034411
+I (164491) auto_cal:   PCCM linear gradients: X[-0.9911,-3.0167,-0.7255] Y[-3.2043,-1.4327,-2.2390] Z[2.3611,2.5928,1.0517]
+I (164492) auto_cal:   Adam alpha=0.0010 bc1=0.977472 bc2=0.035377
+I (164546) auto_cal:   PCCM linear gradients: X[40.4296,38.7359,40.7283] Y[-44.6339,-43.2422,-43.7109] Z[-35.7780,-35.5620,-37.0233]
+I (164547) auto_cal:   Adam alpha=0.0010 bc1=0.979724 bc2=0.036341
+I (164601) auto_cal:   PCCM linear gradients: X[-1.4358,-3.5255,-0.7904] Y[-2.4841,-0.6216,-1.8742] Z[2.5496,2.8696,1.0993]
+I (164602) auto_cal:   Adam alpha=0.0010 bc1=0.981752 bc2=0.037305
+I (164656) auto_cal:   PCCM linear gradients: X[-4.0083,-6.4571,-2.8400] Y[0.6011,2.9211,0.8826] Z[2.8307,3.2368,1.1737]
+I (164657) auto_cal:   Adam alpha=0.0010 bc1=0.983577 bc2=0.038268
+I (164711) auto_cal:   PCCM linear gradients: X[-5.4109,-8.0650,-3.8109] Y[2.4924,5.1134,2.5039] Z[2.9972,3.4454,1.2038]
+I (164712) auto_cal:   Adam alpha=0.0010 bc1=0.985219 bc2=0.039229
+I (164765) auto_cal:   PCCM linear gradients: X[-5.6875,-8.4069,-3.7589] Y[3.0894,5.8377,2.8417] Z[3.1421,3.6182,1.2403]
+I (164766) auto_cal:   Adam alpha=0.0010 bc1=0.986697 bc2=0.040190
+I (164773) auto_cal: Iter  40: avg ΔE=  4.34 (best=  4.34) [R:9.9 G:3.5 B:6.8 Y:1.2]
+I (164779) auto_cal:   PCCM linear diag: [1.906, 1.425, 1.379]
+I (164784) auto_cal:   Lightness: scale=0.0801 offset=-2.85
+I (164790) auto_cal:   Saturation boost: 0.979
+I (164842) auto_cal:   PCCM linear gradients: X[-4.8945,-7.5595,-2.7256] Y[2.3074,5.0042,1.8473] Z[3.3426,3.8486,1.3180]
+I (164843) auto_cal:   Adam alpha=0.0010 bc1=0.988028 bc2=0.041150
+I (164896) auto_cal:   PCCM linear gradients: X[-3.0797,-5.5900,-0.6666] Y[0.1984,2.6736,-0.4900] Z[3.6011,4.1506,1.4169]
+I (164897) auto_cal:   Adam alpha=0.0010 bc1=0.989225 bc2=0.042109
+I (164951) auto_cal:   PCCM linear gradients: X[-2.7728,-5.2037,-0.2089] Y[-0.4711,1.8132,-1.3192] Z[3.7341,4.3318,1.4331]
+I (164952) auto_cal:   Adam alpha=0.0010 bc1=0.990302 bc2=0.043067
+I (165006) auto_cal:   PCCM linear gradients: X[-2.6236,-4.9100,-0.3901] Y[-0.9799,1.0567,-1.5357] Z[3.8126,4.4479,1.4110]
+I (165007) auto_cal:   Adam alpha=0.0010 bc1=0.991272 bc2=0.044024
+I (165061) auto_cal:   PCCM linear gradients: X[-2.1684,-4.2880,-0.2766] Y[-1.6444,0.1497,-1.9159] Z[3.7737,4.4219,1.3580]
+I (165062) auto_cal:   Adam alpha=0.0010 bc1=0.992145 bc2=0.044980
+I (165115) auto_cal:   PCCM linear gradients: X[-1.6589,-3.6452,-0.0541] Y[-2.0800,-0.4363,-2.1479] Z[3.5336,4.1597,1.2784]
+I (165116) auto_cal:   Adam alpha=0.0010 bc1=0.992930 bc2=0.045934
+I (165170) auto_cal:   PCCM linear gradients: X[-1.3716,-3.3062,0.1330] Y[-1.9996,-0.3753,-2.0418] Z[3.1126,3.6843,1.1854]
+I (165171) auto_cal:   Adam alpha=0.0010 bc1=0.993637 bc2=0.046889
+I (165225) auto_cal:   PCCM linear gradients: X[-1.3390,-3.3069,0.2978] Y[-1.5013,0.2060,-1.6930] Z[2.6481,3.1614,1.0920]
+I (165226) auto_cal:   Adam alpha=0.0010 bc1=0.994274 bc2=0.047842
+I (165280) auto_cal:   PCCM linear gradients: X[-1.3535,-3.3786,0.5674] Y[-0.9501,0.8636,-1.3688] Z[2.2371,2.7044,0.9980]
+I (165281) auto_cal:   Adam alpha=0.0010 bc1=0.994846 bc2=0.048794
+I (165334) auto_cal:   PCCM linear gradients: X[-1.2240,-3.2868,1.0130] Y[-0.6700,1.2088,-1.3349] Z[1.9000,2.3346,0.9072]
+I (165335) auto_cal:   Adam alpha=0.0010 bc1=0.995362 bc2=0.049745
+I (165342) auto_cal: Iter  50: avg ΔE=  4.13 (best=  4.13) [R:10.0 G:3.3 B:6.4 Y:1.0]
+I (165348) auto_cal:   PCCM linear diag: [1.907, 1.425, 1.380]
+I (165353) auto_cal:   Lightness: scale=0.0785 offset=-2.81
+I (165359) auto_cal:   Saturation boost: 0.965
+I (165411) auto_cal:   PCCM linear gradients: X[-3.1984,-5.2805,-1.9398] Y[1.4410,3.3402,1.6515] Z[1.5512,1.9593,0.7563]
+I (165412) auto_cal:   Adam alpha=0.0010 bc1=0.995825 bc2=0.050695
+I (165465) auto_cal:   PCCM linear gradients: X[-4.1032,-6.1553,-3.3760] Y[2.2380,4.0557,2.9037] Z[1.2710,1.6603,0.6232]
+I (165467) auto_cal:   Adam alpha=0.0010 bc1=0.996243 bc2=0.051644
+I (165520) auto_cal:   PCCM linear gradients: X[-4.0283,-5.9805,-3.5954] Y[1.8513,3.4938,2.6901] Z[1.0657,1.4303,0.5484]
+I (165521) auto_cal:   Adam alpha=0.0010 bc1=0.996619 bc2=0.052593
+I (165575) auto_cal:   PCCM linear gradients: X[-4.2121,-6.1173,-3.8569] Y[1.6522,3.1857,2.4688] Z[0.8850,1.2259,0.4749]
+I (165576) auto_cal:   Adam alpha=0.0010 bc1=0.996957 bc2=0.053540
+I (165629) auto_cal:   PCCM linear gradients: X[-4.4076,-6.3105,-4.0128] Y[1.6046,3.1016,2.3360] Z[0.7930,1.1175,0.4323]
+I (165630) auto_cal:   Adam alpha=0.0010 bc1=0.997261 bc2=0.054487
+I (165684) auto_cal:   PCCM linear gradients: X[-4.0491,-5.9664,-3.4573] Y[1.2507,2.7828,1.7474] Z[0.8478,1.1823,0.4733]
+I (165685) auto_cal:   Adam alpha=0.0010 bc1=0.997535 bc2=0.055432
+I (165739) auto_cal:   PCCM linear gradients: X[-3.1495,-5.1110,-2.0666] Y[0.5994,2.2426,0.6127] Z[1.0283,1.3914,0.5815]
+I (165740) auto_cal:   Adam alpha=0.0010 bc1=0.997781 bc2=0.056377
+I (165793) auto_cal:   PCCM linear gradients: X[-3.0632,-5.1590,-1.3077] Y[0.8937,2.7562,0.3195] Z[1.2124,1.6052,0.6604]
+I (165794) auto_cal:   Adam alpha=0.0010 bc1=0.998003 bc2=0.057320
+I (165848) auto_cal:   PCCM linear gradients: X[-3.7019,-5.9674,-1.4451] Y[1.7756,3.8687,0.7489] Z[1.3903,1.8156,0.7007]
+I (165849) auto_cal:   Adam alpha=0.0010 bc1=0.998203 bc2=0.058263
+I (165902) auto_cal:   PCCM linear gradients: X[-3.4760,-5.8107,-0.7195] Y[1.4926,3.6774,-0.0457] Z[1.6099,2.0624,0.7672]
+I (165903) auto_cal:   Adam alpha=0.0010 bc1=0.998383 bc2=0.059205
+I (165910) auto_cal: Iter  60: avg ΔE=  3.93 (best=  3.93) [R:9.6 G:3.1 B:6.3 Y:0.6]
+I (165916) auto_cal:   PCCM linear diag: [1.909, 1.423, 1.379]
+I (165921) auto_cal:   Lightness: scale=0.0788 offset=-2.78
+I (165927) auto_cal:   Saturation boost: 0.953
+I (165979) auto_cal:   PCCM linear gradients: X[-2.4816,-4.7899,0.7143] Y[0.1770,2.3211,-1.8470] Z[1.8607,2.3441,0.8472]
+I (165980) auto_cal:   Adam alpha=0.0010 bc1=0.998544 bc2=0.060145
+I (166033) auto_cal:   PCCM linear gradients: X[-1.1067,-3.3185,2.3228] Y[-1.5591,0.4503,-3.8496] Z[2.1342,2.6560,0.9071]
+I (166034) auto_cal:   Adam alpha=0.0010 bc1=0.998690 bc2=0.061085
+I (166088) auto_cal:   PCCM linear gradients: X[-0.0268,-2.1284,3.3156] Y[-2.8800,-1.0165,-5.0799] Z[2.4004,2.9657,0.9490]
+I (166089) auto_cal:   Adam alpha=0.0010 bc1=0.998821 bc2=0.062024
+I (166143) auto_cal:   PCCM linear gradients: X[-0.1990,-2.2415,2.4842] Y[-2.7690,-0.9667,-4.3455] Z[2.5604,3.1590,0.9770]
+I (166144) auto_cal:   Adam alpha=0.0010 bc1=0.998939 bc2=0.062962
+I (166197) auto_cal:   PCCM linear gradients: X[-2.7393,-4.9174,-0.9259] Y[0.0092,1.9730,-0.6870] Z[2.4842,3.0860,0.8954]
+I (166198) auto_cal:   Adam alpha=0.0010 bc1=0.999045 bc2=0.063899
+I (166252) auto_cal:   PCCM linear gradients: X[-4.2028,-6.4746,-2.8331] Y[1.7866,3.8477,1.6434] Z[2.3268,2.9219,0.7621]
+I (166253) auto_cal:   Adam alpha=0.0010 bc1=0.999141 bc2=0.064835
+I (166307) auto_cal:   PCCM linear gradients: X[-4.2988,-6.5327,-3.3091] Y[2.0356,4.0578,2.3121] Z[2.1683,2.7443,0.6686]
+I (166308) auto_cal:   Adam alpha=0.0010 bc1=0.999226 bc2=0.065770
+I (166361) auto_cal:   PCCM linear gradients: X[-3.1842,-5.2360,-2.7800] Y[0.8677,2.6842,1.6631] Z[2.0186,2.5641,0.6373]
+I (166362) auto_cal:   Adam alpha=0.0010 bc1=0.999304 bc2=0.066705
+I (166416) auto_cal:   PCCM linear gradients: X[-1.2035,-2.9839,-1.4030] Y[-1.3126,0.1929,-0.0327] Z[1.8969,2.4068,0.6552]
+I (166417) auto_cal:   Adam alpha=0.0010 bc1=0.999373 bc2=0.067638
+I (166471) auto_cal:   PCCM linear gradients: X[-1.0583,-2.8356,-1.1320] Y[-1.5463,-0.0722,-0.4736] Z[1.6881,2.1609,0.6094]
+I (166472) auto_cal:   Adam alpha=0.0010 bc1=0.999436 bc2=0.068570
+I (166479) auto_cal: Iter  70: avg ΔE=  3.81 (best=  3.81) [R:9.5 G:3.0 B:6.1 Y:0.4]
+I (166485) auto_cal:   PCCM linear diag: [1.912, 1.421, 1.378]
+I (166490) auto_cal:   Lightness: scale=0.0788 offset=-2.75
+I (166495) auto_cal:   Saturation boost: 0.948
+I (166547) auto_cal:   PCCM linear gradients: X[-4.9218,-7.2618,-3.4829] Y[2.4055,4.3991,2.1703] Z[1.4677,1.9438,0.4432]
+I (166548) auto_cal:   Adam alpha=0.0010 bc1=0.999492 bc2=0.069502
+I (166602) auto_cal:   PCCM linear gradients: X[-6.4073,-8.9941,-4.2292] Y[3.8794,6.0683,3.0717] Z[1.4834,1.9907,0.3935]
+I (166603) auto_cal:   Adam alpha=0.0010 bc1=0.999543 bc2=0.070432
+I (166656) auto_cal:   PCCM linear gradients: X[-6.0678,-8.6628,-3.7245] Y[3.5944,5.8030,2.5518] Z[1.4379,1.9350,0.4120]
+I (166657) auto_cal:   Adam alpha=0.0010 bc1=0.999589 bc2=0.071362
+I (166711) auto_cal:   PCCM linear gradients: X[31.5084,29.0713,34.0021] Y[1.6805,3.7899,0.2730] Z[1.3463,1.7966,0.5081]
+I (166712) auto_cal:   Adam alpha=0.0010 bc1=0.999630 bc2=0.072290
+I (166766) auto_cal:   PCCM linear gradients: X[-6.3417,-9.0472,-3.5149] Y[3.8573,6.1556,2.3285] Z[1.4967,2.0148,0.4321]
+I (166767) auto_cal:   Adam alpha=0.0010 bc1=0.999667 bc2=0.073218
+I (166820) auto_cal:   PCCM linear gradients: X[-6.6620,-9.4247,-3.6670] Y[4.1115,6.4408,2.4449] Z[1.5632,2.0978,0.4308]
+I (166821) auto_cal:   Adam alpha=0.0010 bc1=0.999700 bc2=0.074145
+I (166875) auto_cal:   PCCM linear gradients: X[30.3346,27.6631,33.4557] Y[-32.7651,-30.5047,-34.7335] Z[-33.9707,-33.4730,-35.0251]
+I (166876) auto_cal:   Adam alpha=0.0010 bc1=0.999730 bc2=0.075071
+I (166931) auto_cal:   PCCM linear gradients: X[-7.2876,-10.2181,-3.3795] Y[3.4344,5.6809,1.3330] Z[2.9836,3.7555,0.7199]
+I (166932) auto_cal:   Adam alpha=0.0010 bc1=0.999757 bc2=0.075996
+I (166985) auto_cal:   PCCM linear gradients: X[-1.2184,-3.2175,1.7977] Y[-4.4503,-3.5392,-4.9907] Z[3.3112,4.0833,0.6635]
+I (166986) auto_cal:   Adam alpha=0.0010 bc1=0.999782 bc2=0.076920
+I (167040) auto_cal:   PCCM linear gradients: X[41.8613,40.2675,44.1921] Y[-47.1014,-46.5835,-47.0958] Z[-36.7634,-36.1229,-39.0223]
+I (167042) auto_cal:   Adam alpha=0.0010 bc1=0.999803 bc2=0.077843
+I (167049) auto_cal: Iter  80: avg ΔE=  3.78 (best=  3.75) [R:10.1 G:3.4 B:6.0 Y:0.3]
+I (167055) auto_cal:   PCCM linear diag: [1.912, 1.420, 1.379]
+I (167060) auto_cal:   Lightness: scale=0.0776 offset=-2.73
+I (167066) auto_cal:   Saturation boost: 0.948
+I (167118) auto_cal:   PCCM linear gradients: X[-5.2508,-7.7376,-2.1396] Y[0.1051,1.5651,-0.6018] Z[2.9135,3.6556,0.5891]
+I (167119) auto_cal:   Adam alpha=0.0010 bc1=0.999823 bc2=0.078765
+I (167173) auto_cal:   PCCM linear gradients: X[-60.0000,-60.0000,-60.0000] Y[60.0000,60.0000,60.0000] Z[60.0000,60.0000,60.0000]
+I (167174) auto_cal:   Adam alpha=0.0010 bc1=0.999841 bc2=0.079686
+I (167228) auto_cal:   PCCM linear gradients: X[-4.1598,-6.5848,-2.6312] Y[2.9384,5.1109,2.3346] Z[0.7830,1.1134,0.2807]
+I (167229) auto_cal:   Adam alpha=0.0010 bc1=0.999857 bc2=0.080606
+I (167283) auto_cal:   PCCM linear gradients: X[3.5164,1.5899,5.2654] Y[-4.2770,-2.5774,-5.1167] Z[0.2561,0.5374,-0.0191]
+I (167284) auto_cal:   Adam alpha=0.0010 bc1=0.999871 bc2=0.081526
+I (167338) auto_cal:   PCCM linear gradients: X[38.9043,37.0736,41.1234] Y[-39.7741,-38.2278,-40.9992] Z[-33.2426,-32.9642,-33.4666]
+I (167339) auto_cal:   Adam alpha=0.0010 bc1=0.999884 bc2=0.082444
+I (167394) auto_cal:   PCCM linear gradients: X[36.1757,34.1991,36.6605] Y[-37.5534,-35.9318,-37.1528] Z[-36.2437,-35.9945,-36.2886]
+I (167395) auto_cal:   Adam alpha=0.0010 bc1=0.999896 bc2=0.083362
+I (167450) auto_cal:   PCCM linear gradients: X[-8.4121,-11.3423,-5.8318] Y[7.2340,9.7733,6.0275] Z[0.5567,0.9327,-0.0420]
+I (167451) auto_cal:   Adam alpha=0.0010 bc1=0.999906 bc2=0.084278
+I (167505) auto_cal:   PCCM linear gradients: X[-20.2203,-23.6785,-17.0450] Y[17.5986,20.5185,16.1312] Z[2.3751,2.9566,1.0636]
+I (167506) auto_cal:   Adam alpha=0.0010 bc1=0.999915 bc2=0.085194
+I (167560) auto_cal:   PCCM linear gradients: X[-60.0000,-60.0000,-60.0000] Y[13.5571,16.1502,12.0772] Z[3.8818,4.6185,1.9463]
+I (167561) auto_cal:   Adam alpha=0.0010 bc1=0.999924 bc2=0.086109
+I (167615) auto_cal:   PCCM linear gradients: X[0.3026,-1.4461,1.7996] Y[-5.1498,-4.4824,-4.4543] Z[2.8218,3.5017,0.5194]
+I (167616) auto_cal:   Adam alpha=0.0010 bc1=0.999931 bc2=0.087023
+I (167623) auto_cal: Iter  90: avg ΔE=  4.10 (best=  3.73) [R:10.4 G:3.7 B:5.8 Y:0.8]
+I (167629) auto_cal:   PCCM linear diag: [1.912, 1.420, 1.382]
+I (167634) auto_cal:   Lightness: scale=0.0761 offset=-2.71
+I (167639) auto_cal:   Saturation boost: 0.955
+I (167692) auto_cal:   PCCM linear gradients: X[60.0000,60.0000,60.0000] Y[-60.0000,-60.0000,-60.0000] Z[3.4730,4.0956,1.2872]
+I (167693) auto_cal:   Adam alpha=0.0010 bc1=0.999938 bc2=0.087936
+I (167748) auto_cal:   PCCM linear gradients: X[5.3011,3.7359,7.7733] Y[-8.9052,-8.3383,-9.4452] Z[1.4007,1.9219,-0.1938]
+I (167749) auto_cal:   Adam alpha=0.0010 bc1=0.999944 bc2=0.088848
+I (167802) auto_cal:   PCCM linear gradients: X[-5.9702,-8.4583,-4.1099] Y[3.9432,5.7731,3.3617] Z[0.0205,0.2935,-0.1045]
+I (167803) auto_cal:   Adam alpha=0.0010 bc1=0.999950 bc2=0.089759
+I (167857) auto_cal:   PCCM linear gradients: X[-9.8747,-12.9255,-6.8475] Y[10.0050,12.6899,8.3708] Z[0.0759,0.4362,-0.3237]
+I (167858) auto_cal:   Adam alpha=0.0010 bc1=0.999955 bc2=0.090669
+I (167912) auto_cal:   PCCM linear gradients: X[-10.7088,-13.8919,-7.2942] Y[11.7456,14.6720,9.7021] Z[0.0256,0.3871,-0.4250]
+I (167913) auto_cal:   Adam alpha=0.0010 bc1=0.999960 bc2=0.091579
+I (167967) auto_cal:   PCCM linear gradients: X[-10.5381,-13.6496,-7.3116] Y[11.1691,13.9253,9.3743] Z[-0.1287,0.2301,-0.4534]
+I (167968) auto_cal:   Adam alpha=0.0010 bc1=0.999964 bc2=0.092487
+I (168022) auto_cal:   PCCM linear gradients: X[-8.9827,-11.7795,-6.5684] Y[8.1955,10.4022,7.1330] Z[-0.3616,-0.0454,-0.3954]
+I (168023) auto_cal:   Adam alpha=0.0010 bc1=0.999967 bc2=0.093394
+I (168078) auto_cal:   PCCM linear gradients: X[30.4697,28.1135,33.3908] Y[-33.0003,-31.5298,-34.6068] Z[-34.9578,-34.6450,-35.2025]
+I (168079) auto_cal:   Adam alpha=0.0010 bc1=0.999970 bc2=0.094301
+I (168133) auto_cal:   PCCM linear gradients: X[-4.6728,-7.0171,-1.0620] Y[0.6899,1.9016,-0.9245] Z[1.4137,1.9696,-0.0180]
+I (168134) auto_cal:   Adam alpha=0.0010 bc1=0.999973 bc2=0.095207
+I (168188) auto_cal:   PCCM linear gradients: X[-4.4007,-6.8066,-0.4752] Y[0.1929,1.4520,-1.4888] Z[2.5059,3.2427,0.2800]
+I (168189) auto_cal:   Adam alpha=0.0010 bc1=0.999976 bc2=0.096112
+I (168196) auto_cal: Iter 100: avg ΔE=  3.67 (best=  3.67) [R:9.2 G:3.2 B:5.3 Y:0.2]
+I (168202) auto_cal:   PCCM linear diag: [1.911, 1.422, 1.384]
+I (168207) auto_cal:   Lightness: scale=0.0781 offset=-2.69
+I (168212) auto_cal:   Saturation boost: 0.960
+I (168265) auto_cal:   PCCM linear gradients: X[-4.1507,-6.7072,-0.0058] Y[0.6108,2.1638,-1.2218] Z[3.7080,4.6657,0.7046]
+I (168266) auto_cal:   Adam alpha=0.0010 bc1=0.999978 bc2=0.097015
+I (168319) auto_cal:   PCCM linear gradients: X[-3.0932,-5.7062,1.1322] Y[2.0084,4.0278,-0.3792] Z[3.7823,4.7008,0.8533]
+I (168320) auto_cal:   Adam alpha=0.0010 bc1=0.999981 bc2=0.097918
+I (168374) auto_cal:   PCCM linear gradients: X[-8.6067,-11.8164,-4.1853] Y[8.8687,11.6814,6.0188] Z[2.3494,2.9858,0.4303]
+I (168375) auto_cal:   Adam alpha=0.0010 bc1=0.999983 bc2=0.098820
+I (168429) auto_cal:   PCCM linear gradients: X[-10.0684,-13.3653,-5.9038] Y[10.1638,13.0119,7.5318] Z[1.8325,2.3978,0.2353]
+I (168430) auto_cal:   Adam alpha=0.0010 bc1=0.999984 bc2=0.099722
+I (168484) auto_cal:   PCCM linear gradients: X[-10.0731,-13.2879,-6.1224] Y[9.0418,11.6296,6.5497] Z[1.2842,1.7579,0.1301]
+I (168485) auto_cal:   Adam alpha=0.0010 bc1=0.999986 bc2=0.100622
+I (168538) auto_cal:   PCCM linear gradients: X[-4.3793,-6.5461,-3.3602] Y[1.4170,2.6081,2.1716] Z[1.1046,1.5193,0.0950]
+I (168539) auto_cal:   Adam alpha=0.0010 bc1=0.999987 bc2=0.101521
+I (168593) auto_cal:   PCCM linear gradients: X[-0.6305,-2.4420,0.8683] Y[-2.8278,-2.0664,-2.6011] Z[1.4886,1.9617,0.1029]
+I (168594) auto_cal:   Adam alpha=0.0010 bc1=0.999989 bc2=0.102420
+I (168648) auto_cal:   PCCM linear gradients: X[39.8259,38.0968,42.2314] Y[-42.7204,-41.9954,-43.4638] Z[-35.9244,-35.4986,-37.1848]
+I (168649) auto_cal:   Adam alpha=0.0010 bc1=0.999990 bc2=0.103317
+I (168704) auto_cal:   PCCM linear gradients: X[-1.9031,-3.8573,-1.2819] Y[-0.0765,1.0908,0.4779] Z[0.6374,0.9280,0.1030]
+I (168705) auto_cal:   Adam alpha=0.0010 bc1=0.999991 bc2=0.104214
+I (168758) auto_cal:   PCCM linear gradients: X[-6.5958,-9.2962,-4.5375] Y[6.3531,8.5174,5.2984] Z[0.4543,0.7125,0.0352]
+I (168759) auto_cal:   Adam alpha=0.0010 bc1=0.999992 bc2=0.105110
+I (168766) auto_cal: Iter 110: avg ΔE=  3.68 (best=  3.64) [R:8.2 G:3.1 B:4.8 Y:0.4]
+I (168772) auto_cal:   PCCM linear diag: [1.912, 1.422, 1.387]
+I (168777) auto_cal:   Lightness: scale=0.0806 offset=-2.69
+I (168783) auto_cal:   Saturation boost: 0.973
+I (168835) auto_cal:   PCCM linear gradients: X[-8.3071,-11.3550,-5.2195] Y[8.5826,11.1468,6.6324] Z[0.9841,1.3444,0.1017]
+I (168836) auto_cal:   Adam alpha=0.0010 bc1=0.999992 bc2=0.106005
+I (168889) auto_cal:   PCCM linear gradients: X[-7.9505,-10.9855,-4.6370] Y[7.7916,10.2894,5.5997] Z[1.2994,1.7014,0.2272]
+I (168890) auto_cal:   Adam alpha=0.0010 bc1=0.999993 bc2=0.106899
+I (168944) auto_cal:   PCCM linear gradients: X[-3.1462,-5.5081,-1.6304] Y[1.8928,3.5489,1.3450] Z[1.7363,2.1980,0.4044]
+I (168945) auto_cal:   Adam alpha=0.0010 bc1=0.999994 bc2=0.107792
+I (168999) auto_cal:   PCCM linear gradients: X[0.4399,-1.5085,2.7550] Y[-3.7165,-2.8114,-3.9922] Z[2.9346,3.6043,0.5553]
+I (169000) auto_cal:   Adam alpha=0.0010 bc1=0.999995 bc2=0.108684
+I (169054) auto_cal:   PCCM linear gradients: X[1.9438,0.0029,5.2549] Y[-5.4425,-4.6018,-6.4831] Z[3.0277,3.6902,0.5165]
+I (169055) auto_cal:   Adam alpha=0.0010 bc1=0.999995 bc2=0.109575
+I (169108) auto_cal:   PCCM linear gradients: X[-2.7688,-5.1442,0.1792] Y[-1.0062,0.2229,-1.6195] Z[3.4292,4.2126,0.6295]
+I (169109) auto_cal:   Adam alpha=0.0010 bc1=0.999996 bc2=0.110466
+I (169163) auto_cal:   PCCM linear gradients: X[-9.5949,-13.0303,-4.2862] Y[7.5294,10.1082,3.7910] Z[2.2682,2.8422,0.4325]
+I (169164) auto_cal:   Adam alpha=0.0010 bc1=0.999996 bc2=0.111355
+I (169218) auto_cal:   PCCM linear gradients: X[-9.5267,-12.8884,-5.0761] Y[8.5453,11.1887,5.4837] Z[1.7289,2.2024,0.3089]
+I (169219) auto_cal:   Adam alpha=0.0010 bc1=0.999996 bc2=0.112244
+I (169272) auto_cal:   PCCM linear gradients: X[-7.8762,-11.0228,-4.0857] Y[7.3168,9.8164,4.6839] Z[1.3384,1.7151,0.2699]
+I (169273) auto_cal:   Adam alpha=0.0010 bc1=0.999997 bc2=0.113132
+I (169327) auto_cal:   PCCM linear gradients: X[-3.2281,-5.6995,-1.1172] Y[2.3773,4.1898,1.1849] Z[0.9227,1.1704,0.2818]
+I (169328) auto_cal:   Adam alpha=0.0010 bc1=0.999997 bc2=0.114019
+I (169335) auto_cal: Iter 120: avg ΔE=  3.60 (best=  3.60) [R:8.9 G:3.5 B:4.8 Y:0.4]
+I (169341) auto_cal:   PCCM linear diag: [1.913, 1.421, 1.390]
+I (169346) auto_cal:   Lightness: scale=0.0798 offset=-2.70
+I (169351) auto_cal:   Saturation boost: 0.981
+I (169403) auto_cal:   PCCM linear gradients: X[1.6016,-0.2899,3.1441] Y[-3.5609,-2.4917,-3.7657] Z[1.4555,1.7825,0.3735]
+I (169404) auto_cal:   Adam alpha=0.0010 bc1=0.999997 bc2=0.114905
+I (169458) auto_cal:   PCCM linear gradients: X[3.5801,1.7841,5.7738] Y[-6.0734,-5.2081,-6.6116] Z[1.7589,2.1297,0.3768]
+I (169459) auto_cal:   Adam alpha=0.0010 bc1=0.999998 bc2=0.115790
+I (169513) auto_cal:   PCCM linear gradients: X[3.3169,1.5351,5.1012] Y[-5.7485,-4.8889,-5.9609] Z[1.6448,1.9933,0.3710]
+I (169514) auto_cal:   Adam alpha=0.0010 bc1=0.999998 bc2=0.116674
+I (169567) auto_cal:   PCCM linear gradients: X[0.9122,-0.9469,1.3661] Y[-2.7264,-1.6854,-1.9411] Z[1.1661,1.4380,0.3040]
+I (169568) auto_cal:   Adam alpha=0.0010 bc1=0.999998 bc2=0.117557
+I (169622) auto_cal:   PCCM linear gradients: X[-2.3322,-4.5391,-1.8927] Y[1.4641,2.9564,2.1005] Z[0.6456,0.8510,0.1329]
+I (169623) auto_cal:   Adam alpha=0.0010 bc1=0.999998 bc2=0.118440
+I (169677) auto_cal:   PCCM linear gradients: X[-4.6492,-7.2068,-3.3754] Y[4.2164,6.0848,4.0636] Z[0.5605,0.7787,0.0421]
+I (169677) auto_cal:   Adam alpha=0.0010 bc1=0.999998 bc2=0.119321
+I (169731) auto_cal:   PCCM linear gradients: X[-5.1391,-7.7803,-3.4837] Y[4.4770,6.3950,3.9862] Z[0.5946,0.8191,0.0463]
+I (169732) auto_cal:   Adam alpha=0.0010 bc1=0.999999 bc2=0.120202
+I (169786) auto_cal:   PCCM linear gradients: X[-3.6722,-6.1222,-2.1644] Y[2.3603,4.0239,1.9706] Z[0.5485,0.7256,0.1076]
+I (169787) auto_cal:   Adam alpha=0.0010 bc1=0.999999 bc2=0.121082
+I (169840) auto_cal:   PCCM linear gradients: X[0.1837,-1.7958,1.0816] Y[-2.3128,-1.2138,-1.9752] Z[0.8092,0.9950,0.2321]
+I (169841) auto_cal:   Adam alpha=0.0010 bc1=0.999999 bc2=0.121961
+I (169895) auto_cal:   PCCM linear gradients: X[3.2136,1.5107,4.5658] Y[-5.7346,-4.9618,-5.5263] Z[1.6506,1.9972,0.3930]
+I (169896) auto_cal:   Adam alpha=0.0010 bc1=0.999999 bc2=0.122839
+I (169903) auto_cal: Iter 130: avg ΔE=  3.54 (best=  3.54) [R:8.9 G:3.5 B:4.8 Y:0.1]
+I (169909) auto_cal:   PCCM linear diag: [1.914, 1.419, 1.390]
+I (169914) auto_cal:   Lightness: scale=0.0801 offset=-2.70
+I (169919) auto_cal:   Saturation boost: 0.979
+I (169971) auto_cal:   PCCM linear gradients: X[-1.9976,-4.5098,1.4371] Y[0.0612,1.6673,-2.1253] Z[1.6752,2.0682,0.4221]
+I (169972) auto_cal:   Adam alpha=0.0010 bc1=0.999999 bc2=0.123716
+I (170026) auto_cal:   PCCM linear gradients: X[-5.3153,-8.3445,-0.9874] Y[3.6557,5.8535,0.8421] Z[2.3707,2.9147,0.5237]
+I (170027) auto_cal:   Adam alpha=0.0010 bc1=0.999999 bc2=0.124592
+I (170080) auto_cal:   PCCM linear gradients: X[-5.3309,-8.3512,-1.4024] Y[4.0737,6.2879,1.7236] Z[2.4458,3.0092,0.5301]
+I (170081) auto_cal:   Adam alpha=0.0010 bc1=0.999999 bc2=0.125467
+I (170135) auto_cal:   PCCM linear gradients: X[-3.6665,-6.4534,-0.2795] Y[2.4695,4.4875,0.5701] Z[2.5697,3.1402,0.5945]
+I (170136) auto_cal:   Adam alpha=0.0010 bc1=0.999999 bc2=0.126342
+I (170190) auto_cal:   PCCM linear gradients: X[0.7527,-1.3776,2.2336] Y[-2.2645,-0.9272,-2.3906] Z[2.7360,3.3079,0.6772]
+I (170191) auto_cal:   Adam alpha=0.0010 bc1=0.999999 bc2=0.127216
+I (170244) auto_cal:   PCCM linear gradients: X[-4.5447,-7.2441,-1.6503] Y[2.6093,4.4595,1.2494] Z[2.5319,3.0992,0.4765]
+I (170245) auto_cal:   Adam alpha=0.0010 bc1=0.999999 bc2=0.128088
+I (170299) auto_cal:   PCCM linear gradients: X[-6.3524,-9.3138,-3.1776] Y[4.1161,6.1506,2.8081] Z[2.0039,2.4880,0.2576]
+I (170300) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.128960
+I (170354) auto_cal:   PCCM linear gradients: X[-5.2079,-7.9054,-2.9790] Y[3.2538,5.0670,2.6939] Z[1.2496,1.5731,0.1184]
+I (170355) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.129831
+I (170408) auto_cal:   PCCM linear gradients: X[-4.2622,-6.8097,-2.7897] Y[2.5691,4.2624,2.6408] Z[0.9241,1.1761,0.0675]
+I (170409) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.130701
+I (170463) auto_cal:   PCCM linear gradients: X[-4.6594,-7.3225,-2.9329] Y[3.0577,4.8878,2.8739] Z[1.0389,1.3220,0.0912]
+I (170464) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.131571
+I (170470) auto_cal: Iter 140: avg ΔE=  3.53 (best=  3.53) [R:8.6 G:3.3 B:4.7 Y:0.2]
+I (170476) auto_cal:   PCCM linear diag: [1.916, 1.418, 1.390]
+I (170482) auto_cal:   Lightness: scale=0.0812 offset=-2.71
+I (170487) auto_cal:   Saturation boost: 0.976
+I (170539) auto_cal:   PCCM linear gradients: X[-3.3813,-5.8800,-2.2776] Y[1.9342,3.6477,2.1790] Z[0.9631,1.2085,0.1353]
+I (170540) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.132439
+I (170594) auto_cal:   PCCM linear gradients: X[-3.5168,-6.1034,-2.0571] Y[1.9215,3.7297,1.7800] Z[1.1363,1.4012,0.2114]
+I (170595) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.133307
+I (170648) auto_cal:   PCCM linear gradients: X[-2.2292,-4.6568,-1.1888] Y[0.4991,2.1691,0.6388] Z[1.1662,1.4011,0.2934]
+I (170649) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.134173
+I (170703) auto_cal:   PCCM linear gradients: X[-3.5536,-6.2790,-1.2544] Y[1.4200,3.3725,0.4451] Z[1.6823,2.0148,0.4127]
+I (170704) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.135039
+I (170758) auto_cal:   PCCM linear gradients: X[-3.4083,-6.2085,-0.5183] Y[1.0494,3.0974,-0.5378] Z[2.1455,2.5523,0.5649]
+I (170759) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.135904
+I (170813) auto_cal:   PCCM linear gradients: X[60.0000,60.0000,60.0000] Y[-60.0000,-60.0000,-60.0000] Z[-60.0000,-60.0000,-60.0000]
+I (170814) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.136768
+I (170868) auto_cal:   PCCM linear gradients: X[-7.1714,-10.2415,-3.8493] Y[4.0488,6.0717,2.8741] Z[2.0779,2.5933,0.2502]
+I (170869) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.137631
+I (170923) auto_cal:   PCCM linear gradients: X[-60.0000,-60.0000,-60.0000] Y[60.0000,60.0000,60.0000] Z[2.1170,2.6840,0.2037]
+I (170924) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.138494
+I (170978) auto_cal:   PCCM linear gradients: X[-5.0446,-7.8330,-2.3488] Y[2.1715,3.9905,1.3009] Z[1.4082,1.7661,0.1743]
+I (170979) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.139355
+I (171034) auto_cal:   PCCM linear gradients: X[37.3850,35.4973,37.9882] Y[-39.7826,-38.7979,-38.8663] Z[-0.1926,-0.0541,-0.8245]
+I (171035) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.140216
+I (171042) auto_cal: Iter 150: avg ΔE=  3.67 (best=  3.52) [R:8.6 G:3.2 B:4.8 Y:0.4]
+I (171048) auto_cal:   PCCM linear diag: [1.917, 1.416, 1.392]
+I (171053) auto_cal:   Lightness: scale=0.0810 offset=-2.72
+I (171059) auto_cal:   Saturation boost: 0.969
+I (171111) auto_cal:   PCCM linear gradients: X[34.0981,31.9886,34.8331] Y[-35.6106,-34.3027,-35.0211] Z[-33.1647,-33.0126,-33.6207]
+I (171113) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.141076
+I (171167) auto_cal:   PCCM linear gradients: X[-6.4033,-9.2504,-4.2305] Y[5.4427,7.5248,4.8648] Z[1.0018,1.3670,-0.0355]
+I (171168) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.141935
+I (171222) auto_cal:   PCCM linear gradients: X[-19.3694,-22.7789,-16.7665] Y[18.4655,21.0842,17.7873] Z[1.9299,2.4856,0.1800]
+I (171223) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.142793
+I (171277) auto_cal:   PCCM linear gradients: X[-60.0000,-60.0000,-60.0000] Y[60.0000,60.0000,60.0000] Z[60.0000,60.0000,60.0000]
+I (171278) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.143650
+I (171333) auto_cal:   PCCM linear gradients: X[34.6568,32.1307,37.1031] Y[-38.5867,-37.2162,-38.3646] Z[-35.0240,-34.4781,-37.2791]
+I (171334) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.144506
+I (171389) auto_cal:   PCCM linear gradients: X[4.2723,2.4921,5.6185] Y[-8.5506,-7.9350,-7.2176] Z[2.8074,3.3927,0.1968]
+I (171390) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.145362
+I (171444) auto_cal:   PCCM linear gradients: X[3.1667,1.1044,5.2485] Y[-6.8909,-5.8814,-6.4219] Z[2.6807,3.2440,0.3433]
+I (171445) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.146216
+I (171499) auto_cal:   PCCM linear gradients: X[-4.6771,-7.6514,-1.1388] Y[3.2443,5.5066,1.3690] Z[2.5055,3.0096,0.6834]
+I (171499) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.147070
+I (171553) auto_cal:   PCCM linear gradients: X[-6.5023,-9.6551,-3.2910] Y[6.3173,8.8477,4.7277] Z[2.4182,2.9383,0.5128]
+I (171554) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.147923
+I (171608) auto_cal:   PCCM linear gradients: X[-6.8890,-10.0874,-3.6726] Y[6.5036,9.0613,4.9331] Z[2.4173,2.9336,0.5035]
+I (171609) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.148775
+I (171615) auto_cal: Iter 160: avg ΔE=  3.50 (best=  3.50) [R:8.3 G:3.0 B:4.7 Y:0.2]
+I (171621) auto_cal:   PCCM linear diag: [1.918, 1.416, 1.395]
+I (171627) auto_cal:   Lightness: scale=0.0814 offset=-2.72
+I (171632) auto_cal:   Saturation boost: 0.972
+I (171684) auto_cal:   PCCM linear gradients: X[-3.3758,-6.1827,-0.5014] Y[1.7637,3.9005,0.3517] Z[1.9811,2.3100,0.6777]
+I (171685) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.149626
+I (171739) auto_cal:   PCCM linear gradients: X[9.2217,7.7828,9.5775] Y[-12.5017,-11.9801,-10.6708] Z[2.7440,3.1966,0.6201]
+I (171740) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.150477
+I (171794) auto_cal:   PCCM linear gradients: X[9.6685,8.2260,10.1981] Y[-13.3866,-12.9172,-11.5978] Z[2.8698,3.3249,0.6356]
+I (171795) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.151326
+I (171849) auto_cal:   PCCM linear gradients: X[-0.0093,-2.2427,0.8361] Y[-3.5251,-2.2430,-2.2199] Z[2.0430,2.3346,0.7129]
+I (171850) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.152175
+I (171904) auto_cal:   PCCM linear gradients: X[-60.0000,-60.0000,-60.0000] Y[60.0000,60.0000,60.0000] Z[60.0000,60.0000,60.0000]
+I (171905) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.153023
+I (171960) auto_cal:   PCCM linear gradients: X[-2.7567,-5.3667,-1.0556] Y[0.4028,2.2162,0.2327] Z[1.0210,1.2136,0.3959]
+I (171961) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.153870
+I (172015) auto_cal:   PCCM linear gradients: X[4.6272,2.5514,5.8771] Y[-6.5905,-5.3071,-6.4577] Z[-0.0722,0.0623,-0.5108]
+I (172016) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.154716
+I (172070) auto_cal:   PCCM linear gradients: X[2.9522,0.7206,4.4384] Y[-4.5884,-3.1298,-4.8262] Z[-0.4680,-0.3294,-0.6962]
+I (172071) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.155561
+I (172126) auto_cal:   PCCM linear gradients: X[35.2263,32.6594,36.9925] Y[-36.4366,-34.6094,-37.0394] Z[-37.1313,-36.9427,-37.2790]
+I (172127) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.156405
+I (172182) auto_cal:   PCCM linear gradients: X[-15.0501,-18.1720,-13.4652] Y[14.9363,17.4705,14.2264] Z[0.0460,0.2931,-0.2102]
+I (172183) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.157249
+I (172190) auto_cal: Iter 170: avg ΔE=  3.66 (best=  3.50) [R:7.9 G:2.8 B:4.8 Y:0.9]
+I (172196) auto_cal:   PCCM linear diag: [1.919, 1.415, 1.394]
+I (172202) auto_cal:   Lightness: scale=0.0823 offset=-2.72
+I (172207) auto_cal:   Saturation boost: 0.977
+I (172260) auto_cal:   PCCM linear gradients: X[35.0891,32.3813,37.4086] Y[0.7589,2.8769,-0.8047] Z[-0.6222,-0.4375,-0.7858]
+I (172261) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.158092
+I (172315) auto_cal:   PCCM linear gradients: X[35.0080,32.2866,37.8603] Y[1.1582,3.2115,-0.5157] Z[0.2804,0.5059,-0.1465]
+I (172316) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.158934
+I (172370) auto_cal:   PCCM linear gradients: X[16.2925,13.0495,19.2438] Y[-19.9603,-17.6425,-21.0131] Z[-29.1290,-28.6596,-30.6063]
+I (172372) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.159775
+I (172426) auto_cal:   PCCM linear gradients: X[32.6225,30.1400,35.7344] Y[-2.8961,-1.6037,-37.9800] Z[3.0923,3.6618,0.7043]
+I (172427) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.160615
+I (172481) auto_cal:   PCCM linear gradients: X[-2.0241,-4.3567,0.5350] Y[-3.4393,-2.3680,-3.0724] Z[3.5012,4.1339,0.7128]
+I (172482) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.161454
+I (172536) auto_cal:   PCCM linear gradients: X[-2.9008,-5.3740,-0.4032] Y[-2.1713,-0.9211,-1.8015] Z[3.6041,4.2859,0.7694]
+I (172537) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.162293
+I (172591) auto_cal:   PCCM linear gradients: X[-4.9037,-7.8398,-1.4161] Y[1.2814,3.1661,0.3396] Z[3.4213,4.1147,0.8254]
+I (172592) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.163130
+I (172645) auto_cal:   PCCM linear gradients: X[-3.8041,-6.7607,-0.1972] Y[3.7659,6.2302,1.2431] Z[2.3619,2.8145,0.7287]
+I (172646) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.163967
+I (172700) auto_cal:   PCCM linear gradients: X[1.4161,-0.8966,3.1039] Y[-0.1566,1.8069,-1.0127] Z[2.1224,2.4779,0.7493]
+I (172701) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.164803
+I (172755) auto_cal:   PCCM linear gradients: X[43.0928,41.3011,44.0938] Y[-4.3367,-2.9938,-4.1134] Z[2.2230,2.6076,0.7979]
+I (172756) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.165638
+I (172762) auto_cal: Iter 180: avg ΔE=  3.45 (best=  3.45) [R:8.2 G:3.0 B:4.3 Y:0.1]
+I (172768) auto_cal:   PCCM linear diag: [1.916, 1.415, 1.395]
+I (172774) auto_cal:   Lightness: scale=0.0816 offset=-2.72
+I (172779) auto_cal:   Saturation boost: 0.974
+I (172831) auto_cal:   PCCM linear gradients: X[0.1084,-1.9076,-0.0714] Y[-1.9634,-0.7690,0.0060] Z[1.6025,1.9304,0.5138]
+I (172832) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.166473
+I (172886) auto_cal:   PCCM linear gradients: X[-5.0262,-7.6387,-3.1297] Y[1.4659,2.9520,2.1819] Z[2.3019,2.8392,0.3886]
+I (172887) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.167306
+I (172941) auto_cal:   PCCM linear gradients: X[-6.4011,-9.1062,-4.0922] Y[2.4909,3.9914,2.9141] Z[2.2150,2.7689,0.2561]
+I (172941) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.168139
+I (172995) auto_cal:   PCCM linear gradients: X[-6.8114,-9.5910,-4.2303] Y[3.1668,4.7690,3.1452] Z[1.8438,2.3476,0.1794]
+I (172996) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.168971
+I (173050) auto_cal:   PCCM linear gradients: X[-6.1027,-8.9047,-3.3524] Y[3.3524,5.1265,2.6588] Z[1.1321,1.4905,0.1493]
+I (173051) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.169802
+I (173104) auto_cal:   PCCM linear gradients: X[-2.7461,-5.3242,0.0616] Y[1.5522,3.3501,0.0738] Z[0.3433,0.5050,0.2091]
+I (173105) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.170632
+I (173159) auto_cal:   PCCM linear gradients: X[2.0554,-0.2952,43.4182] Y[-1.9825,-0.2726,-4.7109] Z[0.4376,0.6009,0.2725]
+I (173160) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.171461
+I (173214) auto_cal:   PCCM linear gradients: X[-0.5623,-3.1258,3.2196] Y[0.7749,2.7190,-1.8584] Z[0.3675,0.5196,0.2704]
+I (173215) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.172290
+I (173268) auto_cal:   PCCM linear gradients: X[-3.2141,-5.9210,0.2803] Y[2.5073,4.4782,0.3003] Z[0.3874,0.5522,0.2425]
+I (173269) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.173118
+I (173323) auto_cal:   PCCM linear gradients: X[-4.5100,-7.2089,-1.2646] Y[2.0045,3.6979,0.8053] Z[1.2360,1.5914,0.3139]
+I (173324) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.173944
+I (173330) auto_cal: Iter 190: avg ΔE=  3.43 (best=  3.42) [R:8.5 G:3.4 B:4.0 Y:0.2]
+I (173336) auto_cal:   PCCM linear diag: [1.914, 1.414, 1.396]
+I (173342) auto_cal:   Lightness: scale=0.0811 offset=-2.73
+I (173347) auto_cal:   Saturation boost: 0.977
+I (173399) auto_cal:   PCCM linear gradients: X[-3.5936,-6.0432,-1.2492] Y[0.0522,1.3430,0.2167] Z[2.4430,3.0431,0.4711]
+I (173400) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.174770
+I (173454) auto_cal:   PCCM linear gradients: X[-2.3664,-4.6345,-0.6040] Y[-1.1636,-0.0590,-0.3779] Z[2.8831,3.5636,0.5736]
+I (173455) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.175596
+I (173509) auto_cal:   PCCM linear gradients: X[-0.1996,-2.2650,0.6211] Y[-2.4314,-1.4584,-0.8894] Z[2.9738,3.6680,0.6611]
+I (173510) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.176420
+I (173563) auto_cal:   PCCM linear gradients: X[0.9521,-1.0622,1.9423] Y[-1.2753,0.0416,-1.0263] Z[2.0952,2.6094,0.5586]
+I (173564) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.177244
+I (173618) auto_cal:   PCCM linear gradients: X[0.8026,-1.3634,2.7900] Y[-0.5348,0.9787,-1.3560] Z[1.7034,2.1367,0.4960]
+I (173619) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.178066
+I (173673) auto_cal:   PCCM linear gradients: X[1.4142,-0.6257,3.1121] Y[-1.5035,-0.1498,-2.0403] Z[1.4145,1.7961,0.4460]
+I (173674) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.178888
+I (173727) auto_cal:   PCCM linear gradients: X[1.7571,-0.0780,2.6884] Y[-2.9882,-1.9786,-2.5281] Z[1.1383,1.4741,0.3763]
+I (173728) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.179709
+I (173782) auto_cal:   PCCM linear gradients: X[-0.1738,-2.2576,1.4498] Y[-2.2997,-1.2567,-2.0244] Z[1.0977,1.4430,0.3051]
+I (173783) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.180530
+I (173837) auto_cal:   PCCM linear gradients: X[-2.6040,-5.0017,0.1221] Y[-0.0393,1.2882,-0.8289] Z[0.8163,1.1255,0.2091]
+I (173838) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.181349
+I (173891) auto_cal:   PCCM linear gradients: X[-4.2396,-6.9028,-0.5894] Y[2.3267,4.0209,0.2674] Z[0.3773,0.6089,0.1309]
+I (173892) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.182168
+I (173899) auto_cal: Iter 200: avg ΔE=  3.38 (best=  3.38) [R:8.1 G:3.3 B:3.7 Y:0.2]
+I (173905) auto_cal:   PCCM linear diag: [1.914, 1.413, 1.396]
+I (173910) auto_cal:   Lightness: scale=0.0823 offset=-2.74
+I (173916) auto_cal:   Saturation boost: 0.981
+I (173968) auto_cal:   PCCM linear gradients: X[-3.7459,-6.4205,-0.0842] Y[2.8428,4.6773,0.3750] Z[0.2972,0.5196,0.1419]
+I (173969) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.182986
+I (174022) auto_cal:   PCCM linear gradients: X[-1.5475,-3.9781,1.5091] Y[1.2588,2.9232,-0.7626] Z[0.4387,0.6844,0.1999]
+I (174023) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.183803
+I (174077) auto_cal:   PCCM linear gradients: X[1.2258,-0.8202,3.3262] Y[-1.5049,-0.2173,-2.5378] Z[0.7977,1.1084,0.2835]
+I (174078) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.184619
+I (174132) auto_cal:   PCCM linear gradients: X[2.3237,0.6536,2.8305] Y[-3.1230,-2.2473,-2.4626] Z[1.2665,1.6737,0.3464]
+I (174133) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.185434
+I (174186) auto_cal:   PCCM linear gradients: X[-1.9733,-4.2324,-1.0384] Y[0.7000,1.9841,1.1212] Z[1.1537,1.6345,0.1671]
+I (174187) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.186249
+I (174241) auto_cal:   PCCM linear gradients: X[-7.4364,-10.4884,-3.2475] Y[5.2644,7.2280,3.1025] Z[2.2190,2.8803,0.2584]
+I (174242) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.187063
+I (174296) auto_cal:   PCCM linear gradients: X[-7.2381,-10.2656,-3.1215] Y[5.1686,7.1609,2.9582] Z[2.2317,2.8963,0.2649]
+I (174297) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.187875
+I (174350) auto_cal:   PCCM linear gradients: X[-3.0105,-5.3195,-1.2509] Y[1.7828,3.1453,1.2109] Z[1.5898,2.1214,0.2444]
+I (174351) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.188688
+I (174405) auto_cal:   PCCM linear gradients: X[1.7247,-0.0458,1.8672] Y[-2.5187,-1.5215,-1.8535] Z[1.2873,1.7111,0.3222]
+I (174406) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.189499
+I (174460) auto_cal:   PCCM linear gradients: X[-5.6988,-8.5753,-2.3752] Y[5.0442,7.0965,2.8269] Z[1.1382,1.5923,0.1295]
+I (174461) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.190309
+I (174467) auto_cal: Iter 210: avg ΔE=  3.38 (best=  3.36) [R:7.9 G:3.3 B:3.5 Y:0.3]
+I (174473) auto_cal:   PCCM linear diag: [1.915, 1.412, 1.396]
+I (174479) auto_cal:   Lightness: scale=0.0831 offset=-2.74
+I (174484) auto_cal:   Saturation boost: 0.980
+I (174536) auto_cal:   PCCM linear gradients: X[-6.9448,-9.9638,-3.4200] Y[6.0816,8.2065,3.8831] Z[1.1059,1.5841,0.0464]
+I (174537) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.191119
+I (174591) auto_cal:   PCCM linear gradients: X[-6.1821,-9.0942,-2.7405] Y[4.9330,6.9370,2.7939] Z[0.8737,1.2904,0.0349]
+I (174592) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.191928
+I (174645) auto_cal:   PCCM linear gradients: X[-1.6261,-3.8397,-0.0025] Y[0.0781,1.3819,-0.4833] Z[0.0120,0.1793,0.0126]
+I (174646) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.192736
+I (174700) auto_cal:   PCCM linear gradients: X[0.4410,-1.5253,1.2072] Y[-2.2788,-1.2490,-1.9200] Z[0.1442,0.3171,0.0787]
+I (174701) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.193543
+I (174755) auto_cal:   PCCM linear gradients: X[-6.2414,-9.2201,-2.5060] Y[4.5514,6.5708,2.2588] Z[1.1902,1.6556,0.1158]
+I (174756) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.194350
+I (174809) auto_cal:   PCCM linear gradients: X[-6.9858,-10.0482,-3.3046] Y[5.6642,7.7860,3.4477] Z[1.4219,1.9523,0.1262]
+I (174810) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.195155
+I (174864) auto_cal:   PCCM linear gradients: X[-6.0261,-9.0164,-2.4675] Y[4.9242,7.0363,2.6302] Z[1.4731,1.9866,0.2024]
+I (174865) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.195960
+I (174919) auto_cal:   PCCM linear gradients: X[-1.4089,-3.7279,0.4925] Y[0.5631,2.0989,-0.6214] Z[1.1733,1.5633,0.3052]
+I (174920) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.196764
+I (174973) auto_cal:   PCCM linear gradients: X[3.0282,1.3508,2.4185] Y[-4.2987,-3.4076,-2.9373] Z[1.5335,1.9677,0.4220]
+I (174974) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.197567
+I (175028) auto_cal:   PCCM linear gradients: X[-5.6715,-8.6974,-1.7515] Y[3.7948,5.8951,1.3288] Z[1.9095,2.4641,0.3473]
+I (175029) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.198370
+I (175036) auto_cal: Iter 220: avg ΔE=  3.36 (best=  3.34) [R:8.0 G:3.2 B:3.6 Y:0.3]
+I (175042) auto_cal:   PCCM linear diag: [1.916, 1.410, 1.395]
+I (175047) auto_cal:   Lightness: scale=0.0835 offset=-2.75
+I (175052) auto_cal:   Saturation boost: 0.977
+I (175104) auto_cal:   PCCM linear gradients: X[-6.6504,-9.7567,-2.8018] Y[4.7057,6.8338,2.4750] Z[1.9214,2.4965,0.3003]
+I (175105) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.199171
+I (175159) auto_cal:   PCCM linear gradients: X[-4.1932,-6.9484,-0.8296] Y[2.6629,4.6084,0.3794] Z[1.3425,1.7594,0.3132]
+I (175160) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.199972
+I (175214) auto_cal:   PCCM linear gradients: X[60.0000,60.0000,60.0000] Y[-5.5329,-4.7909,-4.1580] Z[1.2711,1.6186,0.4421]
+I (175215) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.200772
+I (175269) auto_cal:   PCCM linear gradients: X[-4.2783,-7.1182,-0.7873] Y[2.8807,4.9056,0.5559] Z[2.4269,3.0502,0.5352]
+I (175270) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.201571
+I (175323) auto_cal:   PCCM linear gradients: X[-2.7424,-5.2800,-0.3915] Y[2.0123,3.7913,0.3983] Z[0.9459,1.2817,0.2717]
+I (175324) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.202370
+I (175378) auto_cal:   PCCM linear gradients: X[0.1615,-1.9072,31.6522] Y[-0.9896,0.3114,-1.2788] Z[0.2340,0.4237,0.1726]
+I (175379) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.203167
+I (175433) auto_cal:   PCCM linear gradients: X[-5.3285,-8.0671,-2.7264] Y[4.0879,5.9324,2.7237] Z[0.4108,0.7310,-0.0293]
+I (175434) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.203964
+I (175487) auto_cal:   PCCM linear gradients: X[-6.4510,-9.2628,-3.7062] Y[4.9003,6.7452,3.6768] Z[0.4487,0.8150,-0.1210]
+I (175488) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.204760
+I (175542) auto_cal:   PCCM linear gradients: X[-5.4643,-8.1207,-2.9969] Y[3.7339,5.4263,2.7052] Z[0.2228,0.5289,-0.1233]
+I (175543) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.205556
+I (175597) auto_cal:   PCCM linear gradients: X[60.0000,60.0000,60.0000] Y[0.7006,1.9965,0.5444] Z[-0.1745,0.0032,-0.0850]
+I (175598) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.206350
+I (175605) auto_cal: Iter 230: avg ΔE=  3.35 (best=  3.32) [R:7.9 G:3.2 B:3.6 Y:0.3]
+I (175611) auto_cal:   PCCM linear diag: [1.916, 1.407, 1.395]
+I (175616) auto_cal:   Lightness: scale=0.0836 offset=-2.76
+I (175621) auto_cal:   Saturation boost: 0.975
+I (175673) auto_cal:   PCCM linear gradients: X[-7.4602,-10.4258,-4.3062] Y[6.0279,8.0267,4.5477] Z[1.0912,1.5733,-0.0142]
+I (175674) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.207144
+I (175728) auto_cal:   PCCM linear gradients: X[-6.1427,-8.9658,-3.0677] Y[4.8676,6.8340,3.2152] Z[2.1546,2.7915,0.2962]
+I (175729) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.207936
+I (175783) auto_cal:   PCCM linear gradients: X[2.4093,0.8590,1.6263] Y[-4.0674,-3.4144,-1.8486] Z[3.1461,3.8992,0.6981]
+I (175784) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.208728
+I (175838) auto_cal:   PCCM linear gradients: X[5.6661,4.1035,6.9051] Y[-7.2274,-6.5426,-6.8697] Z[3.1664,3.8629,0.8210]
+I (175838) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.209520
+I (175892) auto_cal:   PCCM linear gradients: X[1.5346,-0.3737,2.2027] Y[-2.7230,-1.6783,-1.9975] Z[3.5790,4.4111,0.8353]
+I (175893) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.210310
+I (175947) auto_cal:   PCCM linear gradients: X[-4.8016,-7.6408,-1.6313] Y[3.6149,5.5513,1.9419] Z[3.3469,4.1873,0.6670]
+I (175948) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.211100
+I (176001) auto_cal:   PCCM linear gradients: X[-2.6739,-5.3684,1.6102] Y[1.1152,2.9027,-1.8241] Z[3.2196,4.0195,0.7260]
+I (176002) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.211889
+I (176056) auto_cal:   PCCM linear gradients: X[4.1850,2.0200,6.5757] Y[-5.7710,-4.5686,-6.9304] Z[1.0947,1.4739,0.3507]
+I (176057) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.212677
+I (176111) auto_cal:   PCCM linear gradients: X[-0.7361,-3.4328,4.5695] Y[-1.1170,0.6402,-5.1799] Z[0.2213,0.4181,0.1811]
+I (176112) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.213464
+I (176165) auto_cal:   PCCM linear gradients: X[-2.8497,-5.7956,2.4498] Y[1.2597,3.2973,-3.0189] Z[0.2724,0.5300,0.1575]
+I (176166) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.214251
+I (176173) auto_cal: Iter 240: avg ΔE=  3.30 (best=  3.30) [R:7.8 G:3.2 B:3.4 Y:0.3]
+I (176179) auto_cal:   PCCM linear diag: [1.914, 1.405, 1.395]
+I (176184) auto_cal:   Lightness: scale=0.0838 offset=-2.77
+I (176190) auto_cal:   Saturation boost: 0.987
+I (176242) auto_cal:   PCCM linear gradients: X[-3.4758,-6.4085,1.0064] Y[2.3042,4.3682,-1.3657] Z[0.1266,0.3802,0.1022]
+I (176243) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.215037
+I (176296) auto_cal:   PCCM linear gradients: X[-2.6976,-5.4301,0.6870] Y[1.8332,3.7396,-0.8997] Z[-0.1153,0.0858,0.0470]
+I (176297) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.215821
+I (176351) auto_cal:   PCCM linear gradients: X[-0.3583,-2.6574,1.3442] Y[-0.4765,1.0110,-1.5953] Z[-0.2408,-0.0900,0.0315]
+I (176352) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.216606
+I (176406) auto_cal:   PCCM linear gradients: X[0.6182,-1.3307,0.4351] Y[-1.6898,-0.5776,-0.8091] Z[-0.0037,0.1787,0.0207]
+I (176407) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.217389
+I (176461) auto_cal:   PCCM linear gradients: X[1.5936,-0.0587,0.0600] Y[-2.8683,-2.0661,-0.4703] Z[0.5481,0.8382,0.0848]
+I (176462) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.218172
+I (176515) auto_cal:   PCCM linear gradients: X[2.0807,0.5883,-0.1265] Y[-3.2936,-2.6242,-0.2055] Z[1.1865,1.6068,0.1822]
+I (176516) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.218953
+I (176570) auto_cal:   PCCM linear gradients: X[1.6419,-0.0802,-0.1855] Y[-2.5961,-1.6800,-0.0085] Z[2.0100,2.6028,0.3293]
+I (176571) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.219734
+I (176625) auto_cal:   PCCM linear gradients: X[-0.6152,-2.8746,-0.1055] Y[-0.4690,0.9078,-0.0799] Z[2.9008,3.6726,0.5023]
+I (176626) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.220515
+I (176679) auto_cal:   PCCM linear gradients: X[-1.4796,-3.9488,0.7715] Y[0.1385,1.7066,-1.1339] Z[3.1788,4.0132,0.5811]
+I (176680) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.221294
+I (176734) auto_cal:   PCCM linear gradients: X[-1.1430,-3.6453,2.2933] Y[-0.4905,1.0829,-2.8596] Z[3.1241,3.9061,0.5953]
+I (176735) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.222073
+I (176742) auto_cal: Iter 250: avg ΔE=  3.26 (best=  3.26) [R:7.8 G:3.2 B:3.4 Y:0.0]
+I (176748) auto_cal:   PCCM linear diag: [1.914, 1.404, 1.395]
+I (176753) auto_cal:   Lightness: scale=0.0840 offset=-2.78
+I (176758) auto_cal:   Saturation boost: 0.987
+I (176811) auto_cal:   PCCM linear gradients: X[-0.6510,-3.1469,3.4946] Y[-0.8922,0.6478,-4.0736] Z[0.9228,1.4262,0.1789]
+I (176811) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.222851
+I (176865) auto_cal:   PCCM linear gradients: X[-4.6216,-7.8783,0.9750] Y[2.8138,5.1016,-1.7117] Z[1.0809,1.5483,0.1894]
+I (176866) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.223628
+I (176920) auto_cal:   PCCM linear gradients: X[-5.1529,-8.3802,-0.1736] Y[3.4424,5.7018,-0.5355] Z[0.8216,1.2569,0.1029]
+I (176921) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.224404
+I (176975) auto_cal:   PCCM linear gradients: X[-4.1649,-7.1812,0.0796] Y[2.6350,4.7262,-0.7473] Z[0.3254,0.6529,0.0173]
+I (176976) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.225180
+I (177029) auto_cal:   PCCM linear gradients: X[-0.4506,-2.8384,1.5439] Y[-0.7950,0.7106,-2.1611] Z[-0.3271,-0.1711,-0.0550]
+I (177030) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.225955
+I (177084) auto_cal:   PCCM linear gradients: X[-1.3405,-3.7681,0.2474] Y[0.1529,1.6890,-0.7648] Z[-0.2731,-0.1068,-0.0759]
+I (177085) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.226729
+I (177139) auto_cal:   PCCM linear gradients: X[-1.7042,-4.0812,-0.7756] Y[0.5285,1.9993,0.4075] Z[-0.1667,0.0190,-0.0958]
+I (177140) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.227502
+I (177194) auto_cal:   PCCM linear gradients: X[-0.0832,-2.3390,-0.5531] Y[-1.4491,-0.1388,0.1667] Z[0.9016,1.3623,0.0530]
+I (177195) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.228274
+I (177249) auto_cal:   PCCM linear gradients: X[1.3812,-0.5903,-0.0639] Y[-3.3067,-2.3984,-0.3988] Z[2.3454,3.0369,0.3208]
+I (177250) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.229046
+I (177303) auto_cal:   PCCM linear gradients: X[-4.1519,-6.8744,-2.0177] Y[3.5722,5.4662,2.0238] Z[-0.0825,0.1932,-0.2007]
+I (177304) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.229817
+I (177311) auto_cal: Iter 260: avg ΔE=  3.27 (best=  3.26) [R:7.5 G:3.1 B:3.2 Y:0.4]
+I (177317) auto_cal:   PCCM linear diag: [1.914, 1.403, 1.395]
+I (177322) auto_cal:   Lightness: scale=0.0845 offset=-2.79
+I (177328) auto_cal:   Saturation boost: 0.983
+I (177380) auto_cal:   PCCM linear gradients: X[24.2264,21.3403,26.8214] Y[5.1713,-22.7975,-26.5548] Z[-30.0964,-29.7419,-30.3183]
+I (177381) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.230587
+I (177436) auto_cal:   PCCM linear gradients: X[-20.2057,-23.6080,-17.5146] Y[18.6150,20.9401,17.5842] Z[1.0678,1.6831,-0.0325]
+I (177437) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.231357
+I (177491) auto_cal:   PCCM linear gradients: X[-19.9484,-23.2308,-17.2101] Y[17.0522,19.1193,16.4688] Z[1.5552,2.2244,0.1019]
+I (177492) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.232125
+I (177546) auto_cal:   PCCM linear gradients: X[-4.7405,-7.3788,-1.3930] Y[0.5468,1.8889,-0.3248] Z[1.9240,2.5892,-0.0044]
+I (177547) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.232893
+I (177602) auto_cal:   PCCM linear gradients: X[37.5160,35.3639,41.7181] Y[-9.0704,-8.1807,-10.6851] Z[1.4967,2.1530,-0.7296]
+I (177603) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.233660
+I (177657) auto_cal:   PCCM linear gradients: X[32.3855,29.3902,39.3946] Y[-34.1444,-32.2433,-39.3182] Z[-28.3141,-27.6226,-30.3359]
+I (177659) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.234427
+I (177713) auto_cal:   PCCM linear gradients: X[-60.0000,-60.0000,-60.0000] Y[6.7217,9.3482,4.2236] Z[2.4694,3.1233,0.4987]
+I (177714) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.235192
+I (177768) auto_cal:   PCCM linear gradients: X[-5.6992,-9.1119,-2.0388] Y[6.3045,8.9917,3.5187] Z[2.2297,2.8216,0.5025]
+I (177769) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.235957
+I (177823) auto_cal:   PCCM linear gradients: X[31.9127,28.8526,38.7908] Y[-31.3469,-29.0439,-37.6184] Z[-28.9631,-28.6977,-29.2302]
+I (177824) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.236721
+I (177879) auto_cal:   PCCM linear gradients: X[2.9771,0.3771,38.9423] Y[-4.9032,-3.3314,-8.8333] Z[-0.2033,0.1025,-0.5662]
+I (177880) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.237484
+I (177887) auto_cal: Iter 270: avg ΔE=  3.29 (best=  3.26) [R:8.1 G:3.3 B:3.1 Y:0.6]
+I (177893) auto_cal:   PCCM linear diag: [1.915, 1.403, 1.398]
+I (177898) auto_cal:   Lightness: scale=0.0832 offset=-2.79
+I (177904) auto_cal:   Saturation boost: 0.985
+I (177956) auto_cal:   PCCM linear gradients: X[35.2734,32.6335,38.7893] Y[0.4200,1.9275,-1.2997] Z[0.4711,0.8818,-0.2052]
+I (177957) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.238247
+I (178011) auto_cal:   PCCM linear gradients: X[-9.0445,-12.0651,-5.8438] Y[6.0357,7.8527,4.9305] Z[0.8156,1.3609,-0.2658]
+I (178012) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.239008
+I (178066) auto_cal:   PCCM linear gradients: X[-60.0000,-60.0000,-60.0000] Y[60.0000,60.0000,60.0000] Z[0.9413,1.4995,-0.2152]
+I (178067) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.239769
+I (178121) auto_cal:   PCCM linear gradients: X[-4.2131,-6.7948,-1.9082] Y[0.7910,2.1956,0.4337] Z[0.6917,1.0984,-0.1506]
+I (178122) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.240530
+I (178176) auto_cal:   PCCM linear gradients: X[7.2391,5.4169,9.2515] Y[-10.1157,-9.3694,-10.3939] Z[0.2536,0.5568,-0.4597]
+I (178177) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.241289
+I (178231) auto_cal:   PCCM linear gradients: X[26.8830,25.4008,30.9293] Y[-27.9216,-27.3308,-30.7469] Z[0.6171,0.8837,0.2058]
+I (178232) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.242048
+I (178287) auto_cal:   PCCM linear gradients: X[7.9831,5.8247,10.5313] Y[-7.0472,-5.5323,-9.6265] Z[-0.8079,-0.6717,-0.4945]
+I (178288) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.242806
+I (178342) auto_cal:   PCCM linear gradients: X[-1.2850,-3.8955,-1.1373] Y[3.1682,5.1802,3.1710] Z[-1.4169,-1.2565,-1.0500]
+I (178343) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.243563
+I (178398) auto_cal:   PCCM linear gradients: X[-5.3964,-8.2469,-4.4134] Y[7.1130,9.2467,6.7860] Z[-1.7461,-1.4894,-1.4508]
+I (178399) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.244319
+I (178453) auto_cal:   PCCM linear gradients: X[-5.5650,-8.2093,-4.4429] Y[6.1040,7.8595,5.9808] Z[-2.1645,-1.8858,-1.6711]
+I (178454) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.245075
+I (178461) auto_cal: Iter 280: avg ΔE=  3.43 (best=  3.26) [R:8.0 G:3.2 B:2.9 Y:1.3]
+I (178467) auto_cal:   PCCM linear diag: [1.914, 1.402, 1.401]
+I (178472) auto_cal:   Lightness: scale=0.0830 offset=-2.79
+I (178477) auto_cal:   Saturation boost: 0.986
+I (178530) auto_cal:   PCCM linear gradients: X[-1.1331,-3.2141,-0.5268] Y[-0.1957,0.8645,0.5169] Z[-2.1192,-1.8737,-1.6330]
+I (178531) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.245830
+I (178585) auto_cal:   PCCM linear gradients: X[9.4886,7.8745,11.1868] Y[-10.7831,-10.2000,-10.9466] Z[-2.6954,-2.4685,-2.5610]
+I (178586) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.246584
+I (178641) auto_cal:   PCCM linear gradients: X[3.8120,1.9417,5.3952] Y[-5.4426,-4.5311,-5.8618] Z[-1.4259,-1.1907,-1.3038]
+I (178642) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.247338
+I (178696) auto_cal:   PCCM linear gradients: X[-3.1710,-5.6815,-2.2566] Y[3.5472,5.2412,3.3605] Z[-1.2647,-1.0121,-1.2681]
+I (178697) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.248090
+I (178751) auto_cal:   PCCM linear gradients: X[-7.8185,-10.8402,-6.3359] Y[8.4724,10.7436,7.8998] Z[0.2939,0.6655,-0.4112]
+I (178752) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.248842
+I (178806) auto_cal:   PCCM linear gradients: X[-60.0000,-60.0000,-60.0000] Y[60.0000,60.0000,60.0000] Z[1.1234,1.6139,-0.2010]
+I (178807) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.249593
+I (178861) auto_cal:   PCCM linear gradients: X[-7.2440,-10.2354,-4.5898] Y[5.4855,7.5002,4.3341] Z[1.7163,2.2576,0.0006]
+I (178862) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.250344
+I (178916) auto_cal:   PCCM linear gradients: X[43.7667,41.5344,46.9508] Y[-48.2138,-47.1275,-48.6041] Z[-37.9539,-37.3528,-40.6338]
+I (178917) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.251093
+I (178972) auto_cal:   PCCM linear gradients: X[1.8585,-0.5028,5.2330] Y[-6.9050,-5.6961,-7.2745] Z[4.3001,5.0302,0.8390]
+I (178973) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.251842
+I (179026) auto_cal:   PCCM linear gradients: X[-2.7401,-5.6232,0.7212] Y[-0.4560,1.4050,-1.9984] Z[4.7268,5.5352,1.0601]
+I (179027) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.252590
+I (179034) auto_cal: Iter 290: avg ΔE=  3.31 (best=  3.26) [R:7.5 G:2.8 B:2.8 Y:0.6]
+I (179040) auto_cal:   PCCM linear diag: [1.915, 1.400, 1.404]
+I (179045) auto_cal:   Lightness: scale=0.0852 offset=-2.79
+I (179051) auto_cal:   Saturation boost: 0.979
+I (179103) auto_cal:   PCCM linear gradients: X[-2.1908,-5.3227,1.0828] Y[0.3575,2.6020,-1.5398] Z[5.1198,5.9314,1.3429]
+I (179104) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.253338
+I (179158) auto_cal:   PCCM linear gradients: X[0.0905,-2.9655,3.4146] Y[-1.5472,0.6357,-3.4394] Z[4.7108,5.4394,1.2949]
+I (179158) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.254084
+I (179212) auto_cal:   PCCM linear gradients: X[46.5627,44.4096,47.2987] Y[-7.9963,-6.6705,-7.7839] Z[2.3162,2.6779,0.3744]
+I (179213) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.254830
+I (179267) auto_cal:   PCCM linear gradients: X[-1.6756,-4.1200,-1.8748] Y[0.1431,1.6491,1.7271] Z[1.7231,2.0574,0.1949]
+I (179268) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.255575
+I (179322) auto_cal:   PCCM linear gradients: X[-5.7694,-8.4838,-5.1241] Y[3.0622,4.6663,4.8467] Z[1.4412,1.8194,-0.1260]
+I (179323) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.256320
+I (179377) auto_cal:   PCCM linear gradients: X[-6.6915,-9.4268,-5.9571] Y[3.4473,4.9986,5.5177] Z[1.2894,1.6643,-0.2106]
+I (179378) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.257064
+I (179431) auto_cal:   PCCM linear gradients: X[-3.7875,-6.1512,-4.4694] Y[0.7125,1.9479,3.9517] Z[0.8910,1.1593,-0.2750]
+I (179432) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.257806
+I (179486) auto_cal:   PCCM linear gradients: X[37.1658,35.0112,35.6371] Y[-38.8582,-37.6971,-35.5667] Z[-37.4398,-37.2645,-38.1855]
+I (179488) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.258549
+I (179542) auto_cal:   PCCM linear gradients: X[-3.1252,-5.8964,-3.7067] Y[3.4970,5.4822,5.0482] Z[0.6691,0.7957,-0.0379]
+I (179543) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.259290
+I (179597) auto_cal:   PCCM linear gradients: X[-3.1168,-6.1593,-2.7486] Y[3.7677,6.0941,4.2968] Z[1.2121,1.3491,0.2820]
+I (179598) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.260031
+I (179604) auto_cal: Iter 300: avg ΔE=  3.23 (best=  3.23) [R:7.4 G:3.1 B:2.4 Y:0.3]
+I (179610) auto_cal:   PCCM linear diag: [1.914, 1.400, 1.407]
+I (179616) auto_cal:   Lightness: scale=0.0861 offset=-2.79
+I (179621) auto_cal:   Saturation boost: 1.000
+I (179673) auto_cal:   PCCM linear gradients: X[-0.9983,-3.9580,0.6928] Y[0.6135,2.7483,-0.1651] Z[1.5408,1.6878,0.5717]
+I (179674) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.260771
+I (179728) auto_cal:   PCCM linear gradients: X[3.6472,1.1301,7.0422] Y[-6.3981,-4.9567,-7.8084] Z[2.5554,2.9186,0.5949]
+I (179729) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.261510
+I (179782) auto_cal:   PCCM linear gradients: X[2.2796,-0.3061,5.8358] Y[-7.0565,-5.6813,-7.7329] Z[3.5567,4.0443,0.7650]
+I (179783) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.262248
+I (179837) auto_cal:   PCCM linear gradients: X[-1.2612,-4.1848,2.6828] Y[-3.5286,-1.8386,-4.7379] Z[3.7147,4.2524,0.8135]
+I (179838) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.262986
+I (179892) auto_cal:   PCCM linear gradients: X[-4.9198,-8.2870,-0.5506] Y[1.6698,3.8829,-0.7442] Z[3.4533,4.0051,0.8001]
+I (179893) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.263723
+I (179947) auto_cal:   PCCM linear gradients: X[-5.7863,-9.3805,-1.5836] Y[3.9693,6.5217,1.2279] Z[3.3876,3.9165,0.8801]
+I (179947) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.264459
+I (180001) auto_cal:   PCCM linear gradients: X[-4.7491,-8.3365,-0.5559] Y[3.2883,5.8541,0.5145] Z[3.2840,3.7644,0.9159]
+I (180002) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.265195
+I (180056) auto_cal:   PCCM linear gradients: X[0.2778,-2.4624,2.2174] Y[-2.2057,-0.5188,-2.5687] Z[2.8093,3.1751,0.8219]
+I (180057) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.265930
+I (180110) auto_cal:   PCCM linear gradients: X[4.3408,2.3365,4.2942] Y[-6.5994,-5.6251,-5.0924] Z[2.5544,2.8702,0.6976]
+I (180111) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.266664
+I (180165) auto_cal:   PCCM linear gradients: X[4.4295,2.5846,3.7318] Y[-7.0941,-6.2807,-4.8896] Z[2.2736,2.5512,0.5854]
+I (180166) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.267397
+I (180173) auto_cal: Iter 310: avg ΔE=  3.20 (best=  3.20) [R:7.8 G:3.5 B:2.1 Y:0.5]
+I (180179) auto_cal:   PCCM linear diag: [1.913, 1.401, 1.410]
+I (180184) auto_cal:   Lightness: scale=0.0861 offset=-2.80
+I (180189) auto_cal:   Saturation boost: 1.007
+I (180242) auto_cal:   PCCM linear gradients: X[2.3546,0.4454,1.1433] Y[-4.6804,-3.8003,-2.1747] Z[1.6090,1.8172,0.4007]
+I (180242) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.268130
+I (180296) auto_cal:   PCCM linear gradients: X[-1.0440,-3.3157,-1.7190] Y[-0.4153,0.8605,1.2301] Z[0.7019,0.8062,0.1739]
+I (180297) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.268862
+I (180351) auto_cal:   PCCM linear gradients: X[-3.8377,-6.5285,-3.2625] Y[3.0193,4.7472,3.2121] Z[0.3294,0.4201,0.0694]
+I (180352) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.269593
+I (180405) auto_cal:   PCCM linear gradients: X[-4.3389,-7.1490,-2.9650] Y[3.5458,5.3862,2.8642] Z[0.2692,0.3824,0.0684]
+I (180406) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.270323
+I (180460) auto_cal:   PCCM linear gradients: X[-2.6184,-5.3129,-0.3560] Y[1.3337,3.0305,-0.1615] Z[0.2338,0.3409,0.1087]
+I (180461) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.271053
+I (180515) auto_cal:   PCCM linear gradients: X[0.6737,-1.8094,4.0615] Y[-2.4576,-1.0306,-4.7368] Z[0.3682,0.4886,0.1109]
+I (180516) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.271782
+I (180570) auto_cal:   PCCM linear gradients: X[2.7260,0.3685,6.7741] Y[-4.5531,-3.2815,-7.1996] Z[0.5534,0.7064,0.0919]
+I (180570) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.272510
+I (180624) auto_cal:   PCCM linear gradients: X[-2.7661,-5.5906,1.2271] Y[0.9071,2.6385,-1.9007] Z[0.7802,0.9966,0.2035]
+I (180625) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.273237
+I (180679) auto_cal:   PCCM linear gradients: X[-6.5037,-9.6107,-3.2490] Y[5.0710,7.0871,2.9615] Z[1.3466,1.7020,0.2495]
+I (180680) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.273964
+I (180733) auto_cal:   PCCM linear gradients: X[-6.9230,-10.0323,-4.0997] Y[5.5590,7.5495,4.0503] Z[1.7692,2.2000,0.2928]
+I (180734) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.274690
+I (180741) auto_cal: Iter 320: avg ΔE=  3.15 (best=  3.15) [R:7.6 G:3.4 B:2.1 Y:0.1]
+I (180747) auto_cal:   PCCM linear diag: [1.913, 1.401, 1.410]
+I (180752) auto_cal:   Lightness: scale=0.0872 offset=-2.80
+I (180758) auto_cal:   Saturation boost: 0.996
+I (180810) auto_cal:   PCCM linear gradients: X[-2.2686,-4.5407,-1.8320] Y[0.2534,1.3878,1.4572] Z[2.4724,3.0032,0.4654]
+I (180811) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.275416
+I (180864) auto_cal:   PCCM linear gradients: X[3.5119,2.0093,2.1906] Y[-5.2354,-4.8361,-2.6166] Z[2.5920,3.1130,0.5662]
+I (180865) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.276140
+I (180919) auto_cal:   PCCM linear gradients: X[1.2356,-0.3988,-0.9308] Y[-3.0979,-2.6383,0.5206] Z[2.7161,3.2943,0.4925]
+I (180920) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.276864
+I (180974) auto_cal:   PCCM linear gradients: X[-3.4802,-5.7439,-3.3696] Y[1.7349,2.8855,3.2148] Z[2.5759,3.1573,0.3951]
+I (180975) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.277587
+I (181028) auto_cal:   PCCM linear gradients: X[-5.6999,-8.4785,-3.6774] Y[4.3781,6.0256,3.6242] Z[1.6215,2.0422,0.2384]
+I (181029) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.278309
+I (181083) auto_cal:   PCCM linear gradients: X[-3.2606,-5.7747,-1.3198] Y[1.9060,3.3469,0.9216] Z[0.8793,1.1541,0.1770]
+I (181084) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.279031
+I (181138) auto_cal:   PCCM linear gradients: X[0.9711,-1.2138,2.9755] Y[-2.4368,-1.3192,-3.5347] Z[0.5181,0.7180,0.1315]
+I (181139) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.279752
+I (181192) auto_cal:   PCCM linear gradients: X[-6.2907,-9.1738,-3.8570] Y[4.9471,6.7313,3.4271] Z[0.8384,1.2000,-0.0068]
+I (181193) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.280472
+I (181247) auto_cal:   PCCM linear gradients: X[-7.2923,-10.1864,-5.2056] Y[6.0377,7.8149,4.9667] Z[0.7930,1.1878,-0.1117]
+I (181248) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.281192
+I (181302) auto_cal:   PCCM linear gradients: X[-5.8129,-8.5751,-3.7477] Y[4.3972,6.0511,3.2381] Z[0.5355,0.8614,-0.1152]
+I (181303) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.281911
+I (181310) auto_cal: Iter 330: avg ΔE=  3.14 (best=  3.13) [R:7.5 G:3.5 B:2.1 Y:0.2]
+I (181315) auto_cal:   PCCM linear diag: [1.914, 1.400, 1.410]
+I (181321) auto_cal:   Lightness: scale=0.0876 offset=-2.80
+I (181326) auto_cal:   Saturation boost: 0.995
+I (181378) auto_cal:   PCCM linear gradients: X[-4.0330,-6.5994,-2.2399] Y[2.4431,3.9021,1.5299] Z[0.3785,0.6431,-0.0943]
+I (181379) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.282629
+I (181433) auto_cal:   PCCM linear gradients: X[-3.7463,-6.2933,-2.2097] Y[2.1750,3.6122,1.5444] Z[0.5574,0.8348,-0.0370]
+I (181434) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.283346
+I (181488) auto_cal:   PCCM linear gradients: X[-5.0130,-7.7891,-3.2740] Y[3.5515,5.1875,2.7990] Z[1.1115,1.4880,0.0674]
+I (181489) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.284063
+I (181542) auto_cal:   PCCM linear gradients: X[-3.7354,-6.4284,-2.1503] Y[2.1242,3.6658,1.5706] Z[1.4907,1.8942,0.2199]
+I (181543) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.284779
+I (181597) auto_cal:   PCCM linear gradients: X[1.0244,-1.0970,0.9719] Y[-2.8803,-1.8865,-1.7841] Z[1.9096,2.3375,0.4122]
+I (181598) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.285494
+I (181652) auto_cal:   PCCM linear gradients: X[-0.8610,-3.3159,0.1636] Y[-1.1339,0.1513,-1.0024] Z[2.3978,2.9099,0.5150]
+I (181653) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.286208
+I (181706) auto_cal:   PCCM linear gradients: X[-1.6048,-4.2689,0.0134] Y[-0.4050,1.0710,-0.8993] Z[2.5104,3.0380,0.5562]
+I (181707) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.286922
+I (181761) auto_cal:   PCCM linear gradients: X[-1.0921,-3.7512,0.6365] Y[-0.9825,0.4898,-1.6298] Z[2.3856,2.8851,0.5512]
+I (181762) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.287635
+I (181816) auto_cal:   PCCM linear gradients: X[0.0743,-2.4761,1.6885] Y[-2.2029,-0.8277,-2.7941] Z[2.1088,2.5526,0.5120]
+I (181817) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.288347
+I (181870) auto_cal:   PCCM linear gradients: X[1.0271,-1.4409,2.5570] Y[-3.0832,-1.7718,-3.6992] Z[1.7607,2.1404,0.4594]
+I (181871) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.289059
+I (181878) auto_cal: Iter 340: avg ΔE=  3.16 (best=  3.13) [R:7.4 G:3.3 B:2.2 Y:0.3]
+I (181884) auto_cal:   PCCM linear diag: [1.916, 1.398, 1.410]
+I (181889) auto_cal:   Lightness: scale=0.0888 offset=-2.80
+I (181895) auto_cal:   Saturation boost: 0.992
+I (181947) auto_cal:   PCCM linear gradients: X[1.1898,-1.2845,2.7856] Y[-3.0470,-1.7012,-3.8972] Z[1.4158,1.7407,0.4054]
+I (181948) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.289770
+I (182001) auto_cal:   PCCM linear gradients: X[0.7478,-1.7816,2.4068] Y[-2.3756,-0.9502,-3.4616] Z[1.1438,1.4343,0.3552]
+I (182003) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.290480
+I (182056) auto_cal:   PCCM linear gradients: X[0.2431,-2.3052,1.8238] Y[-1.7334,-0.2782,-2.8393] Z[0.9573,1.2357,0.3035]
+I (182057) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.291190
+I (182111) auto_cal:   PCCM linear gradients: X[0.0664,-2.4333,1.4136] Y[-1.5486,-0.1414,-2.4288] Z[0.8272,1.1032,0.2480]
+I (182112) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.291899
+I (182165) auto_cal:   PCCM linear gradients: X[0.2944,-2.1036,1.3205] Y[-1.8539,-0.5590,-2.3664] Z[0.7496,1.0264,0.2010]
+I (182166) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.292607
+I (182220) auto_cal:   PCCM linear gradients: X[0.7160,-1.5727,1.4449] Y[-2.3390,-1.1630,-2.5024] Z[0.7385,1.0211,0.1794]
+I (182221) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.293314
+I (182275) auto_cal:   PCCM linear gradients: X[-2.4362,-5.0286,-1.2395] Y[0.7995,2.2428,0.3123] Z[1.0276,1.4042,0.1612]
+I (182276) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.294021
+I (182329) auto_cal:   PCCM linear gradients: X[0.3344,-1.9342,0.9168] Y[-2.0238,-0.8956,-1.9270] Z[1.0008,1.3413,0.2077]
+I (182330) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.294727
+I (182384) auto_cal:   PCCM linear gradients: X[-0.6112,-2.9942,0.2522] Y[-1.0846,0.1434,-1.2008] Z[1.2696,1.6652,0.2528]
+I (182385) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.295432
+I (182439) auto_cal:   PCCM linear gradients: X[-1.2134,-3.6165,-0.5734] Y[-0.4541,0.7856,-0.2620] Z[1.5116,1.9543,0.2847]
+I (182440) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.296137
+I (182446) auto_cal: Iter 350: avg ΔE=  3.15 (best=  3.13) [R:7.3 G:3.2 B:2.2 Y:0.2]
+I (182452) auto_cal:   PCCM linear diag: [1.916, 1.397, 1.410]
+I (182458) auto_cal:   Lightness: scale=0.0895 offset=-2.80
+I (182463) auto_cal:   Saturation boost: 0.985
+I (182515) auto_cal:   PCCM linear gradients: X[-0.4938,-2.7686,-0.2646] Y[-1.2262,-0.1249,-0.5704] Z[1.6934,2.1678,0.3252]
+I (182516) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.296840
+I (182570) auto_cal:   PCCM linear gradients: X[-2.2178,-4.6966,-1.5696] Y[0.4995,1.7748,0.8280] Z[1.9103,2.4494,0.3186]
+I (182571) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.297544
+I (182625) auto_cal:   PCCM linear gradients: X[3.6159,1.9335,2.1060] Y[-5.3943,-4.8686,-3.0867] Z[1.8102,2.2951,0.3710]
+I (182626) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.298246
+I (182679) auto_cal:   PCCM linear gradients: X[-3.3953,-6.0171,-2.3201] Y[2.1144,3.5846,1.7956] Z[1.4845,1.9858,0.1856]
+I (182680) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.298948
+I (182734) auto_cal:   PCCM linear gradients: X[-2.2315,-4.6893,-1.2814] Y[1.1328,2.4855,0.6987] Z[0.8923,1.2938,0.0738]
+I (182735) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.299649
+I (182789) auto_cal:   PCCM linear gradients: X[-5.2774,-7.9217,-4.3179] Y[4.4771,5.9950,4.2440] Z[0.7992,1.2841,-0.1502]
+I (182790) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.300349
+I (182844) auto_cal:   PCCM linear gradients: X[32.7461,30.9278,32.3833] Y[-33.4564,-32.7388,-32.4901] Z[-30.2427,-29.9808,-30.4983]
+I (182845) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.301049
+I (182900) auto_cal:   PCCM linear gradients: X[-5.7713,-8.4025,-4.6428] Y[4.5737,6.0183,4.5016] Z[1.2870,1.8787,-0.1246]
+I (182901) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.301748
+I (182954) auto_cal:   PCCM linear gradients: X[-5.1302,-7.7476,-3.8846] Y[3.7895,5.2074,3.5690] Z[2.0336,2.7381,0.0700]
+I (182955) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.302446
+I (183009) auto_cal:   PCCM linear gradients: X[-3.6427,-6.1253,-2.3702] Y[1.9712,3.2413,1.6888] Z[2.7812,3.6017,0.2940]
+I (183010) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.303144
+I (183017) auto_cal: Iter 360: avg ΔE=  3.12 (best=  3.12) [R:7.3 G:3.3 B:2.2 Y:0.2]
+I (183023) auto_cal:   PCCM linear diag: [1.916, 1.397, 1.411]
+I (183028) auto_cal:   Lightness: scale=0.0894 offset=-2.80
+I (183033) auto_cal:   Saturation boost: 0.985
+I (183085) auto_cal:   PCCM linear gradients: X[-2.8831,-5.3416,-1.3297] Y[1.0509,2.3010,0.4346] Z[3.0349,3.8825,0.4193]
+I (183086) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.303840
+I (183140) auto_cal:   PCCM linear gradients: X[-3.8240,-6.4692,-1.8214] Y[2.0338,3.4730,0.8997] Z[2.7393,3.5207,0.4181]
+I (183141) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.304537
+I (183195) auto_cal:   PCCM linear gradients: X[-2.5643,-5.3251,0.7069] Y[0.6706,2.2072,-1.7842] Z[2.6277,3.3686,0.5003]
+I (183196) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.305232
+I (183249) auto_cal:   PCCM linear gradients: X[0.3588,-1.9277,4.1035] Y[-2.2244,-1.0484,-5.0902] Z[1.8390,2.3916,0.4387]
+I (183250) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.305927
+I (183304) auto_cal:   PCCM linear gradients: X[-1.4453,-4.1620,1.9453] Y[0.1794,1.7959,-2.9117] Z[0.7771,1.1355,0.2868]
+I (183305) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.306621
+I (183358) auto_cal:   PCCM linear gradients: X[1.4203,-0.9745,4.2473] Y[-2.3422,-1.0034,-5.0483] Z[-0.0235,0.1651,0.1833]
+I (183359) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.307314
+I (183413) auto_cal:   PCCM linear gradients: X[1.6516,-0.5264,3.0591] Y[-2.5940,-1.4694,-3.9514] Z[-0.2390,-0.0859,0.1476]
+I (183414) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.308007
+I (183468) auto_cal:   PCCM linear gradients: X[0.8380,-1.2453,1.2323] Y[-1.8985,-0.8817,-2.1882] Z[-0.2520,-0.0906,0.1273]
+I (183469) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.308699
+I (183523) auto_cal:   PCCM linear gradients: X[6.2485,4.9175,4.5781] Y[-7.1083,-6.8126,-5.3914] Z[0.2743,0.5116,0.2573]
+I (183524) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.309390
+I (183577) auto_cal:   PCCM linear gradients: X[2.4790,0.9377,-0.0732] Y[-3.1998,-2.7040,-0.5710] Z[-0.1107,0.0558,0.1508]
+I (183578) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.310081
+I (183585) auto_cal: Iter 370: avg ΔE=  3.10 (best=  3.10) [R:7.2 G:3.3 B:1.9 Y:0.1]
+I (183591) auto_cal:   PCCM linear diag: [1.917, 1.397, 1.412]
+I (183597) auto_cal:   Lightness: scale=0.0895 offset=-2.80
+I (183602) auto_cal:   Saturation boost: 0.998
+I (183654) auto_cal:   PCCM linear gradients: X[-3.1158,-5.4127,-2.8157] Y[2.2856,3.4814,2.4109] Z[0.3066,0.5956,0.1630]
+I (183655) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.310771
+I (183709) auto_cal:   PCCM linear gradients: X[3.6739,2.1229,1.0298] Y[-4.8411,-4.4467,-1.5472] Z[1.0322,1.4508,0.3752]
+I (183710) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.311460
+I (183763) auto_cal:   PCCM linear gradients: X[6.7902,5.6037,5.4766] Y[-7.8851,-7.9105,-5.7381] Z[1.9189,2.5042,0.5569]
+I (183764) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.312148
+I (183818) auto_cal:   PCCM linear gradients: X[-6.2213,-8.9301,-4.6017] Y[5.3082,6.8026,4.7098] Z[1.6426,2.2895,0.2509]
+I (183819) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.312836
+I (183873) auto_cal:   PCCM linear gradients: X[-7.7623,-10.4103,-6.6072] Y[6.8353,8.2357,7.0262] Z[1.2798,1.9233,-0.0147]
+I (183873) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.313523
+I (183927) auto_cal:   PCCM linear gradients: X[38.0863,35.8639,42.0608] Y[-1.4588,-0.5369,-3.5717] Z[1.9615,2.6804,0.3822]
+I (183928) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.314210
+I (183982) auto_cal:   PCCM linear gradients: X[-2.8335,-5.1920,0.2767] Y[0.6822,1.6911,-0.5834] Z[2.5380,3.3666,0.5367]
+I (183983) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.314896
+I (184037) auto_cal:   PCCM linear gradients: X[-6.3716,-8.8661,-5.1987] Y[5.0484,6.2256,5.6211] Z[2.2113,2.9954,0.3031]
+I (184038) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.315581
+I (184091) auto_cal:   PCCM linear gradients: X[-5.9015,-8.3635,-4.8909] Y[4.7902,5.9360,5.6034] Z[2.4225,3.2328,0.3871]
+I (184092) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.316265
+I (184146) auto_cal:   PCCM linear gradients: X[-1.0798,-2.9916,-0.7879] Y[-0.3594,0.2344,1.2941] Z[3.1413,4.0646,0.7139]
+I (184147) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.316949
+I (184154) auto_cal: Iter 380: avg ΔE=  3.07 (best=  3.07) [R:7.3 G:3.4 B:1.9 Y:0.2]
+I (184160) auto_cal:   PCCM linear diag: [1.916, 1.397, 1.412]
+I (184165) auto_cal:   Lightness: scale=0.0886 offset=-2.80
+I (184170) auto_cal:   Saturation boost: 1.003
+I (184223) auto_cal:   PCCM linear gradients: X[6.4129,5.2776,5.6756] Y[-7.4477,-7.5945,-5.0176] Z[2.0097,2.6559,0.6336]
+I (184223) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.317632
+I (184277) auto_cal:   PCCM linear gradients: X[-5.4417,-7.8356,-4.2790] Y[4.4564,5.5346,4.9344] Z[0.6866,1.1737,0.1569]
+I (184278) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.318314
+I (184332) auto_cal:   PCCM linear gradients: X[-6.8263,-9.3286,-6.1170] Y[6.2863,7.5573,6.8859] Z[-0.0070,0.4035,-0.0823]
+I (184333) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.318996
+I (184386) auto_cal:   PCCM linear gradients: X[-5.0040,-7.2874,-4.4459] Y[4.1870,5.2470,4.8044] Z[-0.5792,-0.2837,-0.0736]
+I (184387) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.319677
+I (184441) auto_cal:   PCCM linear gradients: X[1.6664,-0.0960,2.7014] Y[-2.7288,-2.1833,-2.6038] Z[-0.8850,-0.7035,0.0982]
+I (184442) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.320357
+I (184496) auto_cal:   PCCM linear gradients: X[1.9059,-0.0560,4.2715] Y[-2.9674,-2.2467,-4.0631] Z[-0.7641,-0.5645,0.1279]
+I (184497) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.321037
+I (184551) auto_cal:   PCCM linear gradients: X[-4.1111,-6.7389,-1.2738] Y[3.0220,4.3817,1.4035] Z[0.0532,0.4392,0.2418]
+I (184552) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.321716
+I (184606) auto_cal:   PCCM linear gradients: X[-3.5862,-6.4721,0.9292] Y[2.5884,4.1758,-0.4820] Z[0.6940,1.1814,0.4209]
+I (184607) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.322394
+I (184660) auto_cal:   PCCM linear gradients: X[3.9873,1.5324,10.5097] Y[-5.0641,-3.9951,-9.0531] Z[1.0356,1.5566,0.2806]
+I (184661) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.323072
+I (184715) auto_cal:   PCCM linear gradients: X[-1.3570,-4.3529,5.3654] Y[0.3353,1.9352,-4.1384] Z[1.3748,1.9774,0.4916]
+I (184716) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.323749
+I (184723) auto_cal: Iter 390: avg ΔE=  3.07 (best=  3.06) [R:7.3 G:3.4 B:1.8 Y:0.4]
+I (184729) auto_cal:   PCCM linear diag: [1.916, 1.396, 1.412]
+I (184734) auto_cal:   Lightness: scale=0.0882 offset=-2.80
+I (184739) auto_cal:   Saturation boost: 1.009
+I (184791) auto_cal:   PCCM linear gradients: X[-5.0390,-7.7639,-1.9481] Y[3.6432,4.9723,2.6344] Z[1.3294,1.9464,0.4349]
+I (184792) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.324425
+I (184846) auto_cal:   PCCM linear gradients: X[-1.6651,-3.9458,1.0720] Y[-0.2450,0.5736,-0.2482] Z[1.4888,2.1123,0.4972]
+I (184847) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.325101
+I (184901) auto_cal:   PCCM linear gradients: X[5.0386,3.5471,6.2157] Y[-6.3695,-6.3350,-4.4736] Z[1.2780,1.8355,0.4202]
+I (184902) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.325775
+I (184955) auto_cal:   PCCM linear gradients: X[-4.8760,-7.1710,-4.2400] Y[4.2769,5.1248,6.6105] Z[0.5625,1.0855,-0.1386]
+I (184956) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.326450
+I (185010) auto_cal:   PCCM linear gradients: X[-6.3227,-8.7868,-5.5120] Y[6.4121,7.5090,8.2760] Z[0.1898,0.6784,-0.3401]
+I (185011) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.327123
+I (185065) auto_cal:   PCCM linear gradients: X[60.0000,60.0000,60.0000] Y[-38.6654,-38.6237,-33.5339] Z[-38.1979,-37.9107,-38.0549]
+I (185066) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.327796
+I (185121) auto_cal:   PCCM linear gradients: X[-7.0897,-9.6798,-5.8670] Y[8.1840,9.4893,9.5469] Z[1.0237,1.6476,-0.1837]
+I (185122) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.328468
+I (185175) auto_cal:   PCCM linear gradients: X[-4.9639,-7.2676,-4.0770] Y[5.4401,6.3577,7.7187] Z[2.3371,3.1708,0.1357]
+I (185176) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.329140
+I (185230) auto_cal:   PCCM linear gradients: X[4.1560,3.0025,3.4993] Y[-5.0414,-5.3546,-0.4750] Z[2.6464,3.4059,0.4958]
+I (185231) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.329811
+I (185285) auto_cal:   PCCM linear gradients: X[9.2527,8.1466,11.9735] Y[-11.2789,-11.6159,-10.0431] Z[2.6046,3.2485,0.5537]
+I (185286) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.330481
+I (185293) auto_cal: Iter 400: avg ΔE=  3.07 (best=  3.05) [R:7.6 G:3.7 B:1.7 Y:0.3]
+I (185299) auto_cal:   PCCM linear diag: [1.915, 1.396, 1.413]
+I (185304) auto_cal:   Lightness: scale=0.0870 offset=-2.80
+I (185309) auto_cal:   Saturation boost: 1.014
+I (185361) auto_cal:   PCCM linear gradients: X[1.2746,-0.1482,1.7262] Y[-3.5182,-3.5971,-0.2770] Z[2.7735,3.5392,0.7751]
+I (185362) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.331150
+I (185416) auto_cal:   PCCM linear gradients: X[-7.0788,-9.5043,-5.1727] Y[6.3361,7.3347,7.3647] Z[1.7149,2.3966,0.3874]
+I (185417) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.331819
+I (185471) auto_cal:   PCCM linear gradients: X[-6.2399,-8.8743,-2.6910] Y[6.6596,7.9657,5.7608] Z[1.0000,1.5633,0.3067]
+I (185472) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.332487
+I (185525) auto_cal:   PCCM linear gradients: X[-1.9307,-4.3073,3.4935] Y[2.1399,3.2116,-0.5690] Z[-0.1632,0.1566,0.1634]
+I (185526) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.333155
+I (185580) auto_cal:   PCCM linear gradients: X[6.9693,5.8266,9.2595] Y[-7.5926,-7.7952,-7.0882] Z[-0.1903,0.1115,0.1014]
+I (185581) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.333822
+I (185635) auto_cal:   PCCM linear gradients: X[7.0953,6.0502,9.0880] Y[-7.8363,-8.1089,-7.2162] Z[-0.3408,-0.0610,0.1148]
+I (185636) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.334488
+I (185689) auto_cal:   PCCM linear gradients: X[-0.1529,-1.4685,-0.6055] Y[-0.0830,0.0019,2.2796] Z[-1.1934,-1.0862,0.1792]
+I (185690) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.335153
+I (185744) auto_cal:   PCCM linear gradients: X[-6.2501,-8.0709,-6.7384] Y[6.5380,7.1821,8.5928] Z[-1.0245,-0.8577,0.1072]
+I (185745) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.335818
+I (185799) auto_cal:   PCCM linear gradients: X[-6.9773,-8.8222,-7.5839] Y[7.0760,7.7364,9.2610] Z[-0.7602,-0.5649,0.1767]
+I (185800) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.336482
+I (185854) auto_cal:   PCCM linear gradients: X[-1.8454,-3.0004,-4.3672] Y[0.9446,0.8135,5.4615] Z[-0.3575,-0.1489,0.3866]
+I (185855) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.337146
+I (185862) auto_cal: Iter 410: avg ΔE=  3.06 (best=  3.05) [R:7.4 G:3.7 B:1.4 Y:0.3]
+I (185868) auto_cal:   PCCM linear diag: [1.914, 1.397, 1.415]
+I (185873) auto_cal:   Lightness: scale=0.0867 offset=-2.81
+I (185878) auto_cal:   Saturation boost: 1.029
+I (185930) auto_cal:   PCCM linear gradients: X[4.2284,3.5012,2.3235] Y[-5.5484,-6.1599,-1.3137] Z[1.1023,1.5413,0.7131]
+I (185931) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.337809
+I (185985) auto_cal:   PCCM linear gradients: X[-4.3838,-6.0916,-4.3002] Y[3.7380,4.1689,5.6205] Z[-0.5161,-0.3068,0.3101]
+I (185986) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.338471
+I (186040) auto_cal:   PCCM linear gradients: X[-7.1118,-9.1866,-6.3714] Y[7.0981,7.9426,8.1024] Z[-0.6188,-0.3543,0.1453]
+I (186041) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.339132
+I (186094) auto_cal:   PCCM linear gradients: X[-5.4977,-7.5028,-4.1811] Y[5.3835,6.1435,5.9056] Z[-0.9078,-0.6871,0.1020]
+I (186095) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.339793
+I (186149) auto_cal:   PCCM linear gradients: X[0.6090,-1.0701,3.5925] Y[-1.1013,-0.7131,-1.9181] Z[-1.0631,-0.8938,0.0715]
+I (186150) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.340453
+I (186204) auto_cal:   PCCM linear gradients: X[5.3071,3.8916,9.3303] Y[-5.7582,-5.6667,-7.2223] Z[-0.7571,-0.5132,-0.1471]
+I (186205) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.341113
+I (186259) auto_cal:   PCCM linear gradients: X[-4.2237,-6.3547,-1.1729] Y[3.9834,4.8039,3.2934] Z[-0.5803,-0.3036,0.0989]
+I (186260) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.341772
+I (186314) auto_cal:   PCCM linear gradients: X[-8.3016,-10.5712,-7.1638] Y[8.2123,9.1673,9.3806] Z[-0.0099,0.4194,-0.0631]
+I (186315) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.342430
+I (186369) auto_cal:   PCCM linear gradients: X[-7.8217,-10.0137,-6.9445] Y[7.2516,8.0690,8.9589] Z[0.3806,0.8627,-0.0213]
+I (186370) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.343088
+I (186423) auto_cal:   PCCM linear gradients: X[0.4359,-0.9631,1.1518] Y[-1.6574,-1.6869,0.7073] Z[1.1213,1.6614,0.4075]
+I (186424) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.343745
+I (186431) auto_cal: Iter 420: avg ΔE=  3.03 (best=  3.03) [R:7.2 G:3.4 B:1.8 Y:0.3]
+I (186437) auto_cal:   PCCM linear diag: [1.914, 1.396, 1.415]
+I (186442) auto_cal:   Lightness: scale=0.0863 offset=-2.82
+I (186448) auto_cal:   Saturation boost: 1.009
+I (186500) auto_cal:   PCCM linear gradients: X[4.3656,3.1979,5.2146] Y[-5.2737,-5.4899,-3.2851] Z[1.5345,2.1186,0.4759]
+I (186501) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.344401
+I (186554) auto_cal:   PCCM linear gradients: X[-1.7496,-3.2065,-3.1549] Y[0.7361,0.8180,4.7696] Z[2.1149,2.8274,0.4983]
+I (186555) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.345056
+I (186609) auto_cal:   PCCM linear gradients: X[-5.1405,-7.1484,-5.2867] Y[4.3355,4.9819,6.8178] Z[2.1752,2.8967,0.4715]
+I (186610) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.345711
+I (186664) auto_cal:   PCCM linear gradients: X[-3.3383,-5.1960,-3.6291] Y[2.1718,2.7130,4.3957] Z[1.8892,2.5266,0.5569]
+I (186665) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.346366
+I (186718) auto_cal:   PCCM linear gradients: X[2.0673,0.5840,2.0386] Y[-3.5200,-3.3220,-1.9746] Z[1.3140,1.8177,0.5363]
+I (186719) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.347019
+I (186773) auto_cal:   PCCM linear gradients: X[4.5948,3.1236,5.6521] Y[-5.7437,-5.5249,-5.5146] Z[0.8246,1.2364,0.3706]
+I (186774) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.347672
+I (186827) auto_cal:   PCCM linear gradients: X[-2.1303,-4.2877,-0.6603] Y[0.9753,1.9262,0.3814] Z[0.4505,0.8041,0.3545]
+I (186828) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.348324
+I (186882) auto_cal:   PCCM linear gradients: X[-4.5612,-6.9633,-3.3317] Y[3.5906,4.8133,3.0117] Z[0.5001,0.8872,0.3098]
+I (186883) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.348976
+I (186937) auto_cal:   PCCM linear gradients: X[1.5237,-0.6003,4.4210] Y[-2.4405,-1.4913,-4.5919] Z[0.1054,0.3875,0.2345]
+I (186938) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.349627
+I (186991) auto_cal:   PCCM linear gradients: X[5.2800,3.6190,7.0175] Y[-6.1635,-5.6756,-7.1089] Z[0.2151,0.5114,0.1738]
+I (186992) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.350277
+I (186999) auto_cal: Iter 430: avg ΔE=  3.05 (best=  3.03) [R:7.0 G:3.2 B:1.6 Y:0.3]
+I (187005) auto_cal:   PCCM linear diag: [1.915, 1.395, 1.415]
+I (187010) auto_cal:   Lightness: scale=0.0871 offset=-2.82
+I (187016) auto_cal:   Saturation boost: 1.011
+I (187068) auto_cal:   PCCM linear gradients: X[-3.7140,-6.0343,-2.6253] Y[2.5266,3.6794,1.9146] Z[0.3196,0.6778,0.2068]
+I (187069) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.350927
+I (187122) auto_cal:   PCCM linear gradients: X[1.0316,-0.7687,1.2051] Y[-2.3017,-1.6631,-1.9621] Z[0.3016,0.6101,0.2372]
+I (187123) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.351576
+I (187177) auto_cal:   PCCM linear gradients: X[5.5549,4.2409,4.7271] Y[-6.5805,-6.4020,-5.2592] Z[0.8135,1.1846,0.3369]
+I (187178) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.352225
+I (187232) auto_cal:   PCCM linear gradients: X[1.6593,-0.0492,1.0151] Y[-2.9445,-2.3853,-1.7564] Z[0.9751,1.3715,0.4141]
+I (187233) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.352872
+I (187286) auto_cal:   PCCM linear gradients: X[-3.3853,-5.7592,-2.3103] Y[2.0009,3.1862,1.5563] Z[1.5298,2.0463,0.5007]
+I (187287) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.353520
+I (187341) auto_cal:   PCCM linear gradients: X[7.3589,6.1965,6.1754] Y[-8.4194,-8.3898,-6.6695] Z[1.9473,2.4929,0.5729]
+I (187342) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.354166
+I (187396) auto_cal:   PCCM linear gradients: X[6.9884,5.7709,6.0260] Y[-8.2632,-8.2014,-6.6512] Z[2.0641,2.6401,0.5788]
+I (187397) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.354812
+I (187450) auto_cal:   PCCM linear gradients: X[-2.2453,-4.5332,-0.9294] Y[0.4072,1.4598,-0.1787] Z[2.0339,2.6610,0.5800]
+I (187451) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.355457
+I (187505) auto_cal:   PCCM linear gradients: X[2.7641,1.0452,3.1682] Y[-3.8229,-3.2172,-4.0166] Z[0.2416,0.5641,0.1746]
+I (187506) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.356102
+I (187560) auto_cal:   PCCM linear gradients: X[1.3692,-0.4897,2.2042] Y[-2.0876,-1.2848,-3.0661] Z[-0.5506,-0.3052,-0.0463]
+I (187561) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.356745
+I (187568) auto_cal: Iter 440: avg ΔE=  3.10 (best=  3.03) [R:6.7 G:3.1 B:1.6 Y:0.5]
+I (187573) auto_cal:   PCCM linear diag: [1.915, 1.396, 1.414]
+I (187579) auto_cal:   Lightness: scale=0.0879 offset=-2.82
+I (187584) auto_cal:   Saturation boost: 1.010
+I (187636) auto_cal:   PCCM linear gradients: X[-2.8092,-4.9552,-1.8866] Y[2.0512,3.1478,0.8285] Z[-0.7979,-0.5198,-0.1485]
+I (187637) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.357389
+I (187691) auto_cal:   PCCM linear gradients: X[-2.8298,-4.9729,-1.6845] Y[2.0895,3.1765,0.6088] Z[-1.0136,-0.7300,-0.2484]
+I (187692) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.358031
+I (187746) auto_cal:   PCCM linear gradients: X[-1.5565,-3.5906,-0.2700] Y[0.8103,1.7880,-0.7747] Z[-1.1425,-0.8641,-0.3210]
+I (187747) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.358673
+I (187801) auto_cal:   PCCM linear gradients: X[-2.1791,-4.2236,-0.9607] Y[1.2851,2.2542,-0.1640] Z[-1.0095,-0.7015,-0.3083]
+I (187802) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.359315
+I (187856) auto_cal:   PCCM linear gradients: X[-4.1010,-6.2493,-3.0552] Y[2.9812,4.0330,1.8100] Z[-0.6317,-0.2636,-0.2124]
+I (187857) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.359955
+I (187911) auto_cal:   PCCM linear gradients: X[-1.0232,-3.0403,0.3946] Y[-0.0999,0.8107,-1.5206] Z[-0.3264,0.0513,-0.1407]
+I (187912) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.360595
+I (187966) auto_cal:   PCCM linear gradients: X[-0.1919,-2.2050,1.3361] Y[-1.0612,-0.1709,-2.4383] Z[0.2332,0.6671,0.0080]
+I (187967) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.361235
+I (188021) auto_cal:   PCCM linear gradients: X[-1.1798,-3.2446,-0.0393] Y[-0.2991,0.6322,-1.1963] Z[0.8839,1.3915,0.1972]
+I (188022) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.361873
+I (188076) auto_cal:   PCCM linear gradients: X[37.6551,36.3710,37.8662] Y[-9.9243,-9.6722,-9.9477] Z[0.1550,0.5867,-0.4092]
+I (188077) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.362512
+I (188131) auto_cal:   PCCM linear gradients: X[46.8334,45.3708,46.6858] Y[-47.2666,-46.7982,-47.2589] Z[-0.4352,-0.0696,-0.5821]
+I (188132) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.363149
+I (188139) auto_cal: Iter 450: avg ΔE=  3.40 (best=  3.03) [R:6.4 G:2.8 B:1.6 Y:0.7]
+I (188145) auto_cal:   PCCM linear diag: [1.914, 1.396, 1.414]
+I (188151) auto_cal:   Lightness: scale=0.0891 offset=-2.82
+I (188156) auto_cal:   Saturation boost: 0.997
+I (188208) auto_cal:   PCCM linear gradients: X[-17.7604,-20.2142,-18.2756] Y[15.8299,17.2515,16.1442] Z[1.1088,1.5812,0.9184]
+I (188209) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.363786
+I (188264) auto_cal:   PCCM linear gradients: X[-19.0785,-21.3902,-19.8612] Y[16.7406,17.9528,17.5242] Z[1.1759,1.7093,0.8652]
+I (188265) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.364422
+I (188319) auto_cal:   PCCM linear gradients: X[-3.8503,-5.2860,-4.6985] Y[1.7319,1.9956,2.8919] Z[0.3104,0.8423,-0.1097]
+I (188320) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.365058
+I (188374) auto_cal:   PCCM linear gradients: X[60.0000,60.0000,60.0000] Y[-58.6584,-59.1867,-57.3232] Z[46.2559,46.8003,45.5786]
+I (188375) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.365693
+I (188430) auto_cal:   PCCM linear gradients: X[6.1734,5.6266,5.0832] Y[-8.1434,-8.7544,-6.4380] Z[-0.8640,-0.3674,-1.0289]
+I (188431) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.366327
+I (188485) auto_cal:   PCCM linear gradients: X[-5.1575,-6.2306,-6.7171] Y[3.2140,3.1545,4.8980] Z[-1.0321,-0.5703,-0.5528]
+I (188486) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.366961
+I (188540) auto_cal:   PCCM linear gradients: X[-10.6269,-12.2055,-12.3080] Y[9.5108,10.1022,10.9116] Z[-1.1548,-0.7584,-0.3666]
+I (188541) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.367594
+I (188595) auto_cal:   PCCM linear gradients: X[-11.5118,-13.2558,-13.5040] Y[11.2791,12.2219,12.6246] Z[-1.2361,-0.9328,-0.2972]
+I (188596) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.368226
+I (188651) auto_cal:   PCCM linear gradients: X[26.7773,25.2540,24.3709] Y[-26.0900,-25.2302,-24.6657] Z[-36.1562,-35.9756,-34.9648]
+I (188652) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.368858
+I (188706) auto_cal:   PCCM linear gradients: X[-7.7190,-9.3505,-9.7697] Y[8.3843,9.4494,9.2552] Z[-1.2056,-1.0731,-0.1838]
+I (188707) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.369489
+I (188714) auto_cal: Iter 460: avg ΔE=  3.21 (best=  3.03) [R:5.5 G:2.5 B:1.6 Y:0.2]
+I (188720) auto_cal:   PCCM linear diag: [1.911, 1.399, 1.412]
+I (188725) auto_cal:   Lightness: scale=0.0900 offset=-2.80
+I (188731) auto_cal:   Saturation boost: 0.994
+I (188783) auto_cal:   PCCM linear gradients: X[-6.0766,-7.6761,-7.2266] Y[5.7590,6.5985,6.4512] Z[0.6722,1.1353,0.2465]
+I (188784) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.370119
+I (188838) auto_cal:   PCCM linear gradients: X[-6.4640,-8.0668,-7.0345] Y[5.6088,6.3225,6.0267] Z[2.2335,3.0429,0.5137]
+I (188839) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.370749
+I (188892) auto_cal:   PCCM linear gradients: X[-12.3041,-14.1875,-12.5566] Y[10.9841,11.8844,11.1912] Z[1.5945,2.3855,0.3008]
+I (188893) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.371379
+I (188947) auto_cal:   PCCM linear gradients: X[-13.1330,-14.8872,-13.1189] Y[11.1953,11.8318,11.4505] Z[1.0852,1.8790,0.0498]
+I (188948) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.372007
+I (189003) auto_cal:   PCCM linear gradients: X[-11.2872,-12.8281,-10.7274] Y[8.8642,9.1993,8.8898] Z[0.7060,1.4940,-0.2031]
+I (189004) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.372635
+I (189058) auto_cal:   PCCM linear gradients: X[29.8055,28.4864,31.2170] Y[4.6530,4.7691,3.9922] Z[0.4410,1.2126,-0.4194]
+I (189059) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.373262
+I (189112) auto_cal:   PCCM linear gradients: X[33.6472,32.2918,35.8291] Y[2.2531,2.4502,0.7688] Z[0.8805,1.6891,-0.2872]
+I (189113) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.373889
+I (189167) auto_cal:   PCCM linear gradients: X[-6.5775,-8.4420,-4.0416] Y[5.3385,6.1206,3.0917] Z[1.9424,2.8380,0.2050]
+I (189168) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.374515
+I (189222) auto_cal:   PCCM linear gradients: X[-7.9886,-10.0949,-5.7144] Y[7.0696,8.2231,4.6899] Z[2.5489,3.4351,0.5947]
+I (189223) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.375141
+I (189276) auto_cal:   PCCM linear gradients: X[-7.3162,-9.3213,-5.8025] Y[6.5296,7.6408,4.7882] Z[2.8610,3.7385,0.8074]
+I (189277) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.375766
+I (189284) auto_cal: Iter 470: avg ΔE=  3.15 (best=  3.03) [R:5.9 G:2.9 B:1.6 Y:0.5]
+I (189290) auto_cal:   PCCM linear diag: [1.910, 1.398, 1.413]
+I (189295) auto_cal:   Lightness: scale=0.0890 offset=-2.80
+I (189301) auto_cal:   Saturation boost: 1.008
+I (189353) auto_cal:   PCCM linear gradients: X[-8.9402,-10.7812,-9.2388] Y[7.8957,8.8172,7.8365] Z[2.7046,3.5650,0.8365]
+I (189354) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.376390
+I (189408) auto_cal:   PCCM linear gradients: X[-7.1952,-8.5564,-9.0214] Y[5.7830,6.1356,7.3793] Z[2.1931,3.0267,0.6458]
+I (189408) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.377013
+I (189462) auto_cal:   PCCM linear gradients: X[-3.7150,-4.5633,-6.2805] Y[2.2197,2.0164,4.5606] Z[1.0922,1.7843,0.3047]
+I (189463) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.377636
+I (189517) auto_cal:   PCCM linear gradients: X[-0.8254,-1.4874,-2.8565] Y[-0.5225,-0.9181,1.3274] Z[0.2290,0.8096,0.0287]
+I (189518) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.378259
+I (189572) auto_cal:   PCCM linear gradients: X[1.1233,0.4442,-0.1842] Y[-2.0527,-2.4092,-0.9400] Z[-0.3133,0.1937,-0.1235]
+I (189572) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.378881
+I (189626) auto_cal:   PCCM linear gradients: X[-0.4679,-1.2959,-2.2513] Y[-0.2227,-0.3806,1.0717] Z[-0.7566,-0.3523,-0.0768]
+I (189627) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.379502
+I (189681) auto_cal:   PCCM linear gradients: X[-4.5630,-6.0738,-5.1692] Y[4.3342,4.9781,4.0605] Z[-1.7641,-1.6363,-0.0466]
+I (189682) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.380122
+I (189736) auto_cal:   PCCM linear gradients: X[-8.2816,-10.5661,-6.5432] Y[8.4666,9.9716,5.6853] Z[-1.4573,-1.2956,0.1007]
+I (189737) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.380742
+I (189791) auto_cal:   PCCM linear gradients: X[-7.2451,-9.6079,-4.4620] Y[7.2948,8.8016,3.7273] Z[-1.4775,-1.2941,0.0243]
+I (189792) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.381361
+I (189846) auto_cal:   PCCM linear gradients: X[-2.0690,-3.7730,-0.3330] Y[1.4348,2.0804,-0.3424] Z[-1.3680,-1.0918,-0.1848]
+I (189847) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.381980
+I (189854) auto_cal: Iter 480: avg ΔE=  3.04 (best=  3.03) [R:6.7 G:3.4 B:1.5 Y:0.4]
+I (189860) auto_cal:   PCCM linear diag: [1.911, 1.395, 1.413]
+I (189865) auto_cal:   Lightness: scale=0.0871 offset=-2.80
+I (189870) auto_cal:   Saturation boost: 1.032
+I (189923) auto_cal:   PCCM linear gradients: X[1.5192,0.2874,2.6132] Y[-2.4861,-2.4167,-3.1496] Z[-0.5827,-0.1075,-0.2315]
+I (189924) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.382598
+I (189977) auto_cal:   PCCM linear gradients: X[-0.4107,-1.7121,0.0079] Y[-1.1764,-1.0895,-1.1321] Z[0.0802,0.6593,-0.0232]
+I (189978) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.383215
+I (190032) auto_cal:   PCCM linear gradients: X[-3.4753,-5.0901,-3.5609] Y[1.7573,2.1596,2.2743] Z[1.0847,1.8023,0.3362]
+I (190033) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.383832
+I (190087) auto_cal:   PCCM linear gradients: X[-5.9299,-7.9272,-5.9228] Y[4.7301,5.5777,5.1234] Z[2.0287,2.8640,0.6690]
+I (190088) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.384448
+I (190142) auto_cal:   PCCM linear gradients: X[-4.0488,-5.9152,-4.5176] Y[3.2923,4.0554,4.2404] Z[2.4084,3.2831,0.7966]
+I (190143) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.385064
+I (190196) auto_cal:   PCCM linear gradients: X[0.8458,-0.5122,-0.2645] Y[-1.5423,-1.3196,0.0616] Z[1.7557,2.5021,0.6115]
+I (190197) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.385679
+I (190251) auto_cal:   PCCM linear gradients: X[3.1172,1.9461,2.5808] Y[-3.9450,-3.9383,-2.9199] Z[0.9083,1.5354,0.2713]
+I (190252) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.386293
+I (190305) auto_cal:   PCCM linear gradients: X[-0.7647,-2.0281,-2.5973] Y[-0.9106,-0.8813,1.4336] Z[0.5726,1.1876,0.1597]
+I (190306) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.386907
+I (190360) auto_cal:   PCCM linear gradients: X[-7.8812,-9.9480,-8.7366] Y[6.1556,6.9548,7.6865] Z[0.2985,0.8887,0.0417]
+I (190361) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.387520
+I (190415) auto_cal:   PCCM linear gradients: X[-1.1549,-2.9318,-0.7851] Y[-0.2654,0.2807,-0.0378] Z[0.1712,0.6902,0.1545]
+I (190416) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.388132
+I (190423) auto_cal: Iter 490: avg ΔE=  3.01 (best=  3.00) [R:6.6 G:3.1 B:1.4 Y:0.2]
+I (190429) auto_cal:   PCCM linear diag: [1.912, 1.393, 1.413]
+I (190434) auto_cal:   Lightness: scale=0.0876 offset=-2.79
+I (190439) auto_cal:   Saturation boost: 1.031
+I (190492) auto_cal:   PCCM linear gradients: X[2.2469,0.4226,3.9247] Y[-2.9888,-2.3652,-3.9307] Z[0.0970,0.5625,0.1397]
+I (190492) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.388744
+I (190546) auto_cal:   PCCM linear gradients: X[-3.2207,-5.6677,-0.8310] Y[2.2081,3.4860,0.3664] Z[0.3173,0.7890,0.3290]
+I (190547) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.389355
+I (190601) auto_cal:   PCCM linear gradients: X[35.3004,33.7420,36.9835] Y[-35.4456,-35.0571,-36.2235] Z[-27.8058,-27.3018,-28.2296]
+I (190602) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.389966
+I (190657) auto_cal:   PCCM linear gradients: X[0.3164,-1.4126,0.8461] Y[-2.3792,-1.9518,-2.1005] Z[1.1649,1.8151,0.3672]
+I (190658) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.390576
+I (190711) auto_cal:   PCCM linear gradients: X[4.7774,3.4698,5.4394] Y[-6.5897,-6.5601,-6.3179] Z[0.6218,1.1901,0.1276]
+I (190712) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.391185
+I (190766) auto_cal:   PCCM linear gradients: X[5.6607,4.3981,6.3498] Y[-6.9960,-6.9666,-6.8885] Z[0.3641,0.8833,0.0901]
+I (190767) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.391794
+I (190821) auto_cal:   PCCM linear gradients: X[0.2061,-1.4310,0.2189] Y[-1.4771,-1.0103,-1.1982] Z[0.1116,0.5488,0.2728]
+I (190822) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.392402
+I (190875) auto_cal:   PCCM linear gradients: X[-1.4184,-3.2955,-1.1592] Y[0.7758,1.6115,0.5302] Z[-0.2319,0.0732,0.3570]
+I (190876) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.393010
+I (190930) auto_cal:   PCCM linear gradients: X[2.7735,1.1845,3.3312] Y[-2.5285,-1.8921,-3.0385] Z[-0.4865,-0.2555,0.2602]
+I (190931) auto_cal:   Adam alpha=0.0010 bc1=1.000000 bc2=0.393617
+I (190937) auto_cal: ========================================
+I (190941) auto_cal: === AUTO-CALIBRATION COMPLETE ===
+I (190946) auto_cal: ========================================
+I (190952) auto_cal: Final avg ΔE: 3.00 (target: 3.00)
+I (190957) auto_cal: Iterations: 499
+I (190960) auto_cal:
+I (190962) auto_cal: Optimized CCM:
+I (190965) auto_cal:   |   1.912  -0.153  -0.255 |
+I (190970) auto_cal:   |  -0.022   1.393   0.108 |
+I (190974) auto_cal:   |  -0.061   0.057   1.413 |
+I (190979) auto_cal:
+I (190981) auto_cal: Lightness: scale=0.0872 offset=-2.79 gamma=0.8000
+I (190987) auto_cal: Piecewise gamma: dark=1.0806 light=0.9080 transition=29.4
+I (190994) auto_cal: Blue correction: magnitude=-6.85 center=41.9 width=9.0
+I (191001) auto_cal: Saturation boost: 1.031
+I (191005) auto_cal: Black level: X=326.90 Y=319.00 Z=298.75
+I (191010) auto_cal:
+I (191012) auto_cal: Per-color results:
+I (191016) auto_cal:   White       : ΔE= 1.19 (target L=95.2 a=0.2 b=-0.5)
+I (191023) auto_cal:   Brights Red : ΔE= 6.67 (target L=50.6 a=73.4 b=51.6)
+I (191029) auto_cal:   Brights Green: ΔE= 3.19 (target L=58.0 a=-55.0 b=34.7)
+I (191036) auto_cal:   Brights Blue: ΔE= 1.46 (target L=29.9 a=22.9 b=-52.4)
+I (191043) auto_cal:   Brights Yellow: ΔE= 0.21 (target L=88.5 a=-4.7 b=85.9)
+I (191050) auto_cal:   Brights Orange: ΔE= 1.52 (target L=60.0 a=50.9 b=60.9)
+I (191057) auto_cal:   Cyan        : ΔE= 0.45 (target L=66.6 a=-13.7 b=-43.2)
+I (191064) auto_cal:   Skin        : ΔE= 2.82 (target L=73.8 a=0.8 b=15.1)
+I (191071) auto_cal:   Dark Brown  : ΔE= 3.01 (target L=27.7 a=14.4 b=29.5)
+I (191078) auto_cal:   Dark Taupe  : ΔE= 1.79 (target L=32.7 a=4.7 b=7.7)
+I (191084) auto_cal:   Dark Green  : ΔE= 5.52 (target L=37.8 a=-37.8 b=19.4)
+I (191091) auto_cal:   Gray 50     : ΔE= 8.15 (target L=61.6 a=-0.3 b=-1.3)
+I (191098) auto_cal:   Gray 20     : ΔE= 2.63 (target L=84.2 a=0.0 b=-1.1)
+I (191104) auto_cal:   Gray 80     : ΔE= 8.13 (target L=37.5 a=0.6 b=-1.7)
+I (191111) auto_cal:   Brown 1     : ΔE= 6.85 (target L=16.4 a=9.6 b=14.7)
+I (191118) auto_cal:   Brown 2     : ΔE= 1.02 (target L=43.6 a=14.5 b=26.8)
+I (191125) auto_cal:   Brown 3     : ΔE= 3.64 (target L=69.2 a=3.2 b=34.1)
+I (191131) auto_cal:   Mid Green   : ΔE= 1.68 (target L=53.3 a=-51.4 b=32.4)
+I (191138) auto_cal: ========================================
+I (191143) main: Auto-cal: Calibration complete. Average error: 3.0
+I (191149) tts: Speak: Calibration complete. Average error: 3.0
+I (195719) main: Calibration complete.  Error: 6.35 -> 3.00
+I (195719) tts: Speak: Calibration complete. Average error 3.0
+I (199927) main: Calibration saved to NVS
+I (199928) auto_cal: Applying calibration results to color pipeline
+I (199928) auto_cal:   CCM diagonal: [1.912, 1.393, 1.413]
+I (199931) auto_cal:   Lightness: scale=0.087, offset=-2.788, gamma=0.800
+I (199938) auto_cal:   Piecewise gamma: dark=1.081, light=0.908, transition=29.4
+I (199945) auto_cal:   Saturation boost: 1.031
+I (199949) color_pipe: Pipeline parameters updated (with black level calibration)
+I (199956) auto_cal: Calibration context freed
+I (199960) main: Auto-calibration complete

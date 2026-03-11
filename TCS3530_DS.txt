@@ -1,0 +1,3686 @@
+Product   
+Document
+Published by  
+ams OSRAM Group
+
+TCS3530
+Fully Embedded, True Color Ambient 
+Light Sensor with Selective Flicker 
+Detection
+The TCS3530 features true color XYZ ambient light detection,  General Description
+as well as flicker detection up  to 7kHz. The device comes in a 
+small footprint 8-pin optical module with a dimension of 
+L2.50mm x W1.80mm x H1.50mm. The optical module is fully 
+embedded offering an integrated aperture and integrated 
+diffuser. This unparalleled scale of integration, containing the 
+photodiodes, aperture and diffuser, as well as precise distances 
+between these key optical elements, allows accurate 
+pre-calibration in final optical device test.
+The ambient light detection function provides eight concurrent 
+ambient light sensing channe ls with independent gain 
+configuration. These channels can be arbitrarily connected to 
+the 27 photodiodes. A built-in sequencer enables automated 
+measurements without the need  to reprogram the device after 
+every measurement cycle. All photodiodes are covered with an 
+UV/IR blocking filter. This architecture accurately measures 
+ambient light and calculates illuminance, chromaticity, and 
+correlated color temperature (CCT) to manage display 
+appearance. 
+The device also integrates direct detection of ambient light 
+flicker up to 7kHz. This extended sampling range enables flicker 
+detection from either conventional mains powered 50Hz/60Hz 
+AC light sources as well as modern PDM controlled LED lighting 
+systems. Flicker detection is executed in parallel with ambient 
+light sensing and has independ ent gain configuration. The 
+flicker detection engine will sample and buffer data for 
+calculating flicker frequencie s externally on a host CPU.
+Ordering Information  and  Content Guide  appear at end of 
+datasheet.
+Datasheet, Public Page 1
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530  −   General Description
+Key Benefits & Features
+The benefits and features of TCS3530 are listed below:
+Figure 1:
+Added Value of Using TCS3530
+Benefits Features
+• Configurable, high sensitivity
+•   Programmable gain and integration time
+•   8192x dynamic range by gain adjustment only
+•   1mlux minimum detectable illuminance (100ms) • Invisible ambient light and color sensing 
+under glass  • Tailored ALS and color response
+•   UV/IR blocking filter for all channels
+•   Clear reference channel 
+• ALS/color interrupt with thresholds
+• Flicker-immune ambient light sensing with 
+• Unique fast ALS integration mode
+programmable integration time 
+• Independently configurable timing and gain
+• Concurrent flicker and ALS measurement with new 
+• Integrated ambient light flicker detection on  simplified readout methodology 
+chip
+• Up to 7kHz flicker detection (14kHz sampling)
+• FIFO buffer interrupt
+• 1.8V  and 1.2V  operation BUS BUS
+• Configurable sleep mode
+• Low power consumption and minimum I²C 
+• Interrupt-driven device
+traffic (optional I3C mode)
+• I²C interface up to 1 MHz (Fast-Mode Plus)
+• On-chip data compression de creases serial bus traffic
+• Integrated status checking for all functions • Digital and analog ALS saturation flags
+Applications
+TCS3530 integrates multiple appl ications within one device. 
+The applications for TCS3530 include:
+• CCT and chromaticity calculation 
+• Auxiliary auto white balancing 
+• Light type identification
+• Flicker-immune camera operation
+Page 2 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    General Description
+Block Diagram
+The functional blocks of this device are shown below:
+Figure 2:
+Functional Blocks of TCS3530  
+Datasheet, Public  Page 3
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Pin Assignments
+Pin Assignments
+Figure 3:
+Pin Diagram of TCS3530 
+Figure 4:
+Pin Description of TCS3530
+Pin Number Pin Name Description
+1 INT Interrupt. Open-drain output.
+Ground. All voltages are referenced to VSS/PGND, and both ground pins 
+2PGND
+must be connected to ground.
+3 VDD Supply voltage (1.8V)
+Ground. All voltages are referenced to VSS/PGND, and both ground pins 
+4VSS
+must be connected to ground.
+5 VBUS I²C (I3C) bus supply voltage
+6 SDA I²C (I3C) serial data I/O terminal
+7 SCL I²C (I3C) serial bus clock terminal
+8 VSYNC/GPIO Synchronization input or General Purpose open-drain Input/Output
+Page 4 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Absolute Maximum Ratings
+Stresses beyond those listed under  Absolute Maximum Ratings   Absolute Maximum Ratings
+may cause permanent damage to the device. These are stress 
+ratings only. Functional operation of the device at these or any 
+other conditions beyond those indicated under  Recommended 
+Operating Conditions  is not implied. Exposure to absolute 
+maximum rating conditions for extended periods may affect 
+device reliability.
+All voltages with respect to VSS/PGND. Device parameters are 
+guaranteed at V  = 1.8 V and T  = 25°C unless otherwise noted. DD A
+Figure 5:
+Absolute Maximum Ratings
+Symbol Parameter Min Max Units Comments
+Electrical Parameters
+V Supply Voltage  -0.3 1.98 DD
+V I²C (I3C) Bus Supply Voltage -0.3 1.98 V BUS
+V V  V  Te r m i n a l  Vo l t a g e   -0.3 3.6 IO SYNC/GPIO, INT
+I Output Terminal Current -3 20 mA IO
+Stress Parameters
+ESD HBM Electrostatic Discharge ± 2000 V JEDEC JS-001-2017  HBM
+ESD CDM Electrostatic Discharge ± 500 V JEDEC JS-002-2018 CDM
+I Input Current (latch-up immunity) ± 100 mA Class II JEDEC JESD78E SCR
+Temperature Ranges and Storage Conditions
+T Storage Temperature Range -40 85 °C STRG
+Datasheet, Public  Page 5
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Absolute Maximum Ratings
+Figure 6:
+Recommended Operating Conditions
+Symbol Parameter Conditions Min Typ Max Units
+V Supply voltage  1.7 1.8 1.98 V DD
+V I/O supply voltage 1.62 1.8 3.3 V IO
+V V =1.2V VBUS I/O voltage 1.08 1.2 1.32 V BUS1.2 BUS
+V V =1.8V VBUS I/O voltage 1.62 1.8 1.98 V BUS1.8 BUS
+V INT, GPIO input low voltage 0.54 V IL-INT/GPIO
+INT, GPIO input high 
+V 0.84 V IH-INT/GPIO
+voltage
+-0.1*V V 0.3*V SCL, SDA V IL-SCL/SDA BUS BUS
+V V =1.2V 0.7*V 1.1*V SCL, SDA V IH1.2-SCL/SDA BUS BUS BUS
+V V =1.8V 0.7*V SCL, SDA 1.98 V IH1.8-SCL/SDA BUS BUS
+I²C Bus Operation
+V =1.2V/1.8V@ BUS
+V 0.4 V SDA output low voltage OL-SDA-I2C
+20mA
+I3C Bus Operation
+V V =1.2V@2mA SDA output low voltage 0.18 V OL-SDA1.2-I3C BUS
+V V =1.8V@3mA SDA output low voltage 0.27 V OL-SDA1.8-I3C BUS
+V V =1.2V@-2mA V - 0.18 SDA output high voltage V OH-SDA1.2-I3C BUS BUS
+V V =1.8V@-3mA V -0.27 SDA output high voltage V OH-SDA1.8-I3C BUS BUS
+Temperature Ranges and Storage Conditions
+Operating free-air 
+T -30 25 85 °C A (1)
+temperature 
+Other Conditions
+C Input pin capacitance 4 pF I
+1. While the device is operational across the temperat ure range, functionality will vary with temperature. 
+Page 6 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Optical Characteristics
+Parameters listed under Test Level 4 are guaranteed with  Optical Characteristics
+production tests and SQC (Statistical Quality Control). 
+Parameters listed under Test Level 3 are measured in-line with 
+transparent monitor glasses. Pa rameters listed under Test 
+Level 2 are measured in lab bench characterization. Parameters 
+listed under Test Level 1 are guaranteed by design. All Test 
+Levels are measured with V  = 1.8V and T = 25°C unless  DD A 
+otherwise noted.
+Figure 7:
+ALS/Color Characteristics of TCS3530, ALS Gain = 128x , Integration Time = 11ms (unless otherwise noted) 
+Test 
+Parameter Conditions Min Typ Max Unit
+Level
+2 E  = 0μW/cm
+e
+  (1) 00 3counts4 Dark ADC count value ALS gain: 512x
+Integration time: 100ms
+0.5x 1/261.10
+1x 1/126.90
+2x 1/63.69
+4x 1/31.85
+8x 1/15.53
+16x 1/8
+  (2) 32x 1/4 4 ALS gain ratios
+64x 1/2
+256x 1.92
+512x 3.79
+1024x 7.44
+2048x 14.40
+4096x 27.90
+(3) White LED, 2700K 
+  (4) 0.05 2 ADC noise
+Integration time: 100ms
+Note(s):
+1. The typical 3-sigma distribution shows less than 1 count for an  ATIME setting of less than 98 ms. Residual counts are not con sidered 
+for dark count measurement.
+2. The gain ratios are calculated relative to the response with ALS gain = 128x.
+3. The White LED is an InGaN light-emitting diode with integrat ed phosphor and the following characteristic: correlated color 
+temperature = 2700K.
+4. ADC noise is calculated as the standard deviation relative to full scale.
+Datasheet, Public  Page 7
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530  −   Optical Characteristics
+Figure 8:
+Channel Irradiance Responsivity 
+Parameter Conditions Min Typ Max Unit Test Level
+174 205 230 X (MOD0)
+Y (MOD1) 170 190 210
+Optical channel irradiance 
+Z (MOD2) 23 30 36 responsivity of uncalibrated module: 
+20ms integration time, 128x gain, 
+IR (MOD3) 7 11 16 2700K White LED light source with an  counts/
+4 2 2
+irradiance of 150 μW/cm  (approx.  ) (μW/cm HgL (MOD4) 12 17 21
+450 lux). Measured with residual 
+counts enabled which corresponds to  HgH (MOD5) 18 23 28
+an effective gain of 2048x.
+Clear (MOD6) 123 144 163
+Flicker (MOD7) 450 532 607
+Color and Lux Measurement Accuracy
+Typical achievable accuracy for color and lux measurements 
+with a calibrated TCS3530. The delta is calculated versus results 
+from reference spectrometer Instrument Systems CAS140 and 
+illuminated with lights sources in XRITE Box (Test Level 2, lab 
+bench, not guaranteed by production testing)
+Figure 9:
+Color and Lux Measurement Accuracy 
+Test 
+Parameter Conditions Min Typ Max Unit
+Level
+(1) 0.2 LED 2800K 
+LED 4000K 0.5
+(1) 1.1 Fluorescent (CFL) 6500K 
+Fluorescent (CWF) 4000K 0.7
+dE00 2
+D65 1.2
+Halogen (A) 2900K 0.8
+Halogen (HZ) 2300K 1.7
+(1) 1.1 Incandescent (A) 2600K   
+Page 8 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Optical Characteristics
+Test 
+Parameter Conditions Min Typ Max Unit
+Level
+(1) 1.6 LED 2800K 
+LED 4000K 0.1
+(1) -1.3 Fluorescent (CFL) 6500K 
+Fluorescent (CWF) 4000K 0.1
+dLUX %2
+D65 1.3
+Halogen (A) 2900K 0.4
+Halogen (HZ) 2300K   2.0
+(1) -0.9 Incandescent (A) 2600K
+(1) 0.2 LED 2800K 
+LED 4000K -0.6
+(1) -1.7 Fluorescent (CFL) 6500K 
+Fluorescent (CWF) 4000K -1.9
+dCCT %2
+D65 -0.9
+Halogen (A) 2900K 0.6
+Halogen (HZ) 2300K  1.6
+(1) 0.6 Incandescent (A) 2600K 
+Note(s):
+1. Light source not native in XRITE light box.
+Datasheet, Public  Page 9
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530  −   Optical Characteristics
+Wavelength Accuracy
+The Channel Center Wavelength and Full-Width-Half-Max 
+Wavelength is measured in-line during filter deposition by 
+means of monitor gla sses placed next to the wafers (Test 
+Level 3). 
+Figure 10:
+Channel Center Wavelength 
+Test 
+Parameter Conditions Min Typ Max Unit
+Level
+426 436 446 X1
+X2 584 594 604
+Measured in-line with calibrated 
+Y 545 555 565 monochromator using transparent 
+nm 3
+monitor glasses and placed behind a 
+Z 435 445 455
+diffuser.
+HgL 509 519 529
+HgH 535 545 555
+Figure 11:
+Channel Full Width Half Max Wavelength (FWHM) 
+Test 
+Parameter Conditions Min Typ Max Unit
+Level
+X1_low 410 420 430
+X2_low 538 548 558
+Y_low 498 508 518
+Z_low 411 421 431
+HgL_low 498 508 518
+Measured in-line with calibrated 
+HgH_low 525 535 545 monochromator using transparent 
+nm 3
+monitor glasses and placed behind a  X1_high 455 465 475
+diffuser.
+X2_high 622 632 642
+Y_high 603 613 623
+Z_high 466 476 486
+HgL_high 521 531 541
+HgH_high 547 557 567
+Page 10 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Electrical Characteristics
+Parameters listed under Test Level 4 are guaranteed with  Electrical Characteristics
+production tests and SQC (Statistical Quality Control). 
+Parameters listed under Test Level 3 are measured in-line with 
+transparent monitor glasses. Parameters listed under Test Level 
+2 are measured in lab bench characterization. Parameters listed 
+under Test Level 1 are guaranteed by design. All Test Levels are 
+measured with V  = 1.8V and T  = 25°C unless otherwise noted. DD A
+Figure 12:
+ = 1.8 V, T  = 25°C (unless otherwise noted) Electrical Characteristics of TCS3530, V DD A
+Test 
+Symbol Parameter Conditions Min Typ Max Unit
+Level
+(1)   Active ALS state 
+  I 485 560 ALS supply current DD;ALS
+(PON=AEN=1)
+  (2) Idle state
+  I 98 130 Idle current DD;IDLE
+(PON=1, AEN=0)
+μA 4
+    (3) I 0.7 5.0 Sleep current Sleep state DD;SLEEP
+Measured on SDA, SCL, INT, 
+I -5 5 Leakage current LEAK
+GPIO
+Note(s):
+1. This parameter indicates the supply curr ent during periods of ALS integration. The ALS gain setting will have an effect on t he active 
+supply current. The ALS gain setting  used for this parameter is 128x.
+2. Idle state occurs when PON=1 and all functions are disabled. 
+3. Sleep state occurs when PON = 0 and I²C/I3C bus is idle. If  Sleep state has been entered as the result of operational flow,  SAI = 1, 
+PON will remain high.
+Datasheet, Public  Page 11
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Timing Characteristics
+Parameters listed under Test Level 4 are guaranteed with  Timing Characteristics
+production tests and SQC (Statistical Quality Control). 
+Parameters listed under Test Level 3 are measured in-line with 
+transparent monitor glasses. Parameters listed under Test Level 
+2 are measured in lab bench characterization. Parameters listed 
+under Test Level 1 are guaranteed by design. All Test Levels are 
+measured with V  = 1.8V and T  = 25°C unless otherwise noted. DD A
+Figure 13:
+I²C Timing Characteristics of TCS3530 
+Test 
+Symbol Parameter Min Typ Max Unit
+Level
+f I²C clock frequency 0 400 SCL kHz               1
+t Bus free time between start and stop condition 1.3 BUF
+Hold time after (repeated) start condition. After 
+t 0.6 HD;STA
+this period, the first clock is generated
+t Repeated start condition setup time 0.6 SU;STA
+μs 1
+t Stop condition setup time 0.6 SU;STO
+t SCL clock low period 1.3 LOW
+t SCL clock high period 0.6 HIGH
+t Data hold time 0 HD;DAT
+t Data setup time 100 SU;DAT
+ns 1
+t Clock/data fall time 300 F
+t Clock/data rise time 300 R
+Page 12 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Timing Characteristics
+Figure 14:
+Timing Diagram for TCS3530
+t HIGH t
+R
+t t LOW F
+V IH
+SCL
+V IL
+t t HD; STA SU; DAT
+t t t HD; DAT SU; STA SU; STO
+t BUF
+V IH
+SDA
+V IL
+STOP START START STOP
+Figure 15:
+Functional Timing Characteristics of TCS3530 
+Test 
+Symbol Parameter Min Typ Max Unit
+Level
+f Oscillator clock frequency  700 720 740 kHz 4 OSC
+Datasheet, Public  Page 13
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Typical Operating Characteristics
+Typical Operating 
+Characteristics
+Figure 16:
+Normalized Spectral Responsivity 
+Normalized Photo Diode Response
+120%
+100%
+80%
+X (MOD0)
+Y (MOD1)
+Z (MOD2) 60%
+IR (MOD3)
+HgL (MOD4)
+HgH (MOD5)
+CLEAR (MOD6) 40%
+FLICKER (MOD7)
+20%
+0%
+300 350 400 450 500 550 600 650 700 750 800 850 900 950 1000
+λ wavelength [nm]
+Note(s):
+1. The spectral responsivities shown in the figu re are measured under a diffuser and normalized.
+Figure 17:
+Sensor Field Array 
+Page 14 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Detailed Description
+Upon power-up, POR, the device init ializes. During initialization  Detailed Description
+(typically 200μs), the device will deterministically send NAK on 
+I²C and cannot accept I²C transactions. All communication with 
+the device must be delayed, and all outputs from the device 
+must be ignored including interr upts. After initialization, the 
+device enters the SLEEP state. In this operational state the 
+internal oscillator and other circ uitry are not active, resulting in 
+ultra-low power consumption. If an I²C transaction occurs 
+during this state, the I²C core wakes up temporarily to service 
+the communication. Once the Powe r ON bit, PON, is enabled, 
+the device enters the IDLE state in which the internal oscillator 
+and attendant circuitry are active, but power consumption 
+remains low. Whenever a function is enabled (AEN = 1), the 
+device exits the IDLE state. If all functions are disabled (AEN = 
+0), the device returns to the IDLE state.
+As depicted in  Figure 18  and  Figure 19 , the color sensing 
+functions operate in parallel when enabled. Each function is 
+individually configured (e.g. gain, ADC integration time, wait 
+time, persistence, thresholds, etc.).
+If Sleep after Interrupt is enabled the state machine will enter 
+SLEEP when an interrupt occu rs. Entering SLEEP does not 
+automatically change any of the  register settings (e.g. PON bit 
+is still high, but the normal oper ational state is over-ridden by 
+SLEEP state). SLEEP state is terminated when the SAI_ACTIVE 
+bit is cleared (the status bit is in register 0xA7 and the clear 
+status bit is in register 0xFA).
+State Machine Diagrams
+Figure 18:
+Simplified State Diagram 
+ALS/
+COLOR/WIDEBAND/ SLEEP
+FLICKER
+1
+PON AEN
+0
+IDLE
+Datasheet, Public  Page 15
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530  −   Detailed Description
+Figure 19:
+Detailed State Diagram 
+INITIALIZE TCS3530 Operati onal States
+POR      TCS3440 Operational  States
+(200μs)
+SA I =  1? PON = 1? SLEEP EXIT  SLE EP
+Y Y
+N N
+IDLE
+I2C
+AE N =  0 AE N =  1
+ALS/COLOR/WIDEBAND/FLICKER/IR
+WA IT AUTOZERO
+(WTIME) (every nth  time)
+INTEGRATE CHANNEL DATA
+
+(ATIME)
+CLEAR  INTERRUPT
+INTERRUPTS
+UPDATE GENERATE  EVALUATE:
+INT ER RUPT ? STATUS INTERRUPT Y
+N
+Page 16 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Detailed Description
+I²C Protocol
+The device uses I²C serial communication protocol for 
+communication. The device support s 7-bit chip addressing and 
+both standard and full-speed cl ock frequency modes. Read and 
+Write transactions comply with th e standard set by Philips (now 
+NXP). For a complete description of the I²C protocol, please 
+review the NXP I²C design specification.
+Internal to the device, an 8-bit buffer stores the register address 
+location of the desired byte to read or write. This buffer 
+auto-increments upon each byte  transfer and is retained 
+between transaction events (i.e. valid even after the master 
+issues a STOP command and the I²C bus is released). During 
+consecutive Read transactions, the future/repeated I²C Read 
+transaction may omit the memory address byte normally 
+following the chip address byte; the buffer retains the last 
+register address +1.
+All 16-bit fields have a latching scheme for reading and writing. 
+In general it is recommended to use I²C bursts whenever 
+possible, especially in this ca se when accessing two bytes of 
+one logical entity. When reading these fields, the low byte must 
+be read first, and it triggers a 16-bit latch that stores the 16-bit 
+field. The high byte must be read immediately afterwards. When 
+writing to these fields, the low byte must be written first, 
+immediately followed by the high byte. Reading or writing to 
+these registers without following these requirements will cause 
+errors.
+A Write transaction consists of a START, CHIP-ADDRESSWRITE, 
+REGISTER-ADDRESS WRITE, DATA  BYTE(S), and STOP. Following 
+each byte (9TH clock pulse) the slave places an 
+ACKNOWLEDGE/NOT- ACKNOWLEDGE (ACK/NACK) on the bus. 
+If NACK is transmitted by the sl ave, the master may issue a STOP.
+A Read transaction consists of a START, CHIP-ADDRESSWRITE, 
+REGISTER-ADDRESS, RESTART, CHIP-ADDRESSREAD, DATA 
+BYTE(S), and STOP. Following all but the final byte the master 
+places an ACK on the bus (9TH clock pulse). Termination of the 
+Read transaction is indicated by  a NACK being placed on the 
+bus by the master, followed by STOP.
+Datasheet, Public  Page 17
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+The device is controlled and monitored by registers accessed  Register Overview
+through the I²C serial interface. These registers provide device 
+control functions and are read to  determine device status and 
+acquire device data. 
+Register Map
+The register set is summarized in  Figure 20 . The values of all 
+registers and fields that are listed as reserved or are not listed 
+must not be changed at any time. The power-on reset values of 
+each bit are indicated in these columns. Two-byte fields are 
+always latched with the low byte followed by the high byte.
+Figure 20:
+Register Map 
+Addr Name Description Reset
+0x24 CONTROL_SCL Initialize the device 0x00
+0x40 MOD_OFFSET0[7:0] Modulator Offset Register 0x00
+0x41 MOD_OFFSET0[9:8] Modulator Offset Register 0x00
+0x42 MOD_OFFSET1[7:0] Modulator Offset Register 0x00
+0x43 MOD_OFFSET1[9:8] Modulator Offset Register 0x00
+0x44 MOD_OFFSET2[7:0] Modulator Offset Register 0x00
+0x45 MOD_OFFSET2[9:8] Modulator Offset Register 0x00
+0x46 MOD_OFFSET3[7:0] Modulator Offset Register 0x00
+0x47 MOD_OFFSET4[9:8] Modulator Offset Register 0x00
+0x48 MOD_OFFSET4[7:0] Modulator Offset Register 0x00
+0x49 MOD_OFFSET4[9:8] Modulator Offset Register 0x00
+0x4A MOD_OFFSET5[7:0] Modulator Offset Register 0x00
+0x4B MOD_OFFSET5[9:8] Modulator Offset Register 0x00
+0x4C MOD_OFFSET6[7:0] Modulator Offset Register 0x00
+0x4D MOD_OFFSET6[9:8] Modulator Offset Register 0x00
+0x4E MOD_OFFSET7[7:0] Modulator Offset Register 0x00
+0x4F MOD_OFFSET7[9:8] Modulator Offset Register 0x00
+0x7F OSCEN Power on polling 0x00
+0x80 ENABLE Enables device states 0x00
+0x81 MEAS_MODE0 Measurement mode settings 0 0x04
+0x82 MEAS_MODE1 Measurement mode settings 1 0x0C
+Page 18 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+Addr Name Description Reset
+0x83 SAMPLE_TIME0 Flicker and ALS sample time settings 0 0x60
+0x84 SAMPLE_TIME1 Flicker and ALS sample time settings 1 0x16
+SAMPLE_TIME_
+0x85 Alternative sample time setting 0 0x60
+ALTERNATIVE0
+SAMPLE_TIME_
+0x86 Alternative sample time setting 1 0x16
+ALTERNATIVE1
+0x87 ALS_NR_SAMPLES0 ALS number of samples setting 0 0x00
+0x88 ALS_NR_SAMPLES1 ALS number of samples setting 1 0x00
+ALS_NR_SAMPLES_
+0x89 Alternative ALS number of samples setting 0 0x00
+ALTERNATIVE0
+ALS_NR_SAMPLES_
+0x8A Alternative ALS number of samples setting 1 0x00
+ALTERNATIVE1
+0x8B FD_NR_SAMPLES0   ALS Interrupt Low Threshold [15:8] 0x00
+0x8C FD_NR_SAMPLES1 ALS Interrupt Low Threshold [23:16] 0x00
+FD_NR_SAMPLES_
+ALS Interrupt High Threshold [7:0] 0x00 0x8D
+ALTERNATIVE0
+0x00 FD_NR_SAMPLES_
+ALS Interrupt High Threshold [15:8] 0x8E
+ALTERNATIVE1
+0x8F WTIME Wait Time 0x00
+0x90 Auxiliary Identification 0x00 AUX_ID
+0x91 REV_ID Revision Identification 0x14
+0x92 Device Identification 0x68 ID
+0x93 AILT0 ALS Interrupt Low Threshold 0 0x00
+0x94 AILT1 ALS Interrupt Low Threshold 1 0x00
+0x95 AILT2 ALS Interrupt Low Threshold 2 0x00
+ALS Interrupt High Threshold 0 0x00 0x96 AIHT0
+0x97 AIHT1 ALS Interrupt High Threshold 1 0x00
+0x98 AIHT2 ALS Interrupt High Threshold 2 0x00
+AGC_NR_
+0x99 AGC Number of Samples 0x00
+SAMPLES[7:0]
+AGC_NR_
+0x9A AGC Number of Samples 0x00
+SAMPLES[10:8]
+0x9B STATUS Device Status Information 0x00
+0x9C STATUS2 Device Status Information 2 0x00
+Datasheet, Public  Page 19
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+Addr Name Description Reset
+0x9D STATUS3 Device Status Information 3 0x08
+0x9E STATUS4 Device Status Information 4 0x00
+0x9F STATUS5 Device Status Information 5 0x00
+0xA0 STATUS6 Device Status Information 6 0x00
+0xA1 CFG0 Configuration 0 0x00
+0xA2 CFG1 Configuration 1 0x00
+0xA3 CFG2 Configuration 2 0x00
+0xA4 CFG3 Configuration 3 0x00
+0xA5 CFG4 Configuration 4 0x00
+0xA6 CFG5 Configuration 5 0x00
+0xA7 CFG6 Configuration 6 0x03
+0xA8 CFG7 Configuration 7 0x01
+0xA9 CFG8 Configuration 8 0xC3
+0xAA CFG9 Configuration 9 0x00
+MOD_CHANNEL_
+Modulator Channel Control 0x00 0xAB
+CTRL
+Repetition time of mo dulator or sequencer 
+0xAD TRIGGER_MODE 0x00
+measurement
+0xAE OSC_TUNE Oscillator tuning settings 0x00
+0xB0 VSYNC_GPIO_INT Control of VSYNC/GPIO pin 0x02
+0xBA INTENAB Enable interrupts 0x00
+0xBB SIEN Enable saturation interrupts 0x00
+0xBC CONTROL Device control settings 0x00
+0xBD A L S _ D ATA _ S TAT U S ALS measurement data status 0x00
+0xBE ALS_DATA_FIRST ALS data read and update control 0x00
+0xBF ALS_DATA ALS data read and update control 0x00
+MEAS_SEQR_STEP0_ Defines the gain of modulator for the measurement 
+0xC0 0x88
+MOD_GAINX_0 sequencer step
+MEAS_SEQR_STEP0_ Defines the gain of modulator for the measurement 
+0xC1 0x88
+MOD_GAINX_1 sequencer step
+MEAS_SEQR_STEP0_ Defines the gain of modulator for the measurement 
+0xC2 0x88
+MOD_GAINX_2 sequencer step
+Page 20 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+Addr Name Description Reset
+MEAS_SEQR_STEP0_ Defines the gain of modulator for the measurement 
+0xC3 0x88
+MOD_GAINX_3 sequencer step
+MEAS_SEQR_STEP1_ Defines the gain of modulator for the measurement 
+0xC4 0x88
+MOD_GAINX_0 sequencer step
+MEAS_SEQR_STEP1_ Defines the gain of modulator for the measurement 
+0xC5 0x88
+MOD_GAINX_1 sequencer step
+MEAS_SEQR_STEP1_ Defines the gain of modulator for the measurement 
+0xC6 0x88
+MOD_GAINX_2 sequencer step
+MEAS_SEQR_STEP1_ Defines the gain of modulator for the measurement 
+0xC7 0x88
+MOD_GAINX_3 sequencer step
+MEAS_SEQR_STEP2_ Defines the gain of modulator for the measurement 
+0xC8 0x88
+MOD_GAINX_0 sequencer step
+MEAS_SEQR_STEP2_ Defines the gain of modulator for the measurement 
+0xC9 0x88
+MOD_GAINX_1 sequencer step
+Defines the gain of modulator for the measurement  MEAS_SEQR_STEP2_
+0x88 0xCA
+MOD_GAINX_2 sequencer step
+MEAS_SEQR_STEP2_ Defines the gain of modulator for the measurement 
+0xCB 0x88
+MOD_GAINX_3 sequencer step
+Defines the gain of modulator for the measurement  MEAS_SEQR_STEP3_
+0x88 0xCC
+MOD_GAINX_0 sequencer step
+Defines the gain of modulator for the measurement  MEAS_SEQR_STEP3_
+0x88 0xCD
+MOD_GAINX_1 sequencer step
+Defines the gain of modulator for the measurement  MEAS_SEQR_STEP3_
+0x88 0xCE
+MOD_GAINX_2 sequencer step
+MEAS_SEQR_STEP3_ Defines the gain of modulator for the measurement 
+0xCF 0x88
+MOD_GAINX_3 sequencer step
+Defines whether or not a flicker measurement shall  MEAS_SEQR_STEP0_
+0x00 0xD0
+FD be executed with respective modulator
+MEAS_SEQR_STEP1_ Defines whether or not a flicker measurement shall 
+0xD1 0x00
+FD be executed with respective modulator
+MEAS_SEQR_STEP2_ Defines whether or not a flicker measurement shall 
+0xD2 0x00
+FD be executed with respective modulator
+MEAS_SEQR_STEP3_ Defines whether or not a flicker measurement shall 
+0x00 0xD3
+FD be executed with respective modulator
+MEAS_SEQR_STEP0_ Defines whether or not a residual measurement shall 
+0xD4 0xFF
+RESIDUAL be executed with respective modulator
+MEAS_SEQR_STEP1_ Defines whether or not a residual measurement shall 
+0xD5 0xFF
+RESIDUAL be executed with respective modulator
+Datasheet, Public  Page 21
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+Addr Name Description Reset
+MEAS_SEQR_STEP2_ Defines whether or not a residual measurement shall 
+0xD6 0xFF
+RESIDUAL be executed with respective modulator
+MEAS_SEQR_STEP3_ Defines whether or not a residual measurement shall 
+0xD7 0xFF
+RESIDUAL be executed with respective modulator
+MEAS_SEQR_STEP0_ Defines whether or not an ALS measurement shall 
+0xD8 0xFF
+ALS be executed with respective modulator
+MEAS_SEQR_STEP1_ Defines whether or not an ALS measurement shall 
+0xD9 0x00
+ALS be executed with respective modulator
+MEAS_SEQR_STEP2_ Defines whether or not an ALS measurement shall 
+0xDA 0x00
+ALS be executed with respective modulator
+MEAS_SEQR_STEP3_ Defines whether or not an ALS measurement shall 
+0xDB 0x00
+ALS be executed with respective modulator
+MEAS_SEQR_APERS_
+0xDC Defines the measurement sequencer pattern 0x01
+AND_VSYNC_WAIT
+0xDD MEAS_SEQR_AGC Defines the measurement sequencer pattern 0xFF
+MEAS_SEQR_SMUX_
+0xDE Defines the measurement sequencer pattern 0x00
+AND_SAMPLE_TIME
+MEAS_SEQR_WAIT_
+Defines the measurement sequencer pattern 0x01 0xDF
+AND_TS_ENABLE
+0xE0 MOD_CALIB_CFG0 Defines the modulator cali bration repetition rate 0xFF
+0xE2 MOD_CALIB_CFG2 Defines the modulator calibration settings 0x69
+0xE3 MOD_CALIB_CFG3 Defines the modulator autozero settings 0x6A
+0xE7 MOD_COMP_CFG2 Allows to change the modulator IDAC range 0xBF
+Defines modulator clock cycles for residual  MOD_RESIDUAL_
+0x00 0xE8
+CFG0 measurements
+MOD_RESIDUAL_
+0xE9 Defines relative steps for residual measurements 0x00
+CFG1
+MOD_RESIDUAL_
+0xEA Defines relative steps for residual measurements 0x00
+CFG2
+0xEB VSYNC_DELAY_CFG0 Defines the delay time relative to VSYNC 0x00
+0xEC VSYNC_DELAY_CFG1 Defines the delay time relative to VSYNC 0x00
+Allows to measure the period of a VSYNC input 
+0xED VSYNC_PERIOD0 0x00
+signal
+Allows to measure the period of a VSYNC input 
+0xEE VSYNC_PERIOD1 0x00
+signal
+VSYNC_PERIOD_ Allows to set a target period depending on the 
+0xEF 0x00
+TA R G E T 0 VSYNC input signal
+Page 22 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+Addr Name Description Reset
+VSYNC_PERIOD_ Allows to set a target period depending on the 
+0xF0 0x00
+TA R G E T 1 VSYNC input signal
+Allows to sets various oscillator synchronization 
+0xF1 VSYNC_CONTROL 0x00
+modes
+Defines the oscillator calibration and 
+0xF2 VSYNC_CFG 0x00
+synchronization mode
+0xF3 FIFO_THR Configuration of FIFO threshold interrupt 0x7F
+MOD_FIFO_DATA_ Defines conditions and data format for 
+0xF4 0x8F
+CFG0 corresponding modulator to write to FIFO
+MOD_FIFO_DATA_ Defines conditions and data format for 
+0xF5 0x8F
+CFG1 corresponding modulator to write to FIFO
+MOD_FIFO_DATA_ Defines conditions and data format for 
+0xF6 0x8F
+CFG2 corresponding modulator to write to FIFO
+Defines conditions and data format for  MOD_FIFO_DATA_
+0x8F 0xF7
+CFG3 corresponding modulator to write to FIFO
+MOD_FIFO_DATA_ Defines conditions and data format for 
+0xF8 0x8F
+CFG4 corresponding modulator to write to FIFO
+Defines conditions and data format for  MOD_FIFO_DATA_
+0x8F 0xF9
+CFG5 corresponding modulator to write to FIFO
+Defines conditions and data format for  MOD_FIFO_DATA_
+0x8F 0xFA
+CFG6 corresponding modulator to write to FIFO
+Defines conditions and data format for  MOD_FIFO_DATA_
+0x8F 0xFB
+CFG7 corresponding modulator to write to FIFO
+0xFC FIFO_STATUS0 Contains number of FIFO entries 0x00
+0xFD FIFO_STATUS0 Contains number of FIFO entries 0x00
+0xFD FIFO_STATUS1 Contains FIFO overflow and underflow status 0x00
+FIFO_DATA_ Register to read out FIFO with FIFO protocol 
+0xFE 0x00
+PROTOCOL mechanism
+0xFF FIFO_DATA Register contains FIFO data for read-out 0x00
+Datasheet, Public  Page 23
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+Register Description
+CONTROL_SCL Register
+Figure 21:
+CONTROL_SCL 
+Addr:  0x24 CONTROL_SCL
+Bit Field Reset Type Bit Description
+7:1 Reserved 0
+Software Reset.  If set and executable, the software 
+0SOFT_RESET 0 R/W Reset will initialize the device in the same way as 
+hardware reset.
+Note(s):
+1. Return to the Register Map ( 0x24 ).
+Modulator Offset Register
+Figure 22:
+Modulator Offset Register 
+Type Description Addr Bit Field Reset
+MOD_
+0x40 7:0 0R/W
+OFFSET0[7:0]
+Modulator Offset Registers 0x41 7:2 Reserved 0
+These registers hold the 8 LSB or 
+the 2 MSB bits of the modulator  MOD_
+0R/W 0x41 1:0 offset value for the related 
+OFFSET0[9:8]
+modulator channel. It can be 
+MOD_ overwritten, and it gets 
+0x42 7:0 0R/W
+OFFSET1[7:0] overwritten by the auto-zero 
+mechanism. The value is 10-bit 
+0x43 7:2 Reserved 0 wide and 2's complement 
+encoded. -512 ge ts saturated to 
+MOD_ -511, thus the range is from ±511. 
+0x43 1:0 0R/W
+OFFSET1[9:8] Do not write -512.
+MOD_
+0x44 7:0 0R/W
+OFFSET2[7:0]
+Page 24 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+Type Description Addr Bit Field Reset
+0x45 7:2 Reserved 0
+MOD_
+0x45 1:0 0R/W
+OFFSET2[9:8]
+MOD_
+0x46 7:0 0R/W
+OFFSET3[7:0]
+0x47 7:2 Reserved 0
+MOD_
+0x47 1:0 0R/W
+OFFSET4[9:8]
+MOD_
+0x48 7:0 0R/W
+OFFSET4[7:0]
+Modulator Offset Registers 0x49 7:2 Reserved 0
+These registers hold the 8 LSB or 
+the 2 MSB bits of the modulator  MOD_
+0x49 1:0 0R/W offset value for the related 
+OFFSET4[9:8]
+modulator channel. It can be 
+MOD_ overwritten, and it gets 
+0x4A 7:2 0R/W
+OFFSET5[7:0] overwritten by the auto-zero 
+mechanism. The value is 10-bit 
+0x4B 1:0 Reserved 0 wide and 2's complement 
+encoded. -512 ge ts saturated to 
+MOD_ -511, thus the range is from ±511. 
+0x4B 7:0 0R/W
+OFFSET5[9:8] Do not write -512.
+MOD_
+0R/W 0x4C 7:2
+OFFSET6[7:0]
+0x4D 1:0 Reserved 0
+MOD_
+0x4D 7:0 0R/W
+OFFSET6[9:8]
+MOD_
+0R/W 0x4E 7:2
+OFFSET7[7:0]
+0x4F 1:0 Reserved 0
+MOD_
+0x4F 7:0 0R/W
+OFFSET7[9:8]
+Note(s):
+1. Return to the Register Map ( 0x40 ,  0x41 ,  0x42 ,  0x43 ,  0x44 ,  0x45 ,  0x46 ,  0x47 ,  0x48 ,  0x49 ,  0x4A ,  0x4B ,  0x4C ,  0x4D ,  0x4E ,  0x4F ).
+Datasheet, Public  Page 25
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+OSCEN Register
+Figure 23:
+OSCEN 
+Addr: 0x7F OSCEN
+Bit Field Reset Type Bit Description
+7:3 Reserved 0
+This bit is “1” after power on for about 300μs. The device 
+2PON_INIT 0 R will not respond to any I²C/I3C bus traffic. It can be used 
+for power on polling.
+Oscillator Enable.  The I²C/I3C access to all clocked 
+1 OSCEN_STATUS 0 R
+registers is disabled, if the oscillator is turned off.
+Oscillator Enable.  Writing a “1” activates the oscillator. 
+Writing a “0” disables the oscillator.
+Note, that “PON” in register 0x80 also indicates when the 
+oscillator is on and the internal state-machine is enabled  0OSCEN 0 R/W
+and operating. This operation is temporarily disabled by 
+“SAI” in register 0xA1 while the oscillator keeps running 
+(e.g. for single-shot measurements).
+Note(s):
+1. Return to the Register Map ( 0x7F ).
+ENABLE Register
+Figure 24:
+ENABLE 
+Addr: 0x80 ENABLE
+Bit Field Reset Type Bit Description
+7Reserved 0
+Flicker Detection Enable.  Writing a “1” activates flicker 
+6FDEN 0R/W
+detection. Writing a “0” di sables flicker detection.
+5:2 Reserved 0
+ALS Enable.  Writing a “1” enables ALS/Color. Writing a  “ 0 ”  
+1AEN 0R/W
+disables ALS/Color.
+Power ON .   When asserted, the internal oscillator is activated, 
+allowing timers and ADC channels to operate. Writing a “0” 
+0PON 0R/W
+disables the oscillator and clears PEN, and AEN. Only set this 
+bit after all other registers have been initialized by the host.
+Note(s):
+1. Return to the Register Map ( 0x80 ).
+Page 26 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+MEAS_MODE0 Register
+Figure 25:
+MEAS_MODE0 
+Addr: 0x81 MEAS_MODE0
+Bit Field Reset Type Bit Description
+th Stops a manual calibration after n  iterations by setting 
+STOP_AFTER_NTH_
+7 0R/W FDEN and AEN to “0”. PON will stay at “1”. Per default it stops 
+ITERATION
+after one calibration.
+Enables two gain steps down  at once in case of an 
+ENABLE_AGC_
+analogue AGC saturation and at a gain step still >0. This will 
+6 ASAT_DOUBLE_ 0R/W
+allow a faster reach of 25% full-scale range and a more 
+STEP_DOWN
+prompt reaction if analogue saturations occurs.
+MEASUREMENT_
+SEQUENCER_ Start one measurement cycle with sequencer settings and 
+5 0R/W
+SINGLE_SHOT_ stop it by asserting Sleep After Interrupt (SAI)
+MODE
+MOD_FIFO_ALS_ Enables writing of ALS status  to the FIFO RAM in case ALS 
+4 STATUS_WRITE_ 0R/W data scaling is used as well as  16-bit ALS data writing. It is 
+ENABLE needed to be able to correctly interpret the ALS data. 
+ALS_SCALE is used to avoid that redundant ALS MSBs are 
+transmitted and are reducing  possible resolution, since the 
+ALS data register is only 16 bits wide (internally the result 
+can be 26 bits wide = 11 bits samples + 11 bits sampling 
+3:0 ALS_SCALE 4 R/W
+time + 4 bits residuals -  ALS_MSB_POSITION). The ALS_
+SCALE register defines the number of MSBs which must be 
+"0" so that the scaled representa tion is used in the ALS data 
+registers instead of the unscaled representation.
+Note(s):
+1. Return to the Register Map ( 0x81 ).
+Datasheet, Public  Page 27
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+MEAS_MODE1 Register
+Figure 26:
+MEAS_MODE1 
+Addr: 0x82 MEAS_MODE1
+Bit Field Reset Type Bit Description
+MOD_FIFO_FD_
+END_ Enables writing of end marker  to FIFO after each complete 
+7 0R/W
+MARKER_WRITE_ flicker measurement.
+ENABLE
+MOD_FIFO_FD_
+Enables writing of flicker ch ecksum to FIFO after each 
+6 CHECKSUM_ 0R/W
+complete flicker measurement.
+WRITE_ENABLE
+MOD_FIFO_FD_
+Enables writing of gain to FIFO  after each complete flicker 
+5 GAIN_WRITE_ 0R/W
+measurement. This is required in case AGC is enabled.
+ENABLE
+Internally the result can be 26  bits wide = 11-bit samples + 
+ALS_MSB_ 11-bit sampling time + 4-bit re siduals and is stored in a 
+4:0 12 R/W
+POSITION 32-bit register. ALS_MSB_POSITI ON defines the MSB in this 
+32-bit register.
+Note(s):
+1. Return to the Register Map ( 0x82 ).
+Page 28 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+SAMPLE_TIME0 Register
+Figure 27:
+SAMPLE_TIME0 
+Addr: 0x83 SAMPLE_TIME0
+Bit Field Reset Type Bit Description
+Flicker sampling time and AL S measurement time step. 
+Sets the time in steps of  1.388889μs modulator clock. 
+Please observe that SAMPLE _TIME needs to be set in 
+register 0x83 and 0x84 (11-bit wide). It counts from 0-2047 
+(2048 counts).
+SAMPLE_TIME+1 = 1/Flicke rSamplingFreq/1.388889μs 7:5 SAMPLE_TIME[2:0] 011b R/W
+Default: 179+1 = 1/4000Hz / 1.388889μs
+(180 counts as counted 0-179)
+ALSMeasurementTimeStep = (SAMPLE_TIME+1) x 
+1.388889μs
+Default: 250μs = (179+1) x 1.388889μs
+4Reserved   0
+MEASUREMENT_
+Sets the number of flicker samples for each sequencer step. 
+SEQUENCER_
+3:0 0R/W If set to 0001b the number is  FD_NR_SAMPLES else it is FD_
+FD_NR_SAMPLES_
+NR_SAMPLES_ALTERNATIVE.
+PAT T E R N
+Note(s):
+1. Return to the Register Map ( 0x83 ).
+SAMPLE_TIME1 Register
+Figure 28:
+SAMPLE_TIME1 
+Addr: 0x84 SAMPLE_TIME1
+Bit Field Reset Type Bit Description
+SAMPLE_
+7:0 0x16 R/W Please see  SAMPLE_TIME0 .
+TIME[10:3]
+Note(s):
+1. Return to the Register Map ( 0x84 ).
+Datasheet, Public  Page 29
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+SAMPLE_TIME_ALTERNATIVE0 Register
+Figure 29:
+SAMPLE_TIME_ALTERNATIVE0 
+Addr: 0x85 SAMPLE_TIME_ALTERNATIVE0
+Bit Field Reset Type Bit Description
+Alternative SAMPLE_TIME.  Can be selected with 
+SAMPLE_TIME_
+7:5 011b R/W MEASUREMENT_SEQUENCE R_SMUX_PATTERN, per 
+ALTERNATIVE[2:0]
+measurement sequencer step.
+4Reserved 0
+MEASUREMENT_ Sets the number of ALS samples for each 
+SEQUENCER_ALS_ sequencer step. If set to 0001b, the number is ALS_
+3:0 0R/W
+NR_SAMPLES_ NR_SAMPLES, else it is ALS_NR_SAMPLES_
+PAT T E R N ALTERNATIVE.
+Note(s):
+1. Return to the Register Map ( 0x85 ).
+SAMPLE_TIME_ALTERNATIVE1 Register
+Figure 30:
+SAMPLE_TIME_ALTERNATIVE1 
+Addr: 0x86 SAMPLE_TIME_ALTERNATIVE1
+Bit Field Reset Type Bit Description
+SAMPLE_TIME_
+0x16 R/W Please see  SAMPLE_TIME_ALTERNATIVE0 . 7:0
+ALTERNATIVE[10:3]
+Note(s):
+1. Return to the Register Map ( 0x86 ).
+Page 30 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+ALS_NR_SAMPLES0 Register
+Figure 31:
+ALS_NR_SAMPLES0 
+Addr: 0x87 ALS_NR_SAMPLES0
+Bit Field Reset Type Bit Description
+ALS_NR_OF_SAMPLES define s the total measurement 
+time for ALS together with  SAMPLE_TIME in steps of 
+1.388889μs modulator clock. Please observe that ALS_
+NR_OF_SAMPLES needs to be set in register 0x87 and 
+0x88 (11-bit wide). It counts from 0-2047 (2048 counts).
+ALS_NR_
+ALSMeasurementTime = (ALS_NR_SAMPLES+1) x  7:0 0R/W
+SAMPLES[7:0]
+(SAMPLE_TIME+1) x 1.388889μs
+Default: 250μs = (0+1) x (179+1) x 1.388889μs
+Example: 100ms = (399+1) x (179+1) x 1.388889μs
+In case residual measurement is enabled, SAMPLE_TIME is 
+reduced which also reduces ALSMeasurementTime.
+Note(s):
+1. Return to the Register Map ( 0x87 ).
+ALS_NR_SAMPLES1 Register
+Figure 32:
+ALS_NR_SAMPLES1
+Addr: 0x88 ALS_NR_SAMPLES1
+Bit Field Reset Type Bit Description
+7:3 Reserved 0 0
+ALS_NR_
+0 R/W Please see  ALS_NR_SAMPLES0 . 2:0
+SAMPLES[10:8]
+Note(s):
+1. Return to the Register Map ( 0x88 ).
+Datasheet, Public  Page 31
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+ALS_NR_SAMPLES_ALTERNATIVE0 Register
+Figure 33:
+ALS_NR_SAMPLES_ALTERNATIVE0
+Addr: 0x89 ALS_NR_SAMPLES_ALTERNATIVE0
+Bit Field Reset Type Bit Description
+ALS_NR_OF_SAMPLES_ALTERN ATIVE defines the total 
+measurement time for ALS toge ther with SAMPLE_TIME in 
+steps of 1.388889μs modulator  clock. Please observe that 
+ALS_NR_OF_SAMPLES_ALTERNAT IVE needs to be set in 
+register 0x89 and 0x8A (11-bit wide). It counts from 
+0-2047 (2048 counts). ALS_NR_
+ALSMeasurementTime  = (ALS_NR_SAMPLES_ 7:0 SAMPLES_ 0R/W
+ALTERNATIVE+1) x (SAMPLE_TIME+1) x 1.388889μs ALTERNATIVE[7:0]
+Default: 250μs = (0+1) x (179+1) x 1.388889μs
+Example: 100ms = (399+1) x (179+1) x 1.388889μs
+Attention: In case residual measurement is enabled, 
+SAMPLE_TIME is reduced, which also reduces 
+ALSMeasurementTime. 
+Note(s):
+1. Return to the Register Map ( 0x89 ).
+ALS_NR_SAMPLES_ALTERNATIVE1 Register
+Figure 34:
+ALS_NR_SAMPLES_ALTERNATIVE1
+Addr: 0x8A ALS_NR_SAMPLES_ALTERNATIVE1
+Bit Field Reset Type Bit Description
+7:3 Reserved 0
+ALS_NR_
+2:0 SAMPLES_ 0 R/W Please see  ALS_NR_SAMPLES_ALTERNATIVE0 .
+ALTERNATIVE[10:8]
+Note(s):
+1. Return to the Register Map ( 0x8A ).
+Page 32 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+FD_NR_SAMPLES0 Register
+Figure 35:
+FD_NR_SAMPLES0
+Addr: 0x8B FD_NR_SAMPLES0
+Bit Field Reset Type Bit Description
+FD_NR_OF_SAMPLES defines the total measurement time 
+for Flicker together with SAMPLE_TIME in steps of 
+1.388889μs modulator clock. Please observe that FD_NR_
+OF_SAMPLES needs to be set in register 0x8B and 0x8C 
+(11-bit wide). It counts from 0-2047 (2048 counts).
+FD_NR_
+FDMeasurementTime = (FD_NR_SAMPLES+1) x (SAMPLE_ 7:0 0R/W
+SAMPLES[7:0]
+TIME+1) x 1.388889μs
+Default: 250μs = (0+1) x (179+1) x 1.388889μs
+Example: 100ms = (399+1) x (179+1) x 1.388889μs
+In case residual measurement is enabled, SAMPLE_TIME is 
+reduced which also reduces FDMeasurementTime.
+Note(s):
+1. Return to the Register Map ( 0x8B ).
+FD_NR_SAMPLES1 Register
+Figure 36:
+FD_NR_SAMPLES1
+Addr: 0x8C FD_NR_SAMPLES1
+Bit Field Reset Type Bit Description
+FD_NR_ When asserted flicker measurement sequences will be 
+7 SAMPLES_ 0R/W infinitely repeated. In this mode, no end markers are 
+INFINITE inserted but results are continuously written into the FIFO.
+6:3 Reserved 0
+FD_NR_
+2:0 0 R/W Please see  FD_NR_SAMPLES0 .
+SAMPLES[10:8]
+Note(s):
+1. Return to the Register Map ( 0x8C ).
+Datasheet, Public  Page 33
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+FD_NR_SAMPLES_ALTERNATIVE0 Register
+Figure 37:
+FD_NR_SAMPLES_ALTERNATIVE0
+Addr: 0x8D FD_NR_ SAMPLES_ALTERNATIVE0
+Bit Field Reset Type Bit Description
+FD_NR_OF_SAMPLES_ALTERNATIVE defines the total 
+measurement time for Flicke r together with SAMPLE_
+TIME in steps of 1.388889μs modulator clock. Please 
+observe that FD_NR_OF_SAMPLES_ALTERNATIVE needs 
+to be set in register 0x8D and 0x8E (11-bit wide). It 
+counts from 0-2047 (2048 counts). FD_NR_SAMPLES_
+7:0 0R/W
+FDMeasurementTime = (FD_NR_SAMPLES_ ALTERNATIVE [7:0]
+ALTERNATIVE+1) x (SAMPLE_TIME+1) x 1.388889μs
+Default: 250μs = (0+1) x (179+1) x 1.388889μs
+Example: 100ms = (399+1) x (179+1) x 1.388889μs
+In case residual measurement is enabled, SAMPLE_TIME 
+is reduced which also reduces FDMeasurementTime.
+Note(s):
+1. Return to the Register Map ( 0x8D ).
+FD_NR_SAMPLES_ALTERNATIVE1 Register
+Figure 38:
+FD_NR_SAMPLES_ALTERNATIVE1
+Addr: 0x8E FD_NR_SAMPLES_ALTERNATIVE1
+Bit Field Reset Type Bit Description
+7:3 Reserved 0
+FD_NR_SAMPLES_
+0 R/W Please see  FD_NR_SAMPLES_ALTERNATIVE0 . 2:0
+ALTERNATIVE[10:8]
+Note(s):
+1. Return to the Register Map ( 0x8E )
+Page 34 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+WTIME Register
+Figure 39:
+WTIME 
+Addr: 0x8F WTIME
+Bit Field Reset Type Bit Description
+Sets the WaitTime between 2 measurements of the 
+modulator or sequencer. WTIME together with TRIGGER_
+MODE_TIMING (in register 0x AD, TRIGGER_MODE) define 
+7:0 WTIME 0 R/W
+the actual time between measurements. 
+WaitTime = TRIGGER_MODE_TIMING x WTIME
+Default: 0 = 0 x (0+1) no WaitTime.
+Note(s):
+1. Return to the Register Map ( 0x8F )
+Identification Registers
+Figure 40:
+Identification Registers 
+Bits Addr Field Reset Type Description
+AUX_ID : Identifies package and wafer 
+7:0 0x90 AUX_ID 0x00 R
+factory
+REV_ID:  Identifies revision number of 
+7:0 0x91 REV_ID 0x14 R
+CMOS die
+7:0 0x92 ID 0x68 R ID : Device Identification
+Note(s):
+1. Return to the Register Map ( 0x90 ,  0x91 ,  0x92 ).
+Datasheet, Public  Page 35
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+ALS Interrupt Low Threshold Register
+Figure 41:
+ALS Interrupt Low Threshold 
+Bits Addr Field Reset Type Description
+7:0 0x93 AILT0 0 R/W ALS Interrupt Low Threshold:  The ALS interrupt 
+threshold registers are 24-bit wide. ALS interrupt 
+15:8 0x94 AILT1 R/W level detection compares  the threshold registers  0
+with the data accumulated by the selected 
+modulator. The modulator can be selected via 
+ALS_THRESHOLD_CHANNEL.  If AIEN is asserted 
+and the accumulated data is below AILT for the  23:16 0x95 AILT2 0 R/W
+number of consecutive samples specified in APERS, 
+an interrupt is asserted on the interrupt pin 
+(internally AINT_AILT and AINT are asserted).
+Note(s):
+1. Return to the Register Map ( 0x93 ,  0x94 ,  0x95 ).
+ALS Interrupt High Threshold Register
+Figure 42:
+ALS Interrupt High Threshold  
+Bits Addr Field Reset Type Description
+7:0 0x96 AIHT0 0 R/W ALS Interrupt High Threshold :   The ALS interrupt 
+threshold registers are 24-bit wide. ALS interrupt 
+15:8 0x97 AIHT1 R/W level detection compares the threshold registers  0
+with the data accumula ted by the selected 
+modulator. The modulator can be selected via 
+ALS_THRESHOLD_CHANNEL. If AIEN is asserted 
+and the accumulated data is above AIHT for the  23:16 0x98 AIHT2 0 R/W
+number of consecutive samples specified in 
+APERS, an interrupt is asserted on the interrupt 
+pin (internally AINT_AIHT and AINT are asserted).
+Note(s):
+1. Return to the Register Map ( 0x96 ,  0x97 ,  0x98 ).
+Page 36 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+AGC Number of Samples Register
+Figure 43:
+AGC Number of Samples 
+Bits Addr Field Reset Type Description
+AGC_NR_
+7:0 0x99 0R/W
+SAMPLES[7:0]
+AGC Number of Samples : Sets the 
+7:3 0x9A number of samples for every AGC  0 Reserved
+measurement.
+AGC_NR_
+2:0 0x9A 0R/W
+SAMPLES[10:8]
+Note(s):
+1. Return to the Register Map ( 0x99 ,  0x9A ).
+STATUS Register
+Figure 44:
+STATUS 
+Addr: 0x9B STATUS
+Bit Field Reset Type Bit Description
+Modulator Interrupt:  Indicates that a modulator 
+interrupt has occurred becaus e of saturation. Check the 
+7MINT 0R/W STATUS2 register to differentiate between analog or 
+digital saturation. Writing 1 to this bit clear MINT and all 
+subsequent interrupts.
+6:4 Reserved 0
+ALS Interrupt:  If AIEN is set, this interrupt indicates that 
+an ALS event that met the programmed ALS thresholds 
+3AINT 0R/W (AILT or AIHT) and persistence (APERS) occurred. Check 
+the STATUS3 register to differentiate. Writing 1 to this bit 
+clear AINT and all subsequent interrupts.
+FIFO Interrupt.  Indicates that the data level in the FIFO 
+met the programmed FIFO thresholds (FIFO_LVL and 
+FIFO_THR). This interrupt is automatically 
+asserted/removed depending on the programmed FIFO  2FINT 0R/W
+thresholds. Writing 1 to this bit clears FINT. The interrupt, 
+however, will be promptly asserted again in case the FIFO 
+has not been read out or cleared.
+Datasheet, Public  Page 37
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+Addr: 0x9B STATUS
+Bit Field Reset Type Bit Description
+1Reserved 0
+System Interrupt.  If SIEN is set, indicates that one or 
+more of several events has occurred or is complete. The 
+0SINT 0 0
+events related to this interrupt are indicated in the 
+STATUS5 register.
+Note(s):
+1. Return to the Register Map ( 0x9B ).
+STATUS2 Register
+Figure 45:
+STATUS2 
+Addr: 0x9C STATUS2
+Bit Field Reset Type Bit Description
+7:5 Reserved 0 R
+ALS Digital Saturation .   Indicates that a counter value has 
+been reached that cannot be  expressed with the selected 
+ALS_DIGITAL_
+0R data format defined with ALS_MSB_POSITION. Maximum  4
+SATURATION
+counter value also depends on integration time set in the 
+ATIME register.
+Flicker Detect Digital Saturation.  Indicates that the 
+FD_DIGITAL_
+0R maximum counter value has be en reached during flicker  3
+SATURATION
+detection.
+2:1 Reserved 0 R
+ALS Analog Saturation of any Modulator.  Indicates that 
+MOD_ANALOG_
+0R the intensity of ambient light has exceeded the maximum  0
+SATURATION_ANY
+integration level for the ALS analog circuit.
+Note(s):
+1. Return to the Register Map ( 0x9C ).
+Page 38 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+STATUS3 Register
+Figure 46:
+STATUS3 
+Addr: 0x9D STATUS3
+Bit Field Reset Type Bit Description
+7:6 Reserved 0
+ALS Interrupt High.  Indicates that an ALS interrupt 
+5AINT_AIHT   0R/W occurred because the ALS data exceeded the high 
+threshold. Writing “1” to this bit clears this interrupt.
+ALS Interrupt Low.  Indicates that an ALS interrupt 
+4AINT_AILT   0R/W occurred because the ALS data is below the low 
+threshold. Writing “1” to this bit clears this interrupt.
+Indicates that synchronization is out of sync with clock 
+provided at vsync pin. Default value is “1” since device 
+3 VSYNC_LOST 1 R always starts unsynchronized. The detected vsync clock is 
+not within the expected range. 
+Please see VSYNC_PERIOD_T ARGET for more details. 
+2Reserved   0
+Indicates that oscillator calibration with the current values 
+OSC_CALIB_
+1 0R of TRIM_OSC and OSC_TUNE is out of range abs(TRIM_
+SATURATION
+OSC+OSC_TUNE) > 32 .
+OSC_CALIB_
+0 R Indicates that oscillator calibration is finished. 0
+FINISHED
+Note(s):
+1. Return to the Register Map ( 0x9D ).
+Datasheet, Public  Page 39
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+STATUS4 Register
+Figure 47:
+STATUS4 
+Addr: 0x9E STATUS4
+Bit Field Reset Type Bit Description
+7:4 Reserved 0
+Indicates that Measured Data is Corrupted.  For a valid 
+measurement, this bit must not be asserted. This error 
+MOD_SAMPLE_
+3 0R condition does not trigger an  interrupt, however AEN and 
+TRIGGER_ERROR
+FDEN will be cleared and SINT_MEASURMENT_
+SEQUENCER will be set. Wr iting “1” clears this bit.
+Indicates that WTIME is too short for the programmed 
+MOD_TRIGGER_ configuration (SAMPLE_TIME, ALS_NR_SAMPLES, FD_NR_
+2 0R
+ERROR SMAPLES). This error condit ion does not trigger an 
+interrupt. Writing “1” clears this bit.
+Sleep After Interrupt Active . Indicates that the device is 
+1 SAI_ACTIVE 0 R in sleep due to an interrupt. To  exit sleep mode, clear this 
+bit by writing “1” to CLEAR_SAI_ACTIVE.
+Initialization Busy.  Indicates that the device is 
+initializing. This bit will remain 1 for about 300μs after 
+0INIT_BUSY   0 R
+power on. Do not interact with the device until 
+initialization is complete (e.g. via I²C/I3C).
+Note(s):
+1. Return to the Register Map ( 0x9E ).
+Page 40 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+STATUS5 Register
+Figure 48:
+STATUS5 
+Addr: 0x9F STATUS5
+Bit Field Reset Type Bit Description
+7:3 Reserved 0
+Auxiliary System Interrupt Enable.  Setting this bit will 
+2SINT_AUX   0R/W allow a system interrupt SINT as soon as an auxiliary 
+interrupt occurs. 
+SINT_ Measurement Sequencer Interrupt Enable.  Setting this 
+1 MEASUREMENT_ 0R/W bit will allow a system interrupt SINT as soon as invoked 
+SEQUENCER by a measurement sequencer event.
+Vsync Interrupt Enable.  Setting this bit will allow a 
+0SINT_VSYNC   0R/W system interrupt SINT as soon  as soon as a vysnc interrupt 
+occurs.
+Note(s):
+1. Return to the Register Map ( 0x9F ).
+Datasheet, Public  Page 41
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+STATUS6 Register
+Figure 49:
+STATUS6 
+Addr: 0xA0 STATUS6
+Bit Field Reset Type Bit Description
+ALS Analog Saturation of Modulator7.  Indicates that 
+MOD_ANALOG_
+7 0R the intensity of ambient light has exceeded the maximum 
+SATURATION7
+integration level for the ALS analog circuit.
+ALS Analog Saturation of Modulator6.  Indicates that 
+MOD_ANALOG_
+6 0R the intensity of ambient light has exceeded the maximum 
+SATURATION6
+integration level for the ALS analog circuit.
+ALS Analog Saturation of Modulator5.  Indicates that 
+MOD_ANALOG_
+5 0R the intensity of ambient light has exceeded the maximum 
+SATURATION5
+integration level for the ALS analog circuit.
+ALS Analog Saturation of Modulator4.  Indicates that 
+MOD_ANALOG_
+4 0R the intensity of ambient light has exceeded the maximum 
+SATURATION4
+integration level for the ALS analog circuit.
+ALS Analog Saturation of Modulator3.  Indicates that 
+MOD_ANALOG_
+0R the intensity of ambient light has exceeded the maximum  3
+SATURATION3
+integration level for the ALS analog circuit.
+ALS Analog Saturation of Modulator2.  Indicates that 
+MOD_ANALOG_
+0R the intensity of ambient light has exceeded the maximum  2
+SATURATION2
+integration level for the ALS analog circuit.
+ALS Analog Saturation of Modulator1.  Indicates that 
+MOD_ANALOG_
+0R the intensity of ambient light has exceeded the maximum  1
+SATURATION1
+integration level for the ALS analog circuit.
+ALS Analog Saturation of Modulator0.  Indicates that 
+MOD_ANALOG_
+0 0R the intensity of ambient light has exceeded the maximum 
+SATURATION0
+integration level for the ALS analog circuit.
+Note(s):
+1. Return to the Register Map ( 0xA0 ).
+Page 42 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+CFG0 Register
+Figure 50:
+CFG0 
+Addr: 0xA1 CFG0
+Bit Field Reset Type Bit Description
+7Reserved   0
+Sleep After Interrupt.  If asserted, the oscillator is turned 
+off whenever interrupt is active  (low). SAI_ ACTIVE is set in 
+this event. To activate the  oscillator again, service and 
+clear all interrupts plus clear the SAI_ACTIVE bit by writing 
+6SAI   0R/W
+“1” to CLEAR_SAI_ACTIVE. Sleep after interrupt is asserted 
+only in combination with MEASUREMENT_
+SEQUENCER_SINT_PER_STE P or SIEN or SIEN_
+MEASUREMENT_SEQUENCER.
+5:0 Reserved 0 Do not overwrite default.
+Note(s):
+1. Return to the Register Map ( 0xA1 ).
+CFG1 Register
+Figure 51:
+CFG1 
+Addr: 0xA2 CFG1
+Bit Field Reset Type Bit Description
+7:3 Reserved 0
+If this bit is set to “1” and flicker measurement takes 
+longer than ALS measurement, ALS measurement  DO_ALS_FINAL_
+0R/W 2
+PROCESSING writings are postponed until flicker measurement is 
+finished. Otherwise ALS data is not written to FIFO.
+1:0 Reserved 0 Do not overwrite default.
+Note(s):
+1. Return to the Register Map ( 0xA2 ).
+Datasheet, Public  Page 43
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+CFG2 Register
+Figure 52:
+CFG2 
+Addr: 0xA3 CFG2
+Bit Field Reset Type Bit Description
+7:3 Reserved 0
+FIFO Threshold LSB.  Please see  FIFO_THR  for 
+2:0 FIFO_THR[2:0] 1 R/W
+information.
+Note(s):
+1. Return to the Register Map ( 0xA3 ).
+CFG3 Register
+Figure 53:
+CFG3 
+Addr: 0xA4 CFG3
+Bit Field Reset Type Bit Description
+7:6 Reserved 0
+Interrupt Pin Mapping.  Defines internal signal which is 
+routed to the external INT pin.
+00b: Default, INTERRUPT
+5:4 INT_PINMAP 0 R/W
+01b: Reserved, do not use
+10b: Reserved, do not use
+11b: Reserved, do not use
+3:2 Reserved 0
+Vsync/GPIO Pin Mapping.  Defines internal signal which 
+is routed to the external VSYNC/GPIO pin.
+VSYNC_GPIO_ 00b: Default, VSYNC_GPIO_OUT
+1:0 0R/W
+PINMAP 01b: Reserved, do not use
+10b: Reserved, do not use
+11b: Reserved, do not use
+Note(s):
+1. Return to the Register Map ( 0xA4 ).
+Page 44 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+CFG4 Register
+Figure 54:
+CFG4 
+Addr: 0xA5 CFG4
+Bit Field Reset Type Bit Description
+7Reserved   0
+th Enable a modulator calibration with n  iterations per 
+MOD_
+sequencer step instead of waiting for a full round for all  CALIBRATION_
+6 0R/W sequencers to be finished. In case of AGC enabled (MOD_
+NTH_ITERATION_
+CALIB_NTH_ITERATION_AGC_ENABLE) this bit must be  STEP_ENABLE
+set “0”, otherwise AGC will not properly work.
+MEASUREMENT_ Sets the target measurement levels for AGC prediction. 
+SEQUENCER_AGC_ 0b: 50% of max value
+5 0R/W
+PREDICT_TARGET_ 1b: 25% of max value
+LEVEL
+MEASURMENT_ Invokes the system interrupt SINT_MEASUREMENT_
+4 SEQUENCER_ 0R/W SEQUENCER per sequencer step instead of after a full 
+SINT_PER_STEP sequencer round.
+If set to 0, OSC_TUNE gets reset  to 0 if PON is set to 1. If set  OSC_TUNE_NO_
+0R 3
+RESET to 1, OSC_TUNE keeps its value if PON is set to 1.
+2Reserved   0
+Sets the format for ALS data written to FIFO. Please 
+observe readout pattern if digital or analog saturation has 
+occurred.
+MOD_ALS_FIFO_
+00b: 16-bit (FFFF analog sat, FFFE digital sat) 0R/W 1:0
+DATA_FORMAT
+01b: 24-bit (FFFFFF analog sat, FFFFFE digital sat)
+10b: Reserved 
+11b: 32-bit (FFFFFFFF analog sat)
+Note(s):
+1. Return to the Register Map ( 0xA5 ).
+Datasheet, Public  Page 45
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+CFG5 Register
+Figure 55:
+CFG5 
+Addr: 0xA6 CFG5
+Bit Field Reset Type Bit Description
+7Reserved   0
+Selects the modulator channel used for the ALS threshold 
+metering and subsequent interrupt.
+000b default, Modulator 0
+001b: Modulator 1 ALS_THRESHOLD_
+6:4 0R/W
+010b: Modulator 2 CHANNEL
+011b: Modulator 3
+....
+111b: Modulator7
+ALS Interrupt Persistence.  Defines a filter for the 
+number of consecutive occurrences that ALS 
+measurement data must rema in outside the threshold 
+range between AILT and AIHT before an interrupt is 
+generated. The ALS data chan nel used for the persistence 
+filter is set by ALS_THRESHOLD_CHANNEL. Any sample 
+that is inside the  threshold range resets the counter to 0. 
+Interrupts are generated at
+0x0: Every ALS cycle 3:0 APERS 0 R/W
+0x1: Any ALS value outside the threshold range
+0x2: 2 consecutive ALS values outside the range
+0x3: 3 consecutive ALS values outside the range
+0x4: 5 ...
+0x5: 10 ...
+...... continued in increments of 5 values
+0xE: 55 ...
+0xF: 60 consecutive ALS values outside the range
+Note(s):
+1. Return to the Register Map ( 0xA6 ).
+Page 46 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+CFG6 Register
+Figure 56:
+CFG6 
+Addr: 0xA7 CFG6
+Bit Field Reset Type Bit Description
+7:6 Reserved 0
+MOD_
+Activated complete start procedure in for each 
+MEASUREMENT_
+5 0R/W measurement sample. This reduces measurement time 
+COMPLETE_
+per sample by 9 modulator clock cycles.
+STARTUP
+4Reserved   0
+Limits the number of residual bits to a minimum within 
+this value.
+ATTENTION: When this function is used, the default 
+settings for the gains are not correct anymore. Thus a 
+residual calibration is mandatory (use MOD_CALIB_
+RESIDUAL_ENABLE_AUTO_CALIB_ON_GAIN_ MOD_MINIMUM_
+3:2 0R/W
+CHANGE or MOD_CALIB_NTH_ITERATION_RC_ RESIDUAL_BITS
+ENABLE to enforce residual calibration)
+00b: 0 residual bits at minimum (default, turned off )
+01b: 1 residual bits at minimum 
+10b: 2 residual bits at minimum 
+11b: 3 residual bits at minimum
+Limits the number of residual bits to a maximum within 
+this value.
+ATTENTION: When this function is used, the default 
+settings for the gains are not correct anymore. Thus a 
+residual calibration is mandatory (use MOD_CALIB_
+RESIDUAL_ENABLE_AUTO_CALIB_ON_GAIN_ MOD_MAXIMUM_
+1:0 10b R/W
+CHANGE or MOD_CALIB_NTH_ITERATION_RC_ RESIDUAL_BITS
+ENABLE to enforce residual calibration). 
+00b: 1 residual bits at maximum
+01b: 2 residual bits at maximum 
+10b: 3 residual bits at maximum (default)
+11b: 4 residual bits at maximum
+Note(s):
+1. Return to the Register Map ( 0xA7 ).
+Datasheet, Public  Page 47
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+CFG7 Register
+Figure 57:
+CFG7 
+Addr: 0xA8 CFG7
+Bit Field Reset Type Bit Description
+Enable coherence buffering.  PON must be 0 when this 
+7 ALS_CB_ENABLE 0x00 R/W
+bit is written, otherwise buffer data will be corrupted.
+6:0 Reserved 0x01
+Note(s):
+1. Return to the Register Map ( 0xA8 ).
+CFG8 Register
+Figure 58:
+CFG8 
+Addr: 0xA9 CFG8
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+Sets the maximum gain for al l channels in all sequencer 
+7:4 SEQUENCER_ 0xC R/W
+steps.
+MAX_MOD_GAIN
+MEASUREMENT_ Sets the modulator gain redu ction in AGC predict mode. 
+SEQUENCER_AGC_ All channels in the actual measurement sequence are 
+3:0 0x4 R/W
+PREDICT_MOD_ reduced by the programmed gain reduction before gain 
+GAIN_REDUCTION prediction starts.
+Note(s):
+1. Return to the Register Map ( 0xA9 ).
+Page 48 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+CFG9 Register
+Figure 59:
+CFG9 
+Addr: 0xAA CFG9
+Bit Field Reset Type Bit Description
+7:2 Reserved 0
+Sets the number of residual bits ignored and shifted in 
+MOD_RESIDUAL_
+1:0 0R/W flicker data. Please observ e to set MOD_FD_FIFO_DATAx_
+BITS_IGNORE
+WIDTH accordingly.
+Note(s):
+1. Return to the Register Map ( 0xAA ).
+Datasheet, Public  Page 49
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+MOD_CHANNEL_CTRL Register
+Figure 60:
+MOD_CHANNEL_CTRL 
+Addr: 0xAB MOD_CHANNEL_CTRL
+Bit Field Reset Type Bit Description
+7 MOD7_DISABLE 0 R/W When asserted modulator 7 is disabled
+6 MOD6_DISABLE 0 R/W When asserted modulator 6 is disabled
+5 MOD5_DISABLE 0 R/W When asserted modulator 5 is disabled
+4 MOD4_DISABLE 0 R/W When asserted modulator 4 is disabled
+3 MOD3_DISABLE 0 R/W When asserted modulator 3 is disabled
+2 MOD2_DISABLE 0 R/W When asserted modulator 2 is disabled
+1 MOD1_DISABLE 0 R/W When asserted modulator 1 is disabled
+0 MOD0_DISABLE 0 R/W When asserted modulator 0 is disabled
+Note(s):
+1. Return to the Register Map ( 0xAB ).
+Page 50 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+TRIGGER_MODE Register
+Figure 61:
+TRIGGER_MODE 
+Addr: 0xAD TRIGGER_MODE
+Bit Field Reset Type Bit Description
+7:3 Reserved 0
+Sets the repetition rate of a modulator or sequencer 
+measurement. Counting will immediately start or will wait 
+for the first vsync pulse.
+000: OFF
+001: Normal   =   2.844ms * WTIME
+MOD_TRIGGER_
+010: Long       = 45.511ms * WTIME 2:0 0R/W
+TIMING
+011: Fast        = 88.889μs * WTIME
+100: Fastlong =   1.422ms * WTIME
+101: vsync     = One vsync per WTIME step
+110: Reserved
+111: Reserved
+Note(s):
+1. Return to the Register Map ( 0xAD ).
+OSC_TUNE Register
+Figure 62:
+OSC_TUNE 
+Addr: 0xAE OSC_TUNE
+Bit Field Reset Type Bit Description
+Do not overwrite default. It will artificially detune the 
+7:0 Reserved 0
+oscillator.
+Note(s):
+1. Return to the Register Map ( 0xAE ).
+Datasheet, Public  Page 51
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+VSYNC_GPIO_INT Register
+Figure 63:
+VSYNC_GPIO_INT 
+Addr: 0xB0 VSYNC_GPIO_INT
+Bit Field Reset Type Bit Description
+7Reserved   0
+If set to “1” the INT pin output  is inverted. This applies to 
+6 INT_INVERT 0 R/W
+all output signals as selected in INT_PINMAP.
+If programmed to “1” the INT pin is set as input. Please 
+5INT_IN_EN   0R/W observe that the connected net must not be floating since 
+INT is an open drain input.
+4 INT_IN 0 R External HIGH or LO value applied to INT pin.
+If set to “1” the VSYNC/GPIO pin output is inverted. This 
+VSYNC_GPIO_
+3 0R/W applies to all output signals  as selected in VSYNC_GPIO_
+INVERT
+PINMAP.
+If programmed to “1” the VSYNC/GPIO pin is set as in-put. 
+VSYNC_GPIO_
+0R/W Please observe that the co nnected net must not be  2
+IN_EN
+floating since VSYNC/GPIO is an open drain input.
+Programs the VSYNC/GPIO pin HI or LOW. Since the pin is 
+an open drain I/O pin, the default value is HIGH to avoid 
+1 VSYNC_GPIO_OUT 1 R/W any unintended power consumption through pull-up 
+resistor. The routed internal signal is selected in VSYNC_
+GPIO_PINMAP.
+0 VSYNC_GPIO_IN 0 R External HIGH or LO value applied to VSYNC/GPIO pin.
+Note(s):
+1. Return to the Register Map ( 0xB0 ).
+Page 52 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+INTENAB Register
+Figure 64:
+INTENAB 
+Addr: 0xBA INTENAB
+Bit Field Reset Type Bit Description
+Modulator Interrupt Enable.  Setting this bit will allow a 
+7MIEN   0R/W modulator interrupt on the external INT pin. Please check 
+in STATUS2 for the reason of the interrupt.
+6:4 Reserved 0
+ALS Interrupt Enable.  Setting this bit will allow an ALS 
+3AIEN   0R/W interrupt on the external INT  pin. Please check in STATUS3 
+for the reason of the interrupt.
+FIFO Interrupt Enable.  Setting this bit will allow a fifo 
+interrupt on the external INT pin. Please observe that this 
+2 FIEN 0 R/W
+interrupt indicates that data in the FIFO is available for 
+readout. Check FINT for further information.
+1Reserved   0
+System Interrupt Enable.  Setting this bit will allow a 
+0 SIEN 0 R/W system interrupt on the external INT pin. Please check in 
+STATUS5 for the reason of the interrupt.
+Note(s):
+1. Return to the Register Map ( 0xBA ).
+Datasheet, Public  Page 53
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+SIEN Register
+Figure 65:
+SIEN 
+Addr: 0xBB SIEN
+Bit Field Reset Type Bit Description
+7:3 Reserved 0
+Auxiliary System Interrupt Enable.  Setting this bit will 
+allow a system interrupt SINT as soon as an auxiliary 
+2 SIEN_AUX 0 R/W
+interrupt occurs. Please see  SINT_AUX  for further 
+information.
+Measurement Sequencer Interrupt Enable.  Setting this 
+SIEN_
+bit will allow a system interrupt SINT as soon as invoked 
+1 MEASUREMENT_ 0R/W
+by a measurement sequencer event. Please see  SINT_
+SEQUENCER
+MEASUREMENT_SEQUENCER  for further information
+Vsync Interrupt Enable.  Setting this bit will allow a 
+0 SIEN_VSYNC 0 R/W system interrupt SINT as soon  as soon as a vysnc interrupt 
+occurs. Please see  SINT_VSYNC  for further information.
+Note(s):
+1. Return to the Register Map ( 0xBB ).
+CONTROL Register
+Figure 66:
+CONTROL 
+Addr: 0xBC CONTROL
+Bit Field Reset Type Bit Description
+7:2 Reserved 0
+Setting this bit will clear the FIFO, as well as FINT, FIFO_
+1FIFO_CLR   0R/W
+FULL, FIFO_OVERFLOW, FIFO_UNDERFLOW and FIFO_LVL.
+CLEAR_SAI_ Setting this bit will clear the Sleep After Interrupt Active 
+0 0R/W
+ACTIVE SAI_ACTIVE and start measurements if enabled.
+Note(s):
+1. Return to the Register Map ( 0xBC ).
+Page 54 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+ALS_DATA_STATUS Register
+Figure 67:
+A L S _ DATA _ S TAT U S  
+Addr: 0xBD ALS_DATA_STATUS
+Bit Field Reset Type Bit Description
+ALS Data Valid.  Indicates that the ALS state has 
+7 ALS_DATA_VALID 0 R completed a cycle since either an assertion of AEN or the 
+last readout of the ALS_DATA_FIRST register.
+6:0 Reserved 0
+Note(s):
+1. Return to the Register Map ( 0xBD ).
+ALS_DATA_FIRST Register
+Figure 68:
+ALS_DATA_FIRST 
+Addr: 0xBE ALS_DATA_FIRST
+Bit Field Reset Type Bit Description
+ALS Data First.  ALS_CB_ENABLE needs to be set in order 
+to   read and update to the late st ALS data. A part of the 
+7 ALS_DATA_FIRST 0 R
+FIFO is used for this function. In such case the FIFO size 
+will be reduced from 1280 to 896 bytes.
+6:0 Reserved 0
+Note(s):
+1. Return to the Register Map ( 0xBE ).
+ALS_DATA Register
+Figure 69:
+ALS_DATA 
+Addr: 0xBF ALS_DATA
+Bit Field Reset Type Bit Description
+Continue Reading ALS data.  ALS_CB_ENABLE needs to 
+be set in order to read and up date to the latest ALS data. A 
+part of the FIFO is used for this function. In such case the 
+FIFO size will be reduced from 1280 to 896 bytes. 7:0 ALS_DATA 0 R
+ATTENTION: Automatic address wrap from to this address. 
+In this case the wrap is done from ALS_DATA_H to ALS_
+DATA_H.
+Datasheet, Public  Page 55
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+Note(s):
+1. Return to the Register Map ( 0xBF ).
+MEAS_SEQR_STEP0_MOD_GAINX_0 Register
+Figure 70:
+MEAS_SEQR_STEP0_MOD_GAINX_0 
+Addr: 0xC0 MEAS_SEQR_STEP0_MOD_GAINX_0
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 1 for the measurement 
+7:4 1000b R/W
+STEP0_ sequencer step 0.
+MOD_GAIN1
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 0 for the measurement 
+3:0 1000b R/W
+STEP0_ sequencer step 0.
+MOD_GAIN0
+Note(s):
+1. Return to the Register Map ( 0xC0 ).
+MEAS_SEQR_STEP0_MOD_GAINX_1 Register
+Figure 71:
+MEAS_SEQR_STEP0_MOD_GAINX_1 
+Addr: 0xC1 MEAS_SEQR_STEP0_MOD_GAINX_1
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 3 for the measurement 
+7:4 1000b R/W
+STEP0_ sequencer step 0.
+MOD_GAIN3
+MEASUREMENT_
+Defines the gain of modulator 2 for the measurement  SEQUENCER_
+3:0 1000b R/W
+sequencer step 0. STEP0_
+MOD_GAIN2
+Note(s):
+1. Return to the Register Map ( 0xC1 ).
+Page 56 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+MEAS_SEQR_STEP0_MOD_GAINX_2 Register
+Figure 72:
+MEAS_SEQR_STEP0_MOD_GAINX_2 
+Addr: 0xC2 MEAS_SEQR_STEP0_MOD_GAINX_2
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 5 for the measurement 
+7:4 1000b R/W
+STEP0_ sequencer step 0.
+MOD_GAIN5
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 4 for the measurement 
+3:0 1000b R/W
+STEP0_ sequencer step 0.
+MOD_GAIN4
+Note(s):
+1. Return to the Register Map ( 0xC2 ).
+MEAS_SEQR_STEP0_MOD_GAINX_3 Register
+Figure 73:
+MEAS_SEQR_STEP0_MOD_GAINX_3
+Addr: 0xC3 MEAS_SEQR_STEP0_MOD_GAINX_3
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 7 for the measurement 
+7:4 1000b R/W
+STEP0_ sequencer step 0.
+MOD_GAIN7
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 6 for the measurement 
+3:0 1000b R/W
+STEP0_ sequencer step 0.
+MOD_GAIN6
+Note(s):
+1. Return to the Register Map ( 0xC3 ).
+Datasheet, Public  Page 57
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+MEAS_SEQR_STEP1_MOD_GAINX_0 Register
+Figure 74:
+MEAS_SEQR_STEP1_MOD_GAINX_0
+Addr: 0xC4 MEAS_SEQR_STEP1_MOD_GAINX_0
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 1 for the measurement 
+7:4 1000b R/W
+STEP1_ sequencer step 1.
+MOD_GAIN1
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 0 for the measurement 
+3:0 1000b R/W
+STEP1_ sequencer step 1.
+MOD_GAIN0
+Note(s):
+1. Return to the Register Map ( 0xC4 ).
+MEAS_SEQR_STEP1_MOD_GAINX_1 Register
+Figure 75:
+MEAS_SEQR_STEP1_MOD_GAINX_1
+Addr: 0xC5 MEAS_SEQR_STEP1_MOD_GAINX_1
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 3 for the measurement 
+7:4 1000b R/W
+STEP1_ sequencer step 1.
+MOD_GAIN3
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 2 for the measurement 
+3:0 1000b R/W
+STEP1_ sequencer step 1.
+MOD_GAIN2
+Note(s):
+1. Return to the Register Map ( 0xC5 ).
+Page 58 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+MEAS_SEQR_STEP1_MOD_GAINX_2 Register
+Figure 76:
+MEAS_SEQR_STEP1_MOD_GAINX_2
+Addr: 0xC6 MEAS_SEQR_STEP1_MOD_GAINX_2
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 5 for the measurement 
+7:4 1000b R/W
+STEP1_ sequencer step 1.
+MOD_GAIN5
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 4 for the measurement 
+3:0 1000b R/W
+STEP1_ sequencer step 1.
+MOD_GAIN4
+Note(s):
+1. Return to the Register Map ( 0xC6 ).
+MEAS_SEQR_STEP1_MOD_GAINX_3 Register
+Figure 77:
+MEAS_SEQR_STEP1_MOD_GAINX_3
+Addr: 0xC7 MEAS_SEQR_STEP1_MOD_GAINX_3
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 7 for the measurement 
+7:4 1000b R/W
+STEP1_ sequencer step 1.
+MOD_GAIN7
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 6 for the measurement 
+3:0 1000b R/W
+STEP1_ sequencer step 1.
+MOD_GAIN6
+Note(s):
+1. Return to the Register Map ( 0xC7 ).
+Datasheet, Public  Page 59
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+MEAS_SEQR_STEP2_MOD_GAINX_0 Register
+Figure 78:
+MEAS_SEQR_STEP2_MOD_GAINX_0
+Addr: 0xC8 MEAS_SEQR_STEP2_MOD_GAINX_0
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 1 for the measurement 
+7:4 1000b R/W
+STEP2_ sequencer step 2.
+MOD_GAIN1
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 0 for the measurement 
+3:0 1000b R/W
+STEP2_ sequencer step 2.
+MOD_GAIN0
+Note(s):
+1. Return to the Register Map ( 0xC8 ).
+MEAS_SEQR_STEP2_MOD_GAINX_1 Register
+Figure 79:
+MEAS_SEQR_STEP2_MOD_GAINX_1
+Addr: 0xC9 MEAS_SEQR_STEP2_MOD_GAINX_1
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 3 for the measurement 
+7:4 1000b R/W
+STEP2_ sequencer step 2.
+MOD_GAIN3
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 2 for the measurement 
+3:0 1000b R/W
+STEP2_ sequencer step 2.
+MOD_GAIN2
+Note(s):
+1. Return to the Register Map ( 0xC9 ).
+Page 60 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+MEAS_SEQR_STEP2_MOD_GAINX_2 Register
+Figure 80:
+MEAS_SEQR_STEP2_MOD_GAINX_2
+Addr: 0xCA MEAS_SEQR_STEP2_MOD_GAINX_2
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 5 for the measurement 
+7:4 1000b R/W
+STEP2_ sequencer step 2.
+MOD_GAIN5
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 4 for the measurement 
+3:0 1000b R/W
+STEP2_ sequencer step 2.
+MOD_GAIN4
+Note(s):
+1. Return to the Register Map ( 0xCA ).
+MEAS_SEQR_STEP2_MOD_GAINX_3 Register
+Figure 81:
+MEAS_SEQR_STEP2_MOD_GAINX_3
+Addr: 0xCB MEAS_SEQR_STEP2_MOD_GAINX_3
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 7 for the measurement 
+7:4 1000b R/W
+STEP2_ sequencer step 2.
+MOD_GAIN7
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 6 for the measurement 
+3:0 1000b R/W
+STEP2_ sequencer step 2.
+MOD_GAIN6
+Note(s):
+1. Return to the Register Map ( 0xCB ).
+Datasheet, Public  Page 61
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+MEAS_SEQR_STEP3_MOD_GAINX_0 Register
+Figure 82:
+MEAS_SEQR_STEP3_MOD_GAINX_0
+Addr: 0xCC MEAS_SEQR_STEP3_MOD_GAINX_0
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 1 for the measurement 
+7:4 1000b R/W
+STEP3_ sequencer step 3.
+MOD_GAIN1
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 0 for the measurement 
+3:0 1000b R/W
+STEP3_ sequencer step 3.
+MOD_GAIN0
+Note(s):
+1. Return to the Register Map ( 0xCC ).
+MEAS_SEQR_STEP3_MOD_GAINX_1 Register
+Figure 83:
+MEAS_SEQR_STEP3_MOD_GAINX_1
+Addr: 0xCD MEAS_SEQR_STEP3_MOD_GAINX_1
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 3 for the measurement 
+7:4 1000b R/W
+STEP3_ sequencer step 3.
+MOD_GAIN3
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 2 for the measurement 
+3:0 1000b R/W
+STEP3_ sequencer step 3.
+MOD_GAIN2
+Note(s):
+1. Return to the Register Map ( 0xCD ).
+Page 62 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+MEAS_SEQR_STEP3_MOD_GAINX_2 Register
+Figure 84:
+MEAS_SEQR_STEP3_MOD_GAINX_2
+Addr: 0xCE MEAS_SEQR_STEP3_MOD_GAINX_2
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 5 for the measurement 
+7:4 1000b R/W
+STEP3_ sequencer step 3.
+MOD_GAIN5
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 4 for the measurement 
+3:0 1000b R/W
+STEP3_ sequencer step 3.
+MOD_GAIN4
+Note(s):
+1. Return to the Register Map ( 0xCE ).
+MEAS_SEQR_STEP3_MOD_GAINX_3 Register
+Figure 85:
+MEAS_SEQR_STEP3_MOD_GAINX_3
+Addr: 0xCF MEAS_SEQR_STEP3_MOD_GAINX_3
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 7 for the measurement 
+7:4 1000b R/W
+STEP3_ sequencer step 3.
+MOD_GAIN7
+MEASUREMENT_
+SEQUENCER_ Defines the gain of modulator 6 for the measurement 
+3:0 1000b R/W
+STEP3_ sequencer step 3.
+MOD_GAIN6
+Note(s):
+1. Return to the Register Map ( 0xCF ).
+Datasheet, Public  Page 63
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+MEAS_SEQR_STEP0_FD Register
+Figure 86:
+MEAS_SEQR_STEP0_FD
+Addr: 0xD0 MEAS_SEQR_STEP0_FD
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+This register contains one bit for each modulator channel 
+SEQUENCER_
+(LSB = modulator 0, MSB = modulator 7) which defines if a 
+7:0 STEP0_ 0x01 R/W
+flicker measurement shall be executed with the respective 
+MOD_FD_
+modulator during measurement sequencer step 0.
+PAT T E R N
+Note(s):
+1. Return to the Register Map ( 0xD0 ).
+MEAS_SEQR_STEP1_FD Register
+Figure 87:
+MEAS_SEQR_STEP1_FD
+Addr: 0xD1 MEAS_SEQR_STEP1_FD
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+This register contains one bit for each modulator channel 
+SEQUENCER_
+(LSB = modulator 0, MSB = modulator 7) which defines if a 
+7:0 STEP1_ 0R/W
+flicker measurement shall be executed with the respective 
+MOD_FD_
+modulator during measurement sequencer step 1.
+PAT T E R N
+Note(s):
+1. Return to the Register Map ( 0xD1 ).
+Page 64 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+MEAS_SEQR_STEP2_FD Register
+Figure 88:
+MEAS_SEQR_STEP2_FD
+Addr: 0xD2 MEAS_SEQR_STEP2_FD
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+This register contains one bit for each modulator channel 
+SEQUENCER_
+(LSB = modulator 0, MSB = modulator 7) which defines if a 
+7:0 STEP2_ 0R/W
+flicker measurement shall be executed with the respective 
+MOD_FD_
+modulator during measurement sequencer step 2.
+PAT T E R N
+Note(s):
+1. Return to the Register Map ( 0xD2 ).
+MEAS_SEQR_STEP3_FD Register
+Figure 89:
+MEAS_SEQR_STEP3_FD
+Addr: 0xD3 MEAS_SEQR_STEP3_FD
+Bit Field Reset Type Bit Description
+MEASUREMENT_
+This register contains one bit for each modulator channel 
+SEQUENCER_
+(LSB = modulator 0, MSB = modulator 7) which defines if a 
+7:0 STEP3_ 0R/W
+flicker measurement shall be executed with the respective 
+MOD_FD_
+modulator during measurement sequencer step 3.
+PAT T E R N
+Note(s):
+1. Return to the Register Map ( 0xD3 ).
+Datasheet, Public  Page 65
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+MEAS_SEQR_STEP0_RESIDUAL Register
+Figure 90:
+MEAS_SEQR_STEP0_RESIDUAL
+Addr: 0xD4 MEAS_SEQR_STEP0_RESIDUAL
+Bit Field Reset Type Bit Description
+MEASUREMENT_ This register contains one bit for each modulator channel 
+SEQUENCER_ (LSB = modulator 0, MSB = modulator 7) which defines if a 
+7:0 STEP0_ 0xFF R/W residual measurement shall be executed with the 
+MOD_RESIDUAL_ respective modulator during measurement sequencer 
+ENABLE_PATTERN step 0.
+Note(s):
+1. Return to the Register Map ( 0xD4 ).
+MEAS_SEQR_STEP1_RESIDUAL Register
+Figure 91:
+MEAS_SEQR_STEP1_RESIDUAL
+Addr: 0xD5 MEAS_SEQR_STEP1_RESIDUAL
+Bit Field Reset Type Bit Description
+MEASUREMENT_ This register contains one bit for each modulator channel 
+SEQUENCER_ (LSB = modulator 0, MSB = modulator 7) which defines if a 
+7:0 STEP1_ 0xFF R/W residual measurement shall be executed with the 
+MOD_RESIDUAL_ respective modulator during measurement sequencer 
+ENABLE_PATTERN step 1.
+Note(s):
+1. Return to the Register Map ( 0xD5 ).
+Page 66 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+MEAS_SEQR_STEP2_RESIDUAL Register
+Figure 92:
+MEAS_SEQR_STEP2_RESIDUAL
+Addr: 0xD6 MEAS_SEQR_STEP2_RESIDUAL
+Bit Field Reset Type Bit Description
+MEASUREMENT_ This register contains one bit for each modulator channel 
+SEQUENCER_ (LSB = modulator 0, MSB = modulator 7) which defines if a 
+7:0 STEP2_ 0xFF R/W residual measurement shall be executed with the 
+MOD_RESIDUAL_ respective modulator during measurement sequencer 
+ENABLE_PATTERN step 2.
+Note(s):
+1. Return to the Register Map ( 0xD6 ).
+MEAS_SEQR_STEP3_RESIDUAL Register
+Figure 93:
+MEAS_SEQR_STEP3_RESIDUAL
+Addr: 0xD7 MEAS_SEQR_STEP3_RESIDUAL
+Bit Field Reset Type Bit Description
+MEASUREMENT_ This register contains one bit for each modulator channel 
+SEQUENCER_ (LSB = modulator 0, MSB = modulator 7) which defines if a 
+7:0 STEP3_ 0xFF R/W residual measurement shall be executed with the 
+MOD_RESIDUAL_ respective modulator during measurement sequencer 
+ENABLE_PATTERN step 3.
+Note(s):
+1. Return to the Register Map ( 0xD7 ).
+Datasheet, Public  Page 67
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+MEAS_SEQR_STEP0_ALS Register
+Figure 94:
+MEAS_SEQR_STEP0_ALS
+Addr: 0xD8 MEAS_SEQR_STEP0_ALS
+Bit Field Reset Type Bit Description
+MEASUREMENT_ This register contains one bit for each modulator channel 
+SEQUENCER_ (LSB = modulator 0, MSB = mo dulator 7) which defines if 
+7:0 STEP0_ 0xFF R/W an ALS measurement shall be executed with the 
+MOD_ALS_ respective modulator during measurement sequencer 
+PAT T E R N step 0.
+Note(s):
+1. Return to the Register Map ( 0xD8 ).
+MEAS_SEQR_STEP1_ALS Register
+Figure 95:
+MEAS_SEQR_STEP1_ALS
+Addr: 0xD9 MEAS_SEQR_STEP1_ALS
+Bit Field Reset Type Bit Description
+MEASUREMENT_ This register contains one bit for each modulator channel 
+SEQUENCER_ (LSB = modulator 0, MSB = mo dulator 7) which defines if 
+7:0 STEP1_ 0R/W an ALS measurement shall be executed with the 
+MOD_ALS_ respective modulator during measurement sequencer 
+PAT T E R N step 1.
+Note(s):
+1. Return to the Register Map ( 0xD9 ).
+Page 68 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+MEAS_SEQR_STEP2_ALS Register
+Figure 96:
+MEAS_SEQR_STEP2_ALS
+Addr: 0xDA MEAS_SEQR_STEP2_ALS
+Bit Field Reset Type Bit Description
+This register contains one bit for each modulator channel 
+MEASUREMENT_
+(LSB = modulator 0, MSB = mo dulator 7) which defines if 
+SEQUENCER_
+7:0 0R/W an ALS measurement shall be executed with the 
+STEP2_MOD_ALS_
+respective modulator during measurement sequencer 
+PAT T E R N
+step 2.
+Note(s):
+1. Return to the Register Map ( 0xDA ).
+MEAS_SEQR_STEP3_ALS Register
+Figure 97:
+MEAS_SEQR_STEP3_ALS
+Addr: 0xDB MEAS_SEQR_STEP3_ALS
+Bit Field Reset Type Bit Description
+This register contains one bit for each modulator channel 
+MEASUREMENT_
+(LSB = modulator 0, MSB = mo dulator 7) which defines if 
+SEQUENCER_
+7:0 0R/W an ALS measurement shall be executed with the 
+STEP3_MOD_ALS_
+respective modulator during measurement sequencer 
+PAT T E R N
+step 3.
+Note(s):
+1. Return to the Register Map ( 0xDB ).
+Datasheet, Public  Page 69
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+MEAS_SEQR_APERS_AND_VSYNC_WAIT Register
+Figure 98:
+MEAS_SEQR_APERS_AND_VSYNC_WAIT
+Addr: 0xDC MEAS_SEQR_APERS_AND_VSYNC_WAIT
+Bit Field Reset Type Bit Description
+Defines if a measurement sequence shall wait for a vsync 
+MEASUREMENT_ before starting the measurement. The bit pattern does 
+SEQUENCER_ not represent a value but controls bitwise which 
+7:4 0000b R/W
+VSYNC_WAIT_ sequencer step shall be used . The leftmost position of 
+PAT T E R N “0000” refers to sequencer step 3, the rightmost refers to 
+sequencer step 0.
+Defines the sequencer steps where an ALS persistence 
+evaluation shall be performed on modulator data 
+selected by ALS_THRESHOLD_ CHANNEL. The bit pattern  MEASUREMENT_
+does not represent a value but controls bitwise which  SEQUENCER_
+3:0 0001b R/W
+sequencer step shall be used . The leftmost position of  APERS_
+“0000” refers to sequencer step 3, the rightmost refers to  PAT T E R N
+sequencer step 0. By default step 0 is used on all 
+modulators.
+Note(s):
+1. Return to the Register Map ( 0xDC ).
+Page 70 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+MEAS_SEQR_AGC Register
+Figure 99:
+MEAS_SEQR_AGC
+Addr: 0xDD MEAS_SEQR_AGC
+Bit Field Reset Type Bit Description
+Defines the sequencer steps where predict AGC is 
+enabled for the corresponding measurement.
+The bit pattern does not represent a value but controls  MEASUREMENT_
+bitwise which sequencer step shall be used. The leftmost  7:4 SEQUENCER_AGC_ 1111b R/W
+position of “0000” refers to sequencer step 3, the  PREDICT_PATTERN
+rightmost refers to sequence r step 0. By default this 
+feature is enabled for all sequencer steps.
+Defines the sequencer steps wh ere analog saturation AGC 
+is enabled for the corresponding measurement.
+The bit pattern does not represent a value but controls  MEASUREMENT_
+bitwise which sequencer step shall be used. The leftmost  3:0 SEQUENCER_AGC_ 1111b R/W
+position of “0000” refers to sequencer step 3, the  ASAT_PATTERN
+rightmost refers to sequence r step 0. By default this 
+feature is enabled for all sequencer steps.
+Note(s):
+1. Return to the Register Map ( 0xDD ).
+MEAS_SEQR_SMUX_AND_SAMPLE_TIME Register
+Figure 100:
+MEAS_SEQR_SMUX_AND_SAMPLE_TIME
+Addr: 0xDE MEAS_SEQR_SMUX_AND_SAMPLE_TIME
+Bit Field Reset Type Bit Description
+MEASUREMENT_ This register contains one bit for each sequencer step (LSB 
+SEQUENCER_ = step 0, MSB = step 3) which selects the smux 
+7:4 0R/W
+SAMPLE_ TIME_ configuration from the two available variants for the 
+PAT T E R N corresponding sequencer step.
+This register contains one bit for each sequencer step (LSB 
+MEASUREMENT_
+= step 0, MSB = step 3) wh ich selects the sample time 
+3:0 SEQUENCER_ 0R/W
+configuration from the two available variants for the 
+SMUX_ PATTERN
+corresponding sequencer step.
+Note(s):
+1. Return to the Register Map ( 0xDE ).
+Datasheet, Public  Page 71
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+MEAS_SEQR_WAIT_AND_TS_ENABLE Register
+Figure 101:
+MEAS_SEQR_WAIT_AND_TS_ENABLE
+Addr: 0xDF MEAS_SEQR_WAIT_AND_TS_ENABLE
+Bit Field Reset Type Bit Description
+7:4 Reserved 0
+Defines if a sequencer step  will wait for the modulator 
+trigger timer to finish as programmed in MOD_TRIGGER_
+TIMING and WTIME. At the  same time the timer is 
+restarted. In case this bit is not set, the next sequencer 
+step will start as soon as all measurements in the prior 
+step are completed.
+Please observe that MOD_TR IGGER_TIMIMG is “0” by  MEASUREMENT_
+default. In this case the programmed wait pattern is  3:0 SEQUENCER_ 0001b R/W
+ignored since measurement time has always priority over  WAIT_ PATTERN
+wait time. 
+The bit pattern does not represent a value but controls 
+bitwise which sequencer step shall be used. The leftmost 
+position of “0000” refers to sequencer step 3, the 
+rightmost refers to sequencer step 0. By default the wait is 
+executed for sequencer step 3 (last sequencer step).
+Note(s):
+1. Return to the Register Map ( 0xDF ).
+MOD_CALIB_CFG0 Register
+Figure 102:
+MOD_CALIB_CFG0
+Addr: 0xE0 MOD_CALIB_CFG0
+Bit Field Reset Type Bit Description
+Defines the repetition rate of  calibrations in sequencer 
+rounds or steps depend ing on MOD_CALIB_NTH_
+ITERATION_STEP_ENABLE. MODE_CALIB_
+7:0 0xFF R/W 0x00: Never
+NTH_ITERATION
+th 0x01-0xFE: Every n  time
+0xFF: Only once at start
+Note(s):
+1. Return to the Register Map ( 0xE0 ).
+Page 72 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+MOD_CALIB_CFG2 Register
+Figure 103:
+MOD_CALIB_CFG2
+Addr: 0xE2 MOD_CALIB_CFG2
+Bit Field Reset Type Bit Description
+Enables a residual calibration during the nth iteration. 
+MOD_CALIB_NTH_ Please observe that this residual calibration feature 
+7 ITERATION_RC_ 1R/W only makes sense for modulators which are enabled in 
+ENABLE the first sequences step, since a gain calibration only 
+happens in the first sequencer step.
+MOD_CALIB_NTH_
+6 ITERATION_AZ_ 1 R/W Enables auto-zero calibration during the nth iteration.
+ENABLE
+Enables AGC calibration during the nth iteration. 
+MOD_CALIB_NTH_
+Please observe in this case, that MOD_CALIB_NTH_
+5 ITERATION_AGC_ 0R/W
+ITERATION_STEP_ENABLE must be “0” otherwise AGC 
+ENABLE
+will not be properly executed.
+MOD_CALIB_
+Enables an automatic re-calibration in case of a 
+RESIDUAL_ENABLE_
+1R/W change in gain. This recalibration is executed at the  4
+AUTO_CALIB_ON_
+beginning of each sequencer step.
+GAIN_CHANGE
+Defines the number of averaging rounds during 
+residual calibrations. 
+0000b: No averaging MOD_CALIB_
+0001b: 2 averaging rounds 3:0 RESIDUAL_AVERAGE_ 0011 R/W
+0010b: 3 averaging rounds ROUNDS
+....
+1111b: 16 averaging rounds
+Note(s):
+1. Return to the Register Map ( 0xE2 ).
+Datasheet, Public  Page 73
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+MOD_CALIB_CFG3 Register
+Figure 104:
+MOD_CALIB_CFG3
+Addr: 0xE3 MOD_CALIB_CFG3
+Bit Field Reset Type Bit Description
+Modulator Autozero Settling Factor : Defines the 
+settling time factor during modulator autozero 
+iterations
+MOD_AZ_SETTLING_
+00b: 1x 7:6 01b R/W
+FAC TO R
+01b: 2x
+10b: 3x
+11b: 4x
+Modulator Autozero Iterations:  Defines the number 
+of modulator autozero iterations
+000b: 0
+001b: 1
+010b: 2 MOD_AZ_
+101b R/W 5:3
+011b: 4 ITERATIONS
+100b: 8
+101b:16
+110b: 32
+111b: 64
+Defines the Modulator Autozero Settling Time:  
+(MOD_AZ_SETTLING*(4μs*k) + (8μs*k)) * scale
+MOD_AZ_
+2:0 101b R/W (k = 0.925925925925926), where scale = 1 in SAR phase 
+SETTLING
+and (MOD_AZ_SETTLING_FACTOR + 1) in averaging 
+phase.
+Note(s):
+1. Return to the Register Map ( 0xE3 ).
+MOD_COMP_CFG2 Register
+Figure 105:
+MOD_COMP_CFG2
+Addr: 0xE7 MOD_COMP_CFG2
+Bit Field Reset Type Bit Description
+Sets the auto zero range of the current digital-to-analog 
+converter.
+MOD_IDAC_ 00: 58μV
+7:6 10 R/W
+RANGE 01: 38μV
+10: 18μV
+11: 9μV
+Page 74 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+Addr: 0xE7 MOD_COMP_CFG2
+Bit Field Reset Type Bit Description
+5:0 Reserved 0xF Do not overwrite
+Note(s):
+1. Return to the Register Map ( 0xE7 ).
+MOD_RESIDUAL_CFG0 Register
+Figure 106:
+MOD_RESIDUAL_CFG0
+Addr: 0xE8 MOD_RESIDUAL_CFG0
+Bit Field Reset Type Bit Description
+7:6 Reserved 0
+Defines the minimum number of modulator clock cycles for 
+residual measurements, hence the minimum measurement 
+MOD_RESIDUAL_ time for residual measurements. This can be used during 
+5:0 0R/W
+MINIMUM_STEPS e.g. AGC to receive equidistant measurements throughout 
+all gain steps.
+mod_clock_cycles = MOD_RESIDUAL_MINIMUM_STEPS + 1
+Note(s):
+1. Return to the Register Map ( 0xE8 ).
+MOD_RESIDUAL_CFG1 Register
+Figure 107:
+MOD_RESIDUAL_CFG1
+Addr: 0xE9 MOD_RESIDUAL_CFG1
+Bit Field Reset Type Bit Description
+MOD_RESIDUAL_
+Relative number of steps to  add to 8 steps in case of 
+7:4 RELATIVE_ 0R/W
+number of residual bits 3.
+STEPS_3
+MOD_RESIDUAL_
+Relative number of steps to  add to 4 steps in case of 
+3:0 RELATIVE_ 0R/W
+number of residual bits 2.
+STEPS_2
+Note(s):
+1. Return to the Register Map ( 0xE9 ).
+Datasheet, Public  Page 75
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+MOD_RESIDUAL_CFG2 Register
+Figure 108:
+MOD_RESIDUAL_CFG2
+Addr: 0xEA MOD_RESIDUAL_CFG2
+Bit Field Reset Type Bit Description
+MOD_RESIDUAL_
+Relative number of steps to a dd to 16 steps in case of 
+7:3 RELATIVE_ 0R/W
+number of residual bits 4.
+STEPS_3
+MOD_RESIDUAL_
+Relative number of steps to  add to 2 steps in case of 
+2:0 RELATIVE_ 0R/W
+number of residual bits 1.
+STEPS_2
+Note(s):
+1. Return to the Register Map ( 0xEA ).
+VSYNC_DELAY_CFG0 Register
+Figure 109:
+VSYNC_DELAY_CFG0
+Addr: 0xEB VSYNC_DELAY_CFG0
+Bit Field Reset Type Bit Description
+Sets the time to delay an input from the VSYNC pin in 
+multiples of 1.3888μs. The selectable range is
+7:0 VSYNC_DELAY[7:0] 0 R/W 1.3888μs to 2^14*1.3888μs=22.754ms.
+ATTENTION: Reset value must be 0 so that RAM 
+initialization works.
+Note(s):
+1. Return to the Register Map ( 0xEB ).
+Page 76 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+VSYNC_DELAY_CFG1 Register
+Figure 110:
+VSYNC_DELAY_CFG1
+Addr: 0xEC VSYNC_DELAY_CFG1
+Bit Field Reset Type Bit Description
+7:6 Reserved 0
+5:0 VSYNC_DELAY[13:8] 0 R/W See  VSYNC_DELAY_CFG0 .
+Note(s):
+1. Return to the Register Map ( 0xEC ).
+VSYNC_PERIOD0 Register
+Figure 111:
+VSYNC_PERIOD0
+Addr: 0xED VSYNC_PERIOD0
+Bit Field Reset Type Bit Description
+The measured vsync period in multiples of 1.3888μs. This 
+can be used to correct the internal RC oscillator with an 
+7:0 VSYNC_PERIOD[7:0] 0 R
+input signal at the VSYNC pin derived from a crystal 
+oscillator.
+Note(s):
+1. Return to the Register Map ( 0xED ).
+VSYNC_PERIOD1 Register
+Figure 112:
+VSYNC_PERIOD1
+Addr: 0xEE VSYNC_PERIOD1
+Bit Field Reset Type Bit Description
+The measured vsync period in multiples of 1.3888μs. 
+This can be used to correct the internal RC oscillator 
+7:0 VSYNC_PERIOD[15:8] 0 R
+with an input signal at the VSYNC pin derived from a 
+crystal oscillator.
+Note(s):
+1. Return to the Register Map ( 0xEE ).
+Datasheet, Public  Page 77
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+VSYNC_PERIOD_TARGET0 Register
+Figure 113:
+VSYNC_PERIOD_TARGET0
+Addr: 0xEF VSYNC_PERIOD_TARGET0
+Bit Field Reset Type Bit Description
+It sets the target vsync period. The value can be 
+VSYNC_PERIOD_ calculated as VSYNC_PERIOD_TARGET = ((1/target_
+7:0 0R/W
+TA R G E T [ 7 : 0 ] -6
+frequency_in_Hz) * 1.3888888 * 10 ).
+Note(s):
+1. Return to the Register Map ( 0xEF ).
+VSYNC_PERIOD_TARGET1 Register
+Figure 114:
+VSYNC_PERIOD_TARGET1
+Addr: 0xF0 VSYNC_PERIOD_TARGET1
+Bit Field Reset Type Bit Description
+If set to “0” it selects VSYN C_PERIOD[15:1] (range 15Hz 
+VSYNC_PERIOD_USE_
+0R/W to 500Hz) and if set to “1” it selects VSYNC_ 7
+FA S T _ T I M I N G _ E VA L
+PERIOD[14:0] (range 30Hz to 1kHz).
+VSYNC_PERIOD_
+0R/WSee  VSYNC_PERIOD_TARGET0 . 6:0
+TA R G E T [ 1 4 : 8 ]
+Note(s):
+1. Return to the Register Map ( 0xF0 ).
+Page 78 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+VSYNC_CONTROL Register
+Figure 115:
+VSYNC_CONTROL
+Addr: 0xF1 VSYNC_CONTROL
+Bit Field Reset Type Bit Description
+7:1 Reserved 0
+Trigger S of tware vsync Pulse.  In case if vsync_mode 
+is 1, this register can be written to 1 to trigger a vsync 
+from I²C/I3C side. If one knows the exact time between 
+0 SW_VSYNC_TRIGGER 0 R/W
+two such I²C/I3C writings, the oscillator offset can be 
+calculated by using the resulting value in vsync_
+trigger.
+Note(s):
+1. Return to the Register Map ( 0xF1 ).
+VSYNC_CFG Register
+Figure 116:
+VSYNC_CFG
+VSYNC_CFG Addr: 0xF2
+Bit Description Bit Field Default Access
+Oscillator calibration mode register
+Value ID Meaning
+osccal_ no autmatic oscillator 
+0
+disable calibration is done
+if pon goes to 1 or after 
+each vsync_lost goes 0 
+osccal_
+1 an oscillator calibration 
+after_pon
+is done once not 
+7:6 OSC_CALIB_MODE 0 R/W during measurement 
+oscillator calibration is 
+done always if possible, 
+not during  osccal_
+2
+measurement and not  always_on
+if vsync_lost is 
+detected 
+osccal_ if set to 3, osccal is also 
+3
+reserved not starting 
+Datasheet, Public  Page 79
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+VSYNC_CFG Addr: 0xF2
+Bit Description Bit Field Default Access
+Select which input to use for vsync
+Value ID Meaning
+pad_ Use VSYNC/GPIO/INT 
+0 vsync_ input as vsync start  2 VSYNC_MODE 0 R/W
+trigger trigger 
+Use VSYNC_
+sw_vsync_
+1 CONTROL.sw_vsync_
+trigger
+trigger as vsync trigger
+Select which input to use for vsync
+Value ID Meaning
+1 VSYNC_SELECT 0 R/W
+0 vsync_gpio Use VSYNC/GPIO input
+1intUse INT input
+If enabled then the se lected vsync input is 
+inverted.
+Value ID Meaning
+0 VSYNC_INVERT 0 R/W
+do_not_
+0 Do not invert
+invert
+1invert Do invert
+Note(s):
+1. Return to the Register Map ( 0xF2 ).
+FIFO_THR Register
+Figure 117:
+FIFO_THR
+Addr: 0xF3 FIFO_THR
+Bit Field Default Access Bit Description
+If FIFO_LVL > FIFO_THR, an FI FO interrupt FINT is raised. 
+7:0 FIFO_THR[10:3] 127 R/W
+See  CFG2  and  FIFO_LVL[2:0]  for lsbs.
+Note(s):
+1. Return to the Register Map ( 0xF3 ).
+Page 80 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+MOD_FIFO_DATA_CFG0 Register
+Figure 118:
+MOD_FIFO_DATA_CFG0
+Addr: 0xF4 MOD_FIFO_DATA_CFG0
+Bit Field Default Access Bit Description
+Enable ALS data write to fifo  of modulator 0, if flicker 
+MOD_ALS_FIFO_ measurement is not enabled in  this sequencer step or 
+7 DATA0_WRITE_ 1RAM=0x10L ficker measurement has already finished (select als_
+ENABLE nr_samples >= fd_nr_samples) or in case of do_als_
+final_processing_after_flicker.
+MOD_FD_FIFO_
+DATA0_ Enables data compression in  case of flicker detection 
+5 0RAM=0x10L
+COMPRESSION_ mode.
+ENABLE
+MOD_FD_FIFO_ Enables that only the difference between previous 
+DATA0_ and actual data is used for data writing instead of 
+4 0RAM=0x10L
+DIFFERENCE_ actual data value. This makes only sense in case of 
+ENABLE MOD_FD_FIFO_DATA0_COMPRESSION_ENABLE=1.
+Select data width to use for FIFO writing of flicker 
+data0. Or in case of compression select the width of 
+the data parts. See  MOD_ALS_FIFO_DATA0_WRITE_
+ENABLE  for more details. In case of no compression 
+the user must specify the mod_fd_fifo_dataX_width's  MOD_FD_FIFO_
+15 RAM=0x10L 3:0
+so that the full possible data is written to the fifo  DATA0_WIDTH
+(log2(sample_time)+4). ATTENTION: There is no 
+digital saturation implemented that show's a range 
+overflow. There was not enough resources left to 
+implement this. 
+Note(s):
+1. Return to the Register Map ( 0xF4 ).
+Datasheet, Public  Page 81
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+MOD_FIFO_DATA_CFG1 Register
+Figure 119:
+MOD_FIFO_DATA_CFG1
+Addr: 0xF5 MOD_FIFO_DATA_CFG1
+Bit Field Default Access Bit Description
+MOD_ALS_FIFO_
+7 DATA1_WRITE_ 1RAM=0x11LSee  MOD_ALS_FIFO_DATA0_WRITE_ENABLE .
+ENABLE
+MOD_FD_FIFO_
+See  MOD_FD_FIFO_DATA0_COMPRESSION_
+DATA1_
+5 0RAM=0x11L ENABLE  and  MOD_FD_FIFO_DATA0_WIDTH  for 
+COMPRESSION_
+more details.
+ENABLE
+MOD_FD_FIFO_
+DATA1_
+4 0RAM=0x11LSee  MOD_FD_FIFO_DATA0_DIFFERENCE_ENABLE .
+DIFFERENCE_
+ENABLE
+MOD_FD_FIFO_
+3:0 15 RAM=0x11L See  MOD_FD_FIFO_DATA0_WIDTH .
+DATA1_WIDTH
+Note(s):
+1. Return to the Register Map ( 0xF5 ).
+Page 82 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+MOD_FIFO_DATA_CFG2 Register
+Figure 120:
+MOD_FIFO_DATA_CFG2
+Addr: 0xF6 MOD_FIFO_DATA_CFG2
+Bit Field Default Access Bit Description
+MOD_ALS_FIFO_
+7 DATA2_WRITE_ 1 RAM=0x12L See  MOD_ALS_FIFO_DATA0_WRITE_ENABLE .
+ENABLE
+MOD_FD_FIFO_
+See  MOD_FD_FIFO_DATA0_COMPRESSION_
+DATA2_
+5 0RAM=0x12L ENABLE  and  MOD_FD_FIFO_DATA0_WIDTH  for 
+COMPRESSION_
+more details.
+ENABLE
+MOD_FD_FIFO_
+DATA2_ See  MOD_FD_FIFO_DATA0_DIFFERENCE_
+4 0RAM=0x12L
+DIFFERENCE_ ENABLE .
+ENABLE
+MOD_FD_FIFO_
+3:0 15 RAM=0x12L See  MOD_FD_FIFO_DATA0_WIDTH .
+DATA2_WIDTH
+Note(s):
+1. Return to the Register Map ( 0xF6 ).
+Datasheet, Public  Page 83
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+MOD_FIFO_DATA_CFG3 Register
+Figure 121:
+MOD_FIFO_DATA_CFG3 
+Addr: 0xF7 MOD_FIFO_DATA_CFG3
+Bit Field Default Access Bit Description
+MOD_ALS_FIFO_
+7 DATA3_WRITE_ 1RAM=0x13LSee  MOD_ALS_FIFO_DATA0_WRITE_ENABLE .
+ENABLE
+MOD_FD_FIFO_
+See  MOD_FD_FIFO_DATA0_COMPRESSION_
+DATA3_
+5 0RAM=0x13L ENABLE  and  MOD_FD_FIFO_DATA0_WIDTH  
+COMPRESSION_
+for more details.
+ENABLE
+MOD_FD_FIFO_
+See  MOD_FD_FIFO_DATA0_DIFFERENCE_
+4 DATA3_DIFFERENCE_ 0RAM=0x13L
+ENABLE
+ENABLE
+MOD_FD_FIFO_
+3:0 15 RAM=0x13L See  MOD_FD_FIFO_DATA0_WIDTH .
+DATA3_WIDTH
+Note(s):
+1. Return to the Register Map ( 0xF7 ).
+Page 84 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+MOD_FIFO_DATA_CFG4 Register
+Figure 122:
+MOD_FIFO_DATA_CFG4
+Addr: 0xF8 MOD_FIFO_DATA_CFG4
+Default Bit Field Access Bit Description
+MOD_ALS_FIFO_
+7 DATA4_WRITE_ 1 RAM=0x14L See  MOD_ALS_FIFO_DATA0_WRITE_ENABLE .
+ENABLE
+MOD_FD_FIFO_
+See  MOD_FD_FIFO_DATA0_COMPRESSION_
+DATA4_
+5 0RAM=0x14L ENABLE  and  MOD_FD_FIFO_DATA0_WIDTH  for 
+COMPRESSION_
+more details.
+ENABLE
+MOD_FD_FIFO_
+DATA4_ See  MOD_FD_FIFO_DATA0_DIFFERENCE_
+4 0RAM=0x14L
+DIFFERENCE_ ENABLE .
+ENABLE
+MOD_FD_FIFO_
+3:0 15 RAM=0x14L See  MOD_FD_FIFO_DATA0_WIDTH .
+DATA4_WIDTH
+Note(s):
+1. Return to the Register Map ( 0xF8 ).
+Datasheet, Public  Page 85
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+MOD_FIFO_DATA_CFG5 Register
+Figure 123:
+MOD_FIFO_DATA_CFG5
+Addr: 0xF9 MOD_FIFO_DATA_CFG5
+Bit Field Default Access Bit Description
+MOD_ALS_FIFO_
+7 DATA5_WRITE_ 1 RAM=0x15L See  MOD_ALS_FIFO_DATA0_WRITE_ENABLE .
+ENABLE
+MOD_FD_FIFO_
+See  MOD_FD_FIFO_DATA0_COMPRESSION_
+DATA5_
+5 0RAM=0x15L ENABLE  and  MOD_FD_FIFO_DATA0_WIDTH  for 
+COMPRESSION_
+more details.
+ENABLE
+MOD_FD_FIFO_
+DATA5_
+4 0 RAM=0x15L See  MOD_FD_FIFO_DATA0_DIFFERENCE_ENABLE .
+DIFFERENCE_
+ENABLE
+MOD_FD_FIFO_
+3:0 15 RAM=0x15L See  MOD_FD_FIFO_DATA0_WIDTH .
+DATA5_WIDTH
+Note(s):
+1. Return to the Register Map ( 0xF9 ).
+Page 86 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+MOD_FIFO_DATA_CFG6 Register
+Figure 124:
+MOD_FIFO_DATA_CFG6
+Addr: 0xFA MOD_FIFO_DATA_CFG6
+Bit Field Default Access Bit Description
+MOD_ALS_FIFO_
+7 DATA6_WRITE_ 1RAM=0x16LSee  MOD_ALS_FIFO_DATA0_WRITE_ENABLE .
+ENABLE
+MOD_FD_FIFO_
+See  MOD_FD_FIFO_DATA0_COMPRESSION_
+DATA6_
+5 0RAM=0x16L ENABLE  and  MOD_FD_FIFO_DATA0_WIDTH  for 
+COMPRESSION_
+more details.
+ENABLE
+MOD_FD_FIFO_
+DATA6_
+4 0RAM=0x16LSee  MOD_FD_FIFO_DATA0_DIFFERENCE_ENABLE .
+DIFFERENCE_
+ENABLE
+MOD_FD_FIFO_
+3:0 15 RAM=0x16L See  MOD_FD_FIFO_DATA0_WIDTH .
+DATA6_WIDTH
+Note(s):
+1. Return to the Register Map ( 0xFA ).
+Datasheet, Public  Page 87
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+MOD_FIFO_DATA_CFG7 Register
+Figure 125:
+MOD_FIFO_DATA_CFG7
+Addr: 0xFB MOD_FIFO_DATA_CFG7
+Bit Field Default Access Bit Description
+MOD_ALS_FIFO_
+7 DATA7_WRITE_ 1RAM=0x17LSee  MOD_ALS_FIFO_DATA0_WRITE_ENABLE .
+ENABLE
+MOD_FD_FIFO_
+See  MOD_FD_FIFO_DATA0_COMPRESSION_
+DATA7_
+5 0RAM=0x17L ENABLE  and  MOD_FD_FIFO_DATA0_WIDTH  for 
+COMPRESSION_
+more details.
+ENABLE
+MOD_FD_FIFO_
+DATA7_
+4 0RAM=0x17LSee  MOD_FD_FIFO_DATA0_DIFFERENCE_ENABLE
+DIFFERENCE_
+ENABLE
+MOD_FD_FIFO_
+3:0 15 RAM=0x17L See  MOD_FD_FIFO_DATA0_WIDTH .
+DATA7_WIDTH
+Note(s):
+1. Return to the Register Map ( 0xFB ).
+FIFO_STATUS0 Register
+Figure 126:
+FIFO_STATUS0
+Bits Addr Field Reset Type Description
+7:0 0xFC FIFO_LVL[10:3] 0 R FIFO Status 0
+Contains the number of 1-byte FIFO 
+entries. The size of the FIFO is 1280x8 
+(5x128x16). Thus FIFO_LVL ranges 
+between 0 (empty) and 1280 (full). 2:0 0xFD FIFO_LVL[2:0] 0 R
+Always read FIFO_S TAT U S 0   a n d   t h e n   
+FIFO_STATUS1 one after the other to 
+receive correct FIFO status information.
+Note(s):
+1. Return to the Register Map ( 0xFC ,  0xFD ).
+Page 88 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Register Overview
+FIFO_STATUS1 Register
+Figure 127:
+FIFO_STATUS1 
+Addr: 0xFD FIFO_STATUS1
+Bit Field Reset Type Bit Description
+If set to “1” a FIFO overflow has occurred and data for the 
+FIFO was lost (e.g. reading fr om FIFO was too slow). This 
+flag is cleared by PON and FIFO_CLR. Always check this 
+7 FIFO_OVERFLOW 0 R
+flag before and after reading the FIFO. Read 
+FIFO_STATUS0 and then FIFO_S TATUS1 to get consistent 
+values for both registers.
+If set to “1” the FIFO was read out too often and has 
+returned 0 at least once. In such case the read-out data 
+may not consistent anymore. This flag is cleared by PON 
+6FIFO_UNDERFLOW   0 R
+and FIFO_CLR. Always check th is flag before and after 
+reading the FIFO. Read FIFO_STATUS0 and then 
+FIFO_STATUS1 to get consistent values for both registers.
+5:3 Reserved 0
+See  FIFO Status 0  for description. Read FIFO_STATUS0 
+2:0 FIFO_LVL[2:0] 0 R and then FIFO_STATUS1  to get consistent values for both 
+registers.
+Note(s):
+1. Return to the Register Map ( 0xFD ).
+FIFO_DATA_PROTOCOL Register
+Figure 128:
+FIFO_DATA_PROTOCOL 
+Addr: 0xFE FIFO_DATA_PROTOCOL
+Bit Field Reset Type Bit Description
+The register FIFO_DATA_PROTOCOL can used to read-out 
+FIFO_DATA_
+7:0 0R FIFO data using the protocol mechanism. It can be read 
+PROTOCOL
+out with single reads or with a block-read.
+Note(s):
+1. Return to the Register Map ( 0xFE ).
+Datasheet, Public  Page 89
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Register Overview
+FIFO_DATA Registers
+Figure 129:
+FIFO_DATA 
+Addr: 0xFF FIFO_DATA
+Bit Field Reset Type Bit Description
+The register FIFO_DATA can be read-out with single reads 
+or with a block-read. Upon reading out FIFO_DATA, the 
+7:0 FIFO_DATA 0 R internal FIFO read pointer is advanced and FIFO_LVL is 
+decreased. A false reading upon the FIFO_LVL will return 0 
+and set the FIFO_UNDERFLOW flag.
+Note(s):
+1. Return to the Register Map ( 0xFF ).
+Page 90 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Application Information
+It is highly recommended  to consult the ams OSRAM  Application Information
+application team for circuit diagram and layout review at 
+design-in.
+Figure 130:
+TCS3530 Typical Application Circuit 
+Note(s):
+1. C1 in the graphic above shall be 4.7μF, 6.3V, 10% and C2 in  the graphic above shall be 1μF, 6.3V, 20%. All ground vias shall  connected 
+to a solid ground plane.
+Figure 131:
+TCS3530 Recommended Part Placement 
+To INT (Pull-up R not shown) To SYNC/IO (Pul l - To SYNC/IO (Pull-up R not shown)
+INT GPIO
+PGND SCL GND
+To I2C (Pull-up Rs not shown) To I2C (Pul l - u p  R s
+VDD SDA
+VBUS VSS
+1V8
+VIO 
+(1.2V/1.8V)
+Note(s):
+1. NC pins do not have an internal electr ical connection. For device ESD protection,  it is recommended to connect it to ground.
+Datasheet, Public  Page 91
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530  −   Package Drawings & Markings
+Package Drawings & Markings
+Figure 132:
+TCS3530 Module Dimensions 
+Note(s):
+1. All linear dimensions are in millimeters.
+2. Contacts are copper with NiPdAu plating (ENEPIG). 
+3. This package contains no lead (Pb).
+4. This drawing is subject to change without notice.
+Page 92 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    PCB Pad Layout
+Suggested PCB pad layout guidelines for the surface mount  PCB Pad Layout
+module are shown. Flash Gold is recommended as a surface 
+finish for the landing pads.
+Figure 133:
+TCS3530 PCB Pad Layout 
+Note(s):
+1. All linear dimensions are in millimeters.
+2. This drawing is subject to change without notice.
+Datasheet, Public  Page 93
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Ta p e  &  R e e l  I n fo r m a t i o n
+Tape & Reel Information
+Figure 134:
+Tape and Reel Mechanical Drawing 
+Note(s):
+1. All linear dimensions are in millimeters. Dime nsion tolerance is ± 0.10 mm unless otherwise noted.
+2. The dimensions on this drawing are for illustrative purpos es only. Dimensions of an actual carrier may vary slightly.
+3. Symbols on drawing Ao, Bo, and Ko are  defined in ANSI EIA Standard 481−B 2001.
+4. Each reel is generally 330 millimeters in diameter and  contains 5000 parts. Please reconfirm for actual orders.
+5. ams OSRAM packaging tape and reel confor m to the requirements of EIA Standard 481−B.
+6. In accordance with EIA standard, device pin 1 is  located next to the sprocket holes in the tape.
+7. This drawing is subject to change without notice.
+Page 94 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Soldering & Storage Information
+Soldering & Storage 
+Information
+Soldering Information
+The module has been tested an d has demonstrated an ability 
+to be reflow soldered to a PCB substrate. The solder reflow 
+profile describes the expected maximum heat exposure of 
+components during the solder reflow process of product on a 
+PCB. Temperature is measured on top of component. The 
+components should be limited to a maximum of three passes 
+through this solder reflow profile.
+Please observe that re-soldering the module will influence color 
+measurement accuracy. Please consult with application team 
+in such case.
+Figure 135:
+Solder Reflow Profile 
+Profile Feature Preheat/Soak Sn-Pb Eutectic Assembly Pb-Free Assembly
+Te m p e r a t u re   M i n   ( T ) 100°C 150°C smin
+) Te m p e r a t u re   M a x   ( T 150°C 200°C smax
+) from (T  to T ) Time (t 60-120 s 60-120 s s smin smax
+ to T ) Ramp-up rate (T 3°C/s max. 3°C/s max. L P
+) Liquidous temperature (T 183°C 217°C L
+Time (t 60-150 s 60-150 s ) maintained above T L L
+For users T must not exceed the   must not exceed the  For users T P  P
+Classification temp of 235°C Classification temp of 260°C
+) Peak package body temperature (T For suppliers T For suppliers T  must equal or   must equal or  P P P
+exceed the Classification temp  exceed the Classification temp of 
+of 235°C 260°C
+(1) )  within 5°C of the  Time (t
+P
+(1) (1) specified classification temperature  s30 s 20
+(T ) c
+Ramp-down rate (T  to T ) 6°C/s max. 6°C/s max. P L
+Time 25°C to peak temperature 6 minutes max. 8 minutes max.
+Note(s):
+1. Tolerance for peak profile temperature (TP) is  defined as a supplier minimum and a user maximum.
+Datasheet, Public  Page 95
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530  −   Soldering & Storage Information
+Figure 136:
+Solder Reflow Profile Graph
+Not to Scale – For Reference Only
+T P
+T  - 5°C C Max Ramp Up Rate = 3°C/s 
+ t P Max Ramp Down Rate = 6°C/s
+T L
+ t L
+Preheat Area T smax
+T smin
+Temperature (°C)
+25
+Time (seconds)
+Storage Information
+Moisture Sensitivity
+Optical characteristics of the device can be adversely affected 
+during the soldering process by the release and vaporization of 
+moisture that has been previous ly absorbed into the package. 
+To ensure the package contains the smallest amount of 
+absorbed moisture possible, each  device is baked prior to being 
+dry packed for shipping. Devices are dry packed in a sealed 
+aluminized envelope called a moisture-barrier bag with silica 
+gel to protect them from ambient moisture during shipping, 
+handling, and storage before use.
+Shelf Life
+The calculated shelf life of the device in an unopened moisture 
+barrier bag is 24 months from the date code on the bag when 
+stored under the following conditions:
+• Shelf Life: 24 months
+• Ambient Temperature: <40°C
+• Relative Humidity: <90%
+Rebaking of the devices will be required if the devices exceed 
+the 24 months shelf life or the Humidity Indicator Card shows 
+that the devices were exposed to conditions beyond the 
+allowable moisture region.
+Page 96 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Soldering & Storage Information
+Floor Life
+The module has been assigned a  moisture sensitivity level of 
+MSL 3. As a result, the floor life of devices removed from the 
+moisture barrier bag is 168 hours from the time the bag was 
+opened, provided that the devices are stored under the 
+following conditions:
+• Floor Life: 168 hours
+• Ambient Temperature: <30°C
+• Relative Humidity: <60%
+If the floor life or the temperature/humidity conditions have 
+been exceeded, the devices must be rebaked prior to solder 
+reflow or dry packing.
+Rebaking Instructions
+When the shelf life or floor life limits have been exceeded, 
+rebake at 50°C for 12 hours.
+Datasheet, Public  Page 97
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530  −   Ordering & Contact Information
+Ordering & Contact Information
+Figure 137:
+Ordering Information
+Ordering Code Address Interface Delivery Form Delivery Quantity
+TCS35303-2 0x39 1.8V/1.2V I²C Tape & Reel 5000 pcs/reel
+TCS35303-2M 0x39 1.8V/1.2V I²C Tape & Reel 500 pcs/reel
+Note(s):
+1. TCS35303-3 on request with I3C mode enabled.
+Buy our products or get free samples online at:
+www.ams.com/Products
+Technical Support is available at:
+www.ams.com/Technical-Support
+Provide feedback about this document at:
+www.ams.com/Document-Feedback
+For further information and requests, e-mail us at:
+ams_sales@ams.com
+For sales offices, distributors and representatives, please visit: 
+www.ams.com/Contact
+Headquarters
+ams-OSRAM AG
+Tobelbader Strasse 30
+8141 Premstaetten
+Austria, Europe
+Tel: +43 (0) 3136 500 0
+Website:  www.ams.com
+Page 98 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    RoHS Compliant & ams Green Statement
+RoHS:  The term RoHS compliant means that ams-OSRAM AG  RoHS Compliant & ams Green 
+products fully comply with current RoHS directives. Our 
+Statement
+semiconductor products do not contain any chemicals for all 6 
+substance categories plus additional 4 substance categories 
+(per amendment EU 2015/863), including the requirement that 
+lead not exceed 0.1% by weight in homogeneous materials. 
+Where designed to be soldered at high temperatures, RoHS 
+compliant products are suitable for use in specified lead-free 
+processes. 
+ams Green (RoHS compliant and no Sb/Br/Cl):  ams Green 
+defines that in addition to RoHS compliance, our products are 
+free of Bromine (Br) and Antimony (Sb) based flame retardants 
+(Br or Sb do not exceed 0.1% by weight in homogeneous 
+material) and do not contain Chlorine (Cl not exceed 0.1% by 
+weight in homogeneous material).
+Important Information:  The information provided in this 
+statement represents ams-OSRAM AG knowledge and belief as 
+of the date that it is provided. ams-OSRAM AG bases its 
+knowledge and belief on information provided by third parties, 
+and makes no representation or warranty as to the accuracy of 
+such information. Efforts are  underway to better integrate 
+information from third parties. ams-OSRAM AG has taken and 
+continues to take reasonable steps to provide representative 
+and accurate information but may not have conducted 
+destructive testing or  chemical analysis on  incoming materials 
+and chemicals. ams-OSRAM AG and ams-OSRAM AG suppliers 
+consider certain information to be proprietary, and thus CAS 
+numbers and other limited information may not be available 
+for release.
+Datasheet, Public  Page 99
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Copyrights & Disclaimer
+Copyright ams-OSRAM AG, Tobelbader Strasse 30, 8141  Copyrights & Disclaimer
+Premstaetten, Austria-Europe. Trademarks Registered. All 
+rights reserved. The material herein may not be reproduced, 
+adapted, merged, translated, stored, or used without the prior 
+written consent of the copyright owner. 
+Devices sold by ams-OSRAM AG are covered by the warranty 
+and patent indemnification provis ions appearing in its General 
+Terms of Trade. ams-OSRAM AG makes no warranty, express, 
+statutory, implied, or by desc ription regarding the information 
+set forth herein. ams-OSRAM AG reserves the right to change 
+specifications and prices at any time and without notice. 
+Therefore, prior to designing this product into a system, it is 
+necessary to check with ams-OSRAM AG for current 
+information. This product is intended for use in commercial 
+applications. Applications re quiring extended temperature 
+range, unusual environmental requirements, or high reliability 
+applications, such as military, medical life-support or 
+life-sustaining equipment are  specifically not recommended 
+without additional processing by ams-OSRAM AG for each 
+application. This product is provided by ams-OSRAM AG “AS IS” 
+and any express or implied wa rranties, including, but not 
+limited to the implied warranties  of merchantability and fitness 
+for a particular purpose are disclaimed.
+ams-OSRAM AG shall not be liable to recipient or any third party 
+for any damages, including but no t limited to personal injury, 
+property damage, loss of profits, loss of use, interruption of 
+business or indirect, special, incidental or consequential 
+damages, of any kind, in connection with or arising out of the 
+furnishing, performance or use of the technical data herein. No 
+obligation or liability to recipient or any third party shall arise 
+or flow out of ams-OSRAM AG rendering of technical or other 
+services. 
+Page 100 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Document Status
+Document Status
+Document Status Product Status Definition
+Information in this datasheet  is based on product ideas in 
+the planning phase of development. All specifications are 
+Product Preview Pre-Development
+design goals without any warranty and are subject to 
+change without notice
+Information in this datasheet is based on products in the 
+design, validation or qualific ation phase of development. 
+Preliminary Datasheet Pre-Production The performance and parameters shown in this document 
+are preliminary without any warranty and are subject to 
+change without notice
+Information in this datashee t is based on products in 
+ramp-up to full production or full production which 
+Datasheet Production conform to specifications in accordance with the terms of 
+ams-OSRAM AG standard warranty as given in the General 
+Te r m s   o f   Tra d e
+Information in this datasheet  is based on products which 
+conform to specifications in accordance with the terms of 
+Datasheet (discontinued) Discontinued ams-OSRAM AG standard warranty as given in the General 
+Terms of Trade, but these products have been superseded 
+and should not be used for new designs
+Datasheet, Public  Page 101
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530  −   Revision Information
+Revision Information
+Changes from 2-00 (2022-Jun-24) to current revision 3-00 (2023-Jun-23) Page
+Updated document security class from “Confidential” to “Public”
+Updated Shelf Life from 12 months to 24 months 96
+Note(s):
+1. Page and figure numbers for the previous version may diff er from page and figure numbers in the current revision.
+2. Correction of typographical er rors is not explicitly mentioned.
+Page 102 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Content Guide
+1 General Description Content Guide
+2 Key Benefits & Features
+2 Applications
+3 Block Diagram
+4 Pin Assignments
+5Absolute Maximum Ratings
+7 Optical Characteristics
+8 Color and Lux Measurement Accuracy
+10 Wavelength Accuracy
+11 Electrical Characteristics
+12 Timing Characteristics
+14 Typical Operating Characteristics
+15 Detailed Description
+15 State Machine Diagrams
+17 I²C Protocol
+18 Register Overview
+18 Register Map
+24 Register Description
+24 CONTROL_SCL Register
+24 Modulator Offset Register
+26 OSCEN Register
+26 ENABLE Register
+27 MEAS_MODE0 Register
+28 MEAS_MODE1 Register
+29 SAMPLE_TIME0 Register
+29 SAMPLE_TIME1 Register
+30 SAMPLE_TIME_ALTERNATIVE0 Register
+30 SAMPLE_TIME_ALTERNATIVE1 Register
+31 ALS_NR_SAMPLES0 Register
+31 ALS_NR_SAMPLES1 Register
+32 ALS_NR_SAMPLES_ALT ERNATIVE0 Register
+32 ALS_NR_SAMPLES_ALT ERNATIVE1 Register
+33 FD_NR_SAMPLES0 Register
+33 FD_NR_SAMPLES1 Register
+34 FD_NR_SAMPLES_ALTERNATIVE0 Register
+34 FD_NR_SAMPLES_ALTERNATIVE1 Register
+35 WTIME Register
+35 Identification Registers
+36 ALS Interrupt Low Threshold Register
+36 ALS Interrupt High Threshold Register
+37 AGC Number of Samples Register
+37 STATUS Register
+38 STATUS2 Register
+39 STATUS3 Register
+40 STATUS4 Register
+41 STATUS5 Register
+42 STATUS6 Register
+43 CFG0 Register
+43 CFG1 Register
+Datasheet, Public  Page 103
+[v3-00] 2023-Jun-23 Document Feedback
+
+TCS3530 −   Content Guide
+44 CFG2 Register
+44 CFG3 Register
+45 CFG4 Register
+46 CFG5 Register
+47 CFG6 Register
+48 CFG7 Register
+48 CFG8 Register
+49 CFG9 Register
+50 MOD_CHANNEL_CTRL Register
+51 TRIGGER_MODE Register
+51 OSC_TUNE Register
+52 VSYNC_GPIO_INT Register
+53 INTENAB Register
+54 SIEN Register
+54 CONTROL Register
+55 ALS_DATA_STATUS Register
+55 ALS_DATA_FIRST Register
+55 ALS_DATA Register
+56 MEAS_SEQR_STEP0_MOD_GAINX_0 Register
+56 MEAS_SEQR_STEP0_MOD_GAINX_1 Register
+57 MEAS_SEQR_STEP0_MOD_GAINX_2 Register
+57 MEAS_SEQR_STEP0_MOD_GAINX_3 Register
+58 MEAS_SEQR_STEP1_MOD_GAINX_0 Register
+58 MEAS_SEQR_STEP1_MOD_GAINX_1 Register
+59 MEAS_SEQR_STEP1_MOD_GAINX_2 Register
+59 MEAS_SEQR_STEP1_MOD_GAINX_3 Register
+60 MEAS_SEQR_STEP2_MOD_GAINX_0 Register
+60 MEAS_SEQR_STEP2_MOD_GAINX_1 Register
+61 MEAS_SEQR_STEP2_MOD_GAINX_2 Register
+61 MEAS_SEQR_STEP2_MOD_GAINX_3 Register
+62 MEAS_SEQR_STEP3_MOD_GAINX_0 Register
+62 MEAS_SEQR_STEP3_MOD_GAINX_1 Register
+63 MEAS_SEQR_STEP3_MOD_GAINX_2 Register
+63 MEAS_SEQR_STEP3_MOD_GAINX_3 Register
+64 MEAS_SEQR_STEP0_FD Register
+64 MEAS_SEQR_STEP1_FD Register
+65 MEAS_SEQR_STEP2_FD Register
+65 MEAS_SEQR_STEP3_FD Register
+66 MEAS_SEQR_STEP0_RESIDUAL Register
+66 MEAS_SEQR_STEP1_RESIDUAL Register
+67 MEAS_SEQR_STEP2_RESIDUAL Register
+67 MEAS_SEQR_STEP3_RESIDUAL Register
+68 MEAS_SEQR_STEP0_ALS Register
+68 MEAS_SEQR_STEP1_ALS Register
+69 MEAS_SEQR_STEP2_ALS Register
+69 MEAS_SEQR_STEP3_ALS Register
+70 MEAS_SEQR_APERS_AND_ VSYNC_WAIT Register
+71 MEAS_SEQR_AGC Register
+71 MEAS_SEQR_SMUX_AND_SAMPLE_TIME Register
+72 MEAS_SEQR_WAIT_AND_TS_ENABLE Register
+72 MOD_CALIB_CFG0 Register
+73 MOD_CALIB_CFG2 Register
+74 MOD_CALIB_CFG3 Register
+74 MOD_COMP_CFG2 Register
+Page 104 Datasheet, Public 
+Document Feedback   [v3-00] 2023-Jun-23
+
+TCS3530  −    Content Guide
+75 MOD_RESIDUAL_CFG0 Register
+75 MOD_RESIDUAL_CFG1 Register
+76 MOD_RESIDUAL_CFG2 Register
+76 VSYNC_DELAY_CFG0 Register
+77 VSYNC_DELAY_CFG1 Register
+77 VSYNC_PERIOD0 Register
+77 VSYNC_PERIOD1 Register
+78 VSYNC_PERIOD_TARGET0 Register
+78 VSYNC_PERIOD_TARGET1 Register
+79 VSYNC_CONTROL Register
+79 VSYNC_CFG Register
+80 FIFO_THR Register
+81 MOD_FIFO_DATA_CFG0 Register
+82 MOD_FIFO_DATA_CFG1 Register
+83 MOD_FIFO_DATA_CFG2 Register
+84 MOD_FIFO_DATA_CFG3 Register
+85 MOD_FIFO_DATA_CFG4 Register
+86 MOD_FIFO_DATA_CFG5 Register
+87 MOD_FIFO_DATA_CFG6 Register
+88 MOD_FIFO_DATA_CFG7 Register
+88 FIFO_STATUS0 Register
+89 FIFO_STATUS1 Register
+89 FIFO_DATA_PROTOCOL Register
+90 FIFO_DATA Registers
+91 Application Information
+92 Package Drawings & Markings
+93 PCB Pad Layout
+94 Tape & Reel Information
+95 Soldering & Storage Information
+95 Soldering Information
+96 Storage Information
+96 Moisture Sensitivity
+96 Shelf Life
+97 Floor Life
+97 Rebaking Instructions
+98 Ordering & Contact Information
+99 RoHS Compliant & ams Green Statement
+100  Copyrights & Disclaimer
+101  Document Status
+102  Revision Information
+Datasheet, Public  Page 105
+[v3-00] 2023-Jun-23 Document Feedback

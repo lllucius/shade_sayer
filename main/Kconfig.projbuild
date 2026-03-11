@@ -1,0 +1,240 @@
+menu "Color Detector Configuration"
+
+    # This configuration requires the following component dependencies:
+    # - picotts: Text-to-speech library (from ../components/picotts)
+    # These dependencies are declared in main/idf_component.yml
+
+    menu "I2C Configuration (shared)"
+
+        config I2C_MASTER_SDA_IO
+            int "I2C Master SDA GPIO number"
+            default 8
+            help
+                GPIO pin for I2C data line (SDA).
+                Shared by TCS3530 color sensor and MAX17048 fuel gauge.
+
+        config I2C_MASTER_SCL_IO
+            int "I2C Master SCL GPIO number"
+            default 9
+            help
+                GPIO pin for I2C clock line (SCL).
+                Shared by TCS3530 color sensor and MAX17048 fuel gauge.
+
+        config I2C_MASTER_FREQ_HZ
+            int "I2C Master Frequency (Hz)"
+            default 400000
+            help
+                I2C clock frequency. TCS3530 supports up to 1MHz Fast-Mode Plus.
+    endmenu
+
+    menu "Button Configuration"
+
+        config BUTTON_GPIO
+            int "Measurement Button GPIO number"
+            default 1
+            help
+                GPIO pin for the user measurement trigger button.
+                MUST be an RTC GPIO (GPIO 0-21 on ESP32-S3) for ext1 deep sleep wakeup.
+                Default GPIO 1 is used on Unexpected Maker TinyS3D.
+                
+                Button uses external pulldown resistor (active HIGH):
+                - 47kΩ pulldown resistor (GPIO to GND)
+                - 100nF debounce capacitor (GPIO to GND)
+                - 1kΩ series protection resistor (GPIO to button)
+                - Button connects GPIO to 3.3V when pressed
+
+        config BUTTON_LONG_PRESS_MS
+            int "Long Press Duration (ms)"
+            default 2000
+            range 500 10000
+            help
+                Duration in milliseconds to trigger a long press event.
+                Used for calibration mode.
+
+        config BUTTON_SHORT_PRESS_MS
+            int "Short Press Debounce (ms)"
+            default 50
+            range 10 500
+            help
+                Minimum duration in milliseconds for a valid button press.
+                Helps debounce noisy button signals.
+
+    endmenu
+
+    menu "I2S Audio (MAX98357A)"
+
+        config I2S_BCLK_GPIO
+            int "I2S BCLK GPIO"
+            default 5
+            help
+                I2S bit clock GPIO for MAX98357A amplifier.
+
+        config I2S_LRCLK_GPIO
+            int "I2S LRCLK/WS GPIO"
+            default 6
+            help
+                I2S word select (LRCLK) GPIO for MAX98357A amplifier.
+
+        config I2S_DOUT_GPIO
+            int "I2S Data Out GPIO"
+            default 33
+            help
+                I2S data output GPIO connected to DIN on MAX98357A.
+
+        config I2S_SD_MODE_GPIO
+            int "MAX98357A SD_MODE GPIO (-1 to disable)"
+            default 2
+            help
+                GPIO for MAX98357A SD_MODE pin to enable/disable amplifier.
+                Set to -1 if SD_MODE is tied high (always enabled).
+                SHOULD be an RTC GPIO (GPIO 0-21) to support rtc_gpio_hold_en()
+                for maintaining LOW state during deep sleep, reducing power consumption.
+                Default GPIO 2 is used on Unexpected Maker TinyS3D.
+
+        config I2S_SAMPLE_RATE
+            int "Audio Sample Rate (Hz)"
+            default 16000
+            help
+                Sample rate for audio output. Picotts uses 16000 Hz.
+
+    endmenu
+
+    menu "Text-to-Speech Configuration"
+
+        config TTS_SAMPLE_RATE
+            int "TTS Sample Rate (Hz)"
+            default 16000
+            help
+                Sample rate for text-to-speech synthesis.
+                Picotts uses 16000 Hz by default.
+                Must match I2S_SAMPLE_RATE for proper audio output.
+
+        config TTS_TASK_STACK_SIZE
+            int "TTS Task Stack Size (bytes)"
+            default 4096
+            range 2048 16384
+            help
+                Stack size for the TTS synthesis task.
+                Increase if experiencing stack overflow errors.
+
+        config TTS_TASK_PRIORITY
+            int "TTS Task Priority"
+            default 5
+            range 1 24
+            help
+                FreeRTOS task priority for TTS synthesis.
+                Higher values = higher priority.
+
+        config TTS_SPEECH_QUEUE_SIZE
+            int "Speech Queue Size"
+            default 16
+            range 4 64
+            help
+                Number of speech events the queue can hold.
+                Increase if speech requests are being dropped.
+
+        config TTS_POST_SPEECH_DELAY_MS
+            int "Post-Speech Delay (ms)"
+            default 200
+            range 0 1000
+            help
+                Delay after speech completes before disabling amplifier.
+                Prevents audio clicks/pops.
+
+    endmenu
+
+    menu "Audio Tone Configuration"
+
+        config AUDIO_CHUNK_SIZE
+            int "Audio Chunk Size (samples)"
+            default 256
+            range 64 1024
+            help
+                Samples per chunk for audio generation.
+                Larger values use more memory but may be more efficient.
+
+        config TONE_SAMPLE_RATE
+            int "Tone Sample Rate (Hz)"
+            default 16000
+            help
+                Sample rate for audio tones (ready, error, etc.).
+                16000 Hz provides good quality for simple tones.
+
+        config TONE_NOTE_DURATION_MS
+            int "Tone Note Duration (ms)"
+            default 120
+            range 50 500
+            help
+                Duration of each note in tones (milliseconds).
+
+    endmenu
+
+
+    config ALS_INTEGRATION_TIME_MS
+        int "ALS Integration Time (ms)"
+        default 100
+        range 1 1000
+        help
+            Color sensor integration time in milliseconds.
+            Longer times increase sensitivity but reduce responsiveness.
+
+    config POWER_ENABLE_GPIO
+        int "Sensor Power Enable GPIO (AO3401 gate)"
+        default 6
+        range 0 21
+        help
+            GPIO pin connected to the AO3401 P-MOSFET gate that controls
+            the TCS3530 sensor power rail.
+            Gate LOW = sensor power ON, Gate HIGH = sensor power OFF.
+            This GPIO also drives the gates of the 2N7002 I2C isolation
+            MOSFETs (via the switched VCC rail) in a star topology.
+            MUST be an RTC GPIO (GPIO 0-21 on ESP32-S3) for deep sleep hold.
+
+
+    config POWER_SAVE_TIMEOUT_S
+        int "Sleep Timeout (seconds)"
+        default 30
+        help
+            Time in light sleep before entering deep sleep.
+            After each action, the device enters light sleep for this duration.
+            If no button press occurs, it transitions to deep sleep.
+
+    config USB_DETECT_GPIO
+        int "USB VBUS Detect GPIO (-1 to disable)"
+        default 7
+        help
+            GPIO pin to detect USB VBUS (5V) presence via voltage divider.
+            Connected through voltage divider: 5V -> 1M -> GPIO7 -> 1M -> GND
+            with 100nF capacitor from GPIO7 to GND for filtering.
+            Used to determine if device was woken by USB connection and
+            can wake device from deep sleep (RTC GPIO required).
+            Set to -1 if not using USB detection.
+
+    config MAX17048_ALRT_GPIO
+        int "MAX17048 ALRT GPIO number (-1 to disable)"
+        default 10
+        help
+            GPIO pin connected to MAX17048 ALRT output.
+            The ALRT pin is used to detect charging events and wake from deep sleep.
+            When charging starts, the MAX17048 pulls ALRT low, triggering a wake-up.
+            MUST be an RTC GPIO (GPIO 0-21 on ESP32-S3) for ext1 deep sleep wakeup.
+            Default GPIO 10 is an RTC GPIO on ESP32-S3.
+            Set to -1 to disable charging wake-up feature.
+
+    config DEBUG_SIMULATE_SLEEP
+        bool "Debug: Simulate Light Sleep Instead of Entering Light Sleep"
+        default n
+        help
+            When enabled, the device will NOT enter actual light sleep.
+            Instead it will use FreeRTOS delays and button polling to simulate
+            light sleep behavior. This keeps the USB serial console active
+            and is useful for development and debugging. Deep sleep is
+            unaffected and works normally.
+
+            Simulated light sleep: Uses vTaskDelay with button polling instead
+            of esp_light_sleep_start(). GPIO interrupts remain active.
+
+            WARNING: Do NOT enable this for production builds. Power
+            consumption will be higher during the light sleep phase.
+
+endmenu
