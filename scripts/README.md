@@ -73,6 +73,30 @@ python3 generate_vptree.py --input xkcd_colors.json --output ../main/vptree_data
 - `vptree_data.h`: Header file with const VP-Tree nodes
 - Flash usage: ~9.3 KB for 949 colors
 
+
+### kona_scan_collect.py
+
+Collects `KONA_SCAN_CSV` log lines emitted by firmware scan mode and appends them to a capture CSV.
+
+**Usage:**
+```bash
+python3 kona_scan_collect.py --port /dev/ttyACM0 --baud 115200 --output kona_raw_captures.csv
+
+# Optional metadata mapping (default: kona_365_sensor_ready.csv)
+python3 kona_scan_collect.py --port /dev/ttyACM0 --metadata ../kona_365_sensor_ready.csv
+```
+
+**Features:**
+- Reads serial output in real time
+- Filters lines tagged with `KONA_SCAN_CSV:`
+- Resolves firmware `idx_###` placeholders against `kona_365_sensor_ready.csv` when available
+- Writes panel/panel_index/id/name plus full capture telemetry
+- Skips malformed lines with a warning
+
+**Requirements:**
+- Python 3.8+
+- pyserial (`pip install pyserial`)
+
 ### Legacy Scripts
 
 - **import_resene_colors.py**: Previous import script for Resene paint colors from Excel.

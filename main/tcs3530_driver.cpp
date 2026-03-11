@@ -209,6 +209,25 @@ esp_err_t TCS3530::readRegs(uint8_t start_reg, uint8_t* buffer, size_t length) c
     return i2c_master_transmit_receive(m_i2c_dev, &start_reg, 1, buffer, length, I2C_TIMEOUT_MS);
 }
 
+esp_err_t TCS3530::readStatusRegs(uint8_t* status2, uint8_t* status6) const
+{
+    if (!status2 || !status6)
+    {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    uint8_t status_block[5] = {0};
+    esp_err_t ret = readRegs(TCS3530_REG_STATUS2, status_block, sizeof(status_block));
+    if (ret != ESP_OK)
+    {
+        return ret;
+    }
+
+    *status2 = status_block[0];
+    *status6 = status_block[4];
+    return ESP_OK;
+}
+
 esp_err_t TCS3530::writeRegs(uint8_t start_reg, const uint8_t* data, size_t length)
 {
     if (length > TCS3530_MAX_DATA_SIZE)
@@ -1111,19 +1130,33 @@ esp_err_t TCS3530::readRaw(sensor_reading_t* reading)
     reading->gain = static_cast<uint8_t>(m_current_gain);
     reading->integration_ms = m_integration_time_ms;
 
-    // Read saturation status
-    uint8_t status3;
-    esp_err_t ret = readReg(TCS3530_REG_STATUS3, &status3);
+    // Read saturation status from STATUS2/STATUS6.
+    // STATUS2 carries digital saturation + analog-saturation-any summary,
+    // STATUS6 carries per-modulator analog saturation bits.
+    uint8_t status2 = 0;
+    uint8_t status6 = 0;
+    esp_err_t ret = readStatusRegs(&status2, &status6);
     if (ret != ESP_OK)
     {
         return ret;
     }
 
-    reading->saturated = (status3 & TCS3530_STATUS3_ASAT_DIGITAL_Msk) != 0;
-    if (status3 & TCS3530_STATUS3_ASAT_ANALOG_Msk)
+    reading->status2 = status2;
+    reading->status6 = status6;
+
+    const bool digital_sat = (status2 & TCS3530_STATUS2_ASAT_DIGITAL_Msk) != 0;
+    const bool analog_sat_any = (status2 & TCS3530_STATUS2_ASAT_ANALOG_ANY_Msk) != 0;
+    const bool analog_sat_mod = (status6 & TCS3530_STATUS6_ASAT_ANALOG_MOD_Msk) != 0;
+
+    reading->saturated = digital_sat || analog_sat_any || analog_sat_mod;
+
+    if (digital_sat)
     {
-        ESP_LOGW(TAG, "Analog saturation detected");
-        reading->saturated = true;
+        ESP_LOGW(TAG, "Digital saturation detected (STATUS2=0x%02x)", status2);
+    }
+    if (analog_sat_any || analog_sat_mod)
+    {
+        ESP_LOGW(TAG, "Analog saturation detected (STATUS2=0x%02x, STATUS6=0x%02x)", status2, status6);
     }
 
     // Check FIFO level
@@ -1397,14 +1430,20 @@ esp_err_t TCS3530::getStatus(TCS3530Status* status)
     uint8_t reg_val = 0;
     esp_err_t ret;
 
-    ret = readReg(TCS3530_REG_STATUS3, &reg_val);
+    uint8_t status2 = 0;
+    uint8_t status6 = 0;
+    ret = readStatusRegs(&status2, &status6);
     if (ret != ESP_OK)
     {
         return ret;
     }
-    TCS_LOGD(TAG, "STATUS3 0x%02x", reg_val);
-    status->asat_digital = (reg_val & TCS3530_STATUS3_ASAT_DIGITAL_Msk) != 0;
-    status->asat_analog = (reg_val & TCS3530_STATUS3_ASAT_ANALOG_Msk) != 0;
+    TCS_LOGD(TAG, "STATUS2 0x%02x", status2);
+    status->asat_digital = (status2 & TCS3530_STATUS2_ASAT_DIGITAL_Msk) != 0;
+    status->asat_analog = (status2 & TCS3530_STATUS2_ASAT_ANALOG_ANY_Msk) != 0;
+
+    TCS_LOGD(TAG, "STATUS6 0x%02x", status6);
+    status->asat_analog = status->asat_analog ||
+                          ((status6 & TCS3530_STATUS6_ASAT_ANALOG_MOD_Msk) != 0);
 
     reg_val = 0;
     ret = readReg(TCS3530_REG_STATUS4, &reg_val);

@@ -111,8 +111,27 @@ esp_err_t color_pipeline_init(const color_pipeline_config_t* config);
  * @return ESP_OK on success
  */
 esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result);
-#endif // defined(ESP_PLATFORM) && defined(__cplusplus)
 
+#if defined(ESP_PLATFORM) && defined(__cplusplus)
+/**
+ * @brief Capture one reading and emit a CSV log row for Kona scanning workflows.
+ *
+ * Runs a sensor measurement, processes it through the pipeline, and logs a single
+ * CSV row containing raw channels, status flags, exposure metadata, and Lab/XYZ.
+ *
+ * @param sensor TCS3530 driver pointer
+ * @param led_enabled True if LED illumination is enabled for this capture
+ * @param swatch_id Swatch identifier string (nullable)
+ * @param swatch_name Human-readable swatch name string (nullable)
+ * @param result Optional output color result (nullable)
+ * @return ESP_OK on success
+ */
+esp_err_t color_pipeline_capture_csv(TCS3530* sensor,
+                                     bool led_enabled,
+                                     const char* swatch_id,
+                                     const char* swatch_name,
+                                     color_result_t* result);
+#endif // defined(ESP_PLATFORM) && defined(__cplusplus)
 
 /**
  * @brief Process a pre-captured raw sensor reading and identify color.

@@ -206,6 +206,8 @@ typedef struct
     uint32_t timestamp_us;   //< Capture timestamp in microseconds
     uint8_t gain;            //< Applied gain setting
     uint16_t integration_ms; //< Integration time in milliseconds
+    uint8_t status2;         //< STATUS2 snapshot (ALS digital/analog saturation summary)
+    uint8_t status6;         //< STATUS6 snapshot (per-modulator analog saturation bits)
     bool saturated;          //< True if sensor was saturated during reading
 } sensor_reading_t;
 
