@@ -94,6 +94,11 @@ static const char* TAG = "main";
 // Button event detection timeout (ms)
 #define BUTTON_EVENT_TIMEOUT_MS 5000
 
+// Kona swatch scanning
+#define KONA_SWATCH_TOTAL            365
+#define KONA_SWATCH_ID_BUFFER_SIZE   24
+#define KONA_SWATCH_NAME_BUFFER_SIZE 48
+
 // Global handles
 static TCS3530* s_sensor = nullptr;
 
@@ -106,6 +111,9 @@ static char s_description_buffer[TTS_DESCRIPTION_BUFFER_SIZE];
 // Last measured color result for double-click description
 static color_result_t s_last_result;
 static bool s_has_last_result = false;
+
+// Next swatch index for quad-press Kona scan workflow
+static uint16_t s_kona_scan_index = 0;
 
 /**
  * @brief Announce battery level and estimated time to full
@@ -457,113 +465,66 @@ static void perform_measurement(void)
 }
 
 /**
- * @brief Display stored console logs
- * 
- * Retrieves and announces each stored log session via TTS.
- * Only called when on USB power and user presses button 4 times.
+ * @brief Capture one Kona swatch record and emit KONA_SCAN_CSV log row.
+ *
+ * Quad press advances through a fixed 365-swatch sequence. Host tooling can map
+ * this sequence to metadata from kona_365_sensor_ready.csv.
  */
-static void display_stored_logs(void)
+static void capture_kona_swatch(void)
 {
-    int count = console_logger_get_stored_count();
-    
-    if (count == 0)
+    if (!s_sensor)
     {
-        ESP_LOGI(TAG, "No stored logs found");
-        tts_speak("No stored logs");
+        ESP_LOGE(TAG, "Sensor not initialized for Kona scan");
+        tts_speak("Sensor not ready");
         return;
     }
-    
-    ESP_LOGI(TAG, "Found %d stored log sessions", count);
-    tts_speak("Found %d stored log sessions", count);
-    
-    // Allocate buffer for reading logs (reuse description buffer or allocate)
-    const size_t LOG_DISPLAY_BUFFER_SIZE = 2048;
-    char* log_buffer = (char*)malloc(LOG_DISPLAY_BUFFER_SIZE);
-    if (!log_buffer)
+
+    if (s_kona_scan_index >= KONA_SWATCH_TOTAL)
     {
-        ESP_LOGE(TAG, "Failed to allocate buffer for log display");
-        tts_speak("Memory error");
+        ESP_LOGI(TAG, "Kona scan sequence complete (%u swatches)", KONA_SWATCH_TOTAL);
+        tts_speak("Kona scan is complete");
         return;
     }
-    
-    // Display each log
-    for (int i = 0; i < count; i++)
+
+    const uint16_t swatch_number = static_cast<uint16_t>(s_kona_scan_index + 1);
+
+    char swatch_id[KONA_SWATCH_ID_BUFFER_SIZE] = {0};
+    char swatch_name[KONA_SWATCH_NAME_BUFFER_SIZE] = {0};
+    snprintf(swatch_id, sizeof(swatch_id), "idx_%03u", swatch_number);
+    snprintf(swatch_name, sizeof(swatch_name), "Kona swatch %u", swatch_number);
+
+    ESP_LOGI(TAG, "Kona scan capture %u/%u (%s, %s)",
+             swatch_number, KONA_SWATCH_TOTAL, swatch_id, swatch_name);
+
+    tts_speak("Capture swatch %d of %d", swatch_number, KONA_SWATCH_TOTAL);
+
+    color_result_t scan_result = {};
+    esp_err_t ret = color_pipeline_capture_csv(s_sensor,
+                                               true,
+                                               swatch_id,
+                                               swatch_name,
+                                               &scan_result);
+    if (ret != ESP_OK)
     {
-        size_t log_len = 0;
-        esp_err_t ret = console_logger_get_stored_log(i, log_buffer, LOG_DISPLAY_BUFFER_SIZE, &log_len);
-        
-        if (ret == ESP_OK)
-        {
-            ESP_LOGI(TAG, "=== Stored Log %d (most recent = 0) ===", i);
-            ESP_LOGI(TAG, "%s", log_buffer);
-            ESP_LOGI(TAG, "=== End of Log %d ===", i);
-            
-            // Announce via TTS
-            tts_speak("Log %d of %d", i + 1, count);
-            
-            // Parse and announce key errors from the log
-            // Look for error lines (lines starting with "E (")
-            char* line = log_buffer;
-            int error_count = 0;
-            while (line && *line && error_count < 3)  // Announce up to 3 errors per log
-            {
-                char* next_line = strchr(line, '\n');
-                if (next_line)
-                {
-                    *next_line = '\0';  // Temporarily null-terminate
-                }
-                
-                // Check if this is an error line
-                // ESP-IDF error log format: "E (timestamp) tag: message"
-                const char* error_marker = strstr(line, "E (");
-                if (error_marker != NULL)
-                {
-                    // Extract and speak error message (skip timestamp and tag)
-                    char* msg_start = strchr(error_marker, ')');
-                    if (msg_start)
-                    {
-                        msg_start += 2;  // Skip ") "
-                        // Skip tag - find first colon
-                        char* colon = strchr(msg_start, ':');
-                        if (colon)
-                        {
-                            msg_start = colon + 2;  // Skip ": "
-                        }
-                        ESP_LOGI(TAG, "Error: %s", msg_start);
-                        tts_speak("Error: %s", msg_start);
-                        error_count++;
-                    }
-                }
-                
-                if (next_line)
-                {
-                    *next_line = '\n';  // Restore newline
-                    line = next_line + 1;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            
-            if (error_count == 0)
-            {
-                tts_speak("No errors found in this log");
-            }
-        }
-        else
-        {
-            ESP_LOGE(TAG, "Failed to retrieve log %d: %s", i, esp_err_to_name(ret));
-            tts_speak("Failed to retrieve log %d", i + 1);
-        }
-        
-        // Small delay between logs
-        vTaskDelay(pdMS_TO_TICKS(500));
+        ESP_LOGE(TAG, "Kona scan capture failed: %s", esp_err_to_name(ret));
+        tts_speak("Scan failed");
+        return;
     }
-    
-    free(log_buffer);
-    ESP_LOGI(TAG, "Finished displaying stored logs");
-    tts_speak("End of stored logs");
+
+    s_last_result = scan_result;
+    s_has_last_result = true;
+
+    s_kona_scan_index++;
+    tts_speak("Captured");
+
+    if (s_kona_scan_index < KONA_SWATCH_TOTAL)
+    {
+        tts_speak("Next swatch %d", s_kona_scan_index + 1);
+    }
+    else
+    {
+        tts_speak("All swatches captured");
+    }
 }
 
 extern "C" void app_main(void)
@@ -825,16 +786,16 @@ extern "C" void app_main(void)
                 break;
 
             case UI_EVENT_BUTTON_QUAD:
-                // Quad press: display stored logs (only on USB power)
+                // Quad press: capture one Kona swatch record (USB power only)
                 if (power_is_usb_connected())
                 {
-                    ESP_LOGI(TAG, "Quad press on USB power - displaying stored logs");
-                    display_stored_logs();
+                    ESP_LOGI(TAG, "Quad press on USB power - capture Kona swatch");
+                    capture_kona_swatch();
                 }
                 else
                 {
                     ESP_LOGI(TAG, "Quad press ignored (not on USB power)");
-                    tts_speak("Not on USB power");
+                    tts_speak("Kona scan requires USB power");
                 }
                 break;
 
