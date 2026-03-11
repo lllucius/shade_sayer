@@ -193,6 +193,11 @@ bool TCS3530::debugMode()
     return s_debug_mode;
 }
 
+void TCS3530::setGainScalingFactors(const float* factors, size_t count)
+{
+    tcs3530_set_gain_scaling_factors(factors, count);
+}
+
 esp_err_t TCS3530::writeReg(uint8_t reg, uint8_t value)
 {
     uint8_t buf[2] = {reg, value};

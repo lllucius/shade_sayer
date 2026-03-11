@@ -161,10 +161,16 @@ static const float IR_RATIO_LED_THRESHOLD = 5.0f;           // Above this = most
 static const float IR_RATIO_INCANDESCENT_THRESHOLD = 2.0f;  // Below this = mostly incandescent
 
 
-// Minimum corrected luminance (Y) required for an inner sample to contribute to
-// averaged scan/identify statistics. Values below this are dominated by sensor
-// noise and are rejected for deterministic scan quality.
-static const float CAPTURE_MIN_ACCEPTED_Y = 0.5f;
+// Minimum corrected luminance (Y, CIE 0-100) required for an inner sample to
+// contribute to averaged scan/identify statistics.
+#ifdef ESP_PLATFORM
+static constexpr float k_capture_min_accepted_y = CONFIG_CAPTURE_MIN_ACCEPTED_Y;
+#else
+#ifndef CAPTURE_MIN_ACCEPTED_Y
+#define CAPTURE_MIN_ACCEPTED_Y 0.5f
+#endif
+static constexpr float k_capture_min_accepted_y = CAPTURE_MIN_ACCEPTED_Y;
+#endif
 
 static void clamp_xyz_floor(xyz_t* xyz)
 {
@@ -177,6 +183,7 @@ static void clamp_xyz_floor(xyz_t* xyz)
     xyz->z = fmaxf(0.01f, xyz->z);
 }
 
+#ifdef ESP_PLATFORM
 static esp_err_t capture_averaged_xyz(TCS3530* sensor,
                                       bool led_enabled,
                                       color_capture_stats_t* stats)
@@ -236,7 +243,7 @@ static esp_err_t capture_averaged_xyz(TCS3530* sensor,
             goto sample_delay;
         }
 
-        if (corrected_xyz.y < CAPTURE_MIN_ACCEPTED_Y)
+        if (corrected_xyz.y < k_capture_min_accepted_y)
         {
             stats->rejected_low_signal++;
             goto sample_delay;
@@ -296,6 +303,7 @@ sample_delay:
 
     return ESP_OK;
 }
+#endif
 
 /**
  * @brief Update the cached chromatic adaptation matrix

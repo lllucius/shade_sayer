@@ -522,13 +522,13 @@
 
 // STATUS2 (0x9C)
 /*
- *  bit7 ASAT_DIGITAL:  ALS digital saturation detected (ADC overflow)
- *  bit6 ASAT_ANALOG_ANY: Any ALS modulator reports analog saturation
+ *  bit4 ASAT_DIGITAL:  ALS digital saturation detected (ADC overflow)
+ *  bit0 ASAT_ANALOG_ANY: Any ALS modulator reports analog saturation
  */
-#define TCS3530_STATUS2_ASAT_DIGITAL_Pos      7u
-#define TCS3530_STATUS2_ASAT_DIGITAL_Msk      (1u << 7)
-#define TCS3530_STATUS2_ASAT_ANALOG_ANY_Pos   6u
-#define TCS3530_STATUS2_ASAT_ANALOG_ANY_Msk   (1u << 6)
+#define TCS3530_STATUS2_ASAT_DIGITAL_Pos      4u
+#define TCS3530_STATUS2_ASAT_DIGITAL_Msk      (1u << 4)
+#define TCS3530_STATUS2_ASAT_ANALOG_ANY_Pos   0u
+#define TCS3530_STATUS2_ASAT_ANALOG_ANY_Msk   (1u << 0)
 
 // STATUS6 (0xA0)
 /*

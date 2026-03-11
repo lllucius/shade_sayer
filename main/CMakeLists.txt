@@ -12,6 +12,7 @@ idf_component_register(
         "color_math.cpp"
         "color_matcher.cpp"
         "color_database.cpp"
+        "color_types.cpp"
         "auto_calibrate.cpp"
         "i2c_bus_manager.cpp"
         "console_logger.cpp"

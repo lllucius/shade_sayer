@@ -170,6 +170,16 @@ menu "Color Detector Configuration"
     endmenu
 
 
+
+    config CAPTURE_MIN_ACCEPTED_Y
+        float "Minimum accepted corrected Y for capture averaging"
+        default 0.5
+        range 0.0 100.0
+        help
+            Minimum corrected CIE Y (0-100) required for an individual sample
+            to be accepted into capture averaging. Lower values admit darker,
+            noisier samples; higher values reject more low-light samples.
+
     config ALS_INTEGRATION_TIME_MS
         int "ALS Integration Time (ms)"
         default 100

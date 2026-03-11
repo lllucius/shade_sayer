@@ -25,6 +25,10 @@
 #include "color_database.h"
 #include "color_matcher.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Color identification result
  */
@@ -166,6 +170,8 @@ esp_err_t color_pipeline_capture_csv(TCS3530* sensor,
                                      const char* swatch_name,
                                      color_result_t* result);
 
+#endif
+
 /**
  * @brief Process a pre-captured raw sensor reading and identify color.
  *
@@ -224,5 +230,9 @@ int color_pipeline_describe(const color_result_t* result, char* buffer, size_t b
 void color_pipeline_get_stats(uint32_t* total_identifications,
                               float* avg_processing_ms,
                               float* avg_confidence);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // COLOR_PIPELINE_H
