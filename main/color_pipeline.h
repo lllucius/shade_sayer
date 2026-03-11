@@ -104,6 +104,26 @@ esp_err_t color_pipeline_init(const color_pipeline_config_t* config);
 
 #if defined(ESP_PLATFORM) && defined(__cplusplus)
 /**
+ * @brief Averaged sensor capture statistics for scan/identify workflows.
+ */
+typedef struct
+{
+    uint8_t requested_samples;      //< Number of inner sensor measurements requested
+    uint8_t accepted_samples;       //< Number of measurements accepted into average
+    uint8_t rejected_saturated;     //< Rejected because sensor reported saturation
+    uint8_t rejected_low_signal;    //< Rejected because corrected Y was below threshold
+    bool any_saturated;             //< True if any inner sample reported saturation
+    bool flicker_detected;           //< True if ambient flicker was detected in any sample
+    uint8_t gain_code;              //< Representative gain code from accepted set (or last sample)
+    uint16_t integration_ms;        //< Representative integration time from accepted set (or last sample)
+    uint8_t status2;                //< Representative STATUS2 snapshot from accepted set (or last sample)
+    uint8_t status6;                //< Representative STATUS6 snapshot from accepted set (or last sample)
+    xyz_t mean_xyz;                 //< Mean corrected XYZ across accepted samples
+    xyz_t stddev_xyz;               //< Standard deviation of corrected XYZ across accepted samples
+    lab_t mean_lab;                 //< Lab derived from mean XYZ
+} color_capture_stats_t;
+
+/**
  * @brief Process a sensor reading and identify the color
  *
  * @param sensor TCS3530 driver pointer
@@ -112,12 +132,26 @@ esp_err_t color_pipeline_init(const color_pipeline_config_t* config);
  */
 esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result);
 
-#if defined(ESP_PLATFORM) && defined(__cplusplus)
 /**
- * @brief Capture one reading and emit a CSV log row for Kona scanning workflows.
+ * @brief Capture and average multiple sensor readings with quality filtering.
  *
- * Runs a sensor measurement, processes it through the pipeline, and logs a single
- * CSV row containing raw channels, status flags, exposure metadata, and Lab/XYZ.
+ * Uses pipeline-configured sample count/delay and returns averaged XYZ/Lab plus
+ * acceptance/rejection counters.
+ *
+ * @param sensor TCS3530 driver pointer
+ * @param led_enabled True if LED illumination is enabled for this capture
+ * @param stats Output averaged capture statistics
+ * @return ESP_OK on success, ESP_ERR_INVALID_STATE if all samples are rejected
+ */
+esp_err_t color_pipeline_capture_averaged(TCS3530* sensor,
+                                          bool led_enabled,
+                                          color_capture_stats_t* stats);
+
+/**
+ * @brief Capture averaged readings and emit a CSV log row for Kona scanning workflows.
+ *
+ * Runs an averaged capture measurement, processes it through the pipeline, and logs
+ * a CSV row containing quality counts, status metadata, and averaged XYZ/Lab stats.
  *
  * @param sensor TCS3530 driver pointer
  * @param led_enabled True if LED illumination is enabled for this capture
@@ -131,7 +165,6 @@ esp_err_t color_pipeline_capture_csv(TCS3530* sensor,
                                      const char* swatch_id,
                                      const char* swatch_name,
                                      color_result_t* result);
-#endif // defined(ESP_PLATFORM) && defined(__cplusplus)
 
 /**
  * @brief Process a pre-captured raw sensor reading and identify color.

@@ -507,7 +507,14 @@ static void capture_kona_swatch(void)
     if (ret != ESP_OK)
     {
         ESP_LOGE(TAG, "Kona scan capture failed: %s", esp_err_to_name(ret));
-        tts_speak("Scan failed");
+        if (ret == ESP_ERR_INVALID_STATE)
+        {
+            tts_speak("Scan failed, retry");
+        }
+        else
+        {
+            tts_speak("Scan failed");
+        }
         return;
     }
 
