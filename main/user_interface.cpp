@@ -141,7 +141,7 @@ static ui_event_t detect_button_event(uint32_t timeout_ms)
     TickType_t last_release = xTaskGetTickCount();
     
     // Look for additional clicks within the multi-click window
-    while (click_count < 4)  // Support up to quadruple click
+    while (click_count < 5)  // Support up to quintuple click
     {
         TickType_t elapsed = xTaskGetTickCount() - last_release;
         TickType_t remaining = pdMS_TO_TICKS(MULTI_CLICK_WINDOW_MS) - elapsed;
@@ -186,6 +186,9 @@ static ui_event_t detect_button_event(uint32_t timeout_ms)
         case 4:
             ESP_LOGI(TAG, "Quadruple click detected");
             return UI_EVENT_BUTTON_QUAD;
+        case 5:
+            ESP_LOGI(TAG, "Quintuple click detected");
+            return UI_EVENT_BUTTON_QUINT;
         default:
             return UI_EVENT_NONE;
     }

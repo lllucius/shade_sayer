@@ -4,6 +4,39 @@ This directory contains Python scripts for generating and managing the xkcd colo
 
 ## Scripts
 
+### kona_scanner_gui.py
+
+**GUI Application** for managing Kona Cotton swatch scanning sessions.
+
+**Usage:**
+```bash
+# Launch GUI with default settings
+python3 kona_scanner_gui.py
+
+# Specify serial port and CSV file
+python3 kona_scanner_gui.py --port /dev/ttyACM0 --csv ../kona_365_sensor_ready.csv
+```
+
+**Features:**
+- Display all 365 Kona swatches in a sortable, filterable treeview
+- Show color sample and Lab/RGB info for selected swatches
+- Support single or multi-swatch scanning via EXTENDED selection
+- Bidirectional serial communication with device
+- Export to C++ header file for firmware use
+- Filter by panel, name, ID, or scan status
+
+**Device Setup:**
+1. Connect device via USB cable
+2. Press button 5 times quickly to enter serial scan mode
+3. Launch GUI and click "Connect"
+4. Select swatches to scan and click "Scan Selected"
+5. Position device on each swatch and click "Capture"
+
+**Requirements:**
+- Python 3.8+
+- Tkinter (usually included with Python)
+- pyserial (`pip install pyserial`)
+
 ### import_xkcd_colors.py
 
 **Primary script** that imports xkcd color survey colors from the CSV file.
