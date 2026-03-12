@@ -80,14 +80,17 @@ Collects `KONA_SCAN_CSV` log lines emitted by firmware scan mode and appends the
 
 **Usage:**
 ```bash
-python3 kona_scan_collect.py --port /dev/ttyACM0 --baud 115200 --output kona_avg_captures.csv
+python3 kona_scan_collect.py --input-log ../console.txt --output kona_avg_captures.csv
 
 # Optional metadata mapping (default: kona_365_sensor_ready.csv)
-python3 kona_scan_collect.py --port /dev/ttyACM0 --metadata ../kona_365_sensor_ready.csv
+python3 kona_scan_collect.py --input-log ../console.txt --metadata ../kona_365_sensor_ready.csv
+
+# Or stream from stdin
+cat ../console.txt | python3 kona_scan_collect.py --input-log - --output kona_avg_captures.csv
 ```
 
 **Features:**
-- Reads serial output in real time
+- Reads a saved firmware console log text file (or stdin)
 - Filters lines tagged with `KONA_SCAN_CSV:`
 - Resolves firmware `idx_###` placeholders against `kona_365_sensor_ready.csv` when available
 - Writes panel/panel_index/id/name plus averaged XYZ/Lab and quality counters
@@ -95,7 +98,22 @@ python3 kona_scan_collect.py --port /dev/ttyACM0 --metadata ../kona_365_sensor_r
 
 **Requirements:**
 - Python 3.8+
-- pyserial (`pip install pyserial`)
+
+### generate_kona_table.py
+
+Generates `main/konaref.cpp` from `kona_avg_captures.csv` so firmware can match against
+Kona swatch Lab references directly in flash.
+
+**Usage:**
+```bash
+python3 generate_kona_table.py --input ../kona_avg_captures.csv --output ../main/konaref.cpp
+```
+
+**Features:**
+- Parses `kona_id`, `mean_lab_l/a/b`, and `stddev_xyz_x/y/z` from scan captures
+- Deduplicates by `kona_id` (last row wins), sorted by numeric swatch id
+- Emits `kona_table_t kona_reference` with schema version, entry count, and CRC32
+- Caps table size to 365 entries for firmware flash layout compatibility
 
 ### generate_kona_table.py
 
