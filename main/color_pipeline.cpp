@@ -274,6 +274,9 @@ static esp_err_t capture_averaged_xyz(TCS3530* sensor,
     xyz_t best_low_signal_xyz = {};
     float best_low_signal_y = -1.0f;
     bool has_best_low_signal = false;
+    xyz_t best_saturated_xyz = {};
+    float best_saturated_y = FLT_MAX;  // Track minimum Y (closest to saturation threshold)
+    bool has_best_saturated = false;
 
     for (uint8_t i = 0; i < stats->requested_samples; ++i)
     {
@@ -309,6 +312,15 @@ static esp_err_t capture_averaged_xyz(TCS3530* sensor,
 
         if (reading.saturated)
         {
+            // Track the lowest-Y saturated sample as a fallback.
+            // Lowest-Y is preferred because it's closest to the saturation threshold
+            // and likely the most accurate among over-exposed samples.
+            if (!has_best_saturated || corrected_xyz.y < best_saturated_y)
+            {
+                best_saturated_xyz = corrected_xyz;
+                best_saturated_y = corrected_xyz.y;
+                has_best_saturated = true;
+            }
             goto sample_delay;
         }
 
@@ -377,6 +389,25 @@ sample_delay:
                      "All samples below Y floor %.2f; using best low-signal sample (Y=%.4f)",
                      k_capture_min_accepted_y,
                      best_low_signal_y);
+            return ESP_OK;
+        }
+
+        // If all samples were saturated, use the lowest-Y saturated sample as
+        // a fallback. This allows retry-with-reduced-exposure logic to trigger
+        // rather than aborting entirely.
+        if (has_best_saturated)
+        {
+            stats->accepted_samples = 1;
+            stats->mean_xyz = best_saturated_xyz;
+            stats->stddev_xyz = {0.0f, 0.0f, 0.0f};
+
+            xyz_t lab_xyz = stats->mean_xyz;
+            clamp_xyz_floor(&lab_xyz);
+            stats->mean_lab = color_math_xyz_to_lab(lab_xyz);
+
+            ESP_LOGW(TAG,
+                     "All samples saturated; using best saturated sample (Y=%.4f)",
+                     best_saturated_y);
             return ESP_OK;
         }
 
