@@ -43,6 +43,13 @@ except ImportError:
 SCHEMA_VERSION = 1
 MAX_ENTRIES = 365
 
+# Expected size of kona_ref_t struct in bytes (must match firmware)
+# Layout: uint16_t kona_id (2) + padding (2) + 3 floats (12) = 16 bytes
+KONA_REF_T_SIZE = 16
+
+# Serial communication constants
+DEVICE_READY_DELAY_S = 0.5  # Time to wait for device initialization after connecting
+
 
 @dataclasses.dataclass
 class SwatchData:
@@ -128,8 +135,8 @@ class SerialConnection:
                     timeout=2.0,
                     write_timeout=2.0
                 )
-                # Wait for device to be ready
-                time.sleep(0.5)
+                # Wait for device USB-serial to initialize after connection
+                time.sleep(DEVICE_READY_DELAY_S)
                 # Clear any pending data
                 self.serial.reset_input_buffer()
                 self.serial.reset_output_buffer()
@@ -784,12 +791,17 @@ class KonaScannerApp:
         if len(sorted_swatches) > MAX_ENTRIES:
             raise ValueError(f"Too many entries ({len(sorted_swatches)}), max is {MAX_ENTRIES}")
 
+        # Verify struct pack format matches expected kona_ref_t size
+        entry_pack_format = "<H2x3f"  # uint16_t + 2 pad + 3 floats
+        actual_size = struct.calcsize(entry_pack_format)
+        assert actual_size == KONA_REF_T_SIZE, \
+            f"Struct pack size mismatch: got {actual_size}, expected {KONA_REF_T_SIZE}"
+
         # Calculate CRC32 of entry data (matching firmware struct layout)
         payload = bytearray()
         for s in sorted_swatches:
             # Pack as: uint16_t + 2 padding bytes + 3 floats (little-endian)
-            # This must match sizeof(kona_ref_t) = 16 bytes
-            payload.extend(struct.pack("<H2x3f", s.id, s.L, s.a, s.b))
+            payload.extend(struct.pack(entry_pack_format, s.id, s.L, s.a, s.b))
         crc = zlib.crc32(payload) & 0xFFFFFFFF
 
         # Generate entry lines

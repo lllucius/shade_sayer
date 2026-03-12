@@ -595,7 +595,16 @@ static void capture_kona_swatch(void)
  * Response format:
  * - OK: followed by data on success
  * - ERR: followed by error message on failure
+ * 
+ * @note Uses fcntl to set stdin non-blocking for responsive button checking.
  */
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+
+// Button debounce configuration for serial mode
+#define SERIAL_MODE_BUTTON_DEBOUNCE_MS  50
+
 static void enter_serial_scan_mode(void)
 {
     ESP_LOGI(TAG, "Entering serial scan mode");
@@ -605,96 +614,141 @@ static void enter_serial_scan_mode(void)
     printf("SERIAL_MODE:READY\n");
     fflush(stdout);
     
+    // Set stdin to non-blocking mode for responsive polling
+    int stdin_fd = fileno(stdin);
+    int old_flags = fcntl(stdin_fd, F_GETFL, 0);
+    fcntl(stdin_fd, F_SETFL, old_flags | O_NONBLOCK);
+    
     char cmd_buffer[128];
+    size_t cmd_pos = 0;
     bool exit_mode = false;
+    bool button_was_pressed = false;
+    TickType_t button_press_time = 0;
     
     while (!exit_mode)
     {
-        // Check for button press to exit (non-blocking check via short timeout)
-        // Use a 100ms polling interval to remain responsive
-        vTaskDelay(pdMS_TO_TICKS(100));
+        // Check for button press with simple debouncing
+        bool button_state = (gpio_get_level(BUTTON_GPIO) == 1);
         
-        // Read command from stdin (non-blocking via fgets with timeout behavior)
-        // Note: ESP-IDF's stdin is typically blocking, so we poll with vTaskDelay
-        if (fgets(cmd_buffer, sizeof(cmd_buffer), stdin) != nullptr)
+        if (button_state && !button_was_pressed)
         {
-            // Trim newline
-            size_t len = strlen(cmd_buffer);
-            while (len > 0 && (cmd_buffer[len - 1] == '\n' || cmd_buffer[len - 1] == '\r'))
+            // Button just pressed - record time for debounce
+            button_was_pressed = true;
+            button_press_time = xTaskGetTickCount();
+        }
+        else if (button_state && button_was_pressed)
+        {
+            // Button still pressed - check if debounce time passed
+            TickType_t elapsed = xTaskGetTickCount() - button_press_time;
+            if (elapsed >= pdMS_TO_TICKS(SERIAL_MODE_BUTTON_DEBOUNCE_MS))
             {
-                cmd_buffer[--len] = '\0';
-            }
-            
-            ESP_LOGI(TAG, "Serial command: %s", cmd_buffer);
-            
-            if (strcmp(cmd_buffer, "PING") == 0)
-            {
-                printf("OK:PONG\n");
-                fflush(stdout);
-            }
-            else if (strcmp(cmd_buffer, "EXIT") == 0)
-            {
-                printf("OK:EXITING\n");
+                // Valid press detected - wait for release
+                while (gpio_get_level(BUTTON_GPIO) == 1)
+                {
+                    vTaskDelay(pdMS_TO_TICKS(10));
+                }
+                
+                ESP_LOGI(TAG, "Button pressed - exiting serial mode");
+                printf("OK:BUTTON_EXIT\n");
                 fflush(stdout);
                 exit_mode = true;
             }
-            else if (strcmp(cmd_buffer, "SCAN") == 0)
+        }
+        else if (!button_state && button_was_pressed)
+        {
+            // Button released before debounce - reset
+            button_was_pressed = false;
+        }
+        
+        if (exit_mode) break;
+        
+        // Read available characters from stdin (non-blocking)
+        int ch;
+        while ((ch = getchar()) != EOF)
+        {
+            if (ch == '\n' || ch == '\r')
             {
-                // Perform a measurement
-                if (!s_sensor)
+                // Command complete
+                cmd_buffer[cmd_pos] = '\0';
+                
+                if (cmd_pos > 0)
                 {
-                    printf("ERR:SENSOR_NOT_READY\n");
-                    fflush(stdout);
-                    continue;
+                    ESP_LOGI(TAG, "Serial command: %s", cmd_buffer);
+                    
+                    if (strcmp(cmd_buffer, "PING") == 0)
+                    {
+                        printf("OK:PONG\n");
+                        fflush(stdout);
+                    }
+                    else if (strcmp(cmd_buffer, "EXIT") == 0)
+                    {
+                        printf("OK:EXITING\n");
+                        fflush(stdout);
+                        exit_mode = true;
+                    }
+                    else if (strcmp(cmd_buffer, "SCAN") == 0)
+                    {
+                        // Perform a measurement
+                        if (!s_sensor)
+                        {
+                            printf("ERR:SENSOR_NOT_READY\n");
+                            fflush(stdout);
+                        }
+                        else
+                        {
+                            // Turn on LED for measurement
+                            s_sensor->setLed(true);
+                            vTaskDelay(pdMS_TO_TICKS(50));
+                            
+                            color_result_t result = {};
+                            esp_err_t ret = color_pipeline_identify(s_sensor, &result);
+                            
+                            s_sensor->setLed(false);
+                            
+                            if (ret != ESP_OK)
+                            {
+                                printf("ERR:SCAN_FAILED:%s\n", esp_err_to_name(ret));
+                                fflush(stdout);
+                            }
+                            else
+                            {
+                                // Output Lab values and RGB
+                                printf("OK:LAB:%.4f,%.4f,%.4f:RGB:%d,%d,%d\n",
+                                       result.lab.l, result.lab.a, result.lab.b,
+                                       result.rgb[0], result.rgb[1], result.rgb[2]);
+                                fflush(stdout);
+                                
+                                s_last_result = result;
+                                s_has_last_result = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        printf("ERR:UNKNOWN_COMMAND:%s\n", cmd_buffer);
+                        fflush(stdout);
+                    }
                 }
-                
-                // Turn on LED for measurement
-                s_sensor->setLed(true);
-                vTaskDelay(pdMS_TO_TICKS(50));
-                
-                color_result_t result = {};
-                esp_err_t ret = color_pipeline_identify(s_sensor, &result);
-                
-                s_sensor->setLed(false);
-                
-                if (ret != ESP_OK)
-                {
-                    printf("ERR:SCAN_FAILED:%s\n", esp_err_to_name(ret));
-                    fflush(stdout);
-                    continue;
-                }
-                
-                // Output Lab values and RGB
-                printf("OK:LAB:%.4f,%.4f,%.4f:RGB:%d,%d,%d\n",
-                       result.lab.l, result.lab.a, result.lab.b,
-                       result.rgb[0], result.rgb[1], result.rgb[2]);
-                fflush(stdout);
-                
-                s_last_result = result;
-                s_has_last_result = true;
+                cmd_pos = 0;
             }
-            else if (strlen(cmd_buffer) > 0)
+            else if (cmd_pos < sizeof(cmd_buffer) - 1)
             {
-                printf("ERR:UNKNOWN_COMMAND:%s\n", cmd_buffer);
-                fflush(stdout);
+                cmd_buffer[cmd_pos++] = static_cast<char>(ch);
             }
         }
         
-        // Check for button press to exit serial mode
-        if (gpio_get_level(BUTTON_GPIO) == 1)
+        // Clear errno from non-blocking read (EAGAIN is expected)
+        if (errno == EAGAIN)
         {
-            // Wait for release
-            while (gpio_get_level(BUTTON_GPIO) == 1)
-            {
-                vTaskDelay(pdMS_TO_TICKS(10));
-            }
-            
-            ESP_LOGI(TAG, "Button pressed - exiting serial mode");
-            printf("OK:BUTTON_EXIT\n");
-            fflush(stdout);
-            exit_mode = true;
+            errno = 0;
         }
+        
+        // Small delay to prevent busy-waiting
+        vTaskDelay(pdMS_TO_TICKS(20));
     }
+    
+    // Restore blocking mode on stdin
+    fcntl(stdin_fd, F_SETFL, old_flags);
     
     ESP_LOGI(TAG, "Exiting serial scan mode");
     tts_speak("Serial mode exited");
