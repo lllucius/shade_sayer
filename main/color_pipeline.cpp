@@ -1127,6 +1127,12 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
     result->xyz = corrected;
     result->lab = color_math_xyz_to_lab(corrected);
 
+    // Store raw Lab for Kona matching before any corrections.
+    // The Kona reference table contains raw Lab values (XYZ->Lab conversion only,
+    // no lightness gamma or saturation boost), so we must match against the same
+    // representation. After matching, we apply corrections to result->lab for
+    // display and fallback database matching.
+    lab_t raw_lab = result->lab;
         
     // Log raw and corrected lightness values for diagnostics
     float raw_L = result->lab.l;
@@ -1173,7 +1179,10 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
     }
     else
     {
-        if (try_match_kona_reference(&result->lab, result))
+        // Use raw Lab (before lightness/saturation corrections) for Kona matching.
+        // The Kona reference table stores raw Lab values from the capture scan,
+        // so we must compare against the same representation for accurate deltaE.
+        if (try_match_kona_reference(&raw_lab, result))
         {
             result->description = nullptr;
             TCS_LOGD(TAG, "Kona match: id=%u name=%s dE=%.3f",
@@ -1183,6 +1192,8 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         }
         else
         {
+            // Use corrected Lab for fallback database matching.
+            // The general color database expects perceptually-corrected values.
             result->color_name = color_matcher_find_closest(&result->lab, &result->delta_e);
             if (result->color_name)
             {
