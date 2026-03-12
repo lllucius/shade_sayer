@@ -53,7 +53,6 @@ static struct
     MAX17048* fuel_gauge;
     bool fuel_gauge_available;
     power_wake_cause_t boot_cause;
-    bool boot_cause_determined;
 } s_power;
 
 /**
@@ -690,7 +689,6 @@ esp_err_t power_init(const power_config_t* config, TCS3530* sensor)
 
     // Determine boot cause
     s_power.boot_cause = determine_boot_cause(config);
-    s_power.boot_cause_determined = true;
     ESP_LOGI(TAG, "Boot cause: %d", s_power.boot_cause);
     
     // Release I2C GPIO holds from deep sleep (if any)

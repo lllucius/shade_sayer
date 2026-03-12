@@ -36,7 +36,7 @@ typedef enum
 } ui_event_t;
 
 /**
- * @brief UI callback function type
+ * @brief UI callback function type (currently unused, reserved for future use)
  */
 typedef void (*ui_callback_t)(ui_event_t event, void* user_data);
 
@@ -46,8 +46,6 @@ typedef void (*ui_callback_t)(ui_event_t event, void* user_data);
 typedef struct
 {
     gpio_num_t button_gpio;         /**< Measurement button GPIO */
-    ui_callback_t callback;         /**< Event callback function */
-    void* user_data;                /**< User data for callback */
 } ui_config_t;
 
 /**
