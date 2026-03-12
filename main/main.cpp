@@ -578,6 +578,128 @@ static void capture_kona_swatch(void)
     }
 }
 
+/**
+ * @brief Enter bidirectional serial communication mode for GUI scanning.
+ * 
+ * This mode allows an external GUI application to control the device via
+ * serial commands. The device will respond to commands and perform scans
+ * as requested. The mode continues until the user presses the button or
+ * an EXIT command is received.
+ * 
+ * Protocol:
+ * - Commands are newline-terminated ASCII strings
+ * - SCAN command triggers a measurement and returns Lab values
+ * - EXIT command exits serial mode
+ * - PING command returns PONG to verify connection
+ * 
+ * Response format:
+ * - OK: followed by data on success
+ * - ERR: followed by error message on failure
+ */
+static void enter_serial_scan_mode(void)
+{
+    ESP_LOGI(TAG, "Entering serial scan mode");
+    tts_speak("Serial scan mode active. Press button to exit.");
+    
+    // Print protocol banner
+    printf("SERIAL_MODE:READY\n");
+    fflush(stdout);
+    
+    char cmd_buffer[128];
+    bool exit_mode = false;
+    
+    while (!exit_mode)
+    {
+        // Check for button press to exit (non-blocking check via short timeout)
+        // Use a 100ms polling interval to remain responsive
+        vTaskDelay(pdMS_TO_TICKS(100));
+        
+        // Read command from stdin (non-blocking via fgets with timeout behavior)
+        // Note: ESP-IDF's stdin is typically blocking, so we poll with vTaskDelay
+        if (fgets(cmd_buffer, sizeof(cmd_buffer), stdin) != nullptr)
+        {
+            // Trim newline
+            size_t len = strlen(cmd_buffer);
+            while (len > 0 && (cmd_buffer[len - 1] == '\n' || cmd_buffer[len - 1] == '\r'))
+            {
+                cmd_buffer[--len] = '\0';
+            }
+            
+            ESP_LOGI(TAG, "Serial command: %s", cmd_buffer);
+            
+            if (strcmp(cmd_buffer, "PING") == 0)
+            {
+                printf("OK:PONG\n");
+                fflush(stdout);
+            }
+            else if (strcmp(cmd_buffer, "EXIT") == 0)
+            {
+                printf("OK:EXITING\n");
+                fflush(stdout);
+                exit_mode = true;
+            }
+            else if (strcmp(cmd_buffer, "SCAN") == 0)
+            {
+                // Perform a measurement
+                if (!s_sensor)
+                {
+                    printf("ERR:SENSOR_NOT_READY\n");
+                    fflush(stdout);
+                    continue;
+                }
+                
+                // Turn on LED for measurement
+                s_sensor->setLed(true);
+                vTaskDelay(pdMS_TO_TICKS(50));
+                
+                color_result_t result = {};
+                esp_err_t ret = color_pipeline_identify(s_sensor, &result);
+                
+                s_sensor->setLed(false);
+                
+                if (ret != ESP_OK)
+                {
+                    printf("ERR:SCAN_FAILED:%s\n", esp_err_to_name(ret));
+                    fflush(stdout);
+                    continue;
+                }
+                
+                // Output Lab values and RGB
+                printf("OK:LAB:%.4f,%.4f,%.4f:RGB:%d,%d,%d\n",
+                       result.lab.l, result.lab.a, result.lab.b,
+                       result.rgb[0], result.rgb[1], result.rgb[2]);
+                fflush(stdout);
+                
+                s_last_result = result;
+                s_has_last_result = true;
+            }
+            else if (strlen(cmd_buffer) > 0)
+            {
+                printf("ERR:UNKNOWN_COMMAND:%s\n", cmd_buffer);
+                fflush(stdout);
+            }
+        }
+        
+        // Check for button press to exit serial mode
+        if (gpio_get_level(BUTTON_GPIO) == 1)
+        {
+            // Wait for release
+            while (gpio_get_level(BUTTON_GPIO) == 1)
+            {
+                vTaskDelay(pdMS_TO_TICKS(10));
+            }
+            
+            ESP_LOGI(TAG, "Button pressed - exiting serial mode");
+            printf("OK:BUTTON_EXIT\n");
+            fflush(stdout);
+            exit_mode = true;
+        }
+    }
+    
+    ESP_LOGI(TAG, "Exiting serial scan mode");
+    tts_speak("Serial mode exited");
+}
+
 extern "C" void app_main(void)
 {
     ESP_LOGI(TAG, "Color Detector for Visually Impaired");
@@ -874,6 +996,18 @@ extern "C" void app_main(void)
                     ESP_LOGI(TAG, "Quad press ignored, Kona scan already active");
                     tts_speak("Kona scan already active");
                 }
+                break;
+
+            case UI_EVENT_BUTTON_QUINT:
+                if (!power_is_usb_connected())
+                {
+                    ESP_LOGI(TAG, "Quint press ignored (not on USB power)");
+                    tts_speak("Serial mode requires USB power");
+                    break;
+                }
+
+                ESP_LOGI(TAG, "Quint press on USB power - enter serial scan mode");
+                enter_serial_scan_mode();
                 break;
 
             case UI_EVENT_NONE:

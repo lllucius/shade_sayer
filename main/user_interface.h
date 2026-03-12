@@ -28,6 +28,7 @@ typedef enum
     UI_EVENT_BUTTON_DOUBLE,     /**< Double click */
     UI_EVENT_BUTTON_TRIPLE,     /**< Triple click */
     UI_EVENT_BUTTON_QUAD,       /**< Quadruple click */
+    UI_EVENT_BUTTON_QUINT,      /**< Quintuple click (5 presses) */
     UI_EVENT_MEASUREMENT_START, /**< Measurement starting */
     UI_EVENT_MEASUREMENT_DONE,  /**< Measurement complete */
     UI_EVENT_CALIBRATION,       /**< Calibration requested */
