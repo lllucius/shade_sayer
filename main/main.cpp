@@ -638,8 +638,8 @@ extern "C" void app_main(void)
     power_config.usb_detect_gpio = USB_DETECT_GPIO;
     power_config.max17048_alrt_gpio = MAX17048_ALRT_GPIO;
     
-    // Initialize power manager (sensor will be set later)
-    power_init(&power_config, nullptr);
+    // Initialize power manager
+    power_init(&power_config);
     
     // Check wake cause
     power_wake_cause_t wake_cause = power_get_wake_cause();

@@ -54,15 +54,17 @@ typedef struct
  * 3. Configures sleep wakeup sources
  *
  * @param config Power configuration
- * @param sensor TCS3530 sensor pointer (for sleep control, can be NULL initially)
  * @return ESP_OK on success
+ *
+ * @note Use power_set_sensor() after sensor initialization to enable sensor
+ *       power management during sleep.
  */
-esp_err_t power_init(const power_config_t* config, TCS3530* sensor);
+esp_err_t power_init(const power_config_t* config);
 
 /**
  * @brief Set sensor pointer for sleep control
  *
- * Call this after sensor initialization if sensor was NULL in power_init().
+ * Call this after sensor initialization to enable sensor power management.
  *
  * @param sensor TCS3530 sensor pointer
  */
