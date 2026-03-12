@@ -492,10 +492,6 @@ xyz_t color_math_chromatic_adapt(xyz_t xyz, xyz_t src_white, xyz_t dst_white)
         {
             // Protect against division by zero - use 1.0 scale if source is near-zero
             scale[i] = 1.0f;
-#ifdef COLOR_MATH_DEBUG_GAMUT
-            ESP_LOGW("color_math", "Chromatic adapt: near-zero source cone response[%d]=%.6f, using scale=1.0",
-                     i, src_rgb[i]);
-#endif
         }
         else
         {

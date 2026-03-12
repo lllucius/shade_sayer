@@ -229,17 +229,6 @@ const char* color_pipeline_get_category(const lab_t* lab);
  */
 int color_pipeline_describe(const color_result_t* result, char* buffer, size_t buffer_size);
 
-/**
- * @brief Get pipeline statistics
- *
- * @param total_identifications Total colors identified
- * @param avg_processing_ms Average processing time
- * @param avg_confidence Average match confidence
- */
-void color_pipeline_get_stats(uint32_t* total_identifications,
-                              float* avg_processing_ms,
-                              float* avg_confidence);
-
 #ifdef __cplusplus
 }
 #endif

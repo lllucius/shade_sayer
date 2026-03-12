@@ -229,7 +229,7 @@ static void speak_color_description(void)
 /**
  * @brief Auto-calibration callback for user feedback
  */
-static void auto_cal_callback(const cal_status_t* status, const char* message, void* user_data)
+static void auto_cal_callback(const char* message)
 {
     if (message)
     {
@@ -256,7 +256,7 @@ static void perform_auto_calibration(void)
         return;
     }
     
-    auto_cal_set_callback(cal_ctx, auto_cal_callback, nullptr);
+    auto_cal_set_callback(cal_ctx, auto_cal_callback);
 
     // Dark Gray reference FIRST - captures sensor offset before any other measurements
     // Measured before White to get raw RESP-normalized values (no white normalization)
@@ -638,8 +638,8 @@ extern "C" void app_main(void)
     power_config.usb_detect_gpio = USB_DETECT_GPIO;
     power_config.max17048_alrt_gpio = MAX17048_ALRT_GPIO;
     
-    // Initialize power manager (sensor will be set later)
-    power_init(&power_config, nullptr);
+    // Initialize power manager
+    power_init(&power_config);
     
     // Check wake cause
     power_wake_cause_t wake_cause = power_get_wake_cause();
@@ -731,7 +731,6 @@ extern "C" void app_main(void)
     ESP_LOGI(TAG, "Initializing user interface...");
     ui_config_t ui_config = {};
     ui_config.button_gpio = BUTTON_GPIO;
-    ui_config.callback = NULL;  // Events handled directly in main loop
     ret = ui_init(&ui_config, wake_cause == POWER_WAKE_BUTTON);
 
     // Set sensor pointer for power manager sleep control

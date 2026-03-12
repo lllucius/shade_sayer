@@ -105,29 +105,6 @@ esp_err_t color_database_get_entry(uint32_t index, char *name, size_t name_size,
  */
 const char* color_database_get_name(uint32_t index);
 
-/**
- * Get the lightness (L*) value for a color at the given index
- * @param index Index in database (0 to count-1)
- * @return L* value, or -1.0f if index is out of range
- */
-float color_database_get_lightness(uint32_t index);
-
-/**
- * Get the pre-computed chroma (C*) value for a color at the given index
- * Chroma is computed as sqrt(a*a + b*b)
- * @param index Index in database (0 to count-1)
- * @return C* value, or -1.0f if index is out of range
- */
-float color_database_get_chroma(uint32_t index);
-
-/**
- * Get the pre-computed hue angle for a color at the given index
- * Hue is computed as atan2(b, a) and returned in radians
- * @param index Index in database (0 to count-1)
- * @return Hue in radians, or -1000.0f if index is out of range
- */
-float color_database_get_hue(uint32_t index);
-
 #ifdef __cplusplus
 }
 #endif

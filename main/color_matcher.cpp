@@ -17,7 +17,6 @@
  * MEMORY: All data resides in Flash/RODATA. No heap allocations needed.
  */
 
-#include <string.h>
 #include <float.h>
 #include <math.h>
 #include <inttypes.h>

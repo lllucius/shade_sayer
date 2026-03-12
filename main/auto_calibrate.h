@@ -174,12 +174,12 @@ typedef struct
  * @brief Calibration callback function
  *
  * Called at various points during calibration to provide user feedback.
+ * Only the message parameter is used - status information can be queried
+ * via auto_cal_get_status() if needed.
  *
- * @param status Current calibration status
  * @param message Human-readable message (may be NULL)
- * @param user_data User data pointer passed to auto_cal_set_callback()
  */
-typedef void (*cal_callback_t)(const cal_status_t* status, const char* message, void* user_data);
+typedef void (*cal_callback_t)(const char* message);
 
 /**
  * @brief Calibration context (opaque)
@@ -296,9 +296,8 @@ void auto_cal_clear_references(auto_cal_ctx_t* ctx);
  *
  * @param ctx Calibration context
  * @param cb Callback function (or NULL to disable)
- * @param user_data User data pointer passed to callback
  */
-void auto_cal_set_callback(auto_cal_ctx_t* ctx, cal_callback_t cb, void* user_data);
+void auto_cal_set_callback(auto_cal_ctx_t* ctx, cal_callback_t cb);
 
 /**
  * @brief Start calibration process

@@ -53,7 +53,6 @@ static struct
     MAX17048* fuel_gauge;
     bool fuel_gauge_available;
     power_wake_cause_t boot_cause;
-    bool boot_cause_determined;
 } s_power;
 
 /**
@@ -662,7 +661,7 @@ void power_disable_onboard_led(void)
              RGB_LED_PWR_GPIO, RGB_LED_DATA_GPIO);
 }
 
-esp_err_t power_init(const power_config_t* config, TCS3530* sensor)
+esp_err_t power_init(const power_config_t* config)
 {
     if (!config)
     {
@@ -673,14 +672,13 @@ esp_err_t power_init(const power_config_t* config, TCS3530* sensor)
     if (s_power.initialized)
     {
         ESP_LOGW(TAG, "Power manager already initialized");
-        s_power.sensor = sensor;
         return ESP_OK;
     }
 
     // Initialize state
     memset(&s_power, 0, sizeof(s_power));
     s_power.config = *config;
-    s_power.sensor = sensor;
+    s_power.sensor = nullptr;
 
     // Set default sleep timeout
     if (s_power.config.sleep_timeout_ms == 0)
@@ -690,7 +688,6 @@ esp_err_t power_init(const power_config_t* config, TCS3530* sensor)
 
     // Determine boot cause
     s_power.boot_cause = determine_boot_cause(config);
-    s_power.boot_cause_determined = true;
     ESP_LOGI(TAG, "Boot cause: %d", s_power.boot_cause);
     
     // Release I2C GPIO holds from deep sleep (if any)

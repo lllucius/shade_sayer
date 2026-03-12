@@ -82,11 +82,6 @@ static color_calib_params_t s_params = {
     .has_black_calibration = false
 };
 
-// Statistics
-static uint32_t s_total_identifications = 0;
-static float s_total_processing_ms = 0.0f;
-static float s_total_confidence = 0.0f;
-
 /**
  * @brief Cached chromatic adaptation matrix
  *
@@ -752,10 +747,6 @@ esp_err_t color_pipeline_identify_from_reading(const sensor_reading_t* reading,
 
     ret = color_pipeline_process_xyz(&result->xyz, led_enabled, result);
 
-    s_total_identifications++;
-    s_total_processing_ms += (tcs_time_us() - start_time) / 1000.0f;
-    s_total_confidence += result->confidence;
-
     return ret;
 }
 
@@ -1041,11 +1032,6 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
         }
     }
 
-    // Stats update
-    s_total_identifications++;
-    s_total_processing_ms += (tcs_time_us() - start_time) / 1000.0f;
-    s_total_confidence += result->confidence;
-
     return ret;
 }
 #endif
@@ -1314,26 +1300,6 @@ int color_pipeline_describe(const color_result_t* result, char* buffer, size_t b
     }
 
     return len;
-}
-
-void color_pipeline_get_stats(uint32_t* total_identifications,
-                              float* avg_processing_ms,
-                              float* avg_confidence)
-{
-    if (total_identifications)
-    {
-        *total_identifications = s_total_identifications;
-    }
-
-    if (avg_processing_ms && s_total_identifications > 0)
-    {
-        *avg_processing_ms = s_total_processing_ms / s_total_identifications;
-    }
-
-    if (avg_confidence && s_total_identifications > 0)
-    {
-        *avg_confidence = s_total_confidence / s_total_identifications;
-    }
 }
 
 esp_err_t color_pipeline_set_params(const color_calib_params_t* params)

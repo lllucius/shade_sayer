@@ -280,9 +280,8 @@ struct auto_cal_ctx
     int num_references;
     cal_constraints_t constraints;
     
-    // Callback
+    // Callback (simplified - only message parameter used)
     cal_callback_t callback;
-    void* user_data;
     
     // State
     cal_status_t status;
@@ -792,7 +791,7 @@ static void invoke_callback(auto_cal_ctx_t* ctx, const char* message)
 {
     if (ctx->callback)
     {
-        ctx->callback(&ctx->status, message, ctx->user_data);
+        ctx->callback(message);
     }
 }
 
@@ -973,12 +972,11 @@ void auto_cal_clear_references(auto_cal_ctx_t* ctx)
     }
 }
 
-void auto_cal_set_callback(auto_cal_ctx_t* ctx, cal_callback_t cb, void* user_data)
+void auto_cal_set_callback(auto_cal_ctx_t* ctx, cal_callback_t cb)
 {
     if (ctx)
     {
         ctx->callback = cb;
-        ctx->user_data = user_data;
     }
 }
 
