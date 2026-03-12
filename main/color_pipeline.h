@@ -54,6 +54,8 @@ typedef struct
     float luminance;                 //< Relative luminance (0-100)
     float saturation;                //< Color saturation (0-1)
     const char* category;            //< Basic color category
+    uint16_t kona_id;                //< Matched Kona swatch identifier (0 when not matched)
+    bool kona_matched;               //< True when match came from Kona reference table
 
     // Timestamp
     uint64_t timestamp_us;           //< Reading timestamp (64-bit to avoid overflow)
@@ -67,6 +69,7 @@ typedef struct
     // Quality thresholds
     float min_luminance;             //< Minimum acceptable luminance
     float max_delta_e;               //< Maximum acceptable DeltaE for "good" match
+    float kona_max_delta_e;          //< Maximum DeltaE for Kona reference swatch match
 
     // Calibration - Dual white balance profiles + Black Level
     bool use_white_balance;          //< Apply white point correction

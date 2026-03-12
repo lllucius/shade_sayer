@@ -475,8 +475,20 @@ static void perform_measurement(void)
         display_name = "No Match";
     }
 
-    ESP_LOGI(TAG, "Result: %s (category: %s, dE=%.2f, conf=%.0f%%)",
-             display_name, result.category, result.delta_e, result.confidence * 100);
+    if (result.kona_matched)
+    {
+        ESP_LOGI(TAG, "Result: %s [Kona %u] (category: %s, dE=%.2f, conf=%.0f%%)",
+                 display_name,
+                 (unsigned int)result.kona_id,
+                 result.category,
+                 result.delta_e,
+                 result.confidence * 100);
+    }
+    else
+    {
+        ESP_LOGI(TAG, "Result: %s (category: %s, dE=%.2f, conf=%.0f%%)",
+                 display_name, result.category, result.delta_e, result.confidence * 100);
+    }
     ESP_LOGI(TAG, "XYZ: X=%.2f Y=%.2f Z=%.2f", result.xyz.x, result.xyz.y, result.xyz.z);
     ESP_LOGI(TAG, "Lab: L=%.1f a=%.1f b=%.1f", result.lab.l, result.lab.a, result.lab.b);
     ESP_LOGI(TAG, "RGB: R=%d G=%d B=%d", result.rgb[0], result.rgb[1], result.rgb[2]);
