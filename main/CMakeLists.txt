@@ -39,6 +39,7 @@ idf_component_register(
         "konaref.cpp"
         ${KONA_REF_TABLE_SRC}
         "tcs_glue.cpp"
+        ${KONA_REF_SRC}
     INCLUDE_DIRS
         "."
     REQUIRES
