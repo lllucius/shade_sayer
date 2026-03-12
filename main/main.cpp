@@ -534,12 +534,19 @@ static void capture_kona_swatch(void)
     ESP_LOGI(TAG, "Kona scan capture %u/%u (%s, panel=%s panel_index=%u id=%u name=%s)",
              swatch_number, KONA_SWATCH_TOTAL, swatch_id, info.panel, info.panel_index, info.id, info.name);
 
+    // Turn on LED for measurement (required for accurate color capture)
+    s_sensor->setLed(true);
+
     color_result_t scan_result = {};
     esp_err_t ret = color_pipeline_capture_csv(s_sensor,
                                                true,
                                                swatch_id,
                                                swatch_name,
                                                &scan_result);
+
+    // Turn off LED after measurement
+    s_sensor->setLed(false);
+
     if (ret != ESP_OK)
     {
         ESP_LOGE(TAG, "Kona scan capture failed: %s", esp_err_to_name(ret));
