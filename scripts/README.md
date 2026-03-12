@@ -101,28 +101,13 @@ cat ../console.txt | python3 kona_scan_collect.py --input-log - --output kona_av
 
 ### generate_kona_table.py
 
-Generates `main/konaref.cpp` from `kona_avg_captures.csv` so firmware can match against
+Generates a Kona table source file (default: `main/konaref_generated.cpp`) from
+`kona_avg_captures.csv` so firmware can match against
 Kona swatch Lab references directly in flash.
 
 **Usage:**
 ```bash
-python3 generate_kona_table.py --input ../kona_avg_captures.csv --output ../main/konaref.cpp
-```
-
-**Features:**
-- Parses `kona_id`, `mean_lab_l/a/b`, and `stddev_xyz_x/y/z` from scan captures
-- Deduplicates by `kona_id` (last row wins), sorted by numeric swatch id
-- Emits `kona_table_t kona_reference` with schema version, entry count, and CRC32
-- Caps table size to 365 entries for firmware flash layout compatibility
-
-### generate_kona_table.py
-
-Generates `main/konaref.cpp` from `kona_avg_captures.csv` so firmware can match against
-Kona swatch Lab references directly in flash.
-
-**Usage:**
-```bash
-python3 generate_kona_table.py --input ../kona_avg_captures.csv --output ../main/konaref.cpp
+python3 generate_kona_table.py --input ../kona_avg_captures.csv --output ../main/konaref_generated.cpp
 ```
 
 **Features:**

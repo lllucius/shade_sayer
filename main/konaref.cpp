@@ -17,13 +17,6 @@ static uint32_t kona_crc32(const uint8_t* data, size_t len)
     return crc ^ 0xFFFFFFFFu;
 }
 
-const kona_table_t kona_reference = {
-    .version = KONA_REF_SCHEMA_VERSION,
-    .entry_count = 0,
-    .crc32 = 0,
-    .entries = {},
-};
-
 bool kona_ref_validate(void)
 {
     if (kona_reference.version != KONA_REF_SCHEMA_VERSION)

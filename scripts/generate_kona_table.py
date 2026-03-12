@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate a Kona reference C++ table from kona_avg_captures.csv."""
+"""Generate a Kona reference data C++ table from kona_avg_captures.csv."""
 
 import argparse
 import csv
@@ -104,7 +104,7 @@ const kona_table_t kona_reference = {{
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--input", default="kona_avg_captures.csv", type=pathlib.Path)
-    p.add_argument("--output", default=pathlib.Path("../main/konaref.cpp"), type=pathlib.Path)
+    p.add_argument("--output", default=pathlib.Path("../main/konaref_generated.cpp"), type=pathlib.Path)
     return p.parse_args()
 
 

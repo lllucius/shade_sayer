@@ -1,4 +1,4 @@
-set(KONA_REF_SRC "konaref.cpp")
+set(KONA_REF_TABLE_SRC "konaref_default.cpp")
 
 set(KONA_CAPTURE_CSV "${CMAKE_SOURCE_DIR}/kona_avg_captures.csv")
 set(KONA_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/generate_kona_table.py")
@@ -14,7 +14,7 @@ if(EXISTS "${KONA_CAPTURE_CSV}" AND EXISTS "${KONA_GENERATOR}")
         DEPENDS "${KONA_GENERATOR}" "${KONA_CAPTURE_CSV}"
         COMMENT "Generating Kona reference table from kona_avg_captures.csv"
         VERBATIM)
-    set(KONA_REF_SRC "${KONA_REF_GENERATED}")
+    set(KONA_REF_TABLE_SRC "${KONA_REF_GENERATED}")
 endif()
 
 idf_component_register(
@@ -36,6 +36,8 @@ idf_component_register(
         "i2c_bus_manager.cpp"
         "console_logger.cpp"
         "kona_metadata.cpp"
+        "konaref.cpp"
+        ${KONA_REF_TABLE_SRC}
         "tcs_glue.cpp"
         ${KONA_REF_SRC}
     INCLUDE_DIRS

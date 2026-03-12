@@ -14,7 +14,8 @@ set(CORE_SRCS
     ${CMAKE_SOURCE_DIR}/../main/color_pipeline.cpp
     ${CMAKE_SOURCE_DIR}/../main/auto_calibrate.cpp
     ${CMAKE_SOURCE_DIR}/../main/kona_metadata.cpp
-    ${CMAKE_SOURCE_DIR}/../main/konaref.cpp)
+    ${CMAKE_SOURCE_DIR}/../main/konaref.cpp
+    ${CMAKE_SOURCE_DIR}/../main/konaref_default.cpp)
 
 add_executable(autocal_host_test ${CMAKE_SOURCE_DIR}/../tests/host/autocal_host_test.cpp ${CORE_SRCS})
 add_executable(color_match_host_test ${CMAKE_SOURCE_DIR}/../tests/host/color_match_host_test.cpp ${CORE_SRCS})
