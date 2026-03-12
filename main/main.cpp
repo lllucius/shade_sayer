@@ -100,6 +100,12 @@ static const char* TAG = "main";
 #define KONA_SWATCH_ID_BUFFER_SIZE   24
 #define KONA_SWATCH_NAME_BUFFER_SIZE 48
 
+#if CONFIG_KONA_SCAN_STRIDE < 1
+#define KONA_SCAN_STRIDE 1
+#else
+#define KONA_SCAN_STRIDE CONFIG_KONA_SCAN_STRIDE
+#endif
+
 // Global handles
 static TCS3530* s_sensor = nullptr;
 
@@ -126,13 +132,14 @@ static void speak_kona_swatch_prompt(uint16_t index)
     }
 
     const kona_swatch_info_t& info = KONA_SWATCH_METADATA[index];
-    tts_speak("Capture swatch %d of %d. Panel %s, index %d, ID %d, name %s. Press button to capture, or double click to cancel.",
+    tts_speak("Capture swatch %d of %d. Panel %s, index %d, ID %d, name %s. Sampling every %d. Press button to capture, or double click to cancel.",
               index + 1,
               KONA_SWATCH_TOTAL,
               info.panel,
               info.panel_index,
               info.id,
-              info.name);
+              info.name,
+              KONA_SCAN_STRIDE);
 }
 
 /**
@@ -538,7 +545,7 @@ static void capture_kona_swatch(void)
     s_last_result = scan_result;
     s_has_last_result = true;
 
-    s_kona_scan_index++;
+    s_kona_scan_index = static_cast<uint16_t>(s_kona_scan_index + KONA_SCAN_STRIDE);
     tts_speak("Captured %s, ID %d", info.name, info.id);
 
     if (s_kona_scan_index < KONA_SWATCH_TOTAL && s_kona_scan_index < KONA_SWATCH_METADATA_COUNT)
@@ -840,7 +847,7 @@ extern "C" void app_main(void)
                     ESP_LOGI(TAG, "Quad press on USB power - start Kona scan session");
                     s_kona_scan_active = true;
                     s_kona_scan_index = 0;
-                    tts_speak("Starting Kona swatch scan");
+                    tts_speak("Starting Kona swatch scan, every %d", KONA_SCAN_STRIDE);
                     speak_kona_swatch_prompt(s_kona_scan_index);
                 }
                 else
