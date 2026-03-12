@@ -47,10 +47,10 @@ extern "C" {
  */
 typedef struct
 {
-    uint16_t kona_id;   //< Kona swatch identifier (matches KONA_SWATCH_METADATA[].id)
-    float l;            //< CIE L* (lightness): 0-100
-    float a;            //< CIE a* (green-red axis): typically -128 to +127
-    float b;            //< CIE b* (blue-yellow axis): typically -128 to +127
+    uint16_t kona_id;   ///< Kona swatch identifier (matches KONA_SWATCH_METADATA[].id)
+    float l;            ///< CIE L* (lightness): 0-100
+    float a;            ///< CIE a* (green-red axis): typically -128 to +127
+    float b;            ///< CIE b* (blue-yellow axis): typically -128 to +127
 } kona_ref_t;
 
 /**
@@ -61,10 +61,10 @@ typedef struct
  */
 typedef struct
 {
-    uint16_t version;       //< Schema version (must match KONA_REF_SCHEMA_VERSION)
-    uint16_t entry_count;   //< Number of valid entries (0 to KONA_REF_MAX_ENTRIES)
-    uint32_t crc32;         //< CRC32 checksum of entries[] data (IEEE 802.3 polynomial)
-    kona_ref_t entries[KONA_REF_MAX_ENTRIES]; //< Swatch reference data
+    uint16_t version;       ///< Schema version (must match KONA_REF_SCHEMA_VERSION)
+    uint16_t entry_count;   ///< Number of valid entries (0 to KONA_REF_MAX_ENTRIES)
+    uint32_t crc32;         ///< CRC32 checksum of entries[] data (IEEE 802.3 polynomial)
+    kona_ref_t entries[KONA_REF_MAX_ENTRIES]; ///< Swatch reference data
 } kona_table_t;
 
 /**

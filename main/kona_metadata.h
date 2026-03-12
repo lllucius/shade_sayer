@@ -25,10 +25,10 @@
  */
 struct kona_swatch_info_t
 {
-    const char* panel;      //< Panel name (e.g., "yellow_orange_red", "neutrals_greys")
-    uint16_t panel_index;   //< 1-based index within the panel (1-65)
-    uint16_t id;            //< Manufacturer-assigned swatch ID (unique, non-sequential)
-    const char* name;       //< Human-readable swatch name (e.g., "SUNNY", "PAPAYA")
+    const char* panel;      ///< Panel name (e.g., "yellow_orange_red", "neutrals_greys")
+    uint16_t panel_index;   ///< 1-based index within the panel (1-65)
+    uint16_t id;            ///< Manufacturer-assigned swatch ID (unique, non-sequential)
+    const char* name;       ///< Human-readable swatch name (e.g., "SUNNY", "PAPAYA")
 };
 
 /**
