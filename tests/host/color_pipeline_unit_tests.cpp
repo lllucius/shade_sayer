@@ -17,6 +17,8 @@ int main()
     xyz_t red_xyz{2460.86f, 1623.25f, 556.42f};
     assert(color_pipeline_process_xyz(&red_xyz, true, &red) == ESP_OK);
     assert(red.color_name != nullptr);
+    assert(!red.kona_matched);
+    assert(red.kona_id == 0);
 
     color_result_t green{};
     xyz_t green_xyz{1281.60f, 2094.40f, 957.50f};
