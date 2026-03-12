@@ -161,6 +161,22 @@ static ir_coefficients_t s_ir_coeff_incandescent = {0.60f, 0.45f, 0.15f};  // In
 
 static esp_err_t apply_sensor_correction(const sensor_reading_t* reading, xyz_t* xyz);
 
+/**
+ * @brief Attempt to match input color against Kona reference swatches.
+ *
+ * Performs a linear search through the Kona reference table to find the
+ * closest matching swatch using CIEDE2000 color difference. If a match
+ * is found within the configured threshold, the result is updated with
+ * the Kona swatch information.
+ *
+ * @param lab Input color in CIE L*a*b* space
+ * @param result Output structure to populate with match information
+ * @return true if a match was found within kona_max_delta_e threshold
+ *
+ * @note Uses CIEDE2000 for perceptually uniform matching.
+ * @note Default threshold is 2.0 ΔE (just noticeable difference).
+ * @note Falls through to legacy VP-Tree matcher if no Kona match found.
+ */
 static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
 {
     if (!s_kona_reference_ready || !lab || !result)
@@ -171,6 +187,7 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
     const kona_ref_t* entries = kona_ref_entries();
     const size_t count = kona_ref_entry_count();
 
+    // Linear search for closest match (O(n) for up to 365 entries)
     float best_delta_e = FLT_MAX;
     const kona_ref_t* best_entry = nullptr;
 
@@ -185,17 +202,27 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
         }
     }
 
+    // Reject if no match or distance exceeds threshold
     if (!best_entry || best_delta_e >= s_config.kona_max_delta_e)
     {
         return false;
     }
 
+    // Look up swatch metadata (name, panel info)
     const kona_swatch_info_t* info = kona_metadata_find_by_id(best_entry->kona_id);
+
+    // Populate result with match information
     result->kona_matched = true;
     result->kona_id = best_entry->kona_id;
     result->delta_e = best_delta_e;
     result->color_name = info ? info->name : COLOR_NAME_UNKNOWN;
+
+    // Confidence: linear scaling from 1.0 (exact match) to 0.0 (at threshold)
+    // Formula: confidence = 1.0 - (deltaE / max_deltaE)
+    // This assumes perceptual difference scales roughly linearly within the
+    // small range of 0-2 ΔE units typical for Kona matching.
     result->confidence = fmaxf(0.0f, 1.0f - (best_delta_e / s_config.kona_max_delta_e));
+
     return true;
 }
 

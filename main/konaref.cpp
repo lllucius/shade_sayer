@@ -1,8 +1,27 @@
+/**
+ * @file konaref.cpp
+ * @brief Kona Reference Table Validation and Access Implementation
+ *
+ * Provides runtime validation of the Kona reference table (CRC32 checksum)
+ * and accessor functions for table data.
+ */
+
 #include "konaref.h"
 
 #include <stddef.h>
 #include <stdint.h>
 
+/**
+ * @brief Compute CRC32 checksum using IEEE 802.3 polynomial.
+ *
+ * Uses the standard CRC32 polynomial (0xEDB88320) with bit-reversed
+ * algorithm. This matches Python's zlib.crc32() for compatibility
+ * with the build-time table generator.
+ *
+ * @param data Pointer to data buffer
+ * @param len Length of data in bytes
+ * @return CRC32 checksum value
+ */
 static uint32_t kona_crc32(const uint8_t* data, size_t len)
 {
     uint32_t crc = 0xFFFFFFFFu;
@@ -19,16 +38,19 @@ static uint32_t kona_crc32(const uint8_t* data, size_t len)
 
 bool kona_ref_validate(void)
 {
+    // Check schema version compatibility
     if (kona_reference.version != KONA_REF_SCHEMA_VERSION)
     {
         return false;
     }
 
+    // Check entry count is within bounds
     if (kona_reference.entry_count > KONA_REF_MAX_ENTRIES)
     {
         return false;
     }
 
+    // Verify CRC32 checksum over entry data
     const size_t bytes = static_cast<size_t>(kona_reference.entry_count) * sizeof(kona_ref_t);
     const uint8_t* raw = reinterpret_cast<const uint8_t*>(kona_reference.entries);
     return kona_crc32(raw, bytes) == kona_reference.crc32;

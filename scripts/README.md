@@ -111,7 +111,7 @@ python3 generate_kona_table.py --input ../kona_avg_captures.csv --output ../main
 ```
 
 **Features:**
-- Parses `kona_id`, `mean_lab_l/a/b`, and `stddev_xyz_x/y/z` from scan captures
+- Parses `kona_id` and `mean_lab_l/a/b` from scan captures
 - Deduplicates by `kona_id` (last row wins), sorted by numeric swatch id
 - Emits `kona_table_t kona_reference` with schema version, entry count, and CRC32
 - Caps table size to 365 entries for firmware flash layout compatibility
