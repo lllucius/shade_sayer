@@ -36,11 +36,6 @@ typedef enum
 } ui_event_t;
 
 /**
- * @brief UI callback function type (currently unused, reserved for future use)
- */
-typedef void (*ui_callback_t)(ui_event_t event, void* user_data);
-
-/**
  * @brief UI configuration
  */
 typedef struct
