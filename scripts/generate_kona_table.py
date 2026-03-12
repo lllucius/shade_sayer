@@ -79,14 +79,18 @@ def crc32_entries(entries: Iterable[KonaEntry]) -> int:
     
     The binary format must match kona_ref_t in konaref.h:
     - uint16_t kona_id (2 bytes)
+    - 2 bytes padding (for 4-byte float alignment)
     - float l, a, b (4 bytes each = 12 bytes)
-    - Total: 14 bytes per entry, little-endian
+    - Total: 16 bytes per entry, little-endian
+    
+    Note: The padding is required because C/C++ struct alignment rules
+    insert 2 bytes of padding after kona_id to align the float members.
     """
     payload = bytearray()
     for e in entries:
-        # Pack as: uint16_t + 3 floats (little-endian)
-        # This must match sizeof(kona_ref_t) = 14 bytes
-        payload.extend(struct.pack("<H3f", e.kona_id, e.l, e.a, e.b))
+        # Pack as: uint16_t + 2 padding bytes + 3 floats (little-endian)
+        # This must match sizeof(kona_ref_t) = 16 bytes
+        payload.extend(struct.pack("<H2x3f", e.kona_id, e.l, e.a, e.b))
     return zlib.crc32(payload) & 0xFFFFFFFF
 
 
