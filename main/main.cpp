@@ -615,8 +615,32 @@ static void enter_serial_scan_mode(void)
     
     // Set stdin to non-blocking mode for responsive polling
     int stdin_fd = fileno(stdin);
-    int old_flags = fcntl(stdin_fd, F_GETFL, 0);
-    fcntl(stdin_fd, F_SETFL, old_flags | O_NONBLOCK);
+    int old_flags = -1;
+    bool nonblock_set = false;
+    
+    if (stdin_fd >= 0)
+    {
+        old_flags = fcntl(stdin_fd, F_GETFL, 0);
+        if (old_flags >= 0)
+        {
+            if (fcntl(stdin_fd, F_SETFL, old_flags | O_NONBLOCK) == 0)
+            {
+                nonblock_set = true;
+            }
+            else
+            {
+                ESP_LOGW(TAG, "Failed to set stdin non-blocking mode");
+            }
+        }
+        else
+        {
+            ESP_LOGW(TAG, "Failed to get stdin flags");
+        }
+    }
+    else
+    {
+        ESP_LOGW(TAG, "Invalid stdin file descriptor");
+    }
     
     char cmd_buffer[128];
     size_t cmd_pos = 0;
@@ -746,8 +770,14 @@ static void enter_serial_scan_mode(void)
         vTaskDelay(pdMS_TO_TICKS(20));
     }
     
-    // Restore blocking mode on stdin
-    fcntl(stdin_fd, F_SETFL, old_flags);
+    // Restore blocking mode on stdin if we changed it
+    if (nonblock_set && stdin_fd >= 0 && old_flags >= 0)
+    {
+        if (fcntl(stdin_fd, F_SETFL, old_flags) != 0)
+        {
+            ESP_LOGW(TAG, "Failed to restore stdin flags");
+        }
+    }
     
     ESP_LOGI(TAG, "Exiting serial scan mode");
     tts_speak("Serial mode exited");
