@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Collect Kona scan CSV rows from device serial logs.
+"""Collect Kona scan CSV rows from a console log text file.
 
 Expected device lines contain the tag `KONA_SCAN_CSV:` followed by CSV payload.
 If `kona_365_sensor_ready.csv` metadata is available, `idx_###` placeholders are
@@ -11,14 +11,9 @@ import csv
 import datetime as dt
 import os
 import re
+import pathlib
 import sys
 from typing import Dict, List, Optional
-
-try:
-    import serial
-except ImportError:
-    print("pyserial is required: pip install pyserial", file=sys.stderr)
-    raise
 
 CSV_HEADER = [
     "host_timestamp_iso",
@@ -53,8 +48,11 @@ IDX_PATTERN = re.compile(r"^idx_(\d{3})$")
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--port", required=True, help="Serial port (e.g. /dev/ttyACM0)")
-    p.add_argument("--baud", type=int, default=115200)
+    p.add_argument(
+        "--input-log",
+        default="console.txt",
+        help="Path to captured console log text file (or '-' for stdin)",
+    )
     p.add_argument("--output", default="kona_avg_captures.csv")
     p.add_argument(
         "--metadata",
@@ -100,14 +98,23 @@ def main() -> int:
     args = parse_args()
     metadata = load_metadata(args.metadata)
 
-    with serial.Serial(args.port, args.baud, timeout=1) as ser, open(args.output, "a", newline="") as f:
+    with open(args.output, "a", newline="") as f:
         writer = csv.writer(f)
         if f.tell() == 0:
             writer.writerow(CSV_HEADER)
-        print(f"Listening on {args.port} @ {args.baud}, writing to {args.output}")
+        print(f"Reading log lines from {args.input_log}, writing to {args.output}")
 
-        while True:
-            line = ser.readline().decode("utf-8", errors="replace").strip()
+        if args.input_log == "-":
+            line_iter = sys.stdin
+        else:
+            log_path = pathlib.Path(args.input_log)
+            if not log_path.exists():
+                print(f"Input log not found: {log_path}", file=sys.stderr)
+                return 1
+            line_iter = log_path.open("r", encoding="utf-8", errors="replace")
+
+        for raw_line in line_iter:
+            line = raw_line.strip()
             if not line:
                 continue
 
@@ -135,6 +142,11 @@ def main() -> int:
             writer.writerow(out_row)
             f.flush()
             print(f"Captured {kona_id} {kona_name} (panel={panel} idx={panel_index})")
+
+        if args.input_log != "-":
+            line_iter.close()
+
+    return 0
 
 
 if __name__ == "__main__":

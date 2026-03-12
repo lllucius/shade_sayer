@@ -5,10 +5,13 @@
 
 #include "color_pipeline.h"
 #include "color_math.h"
+#include "konaref.h"
+#include "kona_metadata.h"
 #include "tcs_glue.h"
 #include <cstring>
 #include <cstdio>
 #include <cmath>
+#include <cfloat>
 
 static const char* TAG = "color_pipe";
 
@@ -34,6 +37,7 @@ static color_pipeline_config_t s_config =
 {
     .min_luminance = 5.0f,
     .max_delta_e = 10.0f,
+    .kona_max_delta_e = 2.0f,
     .use_white_balance = false,
     .white_reference_led = {D65_X, D65_Y, D65_Z},
     .white_reference_ambient = {D65_X, D65_Y, D65_Z},
@@ -99,6 +103,7 @@ static float s_cached_adaptation_matrix[3][3] = {{1.0f, 0.0f, 0.0f},
 };
 static bool s_matrix_valid = false;
 static bool s_matrix_for_led = true;  //< True if matrix is for LED calibration
+static bool s_kona_reference_ready = false;
 
 // Categories struct (unchanged) ...
 typedef struct
@@ -155,6 +160,44 @@ static ir_coefficients_t s_ir_coeff_led = {0.35f, 0.25f, 0.05f};           // LE
 static ir_coefficients_t s_ir_coeff_incandescent = {0.60f, 0.45f, 0.15f};  // Incandescent
 
 static esp_err_t apply_sensor_correction(const sensor_reading_t* reading, xyz_t* xyz);
+
+static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
+{
+    if (!s_kona_reference_ready || !lab || !result)
+    {
+        return false;
+    }
+
+    const kona_ref_t* entries = kona_ref_entries();
+    const size_t count = kona_ref_entry_count();
+
+    float best_delta_e = FLT_MAX;
+    const kona_ref_t* best_entry = nullptr;
+
+    for (size_t i = 0; i < count; ++i)
+    {
+        const lab_t entry_lab = {entries[i].l, entries[i].a, entries[i].b};
+        const float de = color_math_delta_e_ciede2000(lab, &entry_lab);
+        if (de < best_delta_e)
+        {
+            best_delta_e = de;
+            best_entry = &entries[i];
+        }
+    }
+
+    if (!best_entry || best_delta_e >= s_config.kona_max_delta_e)
+    {
+        return false;
+    }
+
+    const kona_swatch_info_t* info = kona_metadata_find_by_id(best_entry->kona_id);
+    result->kona_matched = true;
+    result->kona_id = best_entry->kona_id;
+    result->delta_e = best_delta_e;
+    result->color_name = info ? info->name : COLOR_NAME_UNKNOWN;
+    result->confidence = fmaxf(0.0f, 1.0f - (best_delta_e / s_config.kona_max_delta_e));
+    return true;
+}
 
 // Clear/IR ratio thresholds for interpolation
 static const float IR_RATIO_LED_THRESHOLD = 5.0f;           // Above this = mostly LED
@@ -583,6 +626,11 @@ esp_err_t color_pipeline_init(const color_pipeline_config_t* config)
         s_config = *config;
     }
 
+    if (s_config.kona_max_delta_e <= 0.0f)
+    {
+        s_config.kona_max_delta_e = 2.0f;
+    }
+
     color_database_init();
     if (color_matcher_init() != ESP_OK)
     {
@@ -621,6 +669,22 @@ esp_err_t color_pipeline_init(const color_pipeline_config_t* config)
     {
         xyz_t d65 = {D65_X, D65_Y, D65_Z};
         update_adaptation_matrix(&s_config.white_reference_ambient, &d65, false);
+    }
+
+    s_kona_reference_ready = kona_ref_validate();
+    if (s_kona_reference_ready)
+    {
+        ESP_LOGI(TAG,
+                 "Kona reference table ready: version=%u entries=%u",
+                 (unsigned int)kona_reference.version,
+                 (unsigned int)kona_reference.entry_count);
+    }
+    else
+    {
+        ESP_LOGW(TAG,
+                 "Kona reference table invalid/unavailable (version=%u entries=%u); using legacy matcher",
+                 (unsigned int)kona_reference.version,
+                 (unsigned int)kona_reference.entry_count);
     }
 
     return ESP_OK;
@@ -1063,28 +1127,39 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
     }
     else
     {
-        result->color_name = color_matcher_find_closest(&result->lab, &result->delta_e);
-        if (result->color_name)
+        if (try_match_kona_reference(&result->lab, result))
         {
-            // Description is generated on-demand via color_description_generate()
             result->description = nullptr;
-            if (result->delta_e < 1.0f)
-            {
-                result->confidence = 1.0f;
-            }
-            else if (result->delta_e < s_config.max_delta_e)
-            {
-                result->confidence = 1.0f - (result->delta_e / s_config.max_delta_e);
-            }
-            else
-            {
-                result->confidence = 0.0f;
-            }
+            TCS_LOGD(TAG, "Kona match: id=%u name=%s dE=%.3f",
+                     (unsigned int)result->kona_id,
+                     result->color_name,
+                     result->delta_e);
         }
         else
         {
-            result->color_name = COLOR_NAME_UNKNOWN;
-            result->description = COLOR_DESC_NO_MATCH;
+            result->color_name = color_matcher_find_closest(&result->lab, &result->delta_e);
+            if (result->color_name)
+            {
+                // Description is generated on-demand via color_description_generate()
+                result->description = nullptr;
+                if (result->delta_e < 1.0f)
+                {
+                    result->confidence = 1.0f;
+                }
+                else if (result->delta_e < s_config.max_delta_e)
+                {
+                    result->confidence = 1.0f - (result->delta_e / s_config.max_delta_e);
+                }
+                else
+                {
+                    result->confidence = 0.0f;
+                }
+            }
+            else
+            {
+                result->color_name = COLOR_NAME_UNKNOWN;
+                result->description = COLOR_DESC_NO_MATCH;
+            }
         }
     }
 
