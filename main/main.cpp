@@ -723,6 +723,7 @@ extern "C" void app_main(void)
     // CRITICAL FIX: Color Tuning Defaults
     pipeline_config.gray_threshold = 2.0f;
     pipeline_config.color_threshold = 60.0f;
+    pipeline_config.saturation_boost = 1.5f;
 
     // Default White Reference for Cool White LED
     pipeline_config.white_reference_led = {95.0f, 100.0f, 280.0f};
