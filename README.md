@@ -155,15 +155,28 @@ tcs/
 │   ├── tts_manager.cpp     # Text-to-speech manager
 │   ├── tts_manager.h       # TTS API
 │   ├── power_manager.cpp   # Power/sleep management
-│   └── power_manager.h     # Power API
+│   ├── power_manager.h     # Power API
+│   ├── konaref.h           # Kona swatch reference table schema
+│   └── konaref.cpp         # Kona swatch reference data (generated/compiled)
 ├── components/
 │   └── picotts/            # picotts TTS library
 ├── scripts/
 │   ├── import_xkcd_colors.py      # Import xkcd color CSV
 │   ├── generate_color_database.py # Generate color_database.cpp
-│   └── generate_vptree.py         # Generate vptree_data.h
+│   ├── generate_vptree.py         # Generate vptree_data.h
+│   └── generate_kona_table.py     # Generate konaref.cpp from Kona scan captures
 └── TCS3530_DS.txt          # Sensor datasheet extract
 ```
+
+### Kona scan reference table flow
+
+```bash
+python3 scripts/kona_scan_collect.py --port /dev/ttyACM0 --output kona_avg_captures.csv
+python3 scripts/generate_kona_table.py --input kona_avg_captures.csv --output main/konaref.cpp
+```
+
+The firmware validates `konaref.cpp` via schema version + CRC32 at startup. If the table is
+invalid or no entry passes the Kona ΔE threshold, identification falls back to the legacy matcher.
 
 ## Color Processing Pipeline
 

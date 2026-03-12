@@ -368,3 +368,16 @@ const kona_swatch_info_t KONA_SWATCH_METADATA[] = {
 };
 
 const size_t KONA_SWATCH_METADATA_COUNT = sizeof(KONA_SWATCH_METADATA) / sizeof(KONA_SWATCH_METADATA[0]);
+
+const kona_swatch_info_t* kona_metadata_find_by_id(uint16_t id)
+{
+    for (size_t i = 0; i < KONA_SWATCH_METADATA_COUNT; ++i)
+    {
+        if (KONA_SWATCH_METADATA[i].id == id)
+        {
+            return &KONA_SWATCH_METADATA[i];
+        }
+    }
+
+    return nullptr;
+}
