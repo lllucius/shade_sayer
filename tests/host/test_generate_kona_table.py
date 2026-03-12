@@ -3,6 +3,7 @@
 
 import csv
 import pathlib
+import struct
 import tempfile
 import sys
 
@@ -24,6 +25,21 @@ def _write_csv(path: pathlib.Path, rows):
         w = csv.DictWriter(f, fieldnames=header)
         w.writeheader()
         w.writerows(rows)
+
+
+def test_struct_size():
+    """Test that the binary format matches C++ struct layout (16 bytes with padding)."""
+    # Expected layout: uint16_t + 2 padding + 3 floats = 16 bytes
+    expected_size = 16
+    packed_data = struct.pack("<H2x3f", 42, 1.0, 2.0, 3.0)
+    assert len(packed_data) == expected_size, f"Expected {expected_size} bytes, got {len(packed_data)}"
+    
+    # Verify we can unpack it correctly
+    kona_id, l, a, b = struct.unpack("<H2x3f", packed_data)
+    assert kona_id == 42
+    assert l == 1.0
+    assert a == 2.0
+    assert b == 3.0
 
 
 def test_parse_and_render():
@@ -89,6 +105,7 @@ def test_entry_limit():
 
 
 if __name__ == "__main__":
+    test_struct_size()
     test_parse_and_render()
     test_entry_limit()
     print("generate_kona_table tests passed")
