@@ -197,6 +197,8 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
         }
     }
 
+    ESP_LOGI(TAG, "Kona result: best_entry %p best_delta %f max delta %f",
+             best_entry, best_delta_e, s_config.kona_max_delta_e);
     // Reject if no match or distance exceeds threshold
     if (!best_entry || best_delta_e >= s_config.kona_max_delta_e)
     {

@@ -1,388 +1,483 @@
-I (24) boot: ESP-IDF v5.5.2-dirty 2nd stage bootloader
-I (24) boot: compile time Mar 11 2026 11:35:13
-I (25) boot: Multicore bootloader
-I (25) boot: chip revision: v0.2
-I (28) boot: efuse block revision: v1.3
-I (32) qio_mode: Enabling default flash chip QIO
-I (36) boot.esp32s3: Boot SPI Speed : 80MHz
-I (40) boot.esp32s3: SPI Mode       : QIO
-I (44) boot.esp32s3: SPI Flash Size : 8MB
-I (47) boot: Enabling RNG early entropy source...
-I (52) boot: Partition Table:
-I (54) boot: ## Label            Usage          Type ST Offset   Length
-I (61) boot:  0 nvs              WiFi data        01 02 00009000 00027000
-I (67) boot:  1 factory          factory app      00 00 00030000 00300000
-I (74) boot:  2 en_us_sg         Unknown data     01 45 00330000 000be000
-I (80) boot:  3 en_us_ta         Unknown data     01 44 003ee000 0009f000
-I (87) boot: End of partition table
-I (90) esp_image: segment 0: paddr=00030020 vaddr=3c060020 size=24d8ch (150924) map
-I (120) esp_image: segment 1: paddr=00054db4 vaddr=3fc94c00 size=02b30h ( 11056) load
-I (122) esp_image: segment 2: paddr=000578ec vaddr=40374000 size=0872ch ( 34604) load
-I (130) esp_image: segment 3: paddr=00060020 vaddr=42000020 size=58528h (361768) map
-I (185) esp_image: segment 4: paddr=000b8550 vaddr=4037c72c size=08440h ( 33856) load
-I (192) esp_image: segment 5: paddr=000c0998 vaddr=50000000 size=00028h (    40) load
-I (192) esp_image: segment 6: paddr=000c09c8 vaddr=600fe000 size=00038h (    56) load
-I (203) boot: Loaded app from partition at offset 0x30000
-I (203) boot: Disabling RNG early entropy source...
-I (218) esp_psram: Found 8MB PSRAM device
-I (218) esp_psram: Speed: 80MHz
-I (218) cpu_start: Multicore app
-I (1136) esp_psram: SPI SRAM memory test OK
-I (1144) cpu_start: GPIO 44 and 43 are used as console UART I/O pins
-I (1145) cpu_start: Pro cpu start user code
-I (1145) cpu_start: cpu freq: 240000000 Hz
-I (1147) app_init: Application information:
-I (1151) app_init: Project name:     color_detector
-I (1155) app_init: App version:      b26a27c
-I (1159) app_init: Compile time:     Mar 11 2026 15:44:14
-I (1164) app_init: ELF file SHA256:  368d3b321...
-I (1169) app_init: ESP-IDF:          v5.5.2-dirty
-I (1173) efuse_init: Min chip rev:     v0.0
-I (1177) efuse_init: Max chip rev:     v0.99
-I (1181) efuse_init: Chip rev:         v0.2
-I (1185) heap_init: Initializing. RAM available for dynamic allocation:
-I (1192) heap_init: At 3FC98540 len 000511D0 (324 KiB): RAM
-I (1197) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM
-I (1202) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM
-I (1207) heap_init: At 600FE038 len 00001FB0 (7 KiB): RTCRAM
-I (1213) esp_psram: Adding pool of 8192K of PSRAM memory to heap allocator
-I (1220) spi_flash: detected chip: gd
-I (1223) spi_flash: flash io: qio
-I (1226) sleep_gpio: Configure to isolate all GPIO pins in sleep state
-I (1232) sleep_gpio: Enable automatic switching of GPIO sleep configuration
-I (1239) main_task: Started on CPU0
-I (1242) esp_psram: Reserving pool of 32K of internal memory for DMA/internal allocations
-I (1250) main_task: Calling app_main()
-I (1253) main: Color Detector for Visually Impaired
-I (1258) main: Firmware version: 1.0.2
-I (1261) main: Free heap: 8719932 bytes
-I (1277) console_logger: Console logger initialized (buffer size: 16384 bytes)
-I (1278) power: Onboard RGB LED disabled (GPIO 17 LOW, GPIO 18 High-Z, hold enabled)
-I (1281) audio_renderer: Audio renderer initialized
-I (1285) tts: Initializing TTS with picotts + MAX98357A I2S amplifier
-I (1291) tts: Sample rate: 16000 Hz
-I (1294) tts: Initial free heap: 8488K
-I (1298) tts: Pico memory allocated in PSRAM
-I (1303) tts: Voices loaded
-I (1309) tts: TTS initialization complete
-I (1310) main: Initializing shared I2C bus (TCS3530 + MAX17048)...
-I (1314) i2c_bus_mgr: I2C bus initialized on port 0 (SCL: GPIO9, SDA: GPIO8)
-I (1321) power: USB VBUS detected at boot
-I (1324) power: Boot cause: 3
-I (1327) power: Sensor power rail ON (GPIO6 LOW)
-I (1331) power: Initializing button GPIO1 as regular input
-I (1337) power: Button GPIO1 initialized
-I (1340) power: USB detect GPIO7 initialized
-I (1344) i2c_bus_mgr: Registered I2C device 0x3c300f58 (total: 1)
-I (1351) max17048: MAX17048 detected, version: 0x0012
-I (1356) max17048: QuickStart command sent
-I (1359) max17048: MAX17048 initialized successfully
-I (1363) power: MAX17048 fuel gauge initialized
-I (1369) max17048: Alert enabled (ALSC set, CONFIG=0x977C)
-I (1373) power: MAX17048 ALRT enabled on GPIO10
-I (1378) power: Power manager initialized (timeout=30000ms)
-I (1382) main: Wake cause: 3
-I (1385) main: Initializing TCS3530 color sensor...
-I (1390) tcs3530: Debug mode ENABLED
-I (1393) tcs3530: Initializing TCS3530 driver...
-I (1397) tcs3530:   Config: gain=5, integration=500ms, auto_gain=0
-I (1403) tcs3530: Adding I2C device at address 0x39, speed=400000Hz
-I (1409) i2c_bus_mgr: Registered I2C device 0x3c300f7c (total: 2)
-I (1415) tcs3530: Waiting for power-on initialization...
-I (1421) tcs3530: TCS3530 detected (ID=0x68, Rev=0x14)
-I (1425) tcs3530: Performing software reset...
-I (1531) tcs3530: Applying basic register configuration...
-I (1531) tcs3530: Setting integration time to 500ms...
-I (1531) tcs3530: Integration time: requested=500ms, actual=500.00ms, ALS_NR_SAMPLES=1999
-I (1538) tcs3530: Integration time set to 500ms (actual: 500.00ms)
-I (1543) tcs3530: Setting gain to 16x...
-I (1547) tcs3530: Enabling Flicker measurement for MOD7 in step 0...
-I (1553) tcs3530: Configuring 32-bit ALS data format...
-I (1558) tcs3530: CFG4 32-bit format verified successfully
-I (1563) tcs3530: Ensuring coherence buffer is disabled...
-I (1569) tcs3530: Configuring FIFO for all 8 modulators (block write)...
-I (1575) tcs3530: Configuring SAI single-shot mode...
-I (1580) tcs3530: SAI single-shot mode configured
-I (1584) tcs3530: Configuring TCS3530 internal LED/GPIO (output mode, LED off)...
-I (1591) tcs3530: TCS3530 internal LED/GPIO configured (output mode, LED off)
-I (1598) tcs3530: Secondary LED GPIO35 configured (active low, LED off)
-I (1604) tcs3530: Performing warm-up measurement for auto-zero calibration...
-I (1613) tcs3530: FIFO before clear: 512 bytes
-I (1616) tcs3530: FIFO after clear: 0 bytes
-I (1620) tcs3530: Measurement triggered
-I (2128) tcs3530: SAI_ACTIVE detected (elapsed: 504 ms)
-I (2128) tcs3530: Warm-up FIFO level: 260 bytes
-I (2136) tcs3530: Warm-up measurement complete (auto-zero calibration done)
-I (2136) tcs3530: MOD_CALIB_CFG0: wrote 0x00, readback=0x00
-I (2138) tcs3530: TCS3530 initialized (gain=16x, integration=500ms)
-I (2144) main: Sensor configured for Uniform Gain (X16)
-I (2149) main: Initializing color processing pipeline...
-I (2154) color_matcher: Initializing color matcher (VP-Tree in Flash, zero allocations)
-I (2162) color_matcher: VP-Tree initialized: 949 nodes, depth ~10, Flash usage: 11.12 KB
-I (2170) color_pipe: Loaded auto-calibration params
-I (2174) color_pipe:   lightness: scale=0.0872 offset=0.00 gamma=0.8000
-I (2180) color_pipe:   saturation_boost=1.031, has_black_cal=1
-I (2186) main: Initializing user interface...
-I (2190) ui: Button initialized on GPIO1 (custom synchronous handler)
-I (2196) ui: UI initialized (button only - audio via I2S TTS)
-I (2203) main: Battery: 89% (4092mV)
-I (2516) main: Color detector ready!
-I (2516) tts: Speak: Ready
-I (2519) main: USB wake detected - announcing charging status
-I (2519) power: Onboard RGB LED disabled (GPIO 17 LOW, GPIO 18 High-Z, hold enabled)
-I (2526) main: Battery level: 89% (4092mV), estimated 21 minutes to full
-I (2530) tts: Speak: Battery at 89 percent
-I (5707) tts: Speak: Estimated 21 minutes to full charge
-I (9128) main: Entering sleep mode...
-I (9128) tcs3530: Internal LED turned OFF
-I (9128) tcs3530: STATUS2 0x00
-I (9129) tcs3530: STATUS6 0x00
-I (9129) tcs3530: STATUS4 0x00
-I (9132) tcs3530: STATUS5 0x02
-I (9135) tcs3530: ALS_DATA_STATUS 0x00
-I (9138) tcs3530: ENABLE 0x01
-I (9141) tcs3530: OSCEN 0x03
-I (9143) tcs3530: STATUS: PON=1 AEN=0 FDEN=0 ALS_VALID=0 DSAT=0 ASAT=0 SAI=0 MEAS_DONE=1
-I (9152) power: Simulated light sleep (30000 ms) - polling for button/USB
-I (16608) power: Simulated wake (button)
-I (17298) ui: Quadruple click detected
-I (17298) main: Quad press on USB power - start Kona scan session
-I (17298) tts: Speak: Starting Kona swatch scan
-I (19689) tts: Speak: Capture swatch 1 of 365. Panel yellow_orange_red, index 1, ID 449, name SUNNY. Press button to capture, or double click to cancel.
-I (34812) main: Entering sleep mode...
-I (34812) tcs3530: Internal LED turned OFF
-I (34812) tcs3530: STATUS2 0x00
-I (34813) tcs3530: STATUS6 0x00
-I (34814) tcs3530: STATUS4 0x02
-I (34817) tcs3530: STATUS5 0x02
-I (34819) tcs3530: ALS_DATA_STATUS 0x00
-I (34823) tcs3530: ENABLE 0x43
-I (34826) tcs3530: OSCEN 0x03
-I (34828) tcs3530: STATUS: PON=1 AEN=1 FDEN=1 ALS_VALID=0 DSAT=0 ASAT=0 SAI=1 MEAS_DONE=1
-I (34837) power: Simulated light sleep (30000 ms) - polling for button/USB
-I (61243) power: Simulated wake (button)
-I (61813) ui: Single click detected
-I (61813) main: Button press while Kona scan active - capture swatch
-I (61813) main: Kona scan capture 1/365 (idx_001, panel=yellow_orange_red panel_index=1 id=449 name=SUNNY)
-I (61822) tcs3530: FIFO before clear: 260 bytes
-I (61825) tcs3530: FIFO after clear: 0 bytes
-I (61829) tcs3530: Measurement triggered
-I (62337) tcs3530: SAI_ACTIVE detected (elapsed: 504 ms)
-I (62337) tcs3530: FIFO Status: 260 bytes available
-I (62345) tcs3530: Raw: X=0 Y=0 Z=0 IR=0
-I (62345) tcs3530: Measurement complete (gain=16x, int=500ms, sat=0)
-I (62345) color_pipe: SensorCorr: raw X=0 Y=0 Z=0 clear=256 IR=0 gain=5 int_ms=500
-I (62352) color_pipe: SensorCorr: gain_mult=16.0 time_scale=5.0000 base_scale=0.012500
-I (62360) color_pipe: SensorCorr: RESP-norm x_in=0.0000 y_in=0.0000 z_in=0.0000 (pre-black-sub)
-I (62368) color_pipe: SensorCorr: black subtraction: black_x=0.0000 black_y=0.0000 black_z=0.0000 (clamped to 40%)
-I (62378) color_pipe: SensorCorr: after black sub: x_in=0.0000 y_in=0.0000 z_in=0.0000
-I (62386) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
-I (62392) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
-I (62399) color_pipe: After D65 scaling: x_in=0.000 y_in=0.000 z_in=0.000
-I (62405) color_pipe: lightness_scale (gain): 0.087
-I (62410) color_pipe: After gain scaling: x_in=0.000 y_in=0.000 z_in=0.000
-I (62417) color_pipe: SensorCorr: after PCCM+scale: X=0.0000 Y=0.0000 Z=0.0011
-I (62424) color_pipe: After CCM+IR: X=0.0 Y=0.0 Z=0.0
-I (62480) tcs3530: FIFO before clear: 0 bytes
-I (62480) tcs3530: FIFO after clear: 0 bytes
-I (62481) tcs3530: Measurement triggered
-I (62991) tcs3530: SAI_ACTIVE detected (elapsed: 509 ms)
-I (62991) tcs3530: FIFO Status: 260 bytes available
-I (62999) tcs3530: Raw: X=0 Y=0 Z=0 IR=0
-I (62999) tcs3530: Measurement complete (gain=16x, int=500ms, sat=0)
-I (62999) color_pipe: SensorCorr: raw X=0 Y=0 Z=0 clear=0 IR=0 gain=5 int_ms=500
-I (63006) color_pipe: SensorCorr: gain_mult=16.0 time_scale=5.0000 base_scale=0.012500
-I (63014) color_pipe: SensorCorr: RESP-norm x_in=0.0000 y_in=0.0000 z_in=0.0000 (pre-black-sub)
-I (63022) color_pipe: SensorCorr: black subtraction: black_x=0.0000 black_y=0.0000 black_z=0.0000 (clamped to 40%)
-I (63032) color_pipe: SensorCorr: after black sub: x_in=0.0000 y_in=0.0000 z_in=0.0000
-I (63040) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
-I (63046) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
-I (63053) color_pipe: After D65 scaling: x_in=0.000 y_in=0.000 z_in=0.000
-I (63059) color_pipe: lightness_scale (gain): 0.087
-I (63064) color_pipe: After gain scaling: x_in=0.000 y_in=0.000 z_in=0.000
-I (63070) color_pipe: SensorCorr: after PCCM+scale: X=0.0000 Y=0.0000 Z=0.0011
-I (63077) color_pipe: After CCM+IR: X=0.0 Y=0.0 Z=0.0
-I (63134) tcs3530: FIFO before clear: 0 bytes
-I (63134) tcs3530: FIFO after clear: 0 bytes
-I (63135) tcs3530: Measurement triggered
-I (63645) tcs3530: SAI_ACTIVE detected (elapsed: 509 ms)
-I (63645) tcs3530: FIFO Status: 260 bytes available
-I (63653) tcs3530: Raw: X=1 Y=0 Z=0 IR=0
-I (63653) tcs3530: Measurement complete (gain=16x, int=500ms, sat=0)
-I (63653) color_pipe: SensorCorr: raw X=1 Y=0 Z=0 clear=256 IR=0 gain=5 int_ms=500
-I (63660) color_pipe: SensorCorr: gain_mult=16.0 time_scale=5.0000 base_scale=0.012500
-I (63668) color_pipe: SensorCorr: RESP-norm x_in=0.0000 y_in=0.0000 z_in=0.0000 (pre-black-sub)
-I (63676) color_pipe: SensorCorr: black subtraction: black_x=0.0000 black_y=0.0000 black_z=0.0000 (clamped to 40%)
-I (63686) color_pipe: SensorCorr: after black sub: x_in=0.0000 y_in=0.0000 z_in=0.0000
-I (63694) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
-I (63700) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
-I (63707) color_pipe: After D65 scaling: x_in=0.000 y_in=0.000 z_in=0.000
-I (63713) color_pipe: lightness_scale (gain): 0.087
-I (63718) color_pipe: After gain scaling: x_in=0.000 y_in=0.000 z_in=0.000
-I (63725) color_pipe: SensorCorr: after PCCM+scale: X=0.0000 Y=0.0000 Z=0.0011
-I (63732) color_pipe: After CCM+IR: X=0.0 Y=0.0 Z=0.0
-W (63736) color_pipe: All samples below Y floor 0.50; using best low-signal sample (Y=0.0000)
-I (63745) color_pipe: Lightness correction: raw_L=0.1 -> corrected_L=0.1 (gamma=0.8000, scale=0.0872, offset=0.00)
-I (63755) color_pipe: Gate: raw_L=0.09 corrected_L=0.05 min_luminance=5.00 lightness_scale=0.0872 effective_min=0.44 low_light=1
-I (63766) color_pipe: Pre-enhance Lab: L=0.1 a=0.0 b=0.0 chroma=0.0
-I (63772) KONA_SCAN_CSV: idx_001,SUNNY,1,5,500,0x00,0x00,3,1,0,3,0.0000,0.0000,0.0011,0.0000,0.0000,0.0000,0.0903,0.0203,0.0127,62531965
-I (63784) tts: Speak: Captured SUNNY, ID 449
-I (67585) tts: Speak: Capture swatch 2 of 365. Panel yellow_orange_red, index 2, ID 149, name PAPAYA. Press button to capture, or double click to cancel.
-I (82740) main: Entering sleep mode...
-I (82740) tcs3530: Internal LED turned OFF
-I (82740) tcs3530: STATUS2 0x00
-I (82741) tcs3530: STATUS6 0x00
-I (82742) tcs3530: STATUS4 0x02
-I (82745) tcs3530: STATUS5 0x02
-I (82747) tcs3530: ALS_DATA_STATUS 0x00
-I (82751) tcs3530: ENABLE 0x43
-I (82754) tcs3530: OSCEN 0x03
-I (82756) tcs3530: STATUS: PON=1 AEN=1 FDEN=1 ALS_VALID=0 DSAT=0 ASAT=0 SAI=1 MEAS_DONE=1
-I (82765) power: Simulated light sleep (30000 ms) - polling for button/USB
-I (82971) power: Simulated wake (button)
-I (83551) ui: Single click detected
-I (83551) main: Button press while Kona scan active - capture swatch
-I (83551) main: Kona scan capture 2/365 (idx_002, panel=yellow_orange_red panel_index=2 id=149 name=PAPAYA)
-I (83560) tcs3530: FIFO before clear: 260 bytes
-I (83563) tcs3530: FIFO after clear: 0 bytes
-I (83567) tcs3530: Measurement triggered
-I (84075) tcs3530: SAI_ACTIVE detected (elapsed: 504 ms)
-I (84075) tcs3530: FIFO Status: 260 bytes available
-I (84083) tcs3530: Raw: X=0 Y=0 Z=0 IR=0
-I (84083) tcs3530: Measurement complete (gain=16x, int=500ms, sat=0)
-I (84083) color_pipe: SensorCorr: raw X=0 Y=0 Z=0 clear=0 IR=0 gain=5 int_ms=500
-I (84090) color_pipe: SensorCorr: gain_mult=16.0 time_scale=5.0000 base_scale=0.012500
-I (84098) color_pipe: SensorCorr: RESP-norm x_in=0.0000 y_in=0.0000 z_in=0.0000 (pre-black-sub)
-I (84106) color_pipe: SensorCorr: black subtraction: black_x=0.0000 black_y=0.0000 black_z=0.0000 (clamped to 40%)
-I (84116) color_pipe: SensorCorr: after black sub: x_in=0.0000 y_in=0.0000 z_in=0.0000
-I (84124) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
-I (84130) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
-I (84137) color_pipe: After D65 scaling: x_in=0.000 y_in=0.000 z_in=0.000
-I (84143) color_pipe: lightness_scale (gain): 0.087
-I (84148) color_pipe: After gain scaling: x_in=0.000 y_in=0.000 z_in=0.000
-I (84154) color_pipe: SensorCorr: after PCCM+scale: X=0.0000 Y=0.0000 Z=0.0011
-I (84161) color_pipe: After CCM+IR: X=0.0 Y=0.0 Z=0.0
-I (84218) tcs3530: FIFO before clear: 0 bytes
-I (84218) tcs3530: FIFO after clear: 0 bytes
-I (84219) tcs3530: Measurement triggered
-I (84729) tcs3530: SAI_ACTIVE detected (elapsed: 509 ms)
-I (84729) tcs3530: FIFO Status: 260 bytes available
-I (84737) tcs3530: Raw: X=0 Y=0 Z=0 IR=0
-I (84737) tcs3530: Measurement complete (gain=16x, int=500ms, sat=0)
-I (84737) color_pipe: SensorCorr: raw X=0 Y=0 Z=0 clear=256 IR=0 gain=5 int_ms=500
-I (84744) color_pipe: SensorCorr: gain_mult=16.0 time_scale=5.0000 base_scale=0.012500
-I (84752) color_pipe: SensorCorr: RESP-norm x_in=0.0000 y_in=0.0000 z_in=0.0000 (pre-black-sub)
-I (84760) color_pipe: SensorCorr: black subtraction: black_x=0.0000 black_y=0.0000 black_z=0.0000 (clamped to 40%)
-I (84770) color_pipe: SensorCorr: after black sub: x_in=0.0000 y_in=0.0000 z_in=0.0000
-I (84778) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
-I (84784) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
-I (84791) color_pipe: After D65 scaling: x_in=0.000 y_in=0.000 z_in=0.000
-I (84797) color_pipe: lightness_scale (gain): 0.087
-I (84802) color_pipe: After gain scaling: x_in=0.000 y_in=0.000 z_in=0.000
-I (84809) color_pipe: SensorCorr: after PCCM+scale: X=0.0000 Y=0.0000 Z=0.0011
-I (84816) color_pipe: After CCM+IR: X=0.0 Y=0.0 Z=0.0
-I (84872) tcs3530: FIFO before clear: 0 bytes
-I (84872) tcs3530: FIFO after clear: 0 bytes
-I (84873) tcs3530: Measurement triggered
-I (85383) tcs3530: SAI_ACTIVE detected (elapsed: 509 ms)
-I (85383) tcs3530: FIFO Status: 260 bytes available
-I (85391) tcs3530: Raw: X=0 Y=0 Z=0 IR=0
-I (85391) tcs3530: Measurement complete (gain=16x, int=500ms, sat=0)
-I (85391) color_pipe: SensorCorr: raw X=0 Y=0 Z=0 clear=0 IR=0 gain=5 int_ms=500
-I (85398) color_pipe: SensorCorr: gain_mult=16.0 time_scale=5.0000 base_scale=0.012500
-I (85406) color_pipe: SensorCorr: RESP-norm x_in=0.0000 y_in=0.0000 z_in=0.0000 (pre-black-sub)
-I (85414) color_pipe: SensorCorr: black subtraction: black_x=0.0000 black_y=0.0000 black_z=0.0000 (clamped to 40%)
-I (85424) color_pipe: SensorCorr: after black sub: x_in=0.0000 y_in=0.0000 z_in=0.0000
-I (85432) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
-I (85438) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
-I (85445) color_pipe: After D65 scaling: x_in=0.000 y_in=0.000 z_in=0.000
-I (85451) color_pipe: lightness_scale (gain): 0.087
-I (85456) color_pipe: After gain scaling: x_in=0.000 y_in=0.000 z_in=0.000
-I (85462) color_pipe: SensorCorr: after PCCM+scale: X=0.0000 Y=0.0000 Z=0.0011
-I (85469) color_pipe: After CCM+IR: X=0.0 Y=0.0 Z=0.0
-W (85474) color_pipe: All samples below Y floor 0.50; using best low-signal sample (Y=0.0000)
-I (85483) color_pipe: Lightness correction: raw_L=0.1 -> corrected_L=0.1 (gamma=0.8000, scale=0.0872, offset=0.00)
-I (85493) color_pipe: Gate: raw_L=0.09 corrected_L=0.05 min_luminance=5.00 lightness_scale=0.0872 effective_min=0.44 low_light=1
-I (85504) color_pipe: Pre-enhance Lab: L=0.1 a=0.0 b=0.0 chroma=0.0
-I (85510) KONA_SCAN_CSV: idx_002,PAPAYA,1,5,500,0x00,0x00,3,1,0,3,0.0000,0.0000,0.0011,0.0000,0.0000,0.0000,0.0903,0.0203,0.0127,84269787
-I (85522) tts: Speak: Captured PAPAYA, ID 149
-I (89413) tts: Speak: Capture swatch 3 of 365. Panel yellow_orange_red, index 3, ID 1849, name NACHO CHEESE. Press button to capture, or double click to cancel.
-I (104928) main: Entering sleep mode...
-I (104928) tcs3530: Internal LED turned OFF
-I (104928) tcs3530: STATUS2 0x00
-I (104929) tcs3530: STATUS6 0x00
-I (104930) tcs3530: STATUS4 0x02
-I (104933) tcs3530: STATUS5 0x02
-I (104936) tcs3530: ALS_DATA_STATUS 0x00
-I (104940) tcs3530: ENABLE 0x43
-I (104942) tcs3530: OSCEN 0x03
-I (104945) tcs3530: STATUS: PON=1 AEN=1 FDEN=1 ALS_VALID=0 DSAT=0 ASAT=0 SAI=1 MEAS_DONE=1
-I (104953) power: Simulated light sleep (30000 ms) - polling for button/USB
-I (105810) power: Simulated wake (button)
-I (106410) ui: Single click detected
-I (106410) main: Button press while Kona scan active - capture swatch
-I (106410) main: Kona scan capture 3/365 (idx_003, panel=yellow_orange_red panel_index=3 id=1849 name=NACHO CHEESE)
-I (106420) tcs3530: FIFO before clear: 260 bytes
-I (106423) tcs3530: FIFO after clear: 0 bytes
-I (106427) tcs3530: Measurement triggered
-I (106935) tcs3530: SAI_ACTIVE detected (elapsed: 504 ms)
-I (106935) tcs3530: FIFO Status: 260 bytes available
-I (106943) tcs3530: Raw: X=1 Y=0 Z=0 IR=0
-I (106943) tcs3530: Measurement complete (gain=16x, int=500ms, sat=0)
-I (106943) color_pipe: SensorCorr: raw X=1 Y=0 Z=0 clear=0 IR=0 gain=5 int_ms=500
-I (106951) color_pipe: SensorCorr: gain_mult=16.0 time_scale=5.0000 base_scale=0.012500
-I (106958) color_pipe: SensorCorr: RESP-norm x_in=0.0000 y_in=0.0000 z_in=0.0000 (pre-black-sub)
-I (106967) color_pipe: SensorCorr: black subtraction: black_x=0.0000 black_y=0.0000 black_z=0.0000 (clamped to 40%)
-I (106977) color_pipe: SensorCorr: after black sub: x_in=0.0000 y_in=0.0000 z_in=0.0000
-I (106985) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
-I (106991) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
-I (106998) color_pipe: After D65 scaling: x_in=0.000 y_in=0.000 z_in=0.000
-I (107004) color_pipe: lightness_scale (gain): 0.087
-I (107009) color_pipe: After gain scaling: x_in=0.000 y_in=0.000 z_in=0.000
-I (107016) color_pipe: SensorCorr: after PCCM+scale: X=0.0000 Y=0.0000 Z=0.0011
-I (107023) color_pipe: After CCM+IR: X=0.0 Y=0.0 Z=0.0
-I (107080) tcs3530: FIFO before clear: 0 bytes
-I (107080) tcs3530: FIFO after clear: 0 bytes
-I (107081) tcs3530: Measurement triggered
-I (107591) tcs3530: SAI_ACTIVE detected (elapsed: 509 ms)
-I (107591) tcs3530: FIFO Status: 260 bytes available
-I (107599) tcs3530: Raw: X=257 Y=0 Z=0 IR=0
-I (107599) tcs3530: Measurement complete (gain=16x, int=500ms, sat=0)
-I (107600) color_pipe: SensorCorr: raw X=257 Y=0 Z=0 clear=0 IR=0 gain=5 int_ms=500
-I (107607) color_pipe: SensorCorr: gain_mult=16.0 time_scale=5.0000 base_scale=0.012500
-I (107615) color_pipe: SensorCorr: RESP-norm x_in=0.0111 y_in=0.0000 z_in=0.0000 (pre-black-sub)
-I (107623) color_pipe: SensorCorr: black subtraction: black_x=0.0044 black_y=0.0000 black_z=0.0000 (clamped to 40%)
-I (107633) color_pipe: SensorCorr: after black sub: x_in=0.0066 y_in=0.0000 z_in=0.0000
-I (107641) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
-I (107647) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
-I (107654) color_pipe: After D65 scaling: x_in=0.006 y_in=0.000 z_in=0.000
-I (107661) color_pipe: lightness_scale (gain): 0.087
-I (107665) color_pipe: After gain scaling: x_in=0.001 y_in=0.000 z_in=0.000
-I (107672) color_pipe: SensorCorr: after PCCM+scale: X=0.0001 Y=0.0000 Z=0.0011
-I (107679) color_pipe: After CCM+IR: X=0.0 Y=0.0 Z=0.0
-I (107736) tcs3530: FIFO before clear: 0 bytes
-I (107736) tcs3530: FIFO after clear: 0 bytes
-I (107737) tcs3530: Measurement triggered
-I (108247) tcs3530: SAI_ACTIVE detected (elapsed: 509 ms)
-I (108247) tcs3530: FIFO Status: 260 bytes available
-I (108255) tcs3530: Raw: X=1 Y=0 Z=0 IR=0
-I (108255) tcs3530: Measurement complete (gain=16x, int=500ms, sat=0)
-I (108255) color_pipe: SensorCorr: raw X=1 Y=0 Z=0 clear=0 IR=0 gain=5 int_ms=500
-I (108263) color_pipe: SensorCorr: gain_mult=16.0 time_scale=5.0000 base_scale=0.012500
-I (108270) color_pipe: SensorCorr: RESP-norm x_in=0.0000 y_in=0.0000 z_in=0.0000 (pre-black-sub)
-I (108279) color_pipe: SensorCorr: black subtraction: black_x=0.0000 black_y=0.0000 black_z=0.0000 (clamped to 40%)
-I (108289) color_pipe: SensorCorr: after black sub: x_in=0.0000 y_in=0.0000 z_in=0.0000
-I (108297) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
-I (108303) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
-I (108310) color_pipe: After D65 scaling: x_in=0.000 y_in=0.000 z_in=0.000
-I (108316) color_pipe: lightness_scale (gain): 0.087
-I (108321) color_pipe: After gain scaling: x_in=0.000 y_in=0.000 z_in=0.000
-I (108328) color_pipe: SensorCorr: after PCCM+scale: X=0.0000 Y=0.0000 Z=0.0011
-I (108335) color_pipe: After CCM+IR: X=0.0 Y=0.0 Z=0.0
-W (108340) color_pipe: All samples below Y floor 0.50; using best low-signal sample (Y=0.0000)
-I (108348) color_pipe: Lightness correction: raw_L=0.1 -> corrected_L=0.1 (gamma=0.8000, scale=0.0872, offset=0.00)
-I (108358) color_pipe: Gate: raw_L=0.09 corrected_L=0.05 min_luminance=5.00 lightness_scale=0.0872 effective_min=0.44 low_light=1
-I (108369) color_pipe: Pre-enhance Lab: L=0.1 a=0.0 b=0.0 chroma=0.0
-I (108376) KONA_SCAN_CSV: idx_003,NACHO CHEESE,1,5,500,0x00,0x00,3,1,0,3,0.0000,0.0000,0.0011,0.0000,0.0000,0.0000,0.0903,0.0203,0.0127,107135264
-I (108388) tts: Speak: Captured NACHO CHEESE, ID 1849
-I (112435) tts: Speak: Capture swatch 4 of 365. Panel yellow_orange_red, index 4, ID 1482, name SCHOOL BUS. Press button to capture, or double click to cancel.
+I (183901) tts: Speak: Starting Kona swatch scan, every 12
+I (187433) tts: Speak: Capture swatch 1 of 365. Panel yellow_orange_red, index 1, ID 449, name SUNNY. Sampling every 12. Press button to capture, or double click to cancel.
+I (204269) main: Entering sleep mode...
+I (204269) tcs3530: Internal LED turned OFF
+I (204269) tcs3530: STATUS2 0x00
+I (204270) tcs3530: STATUS6 0x00
+I (204271) tcs3530: STATUS4 0x02
+I (204274) tcs3530: STATUS5 0x02
+I (204277) tcs3530: ALS_DATA_STATUS 0x00
+I (204281) tcs3530: ENABLE 0x43
+I (204283) tcs3530: OSCEN 0x03
+I (204286) tcs3530: STATUS: PON=1 AEN=1 FDEN=1 ALS_VALID=0 DSAT=0 ASAT=0 SAI=1 MEAS_DONE=1
+I (204294) power: Simulated light sleep (30000 ms) - polling for button/USB
+I (205201) power: Simulated wake (button)
+I (205781) ui: Single click detected
+I (205781) main: Button press while Kona scan active - capture swatch
+I (205781) main: Kona scan capture 1/365 (idx_001, panel=yellow_orange_red panel_index=1 id=449 name=SUNNY)
+I (205788) tcs3530: Internal LED turned ON
+I (205794) tcs3530: FIFO before clear: 260 bytes
+I (205797) tcs3530: FIFO after clear: 0 bytes
+I (205801) tcs3530: Measurement triggered
+I (205915) tcs3530: SAI_ACTIVE detected (elapsed: 110 ms)
+I (205915) tcs3530: FIFO Status: 260 bytes available
+I (205923) tcs3530: Raw: X=30430208 Y=32762880 Z=3833344 IR=864256
+I (205923) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (205926) color_pipe: SensorCorr: raw X=30430208 Y=32762880 Z=3833344 clear=19694336 IR=864256 gain=5 int_ms=100
+I (205936) color_pipe: SensorCorr: gain_mult=16.0 time_scale=1.0000 base_scale=0.062500
+I (205943) color_pipe: SensorCorr: RESP-norm x_in=6558.2344 y_in=6825.6001 z_in=958.3360 (pre-black-sub)
+I (205953) color_pipe: SensorCorr: black subtraction: black_x=331.7379 black_y=323.6000 black_z=303.5520 (clamped to 40%)
+I (205963) color_pipe: SensorCorr: after black sub: x_in=6226.4966 y_in=6502.0000 z_in=654.7840
+I (205972) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (205977) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (205985) color_pipe: After D65 scaling: x_in=5918.098 y_in=6502.000 z_in=712.948
+I (205992) color_pipe: lightness_scale (gain): 0.078
+I (205996) color_pipe: After gain scaling: x_in=464.326 y_in=510.138 z_in=55.937
+I (206004) color_pipe: SensorCorr: after PCCM+scale: X=75.3390 Y=71.2300 Z=9.8572
+I (206011) color_pipe: IRComp: clear_ir_ratio=22.788 t=1.000 ir_normalized=1.5539 (x gain=0.078)
+I (206019) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (206027) color_pipe: IRComp: sub_x=0.5439 sub_y=0.3885 sub_z=0.0777
+I (206033) color_pipe: IRComp: XYZ pre-IR: X=75.3390 Y=71.2300 Z=9.8572
+I (206040) color_pipe: IRComp: XYZ post-sub=74.7952/70.8416/9.7795 post-clamp=74.7952/70.8416/9.7795
+I (206048) color_pipe: After CCM+IR: X=74.8 Y=70.8 Z=9.8
+I (206105) tcs3530: FIFO before clear: 0 bytes
+I (206105) tcs3530: FIFO after clear: 0 bytes
+I (206106) tcs3530: Measurement triggered
+I (206216) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (206216) tcs3530: FIFO Status: 260 bytes available
+I (206224) tcs3530: Raw: X=30429440 Y=32761600 Z=3849728 IR=865024
+I (206224) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (206227) color_pipe: SensorCorr: raw X=30429440 Y=32761600 Z=3849728 clear=19698432 IR=865024 gain=5 int_ms=100
+I (206237) color_pipe: SensorCorr: gain_mult=16.0 time_scale=1.0000 base_scale=0.062500
+I (206244) color_pipe: SensorCorr: RESP-norm x_in=6558.0688 y_in=6825.3335 z_in=962.4320 (pre-black-sub)
+I (206254) color_pipe: SensorCorr: black subtraction: black_x=331.7379 black_y=323.6000 black_z=303.5520 (clamped to 40%)
+I (206264) color_pipe: SensorCorr: after black sub: x_in=6226.3311 y_in=6501.7334 z_in=658.8800
+I (206273) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (206278) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (206286) color_pipe: After D65 scaling: x_in=5917.941 y_in=6501.733 z_in=717.408
+I (206293) color_pipe: lightness_scale (gain): 0.078
+I (206297) color_pipe: After gain scaling: x_in=464.314 y_in=510.117 z_in=56.287
+I (206305) color_pipe: SensorCorr: after PCCM+scale: X=75.3271 Y=71.2294 Z=9.9102
+I (206312) color_pipe: IRComp: clear_ir_ratio=22.772 t=1.000 ir_normalized=1.5553 (x gain=0.078)
+I (206320) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (206328) color_pipe: IRComp: sub_x=0.5444 sub_y=0.3888 sub_z=0.0778
+I (206334) color_pipe: IRComp: XYZ pre-IR: X=75.3271 Y=71.2294 Z=9.9102
+I (206341) color_pipe: IRComp: XYZ post-sub=74.7827/70.8406/9.8324 post-clamp=74.7827/70.8406/9.8324
+I (206349) color_pipe: After CCM+IR: X=74.8 Y=70.8 Z=9.8
+I (206406) tcs3530: FIFO before clear: 0 bytes
+I (206406) tcs3530: FIFO after clear: 0 bytes
+I (206407) tcs3530: Measurement triggered
+I (206517) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (206517) tcs3530: FIFO Status: 260 bytes available
+I (206525) tcs3530: Raw: X=30433024 Y=32766976 Z=3859200 IR=865024
+I (206525) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (206528) color_pipe: SensorCorr: raw X=30433024 Y=32766976 Z=3859200 clear=19704064 IR=865024 gain=5 int_ms=100
+I (206538) color_pipe: SensorCorr: gain_mult=16.0 time_scale=1.0000 base_scale=0.062500
+I (206545) color_pipe: SensorCorr: RESP-norm x_in=6558.8413 y_in=6826.4531 z_in=964.8000 (pre-black-sub)
+I (206555) color_pipe: SensorCorr: black subtraction: black_x=331.7379 black_y=323.6000 black_z=303.5520 (clamped to 40%)
+I (206565) color_pipe: SensorCorr: after black sub: x_in=6227.1035 y_in=6502.8530 z_in=661.2480
+I (206574) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (206579) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (206587) color_pipe: After D65 scaling: x_in=5918.675 y_in=6502.853 z_in=719.987
+I (206594) color_pipe: lightness_scale (gain): 0.078
+I (206598) color_pipe: After gain scaling: x_in=464.371 y_in=510.205 z_in=56.489
+I (206606) color_pipe: SensorCorr: after PCCM+scale: X=75.3284 Y=71.2418 Z=9.9416
+I (206613) color_pipe: IRComp: clear_ir_ratio=22.779 t=1.000 ir_normalized=1.5553 (x gain=0.078)
+I (206621) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (206629) color_pipe: IRComp: sub_x=0.5444 sub_y=0.3888 sub_z=0.0778
+I (206635) color_pipe: IRComp: XYZ pre-IR: X=75.3284 Y=71.2418 Z=9.9416
+I (206642) color_pipe: IRComp: XYZ post-sub=74.7840/70.8530/9.8639 post-clamp=74.7840/70.8530/9.8639
+I (206650) color_pipe: After CCM+IR: X=74.8 Y=70.9 Z=9.9
+I (206656) color_pipe: Lightness correction: raw_L=87.4 -> corrected_L=86.6 (gamma=0.8000, scale=0.0785, offset=-2.85)
+I (206666) color_pipe: Gate: raw_L=87.41 corrected_L=86.62 min_luminance=5.00 lightness_scale=0.0785 effective_min=0.39 low_light=0
+I (206677) color_pipe: Pre-enhance Lab: L=86.6 a=15.9 b=88.6 chroma=90.0
+I (206684) color_pipe: Kona result: best_entry 0x3c07d578 best_delta 8.582530 max delta 2.000000
+I (206694) KONA_SCAN_CSV: idx_001,SUNNY,1,5,100,0x00,0x00,3,3,0,0,74.7873,70.8450,9.8253,0.0000,0.0204,0.0344,87.4097,15.8695,88.5859,205440908
+I (206705) tcs3530: Internal LED turned OFF
+I (206709) tts: Speak: Captured SUNNY, ID 449
+I (210500) tts: Speak: Capture swatch 13 of 365. Panel yellow_orange_red, index 13, ID 496, name NECTARINE. Sampling every 12. Press button to capture, or double click to cancel.
+I (228132) main: Entering sleep mode...
+I (228132) tcs3530: Internal LED turned OFF
+I (228132) tcs3530: STATUS2 0x00
+I (228133) tcs3530: STATUS6 0x00
+I (228134) tcs3530: STATUS4 0x02
+I (228137) tcs3530: STATUS5 0x02
+I (228140) tcs3530: ALS_DATA_STATUS 0x00
+I (228144) tcs3530: ENABLE 0x43
+I (228146) tcs3530: OSCEN 0x03
+I (228149) tcs3530: STATUS: PON=1 AEN=1 FDEN=1 ALS_VALID=0 DSAT=0 ASAT=0 SAI=1 MEAS_DONE=1
+I (228157) power: Simulated light sleep (30000 ms) - polling for button/USB
+I (230064) power: Simulated wake (button)
+I (230614) ui: Single click detected
+I (230614) main: Button press while Kona scan active - capture swatch
+I (230614) main: Kona scan capture 13/365 (idx_013, panel=yellow_orange_red panel_index=13 id=496 name=NECTARINE)
+I (230622) tcs3530: Internal LED turned ON
+I (230628) tcs3530: FIFO before clear: 260 bytes
+I (230630) tcs3530: FIFO after clear: 0 bytes
+I (230634) tcs3530: Measurement triggered
+I (230748) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (230748) tcs3530: FIFO Status: 260 bytes available
+I (230756) tcs3530: Raw: X=22086401 Y=18216192 Z=7049472 IR=772352
+I (230756) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (230759) color_pipe: SensorCorr: raw X=22086401 Y=18216192 Z=7049472 clear=14438912 IR=772352 gain=5 int_ms=100
+I (230769) color_pipe: SensorCorr: gain_mult=16.0 time_scale=1.0000 base_scale=0.062500
+I (230776) color_pipe: SensorCorr: RESP-norm x_in=4760.0000 y_in=3795.0400 z_in=1762.3680 (pre-black-sub)
+I (230786) color_pipe: SensorCorr: black subtraction: black_x=331.7379 black_y=323.6000 black_z=303.5520 (clamped to 40%)
+I (230796) color_pipe: SensorCorr: after black sub: x_in=4428.2622 y_in=3471.4399 z_in=1458.8160
+I (230805) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (230811) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (230818) color_pipe: After D65 scaling: x_in=4208.930 y_in=3471.440 z_in=1588.403
+I (230825) color_pipe: lightness_scale (gain): 0.078
+I (230830) color_pipe: After gain scaling: x_in=330.227 y_in=272.364 z_in=124.624
+I (230837) color_pipe: SensorCorr: after PCCM+scale: X=56.0798 Y=40.2616 Z=18.4976
+I (230844) color_pipe: IRComp: clear_ir_ratio=18.695 t=1.000 ir_normalized=1.3887 (x gain=0.078)
+I (230853) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (230860) color_pipe: IRComp: sub_x=0.4860 sub_y=0.3472 sub_z=0.0694
+I (230867) color_pipe: IRComp: XYZ pre-IR: X=56.0798 Y=40.2616 Z=18.4976
+I (230873) color_pipe: IRComp: XYZ post-sub=55.5938/39.9144/18.4281 post-clamp=55.5938/39.9144/18.4281
+I (230882) color_pipe: After CCM+IR: X=55.6 Y=39.9 Z=18.4
+I (230939) tcs3530: FIFO before clear: 0 bytes
+I (230939) tcs3530: FIFO after clear: 0 bytes
+I (230940) tcs3530: Measurement triggered
+I (231050) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (231050) tcs3530: FIFO Status: 260 bytes available
+I (231058) tcs3530: Raw: X=22087169 Y=18218240 Z=7054336 IR=772864
+I (231058) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (231061) color_pipe: SensorCorr: raw X=22087169 Y=18218240 Z=7054336 clear=14441472 IR=772864 gain=5 int_ms=100
+I (231071) color_pipe: SensorCorr: gain_mult=16.0 time_scale=1.0000 base_scale=0.062500
+I (231078) color_pipe: SensorCorr: RESP-norm x_in=4760.1655 y_in=3795.4666 z_in=1763.5840 (pre-black-sub)
+I (231088) color_pipe: SensorCorr: black subtraction: black_x=331.7379 black_y=323.6000 black_z=303.5520 (clamped to 40%)
+I (231098) color_pipe: SensorCorr: after black sub: x_in=4428.4277 y_in=3471.8665 z_in=1460.0320
+I (231107) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (231113) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (231120) color_pipe: After D65 scaling: x_in=4209.087 y_in=3471.866 z_in=1589.727
+I (231127) color_pipe: lightness_scale (gain): 0.078
+I (231132) color_pipe: After gain scaling: x_in=330.239 y_in=272.398 z_in=124.728
+I (231139) color_pipe: SensorCorr: after PCCM+scale: X=56.0785 Y=40.2671 Z=18.5137
+I (231146) color_pipe: IRComp: clear_ir_ratio=18.686 t=1.000 ir_normalized=1.3896 (x gain=0.078)
+I (231155) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (231162) color_pipe: IRComp: sub_x=0.4864 sub_y=0.3474 sub_z=0.0695
+I (231169) color_pipe: IRComp: XYZ pre-IR: X=56.0785 Y=40.2671 Z=18.5137
+I (231175) color_pipe: IRComp: XYZ post-sub=55.5921/39.9197/18.4443 post-clamp=55.5921/39.9197/18.4443
+I (231184) color_pipe: After CCM+IR: X=55.6 Y=39.9 Z=18.4
+I (231241) tcs3530: FIFO before clear: 0 bytes
+I (231241) tcs3530: FIFO after clear: 0 bytes
+I (231242) tcs3530: Measurement triggered
+I (231352) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (231352) tcs3530: FIFO Status: 260 bytes available
+I (231360) tcs3530: Raw: X=22084865 Y=18218496 Z=7052032 IR=772608
+I (231360) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (231363) color_pipe: SensorCorr: raw X=22084865 Y=18218496 Z=7052032 clear=14439680 IR=772608 gain=5 int_ms=100
+I (231373) color_pipe: SensorCorr: gain_mult=16.0 time_scale=1.0000 base_scale=0.062500
+I (231380) color_pipe: SensorCorr: RESP-norm x_in=4759.6689 y_in=3795.5200 z_in=1763.0081 (pre-black-sub)
+I (231390) color_pipe: SensorCorr: black subtraction: black_x=331.7379 black_y=323.6000 black_z=303.5520 (clamped to 40%)
+I (231400) color_pipe: SensorCorr: after black sub: x_in=4427.9312 y_in=3471.9199 z_in=1459.4561
+I (231409) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (231415) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (231422) color_pipe: After D65 scaling: x_in=4208.616 y_in=3471.920 z_in=1589.099
+I (231429) color_pipe: lightness_scale (gain): 0.078
+I (231434) color_pipe: After gain scaling: x_in=330.202 y_in=272.402 z_in=124.679
+I (231441) color_pipe: SensorCorr: after PCCM+scale: X=56.0727 Y=40.2674 Z=18.5068
+I (231448) color_pipe: IRComp: clear_ir_ratio=18.690 t=1.000 ir_normalized=1.3892 (x gain=0.078)
+I (231457) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (231464) color_pipe: IRComp: sub_x=0.4862 sub_y=0.3473 sub_z=0.0695
+I (231471) color_pipe: IRComp: XYZ pre-IR: X=56.0727 Y=40.2674 Z=18.5068
+I (231477) color_pipe: IRComp: XYZ post-sub=55.5865/39.9201/18.4373 post-clamp=55.5865/39.9201/18.4373
+I (231486) color_pipe: After CCM+IR: X=55.6 Y=39.9 Z=18.4
+I (231491) color_pipe: Lightness correction: raw_L=69.4 -> corrected_L=70.6 (gamma=0.8000, scale=0.0785, offset=-2.85)
+I (231502) color_pipe: Gate: raw_L=69.41 corrected_L=70.57 min_luminance=5.00 lightness_scale=0.0785 effective_min=0.39 low_light=0
+I (231513) color_pipe: Pre-enhance Lab: L=70.6 a=50.0 b=36.6 chroma=62.0
+I (231520) color_pipe: Kona result: best_entry 0x3c07d578 best_delta 19.534193 max delta 2.000000
+I (231530) KONA_SCAN_CSV: idx_013,NECTARINE,1,5,100,0x00,0x00,3,3,0,0,55.5908,39.9181,18.4366,0.0233,0.0135,0.0048,69.4111,49.9916,36.6143,230276696
+I (231542) tcs3530: Internal LED turned OFF
+I (231545) tts: Speak: Captured NECTARINE, ID 496
+I (235678) tts: Speak: Capture swatch 25 of 365. Panel yellow_orange_red, index 25, ID 1283, name PEARL PINK. Sampling every 12. Press button to capture, or double click to cancel.
+I (254780) main: Entering sleep mode...
+I (254780) tcs3530: Internal LED turned OFF
+I (254780) tcs3530: STATUS2 0x00
+I (254781) tcs3530: STATUS6 0x00
+I (254782) tcs3530: STATUS4 0x02
+I (254785) tcs3530: STATUS5 0x02
+I (254788) tcs3530: ALS_DATA_STATUS 0x00
+I (254792) tcs3530: ENABLE 0x43
+I (254794) tcs3530: OSCEN 0x03
+I (254797) tcs3530: STATUS: PON=1 AEN=1 FDEN=1 ALS_VALID=0 DSAT=0 ASAT=0 SAI=1 MEAS_DONE=1
+I (254805) power: Simulated light sleep (30000 ms) - polling for button/USB
+I (255812) power: Simulated wake (button)
+I (256382) ui: Single click detected
+I (256382) main: Button press while Kona scan active - capture swatch
+I (256382) main: Kona scan capture 25/365 (idx_025, panel=yellow_orange_red panel_index=25 id=1283 name=PEARL PINK)
+I (256390) tcs3530: Internal LED turned ON
+I (256396) tcs3530: FIFO before clear: 260 bytes
+I (256399) tcs3530: FIFO after clear: 0 bytes
+I (256403) tcs3530: Measurement triggered
+I (256516) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (256516) tcs3530: FIFO Status: 260 bytes available
+I (256524) tcs3530: Raw: X=47314689 Y=46669568 Z=35539968 IR=1111040
+I (256524) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (256527) color_pipe: SensorCorr: raw X=47314689 Y=46669568 Z=35539968 clear=36169728 IR=1111040 gain=5 int_ms=100
+I (256537) color_pipe: SensorCorr: gain_mult=16.0 time_scale=1.0000 base_scale=0.062500
+I (256545) color_pipe: SensorCorr: RESP-norm x_in=10197.1309 y_in=9722.8271 z_in=8884.9922 (pre-black-sub)
+I (256554) color_pipe: SensorCorr: black subtraction: black_x=331.7379 black_y=323.6000 black_z=303.5520 (clamped to 40%)
+I (256565) color_pipe: SensorCorr: after black sub: x_in=9865.3926 y_in=9399.2275 z_in=8581.4404
+I (256573) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (256579) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (256586) color_pipe: After D65 scaling: x_in=9376.760 y_in=9399.228 z_in=9343.729
+I (256594) color_pipe: lightness_scale (gain): 0.078
+I (256598) color_pipe: After gain scaling: x_in=735.688 y_in=737.451 z_in=733.096
+I (256605) color_pipe: SensorCorr: after PCCM+scale: X=98.0284 Y=100.7817 Z=110.9390
+I (256613) color_pipe: IRComp: clear_ir_ratio=32.555 t=1.000 ir_normalized=1.9977 (x gain=0.078)
+I (256621) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (256629) color_pipe: IRComp: sub_x=0.6992 sub_y=0.4994 sub_z=0.0999
+I (256635) color_pipe: IRComp: XYZ pre-IR: X=98.0284 Y=100.7817 Z=110.9390
+I (256642) color_pipe: IRComp: XYZ post-sub=97.3292/100.2823/110.8391 post-clamp=97.3292/100.2823/110.8391
+I (256651) color_pipe: After CCM+IR: X=97.3 Y=100.3 Z=110.8
+I (256709) tcs3530: FIFO before clear: 0 bytes
+I (256709) tcs3530: FIFO after clear: 0 bytes
+I (256710) tcs3530: Measurement triggered
+I (256820) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (256820) tcs3530: FIFO Status: 260 bytes available
+I (256828) tcs3530: Raw: X=47318529 Y=46661888 Z=35589888 IR=1111552
+I (256828) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (256831) color_pipe: SensorCorr: raw X=47318529 Y=46661888 Z=35589888 clear=36181248 IR=1111552 gain=5 int_ms=100
+I (256841) color_pipe: SensorCorr: gain_mult=16.0 time_scale=1.0000 base_scale=0.062500
+I (256849) color_pipe: SensorCorr: RESP-norm x_in=10197.9590 y_in=9721.2266 z_in=8897.4717 (pre-black-sub)
+I (256858) color_pipe: SensorCorr: black subtraction: black_x=331.7379 black_y=323.6000 black_z=303.5520 (clamped to 40%)
+I (256869) color_pipe: SensorCorr: after black sub: x_in=9866.2207 y_in=9397.6270 z_in=8593.9199
+I (256877) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (256883) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (256890) color_pipe: After D65 scaling: x_in=9377.547 y_in=9397.627 z_in=9357.317
+I (256898) color_pipe: lightness_scale (gain): 0.078
+I (256902) color_pipe: After gain scaling: x_in=735.750 y_in=737.325 z_in=734.162
+I (256909) color_pipe: SensorCorr: after PCCM+scale: X=98.0310 Y=100.7720 Z=111.0929
+I (256917) color_pipe: IRComp: clear_ir_ratio=32.550 t=1.000 ir_normalized=1.9986 (x gain=0.078)
+I (256925) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (256933) color_pipe: IRComp: sub_x=0.6995 sub_y=0.4996 sub_z=0.0999
+I (256939) color_pipe: IRComp: XYZ pre-IR: X=98.0310 Y=100.7720 Z=111.0929
+I (256946) color_pipe: IRComp: XYZ post-sub=97.3315/100.2724/110.9930 post-clamp=97.3315/100.2724/110.9930
+I (256955) color_pipe: After CCM+IR: X=97.3 Y=100.3 Z=111.0
+I (257013) tcs3530: FIFO before clear: 0 bytes
+I (257013) tcs3530: FIFO after clear: 0 bytes
+I (257014) tcs3530: Measurement triggered
+I (257124) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (257124) tcs3530: FIFO Status: 260 bytes available
+I (257132) tcs3530: Raw: X=47315457 Y=46654976 Z=35598336 IR=1111296
+I (257132) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (257135) color_pipe: SensorCorr: raw X=47315457 Y=46654976 Z=35598336 clear=36181248 IR=1111296 gain=5 int_ms=100
+I (257145) color_pipe: SensorCorr: gain_mult=16.0 time_scale=1.0000 base_scale=0.062500
+I (257153) color_pipe: SensorCorr: RESP-norm x_in=10197.2969 y_in=9719.7871 z_in=8899.5840 (pre-black-sub)
+I (257162) color_pipe: SensorCorr: black subtraction: black_x=331.7379 black_y=323.6000 black_z=303.5520 (clamped to 40%)
+I (257173) color_pipe: SensorCorr: after black sub: x_in=9865.5586 y_in=9396.1875 z_in=8596.0322
+I (257181) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (257187) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (257194) color_pipe: After D65 scaling: x_in=9376.917 y_in=9396.188 z_in=9359.618
+I (257202) color_pipe: lightness_scale (gain): 0.078
+I (257206) color_pipe: After gain scaling: x_in=735.700 y_in=737.212 z_in=734.343
+I (257213) color_pipe: SensorCorr: after PCCM+scale: X=98.0259 Y=100.7605 Z=111.1183
+I (257221) color_pipe: IRComp: clear_ir_ratio=32.558 t=1.000 ir_normalized=1.9981 (x gain=0.078)
+I (257229) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (257237) color_pipe: IRComp: sub_x=0.6993 sub_y=0.4995 sub_z=0.0999
+I (257243) color_pipe: IRComp: XYZ pre-IR: X=98.0259 Y=100.7605 Z=111.1183
+I (257250) color_pipe: IRComp: XYZ post-sub=97.3265/100.2610/111.0184 post-clamp=97.3265/100.2610/111.0184
+I (257259) color_pipe: After CCM+IR: X=97.3 Y=100.3 Z=111.0
+I (257265) color_pipe: Lightness correction: raw_L=100.1 -> corrected_L=97.6 (gamma=0.8000, scale=0.0785, offset=-2.85)
+I (257275) color_pipe: Gate: raw_L=100.11 corrected_L=97.65 min_luminance=5.00 lightness_scale=0.0785 effective_min=0.39 low_light=0
+I (257287) color_pipe: Pre-enhance Lab: L=97.6 a=3.5 b=-1.1 chroma=3.7
+I (257293) color_pipe: Kona result: best_entry 0x3c07d568 best_delta 2.523937 max delta 2.000000
+I (257302) KONA_SCAN_CSV: idx_025,PEARL PINK,1,5,100,0x00,0x00,3,3,0,0,97.3291,100.2719,110.9502,0.0253,0.0219,0.0790,100.1050,3.5174,-1.0767,256050002
+I (257315) tcs3530: Internal LED turned OFF
+I (257319) tts: Speak: Captured PEARL PINK, ID 1283
+I (262204) tts: Speak: Capture swatch 37 of 365. Panel yellow_orange_red, index 37, ID 861, name BALLET SLIPPER. Sampling every 12. Press button to capture, or double click to cancel.
+I (280616) main: Entering sleep mode...
+I (280616) tcs3530: Internal LED turned OFF
+I (280616) tcs3530: STATUS2 0x00
+I (280617) tcs3530: STATUS6 0x00
+I (280618) tcs3530: STATUS4 0x02
+I (280621) tcs3530: STATUS5 0x02
+I (280624) tcs3530: ALS_DATA_STATUS 0x00
+I (280628) tcs3530: ENABLE 0x43
+I (280630) tcs3530: OSCEN 0x03
+I (280633) tcs3530: STATUS: PON=1 AEN=1 FDEN=1 ALS_VALID=0 DSAT=0 ASAT=0 SAI=1 MEAS_DONE=1
+I (280641) power: Simulated light sleep (30000 ms) - polling for button/USB
+I (281548) power: Simulated wake (button)
+I (282078) ui: Single click detected
+I (282078) main: Button press while Kona scan active - capture swatch
+I (282078) main: Kona scan capture 37/365 (idx_037, panel=yellow_orange_red panel_index=37 id=861 name=BALLET SLIPPER)
+I (282086) tcs3530: Internal LED turned ON
+I (282092) tcs3530: FIFO before clear: 260 bytes
+I (282095) tcs3530: FIFO after clear: 0 bytes
+I (282099) tcs3530: Measurement triggered
+I (282213) tcs3530: SAI_ACTIVE detected (elapsed: 110 ms)
+I (282213) tcs3530: FIFO Status: 260 bytes available
+I (282221) tcs3530: Raw: X=46135040 Y=44542464 Z=35170304 IR=1098752
+I (282221) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (282224) color_pipe: SensorCorr: raw X=46135040 Y=44542464 Z=35170304 clear=35060480 IR=1098752 gain=5 int_ms=100
+I (282234) color_pipe: SensorCorr: gain_mult=16.0 time_scale=1.0000 base_scale=0.062500
+I (282242) color_pipe: SensorCorr: RESP-norm x_in=9942.8965 y_in=9279.6797 z_in=8792.5762 (pre-black-sub)
+I (282251) color_pipe: SensorCorr: black subtraction: black_x=331.7379 black_y=323.6000 black_z=303.5520 (clamped to 40%)
+I (282262) color_pipe: SensorCorr: after black sub: x_in=9611.1582 y_in=8956.0801 z_in=8489.0244
+I (282270) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (282276) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (282283) color_pipe: After D65 scaling: x_in=9135.117 y_in=8956.080 z_in=9243.104
+I (282290) color_pipe: lightness_scale (gain): 0.078
+I (282295) color_pipe: After gain scaling: x_in=716.729 y_in=702.682 z_in=725.201
+I (282302) color_pipe: SensorCorr: after PCCM+scale: X=96.5436 Y=96.9785 Z=109.4613
+I (282310) color_pipe: IRComp: clear_ir_ratio=31.909 t=1.000 ir_normalized=1.9756 (x gain=0.078)
+I (282318) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (282326) color_pipe: IRComp: sub_x=0.6914 sub_y=0.4939 sub_z=0.0988
+I (282332) color_pipe: IRComp: XYZ pre-IR: X=96.5436 Y=96.9785 Z=109.4613
+I (282339) color_pipe: IRComp: XYZ post-sub=95.8522/96.4846/109.3626 post-clamp=95.8522/96.4846/109.3626
+I (282348) color_pipe: After CCM+IR: X=95.9 Y=96.5 Z=109.4
+I (282405) tcs3530: FIFO before clear: 0 bytes
+I (282405) tcs3530: FIFO after clear: 0 bytes
+I (282406) tcs3530: Measurement triggered
+I (282516) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (282516) tcs3530: FIFO Status: 260 bytes available
+I (282524) tcs3530: Raw: X=46153985 Y=44549888 Z=35225600 IR=1099264
+I (282524) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (282527) color_pipe: SensorCorr: raw X=46153985 Y=44549888 Z=35225600 clear=35081984 IR=1099264 gain=5 int_ms=100
+I (282537) color_pipe: SensorCorr: gain_mult=16.0 time_scale=1.0000 base_scale=0.062500
+I (282545) color_pipe: SensorCorr: RESP-norm x_in=9946.9795 y_in=9281.2266 z_in=8806.4004 (pre-black-sub)
+I (282554) color_pipe: SensorCorr: black subtraction: black_x=331.7379 black_y=323.6000 black_z=303.5520 (clamped to 40%)
+I (282565) color_pipe: SensorCorr: after black sub: x_in=9615.2412 y_in=8957.6270 z_in=8502.8486
+I (282573) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (282579) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (282586) color_pipe: After D65 scaling: x_in=9138.998 y_in=8957.627 z_in=9258.156
+I (282593) color_pipe: lightness_scale (gain): 0.078
+I (282598) color_pipe: After gain scaling: x_in=717.033 y_in=702.803 z_in=726.382
+I (282605) color_pipe: SensorCorr: after PCCM+scale: X=96.5725 Y=96.9963 Z=109.6326
+I (282613) color_pipe: IRComp: clear_ir_ratio=31.914 t=1.000 ir_normalized=1.9765 (x gain=0.078)
+I (282621) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (282629) color_pipe: IRComp: sub_x=0.6918 sub_y=0.4941 sub_z=0.0988
+I (282635) color_pipe: IRComp: XYZ pre-IR: X=96.5725 Y=96.9963 Z=109.6326
+I (282642) color_pipe: IRComp: XYZ post-sub=95.8807/96.5022/109.5338 post-clamp=95.8807/96.5022/109.5338
+I (282651) color_pipe: After CCM+IR: X=95.9 Y=96.5 Z=109.5
+I (282708) tcs3530: FIFO before clear: 0 bytes
+I (282708) tcs3530: FIFO after clear: 0 bytes
+I (282709) tcs3530: Measurement triggered
+I (282819) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (282819) tcs3530: FIFO Status: 260 bytes available
+I (282827) tcs3530: Raw: X=46165761 Y=44558080 Z=35243776 IR=1099776
+I (282827) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (282830) color_pipe: SensorCorr: raw X=46165761 Y=44558080 Z=35243776 clear=35091968 IR=1099776 gain=5 int_ms=100
+I (282840) color_pipe: SensorCorr: gain_mult=16.0 time_scale=1.0000 base_scale=0.062500
+I (282848) color_pipe: SensorCorr: RESP-norm x_in=9949.5176 y_in=9282.9336 z_in=8810.9443 (pre-black-sub)
+I (282857) color_pipe: SensorCorr: black subtraction: black_x=331.7379 black_y=323.6000 black_z=303.5520 (clamped to 40%)
+I (282868) color_pipe: SensorCorr: after black sub: x_in=9617.7793 y_in=8959.3340 z_in=8507.3926
+I (282876) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (282882) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (282889) color_pipe: After D65 scaling: x_in=9141.410 y_in=8959.334 z_in=9263.104
+I (282896) color_pipe: lightness_scale (gain): 0.078
+I (282901) color_pipe: After gain scaling: x_in=717.223 y_in=702.937 z_in=726.771
+I (282908) color_pipe: SensorCorr: after PCCM+scale: X=96.5920 Y=97.0124 Z=109.6890
+I (282916) color_pipe: IRComp: clear_ir_ratio=31.908 t=1.000 ir_normalized=1.9774 (x gain=0.078)
+I (282924) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (282932) color_pipe: IRComp: sub_x=0.6921 sub_y=0.4944 sub_z=0.0989
+I (282938) color_pipe: IRComp: XYZ pre-IR: X=96.5920 Y=97.0124 Z=109.6890
+I (282945) color_pipe: IRComp: XYZ post-sub=95.8999/96.5180/109.5901 post-clamp=95.8999/96.5180/109.5901
+I (282954) color_pipe: After CCM+IR: X=95.9 Y=96.5 Z=109.6
+I (282959) color_pipe: Lightness correction: raw_L=98.6 -> corrected_L=96.4 (gamma=0.8000, scale=0.0785, offset=-2.85)
+I (282970) color_pipe: Gate: raw_L=98.63 corrected_L=96.38 min_luminance=5.00 lightness_scale=0.0785 effective_min=0.39 low_light=0
+I (282981) color_pipe: Pre-enhance Lab: L=96.4 a=7.4 b=-2.7 chroma=7.8
+I (282988) color_pipe: Kona result: best_entry 0x3c07d568 best_delta 2.641342 max delta 2.000000
+I (282997) KONA_SCAN_CSV: idx_037,BALLET SLIPPER,1,5,100,0x00,0x00,3,3,0,0,95.8776,96.5016,109.4955,0.0000,0.0285,0.0981,98.6312,7.3522,-2.7343,281744475
+I (283009) tcs3530: Internal LED turned OFF
+I (283013) tts: Speak: Captured BALLET SLIPPER, ID 861
+I (287385) tts: Speak: Capture swatch 49 of 365. Panel yellow_orange_red, index 49, ID 189, name BABY PINK. Sampling every 12. Press button to capture, or double click to cancel.
+I (305302) main: Entering sleep mode...
+I (305302) tcs3530: Internal LED turned OFF
+I (305302) tcs3530: STATUS2 0x00
+I (305303) tcs3530: STATUS6 0x00
+I (305304) tcs3530: STATUS4 0x02
+I (305307) tcs3530: STATUS5 0x02
+I (305310) tcs3530: ALS_DATA_STATUS 0x00
+I (305314) tcs3530: ENABLE 0x43
+I (305316) tcs3530: OSCEN 0x03
+I (305319) tcs3530: STATUS: PON=1 AEN=1 FDEN=1 ALS_VALID=0 DSAT=0 ASAT=0 SAI=1 MEAS_DONE=1
+I (305327) power: Simulated light sleep (30000 ms) - polling for button/USB
+I (306334) power: Simulated wake (button)
+I (306854) ui: Single click detected
+I (306854) main: Button press while Kona scan active - capture swatch
+I (306854) main: Kona scan capture 49/365 (idx_049, panel=yellow_orange_red panel_index=49 id=189 name=BABY PINK)
+I (306862) tcs3530: Internal LED turned ON
+I (306868) tcs3530: FIFO before clear: 260 bytes
+I (306870) tcs3530: FIFO after clear: 0 bytes
+I (306874) tcs3530: Measurement triggered
+I (306988) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (306988) tcs3530: FIFO Status: 260 bytes available
+I (306996) tcs3530: Raw: X=40883456 Y=38454528 Z=29975296 IR=1015552
+I (306996) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (306999) color_pipe: SensorCorr: raw X=40883456 Y=38454528 Z=29975296 clear=30759680 IR=1015552 gain=5 int_ms=100
+I (307009) color_pipe: SensorCorr: gain_mult=16.0 time_scale=1.0000 base_scale=0.062500
+I (307017) color_pipe: SensorCorr: RESP-norm x_in=8811.0898 y_in=8011.3599 z_in=7493.8242 (pre-black-sub)
+I (307026) color_pipe: SensorCorr: black subtraction: black_x=331.7379 black_y=323.6000 black_z=303.5520 (clamped to 40%)
+I (307037) color_pipe: SensorCorr: after black sub: x_in=8479.3516 y_in=7687.7598 z_in=7190.2725
+I (307045) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (307051) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (307058) color_pipe: After D65 scaling: x_in=8059.369 y_in=7687.760 z_in=7828.984
+I (307065) color_pipe: lightness_scale (gain): 0.078
+I (307070) color_pipe: After gain scaling: x_in=632.327 y_in=603.171 z_in=614.252
+I (307077) color_pipe: SensorCorr: after PCCM+scale: X=88.3394 Y=85.3250 Z=92.7354
+I (307085) color_pipe: IRComp: clear_ir_ratio=30.289 t=1.000 ir_normalized=1.8260 (x gain=0.078)
+I (307093) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (307101) color_pipe: IRComp: sub_x=0.6391 sub_y=0.4565 sub_z=0.0913
+I (307107) color_pipe: IRComp: XYZ pre-IR: X=88.3394 Y=85.3250 Z=92.7354
+I (307113) color_pipe: IRComp: XYZ post-sub=87.7003/84.8685/92.6441 post-clamp=87.7003/84.8685/92.6441
+I (307123) color_pipe: After CCM+IR: X=87.7 Y=84.9 Z=92.6
+I (307180) tcs3530: FIFO before clear: 0 bytes
+I (307180) tcs3530: FIFO after clear: 0 bytes
+I (307181) tcs3530: Measurement triggered
+I (307291) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (307291) tcs3530: FIFO Status: 260 bytes available
+I (307299) tcs3530: Raw: X=40904193 Y=38461440 Z=30039552 IR=1015808
+I (307299) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (307302) color_pipe: SensorCorr: raw X=40904193 Y=38461440 Z=30039552 clear=30782976 IR=1015808 gain=5 int_ms=100
+I (307312) color_pipe: SensorCorr: gain_mult=16.0 time_scale=1.0000 base_scale=0.062500
+I (307320) color_pipe: SensorCorr: RESP-norm x_in=8815.5586 y_in=8012.7998 z_in=7509.8882 (pre-black-sub)
+I (307329) color_pipe: SensorCorr: black subtraction: black_x=331.7379 black_y=323.6000 black_z=303.5520 (clamped to 40%)
+I (307340) color_pipe: SensorCorr: after black sub: x_in=8483.8203 y_in=7689.1997 z_in=7206.3359
+I (307348) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (307354) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (307361) color_pipe: After D65 scaling: x_in=8063.616 y_in=7689.200 z_in=7846.475
+I (307368) color_pipe: lightness_scale (gain): 0.078
+I (307373) color_pipe: After gain scaling: x_in=632.660 y_in=603.284 z_in=615.624
+I (307380) color_pipe: SensorCorr: after PCCM+scale: X=88.3698 Y=85.3450 Z=92.9359
+I (307388) color_pipe: IRComp: clear_ir_ratio=30.304 t=1.000 ir_normalized=1.8264 (x gain=0.078)
+I (307396) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (307404) color_pipe: IRComp: sub_x=0.6393 sub_y=0.4566 sub_z=0.0913
+I (307410) color_pipe: IRComp: XYZ pre-IR: X=88.3698 Y=85.3450 Z=92.9359
+I (307416) color_pipe: IRComp: XYZ post-sub=87.7306/84.8884/92.8446 post-clamp=87.7306/84.8884/92.8446
+I (307426) color_pipe: After CCM+IR: X=87.7 Y=84.9 Z=92.8
+I (307483) tcs3530: FIFO before clear: 0 bytes
+I (307483) tcs3530: FIFO after clear: 0 bytes
+I (307484) tcs3530: Measurement triggered
+I (307594) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+I (307594) tcs3530: FIFO Status: 260 bytes available
+I (307602) tcs3530: Raw: X=40912128 Y=38461440 Z=30061824 IR=1016064
+I (307602) tcs3530: Measurement complete (gain=16x, int=100ms, sat=0)
+I (307605) color_pipe: SensorCorr: raw X=40912128 Y=38461440 Z=30061824 clear=30789632 IR=1016064 gain=5 int_ms=100
+I (307615) color_pipe: SensorCorr: gain_mult=16.0 time_scale=1.0000 base_scale=0.062500
+I (307623) color_pipe: SensorCorr: RESP-norm x_in=8817.2686 y_in=8012.7998 z_in=7515.4561 (pre-black-sub)
+I (307632) color_pipe: SensorCorr: black subtraction: black_x=331.7379 black_y=323.6000 black_z=303.5520 (clamped to 40%)
+I (307643) color_pipe: SensorCorr: after black sub: x_in=8485.5303 y_in=7689.1997 z_in=7211.9043
+I (307651) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (307657) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (307664) color_pipe: After D65 scaling: x_in=8065.242 y_in=7689.200 z_in=7852.538
+I (307671) color_pipe: lightness_scale (gain): 0.078
+I (307676) color_pipe: After gain scaling: x_in=632.788 y_in=603.284 z_in=616.099
+I (307683) color_pipe: SensorCorr: after PCCM+scale: X=88.3836 Y=85.3473 Z=93.0045
+I (307691) color_pipe: IRComp: clear_ir_ratio=30.303 t=1.000 ir_normalized=1.8269 (x gain=0.078)
+I (307699) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (307707) color_pipe: IRComp: sub_x=0.6394 sub_y=0.4567 sub_z=0.0913
+I (307713) color_pipe: IRComp: XYZ pre-IR: X=88.3836 Y=85.3473 Z=93.0045
+I (307719) color_pipe: IRComp: XYZ post-sub=87.7442/84.8905/92.9131 post-clamp=87.7442/84.8905/92.9131
+I (307729) color_pipe: After CCM+IR: X=87.7 Y=84.9 Z=92.9
+I (307734) color_pipe: Lightness correction: raw_L=93.8 -> corrected_L=92.2 (gamma=0.8000, scale=0.0785, offset=-2.85)
+I (307744) color_pipe: Gate: raw_L=93.83 corrected_L=92.23 min_luminance=5.00 lightness_scale=0.0785 effective_min=0.39 low_light=0
+I (307756) color_pipe: Pre-enhance Lab: L=92.2 a=13.4 b=-0.3 chroma=13.4
+I (307762) color_pipe: Kona result: best_entry 0x3c07d538 best_delta 1.312999 max delta 2.000000
+I (307771) color_pipe: Kona match: id=189 name=BABY PINK dE=1.313
+I (307776) KONA_SCAN_CSV: idx_049,BABY PINK,1,5,100,0x00,0x00,3,3,0,0,87.7250,84.8825,92.8006,0.0000,0.0000,0.1118,93.8325,13.4004,-0.2578,306519049
+I (307790) tcs3530: Internal LED turned OFF
+I (307793) tts: Speak: Captured BABY PINK, ID 189
+I (311898) tts: Speak: Capture swatch 61 of 365. Panel yellow_green, index 1, ID 1865, name SUMMER PEAR. Sampling every 12. Press button to capture, or double click to cancel.
