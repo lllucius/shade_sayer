@@ -1152,9 +1152,9 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
              result->lab.l, result->lab.a, result->lab.b, raw_chroma);
 
     float enhanced_chroma = color_math_enhance_saturation(&result->lab,
-                            s_params.gray_threshold,
-                            s_params.color_threshold,
-                            s_params.saturation_boost);
+                            s_config.gray_threshold,
+                            s_config.color_threshold,
+                            s_config.saturation_boost);
 
     result->saturation = enhanced_chroma / 100.0f;
 
