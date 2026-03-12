@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Tests for generate_kona_table.py script."""
 
 import csv
 import pathlib
@@ -12,11 +13,9 @@ from generate_kona_table import MAX_ENTRIES, crc32_entries, parse_capture_csv, r
 
 
 def _write_csv(path: pathlib.Path, rows):
+    """Helper to write test CSV files."""
     header = [
         "kona_id",
-        "stddev_xyz_x",
-        "stddev_xyz_y",
-        "stddev_xyz_z",
         "mean_lab_l",
         "mean_lab_a",
         "mean_lab_b",
@@ -28,23 +27,18 @@ def _write_csv(path: pathlib.Path, rows):
 
 
 def test_parse_and_render():
+    """Test parsing CSV and rendering C++ output."""
     with tempfile.TemporaryDirectory() as tmp:
         csv_path = pathlib.Path(tmp) / "kona_avg_captures.csv"
         _write_csv(csv_path, [
             {
                 "kona_id": "249",
-                "stddev_xyz_x": "0.10",
-                "stddev_xyz_y": "0.20",
-                "stddev_xyz_z": "0.30",
                 "mean_lab_l": "55.0",
                 "mean_lab_a": "12.0",
                 "mean_lab_b": "-18.0",
             },
             {
                 "kona_id": "120",
-                "stddev_xyz_x": "0.40",
-                "stddev_xyz_y": "0.50",
-                "stddev_xyz_z": "0.60",
                 "mean_lab_l": "44.0",
                 "mean_lab_a": "2.0",
                 "mean_lab_b": "3.0",
@@ -52,9 +46,6 @@ def test_parse_and_render():
             # duplicate id should keep last row
             {
                 "kona_id": "249",
-                "stddev_xyz_x": "1.10",
-                "stddev_xyz_y": "1.20",
-                "stddev_xyz_z": "1.30",
                 "mean_lab_l": "65.0",
                 "mean_lab_a": "22.0",
                 "mean_lab_b": "-28.0",
@@ -74,6 +65,7 @@ def test_parse_and_render():
 
 
 def test_entry_limit():
+    """Test that MAX_ENTRIES limit is enforced."""
     with tempfile.TemporaryDirectory() as tmp:
         csv_path = pathlib.Path(tmp) / "kona_avg_captures.csv"
         rows = []
@@ -81,9 +73,6 @@ def test_entry_limit():
             rows.append(
                 {
                     "kona_id": str(i + 1),
-                    "stddev_xyz_x": "0",
-                    "stddev_xyz_y": "0",
-                    "stddev_xyz_z": "0",
                     "mean_lab_l": "0",
                     "mean_lab_a": "0",
                     "mean_lab_b": "0",

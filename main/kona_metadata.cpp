@@ -1,3 +1,13 @@
+/**
+ * @file kona_metadata.cpp
+ * @brief Kona Cotton Swatch Metadata Implementation
+ *
+ * Contains the static array of all 365 Kona swatch metadata entries
+ * and the lookup function for finding swatches by ID.
+ *
+ * Data source: Kona Cotton Solids color card (Robert Kaufman Fabrics)
+ */
+
 #include "kona_metadata.h"
 const kona_swatch_info_t KONA_SWATCH_METADATA[] = {
     {"yellow_orange_red", 1, 449, "SUNNY"},
