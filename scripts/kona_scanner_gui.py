@@ -865,11 +865,12 @@ def main() -> int:
     """Main entry point."""
     args = parse_args()
 
-    # Make CSV path relative to script location if not absolute
+    # Make CSV path relative to repository root (one level up from scripts directory)
     csv_path = args.csv
     if not os.path.isabs(csv_path):
-        script_dir = pathlib.Path(__file__).parent.parent
-        csv_path = script_dir / csv_path
+        script_dir = pathlib.Path(__file__).parent  # scripts directory
+        repo_root = script_dir.parent               # repository root
+        csv_path = repo_root / csv_path
 
     root = tk.Tk()
     app = KonaScannerApp(root, str(csv_path), args.port)

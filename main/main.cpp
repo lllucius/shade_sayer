@@ -51,6 +51,9 @@
 #include <cstring>
 #include <cstdlib>
 #include <new>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -94,6 +97,9 @@ static const char* TAG = "main";
 
 // Button event detection timeout (ms)
 #define BUTTON_EVENT_TIMEOUT_MS 5000
+
+// Serial scan mode button debounce (ms)
+#define SERIAL_MODE_BUTTON_DEBOUNCE_MS  50
 
 // Kona swatch scanning
 #define KONA_SWATCH_TOTAL            365
@@ -598,13 +604,6 @@ static void capture_kona_swatch(void)
  * 
  * @note Uses fcntl to set stdin non-blocking for responsive button checking.
  */
-#include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
-
-// Button debounce configuration for serial mode
-#define SERIAL_MODE_BUTTON_DEBOUNCE_MS  50
-
 static void enter_serial_scan_mode(void)
 {
     ESP_LOGI(TAG, "Entering serial scan mode");
