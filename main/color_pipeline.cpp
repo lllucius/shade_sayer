@@ -1135,14 +1135,9 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
 
     result->xyz = corrected;
 
-    // Compute raw Lab for Kona matching BEFORE any normalization/floor.
-    // The Kona reference table contains raw Lab values (XYZ->Lab conversion only),
-    // so we must match against the same representation for accurate deltaE.
-    lab_t raw_lab = color_math_xyz_to_lab(corrected);
-
-    // For display Lab values, normalize XYZ to prevent extreme b* values.
-    // This doesn't affect Kona matching (which uses raw_lab) but improves
-    // the displayed color values and differentiation between similar colors.
+    // For display Lab values and Kona matching, normalize XYZ to prevent extreme
+    // b* values. The Kona reference table was generated using normalized Lab values,
+    // so we must use the same normalization for accurate deltaE matching.
     xyz_t lab_xyz = corrected;
 
     // Normalize XYZ values when luminance exceeds D65 white reference.
@@ -1219,10 +1214,10 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
     }
     else
     {
-        // Use raw Lab (before lightness/saturation corrections) for Kona matching.
-        // The Kona reference table stores raw Lab values from the capture scan,
-        // so we must compare against the same representation for accurate deltaE.
-        if (try_match_kona_reference(&raw_lab, result))
+        // Use fully processed Lab (after saturation boost and clamping) for Kona matching.
+        // The Kona reference table stores Lab values from device SCAN responses, which
+        // include all processing. Using result->lab ensures consistent comparison.
+        if (try_match_kona_reference(&result->lab, result))
         {
             result->description = nullptr;
             TCS_LOGD(TAG, "Kona match: id=%u name=%s dE=%.3f",
