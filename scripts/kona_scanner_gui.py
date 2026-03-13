@@ -911,10 +911,11 @@ class KonaScannerApp:
 
                 for s in sorted_swatches:
                     if self.debug and s.measured:
+                        L_str = f"{s.L:.4f}" if s.L is not None else "None"
+                        a_str = f"{s.a:.4f}" if s.a is not None else "None"
+                        b_str = f"{s.b:.4f}" if s.b is not None else "None"
                         print(f"  Writing swatch[{s.id}] ({s.name}): "
-                              f"L={s.L:.4f if s.L else 'None'} "
-                              f"a={s.a:.4f if s.a else 'None'} "
-                              f"b={s.b:.4f if s.b else 'None'}")
+                              f"L={L_str} a={a_str} b={b_str}")
                     writer.writerow([
                         s.panel,
                         s.panel_index,
@@ -1272,6 +1273,11 @@ class KonaScannerApp:
                          f"RGB=({r}, {g}, {b})")
 
                 self.progress_var.set(f"Captured {swatch.name}: L={L:.1f} a={a:.1f} b={b:.1f}")
+                
+                # Force immediate UI refresh so the canvas and labels are visually updated
+                # before advancing to the next item. Without this, the updates may not be
+                # visible until the user moves the mouse or triggers another event.
+                self.root.update_idletasks()
                 
                 # Mark that we have unsaved changes
                 self._unsaved_changes = True

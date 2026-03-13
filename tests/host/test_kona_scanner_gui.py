@@ -383,6 +383,40 @@ def test_generate_kona_binary():
     print("Binary Kona table generation test passed")
 
 
+def test_lab_value_formatting():
+    """Test that Lab value formatting handles None values correctly.
+    
+    This tests the fix for the bug where f-string formatting like
+    f"{s.L:.4f if s.L else 'None'}" would fail with:
+    "Invalid format specifier '.4f if s.L else 'None'' for object of type 'float'"
+    
+    The fix uses conditional expressions BEFORE the format specifier:
+    f"{s.L:.4f}" if s.L is not None else "None"
+    """
+    # Test swatches with various Lab value states
+    test_cases = [
+        # (L, a, b, expected_L_str, expected_a_str, expected_b_str)
+        (50.1234, 10.5678, -5.9999, "50.1234", "10.5678", "-5.9999"),  # All values
+        (None, 10.0, -5.0, "None", "10.0000", "-5.0000"),  # L is None
+        (50.0, None, -5.0, "50.0000", "None", "-5.0000"),  # a is None
+        (50.0, 10.0, None, "50.0000", "10.0000", "None"),  # b is None
+        (None, None, None, "None", "None", "None"),  # All None
+        (0.0, 0.0, 0.0, "0.0000", "0.0000", "0.0000"),  # Zero values are valid and formatted
+    ]
+    
+    for L, a, b, expected_L, expected_a, expected_b in test_cases:
+        # Use the same formatting logic as the fixed _save_csv code
+        L_str = f"{L:.4f}" if L is not None else "None"
+        a_str = f"{a:.4f}" if a is not None else "None"
+        b_str = f"{b:.4f}" if b is not None else "None"
+        
+        assert L_str == expected_L, f"L mismatch for {L}: got '{L_str}', expected '{expected_L}'"
+        assert a_str == expected_a, f"a mismatch for {a}: got '{a_str}', expected '{expected_a}'"
+        assert b_str == expected_b, f"b mismatch for {b}: got '{b_str}', expected '{expected_b}'"
+    
+    print("Lab value formatting test passed")
+
+
 if __name__ == "__main__":
     test_generate_cpp_inline_comments()
     test_generate_cpp_sorted_by_id()
@@ -391,4 +425,5 @@ if __name__ == "__main__":
     test_remaining_selection_calculation()
     test_display_gamma_darkens_colors()
     test_generate_kona_binary()
+    test_lab_value_formatting()
     print("\nAll kona_scanner_gui tests passed")
