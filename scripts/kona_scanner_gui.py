@@ -394,7 +394,8 @@ class KonaScannerApp:
         self.color_canvas.pack(pady=10)
 
         # Color info with LAB on left, RGB on right (read-only text boxes for copying)
-        info_frame = ttk.LabelFrame(right_frame, text="Color Information")
+        # Note: This shows the SELECTED item's info (which may differ from last captured)
+        info_frame = ttk.LabelFrame(right_frame, text="Selected Item Info")
         info_frame.pack(fill=tk.X, padx=5, pady=5)
 
         self.info_entries = {}
@@ -430,6 +431,14 @@ class KonaScannerApp:
                               font=("TkDefaultFont", 10, "bold"))
         hex_entry.pack(side=tk.LEFT)
         self.info_entries["Hex"] = hex_var
+
+        # Last captured display - shows the most recently scanned swatch info
+        last_captured_frame = ttk.LabelFrame(right_frame, text="Last Captured")
+        last_captured_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        self.last_captured_label = ttk.Label(last_captured_frame, text="No captures yet", 
+                                             wraplength=250, justify=tk.LEFT)
+        self.last_captured_label.pack(padx=5, pady=5)
 
         # Scan guidance frame
         scan_frame = ttk.LabelFrame(right_frame, text="Scanning")
@@ -1070,6 +1079,13 @@ class KonaScannerApp:
                 # Update display panel - read back from swatch to ensure consistency
                 self._show_color_info(swatch)
                 self._update_stats()
+                
+                # Update "Last Captured" display to show what was just scanned
+                # This persists even when selection changes to next item
+                self.last_captured_label.config(
+                    text=f"{swatch.name}\n"
+                         f"L*={L:.2f}  a*={a:.2f}  b*={b:.2f}\n"
+                         f"RGB=({R}, {G}, {B})")
 
                 self.progress_var.set(f"Captured {swatch.name}: L={L:.1f} a={a:.1f} b={b:.1f}")
                 
@@ -1241,11 +1257,12 @@ const kona_table_t kona_reference = {{
             result = messagebox.askyesnocancel(
                 "Unsaved Changes",
                 "You have unsaved scan changes.\n\nSave before closing?")
-            if result is None:  # Cancel
+            if result is None:  # Cancel - don't close
                 return
-            if result:  # Yes - save
+            if result:  # Yes - save first
                 if not self._save_csv():
                     return  # Save failed, don't close
+            # If No (result is False), proceed to close without saving
         self.serial.disconnect()
         self.root.destroy()
 
