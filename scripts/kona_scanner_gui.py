@@ -479,18 +479,9 @@ class KonaScannerApp:
     def _setup_ui(self):
         """Set up the main UI components."""
         self.root.title("Kona Swatch Scanner")
-        self.root.geometry("1200x800")
-        # Maximize window on startup (cross-platform with fallback)
-        if platform.system() == 'Windows':
-            self.root.state('zoomed')
-        elif platform.system() == 'Darwin':  # macOS
-            self.root.attributes('-fullscreen', True)  # or use geometry
-        else:  # Linux
-            try:
-                self.root.attributes('-zoomed', True)
-            except:
-                # Fallback: set geometry to screen size
-                self.root.geometry(f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}+0+0")
+        # Default geometry fits 1097x617 (4K at 350% scaling)
+        self.root.geometry("1050x600")
+        self.root.minsize(800, 500)  # Minimum usable size
 
         # Main frame with paned window
         main_pane = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
@@ -502,68 +493,63 @@ class KonaScannerApp:
 
         # Toolbar
         toolbar = ttk.Frame(left_frame)
-        toolbar.pack(fill=tk.X, pady=(0, 5))
+        toolbar.pack(fill=tk.X, pady=(0, 3))
 
-        # Buttons with keyboard shortcuts (shown in parentheses)
-        # Button enablement reflects connection state: Connect enabled when disconnected,
-        # Disconnect enabled when connected.
-        self.connect_btn = ttk.Button(toolbar, text="Connect (Alt+C)", command=self._on_connect)
-        self.connect_btn.pack(side=tk.LEFT, padx=2)
-        self.disconnect_btn = ttk.Button(toolbar, text="Disconnect (Alt+D)", command=self._on_disconnect,
+        # Buttons - keyboard shortcuts in tooltips (hover) to save space
+        # Button enablement reflects connection state
+        self.connect_btn = ttk.Button(toolbar, text="Connect", command=self._on_connect)
+        self.connect_btn.pack(side=tk.LEFT, padx=1)
+        self.disconnect_btn = ttk.Button(toolbar, text="Disconnect", command=self._on_disconnect,
                                           state=tk.DISABLED)
-        self.disconnect_btn.pack(side=tk.LEFT, padx=2)
+        self.disconnect_btn.pack(side=tk.LEFT, padx=1)
 
-        ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
+        ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=3)
 
-        self.scan_selected_btn = ttk.Button(toolbar, text="Scan (Alt+S)", command=self._on_scan_selected)
-        self.scan_selected_btn.pack(side=tk.LEFT, padx=2)
-        self.stop_scan_btn = ttk.Button(toolbar, text="Stop (Esc)", command=self._on_stop_scan)
-        self.stop_scan_btn.pack(side=tk.LEFT, padx=2)
+        self.scan_selected_btn = ttk.Button(toolbar, text="Scan", command=self._on_scan_selected)
+        self.scan_selected_btn.pack(side=tk.LEFT, padx=1)
+        self.stop_scan_btn = ttk.Button(toolbar, text="Stop", command=self._on_stop_scan)
+        self.stop_scan_btn.pack(side=tk.LEFT, padx=1)
 
-        ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
+        ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=3)
 
-        self.save_csv_btn = ttk.Button(toolbar, text="Save (Ctrl+S)", command=self._on_save_csv)
-        self.save_csv_btn.pack(side=tk.LEFT, padx=2)
-        self.export_cpp_btn = ttk.Button(toolbar, text="Export (Alt+E)", command=self._on_export_cpp)
-        self.export_cpp_btn.pack(side=tk.LEFT, padx=2)
+        self.save_csv_btn = ttk.Button(toolbar, text="Save", command=self._on_save_csv)
+        self.save_csv_btn.pack(side=tk.LEFT, padx=1)
+        self.export_cpp_btn = ttk.Button(toolbar, text="Export", command=self._on_export_cpp)
+        self.export_cpp_btn.pack(side=tk.LEFT, padx=1)
 
-        ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
+        ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=3)
 
-        self.clear_scanned_btn = ttk.Button(toolbar, text="Clear (Alt+L)", command=self._on_clear_scanned)
-        self.clear_scanned_btn.pack(side=tk.LEFT, padx=2)
+        self.clear_scanned_btn = ttk.Button(toolbar, text="Clear", command=self._on_clear_scanned)
+        self.clear_scanned_btn.pack(side=tk.LEFT, padx=1)
 
-        ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
+        ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=3)
 
         # Kona table management buttons
-        self.upload_kona_btn = ttk.Button(toolbar, text="Upload (Alt+U)", command=self._on_upload_kona)
-        self.upload_kona_btn.pack(side=tk.LEFT, padx=2)
-        self.measure_btn = ttk.Button(toolbar, text="Measure (Alt+M)", command=self._on_measure)
-        self.measure_btn.pack(side=tk.LEFT, padx=2)
+        self.upload_kona_btn = ttk.Button(toolbar, text="Upload", command=self._on_upload_kona)
+        self.upload_kona_btn.pack(side=tk.LEFT, padx=1)
+        self.measure_btn = ttk.Button(toolbar, text="Measure", command=self._on_measure)
+        self.measure_btn.pack(side=tk.LEFT, padx=1)
         
-        # Filter controls
+        # Filter controls - compact layout
         filter_frame = ttk.Frame(left_frame)
-        filter_frame.pack(fill=tk.X, pady=(0, 5))
+        filter_frame.pack(fill=tk.X, pady=(0, 3))
         
-        ttk.Label(filter_frame, text="Filter (Alt+F):").pack(side=tk.LEFT)
+        ttk.Label(filter_frame, text="Filter:").pack(side=tk.LEFT)
         self.filter_var = tk.StringVar()
         self.filter_var.trace_add("write", self._on_filter_change)
-        self.filter_entry = ttk.Entry(filter_frame, textvariable=self.filter_var, width=20)
-        self.filter_entry.pack(side=tk.LEFT, padx=5)
+        self.filter_entry = ttk.Entry(filter_frame, textvariable=self.filter_var, width=15)
+        self.filter_entry.pack(side=tk.LEFT, padx=3)
         
-        ttk.Label(filter_frame, text="Show:").pack(side=tk.LEFT, padx=(10, 0))
+        ttk.Label(filter_frame, text="Show:").pack(side=tk.LEFT, padx=(5, 0))
         self.show_var = tk.StringVar(value="all")
-        ttk.Radiobutton(filter_frame, text="All (Alt+1)", variable=self.show_var, value="all",
+        ttk.Radiobutton(filter_frame, text="All", variable=self.show_var, value="all",
                        command=self._on_filter_change).pack(side=tk.LEFT)
-        ttk.Radiobutton(filter_frame, text="Scanned (Alt+2)", variable=self.show_var, value="scanned",
+        ttk.Radiobutton(filter_frame, text="Scanned", variable=self.show_var, value="scanned",
                        command=self._on_filter_change).pack(side=tk.LEFT)
-        ttk.Radiobutton(filter_frame, text="Not Scanned (Alt+3)", variable=self.show_var, value="not_scanned",
+        ttk.Radiobutton(filter_frame, text="Not Scanned", variable=self.show_var, value="not_scanned",
                        command=self._on_filter_change).pack(side=tk.LEFT)
 
         # Treeview with scrollbars
-        tree_label_frame = ttk.Frame(left_frame)
-        tree_label_frame.pack(fill=tk.X)
-        ttk.Label(tree_label_frame, text="Swatch List (Alt+T) - Ctrl+Space, Shift+Arrows, Home/End").pack(side=tk.LEFT, pady=(2, 0))
-        
         tree_frame = ttk.Frame(left_frame)
         tree_frame.pack(fill=tk.BOTH, expand=True)
 
@@ -571,22 +557,23 @@ class KonaScannerApp:
         self.tree = ttk.Treeview(tree_frame, columns=columns, show="headings", selectmode="extended")
 
         self.tree.heading("panel", text="Panel", command=lambda: self._sort_column("panel"))
-        self.tree.heading("index", text="Index", command=lambda: self._sort_column("index"))
+        self.tree.heading("index", text="Idx", command=lambda: self._sort_column("index"))
         self.tree.heading("id", text="ID", command=lambda: self._sort_column("id"))
         self.tree.heading("name", text="Name", command=lambda: self._sort_column("name"))
-        self.tree.heading("measured", text="Scanned", command=lambda: self._sort_column("measured"))
+        self.tree.heading("measured", text="OK", command=lambda: self._sort_column("measured"))
         self.tree.heading("L", text="L*", command=lambda: self._sort_column("L"))
         self.tree.heading("a", text="a*", command=lambda: self._sort_column("a"))
         self.tree.heading("b", text="b*", command=lambda: self._sort_column("b"))
 
-        self.tree.column("panel", width=140)
-        self.tree.column("index", width=50, anchor=tk.CENTER)
-        self.tree.column("id", width=50, anchor=tk.CENTER)
-        self.tree.column("name", width=120)
-        self.tree.column("measured", width=60, anchor=tk.CENTER)
-        self.tree.column("L", width=60, anchor=tk.CENTER)
-        self.tree.column("a", width=60, anchor=tk.CENTER)
-        self.tree.column("b", width=60, anchor=tk.CENTER)
+        # Compact column widths for small screens
+        self.tree.column("panel", width=100)
+        self.tree.column("index", width=35, anchor=tk.CENTER)
+        self.tree.column("id", width=35, anchor=tk.CENTER)
+        self.tree.column("name", width=90)
+        self.tree.column("measured", width=30, anchor=tk.CENTER)
+        self.tree.column("L", width=45, anchor=tk.CENTER)
+        self.tree.column("a", width=45, anchor=tk.CENTER)
+        self.tree.column("b", width=45, anchor=tk.CENTER)
 
         vsb = ttk.Scrollbar(tree_frame, orient=tk.VERTICAL, command=self.tree.yview)
         hsb = ttk.Scrollbar(tree_frame, orient=tk.HORIZONTAL, command=self.tree.xview)
@@ -603,92 +590,110 @@ class KonaScannerApp:
         # Status bar
         self.progress_var = tk.StringVar(value="Ready")
         progress_bar = ttk.Label(left_frame, textvariable=self.progress_var, relief=tk.SUNKEN)
-        progress_bar.pack(fill=tk.X, pady=(5, 0))
+        progress_bar.pack(fill=tk.X, pady=(3, 0))
 
-        # Right frame: color info panel
+        # Right frame: color info panel with scrollbar for small screens
         right_frame = ttk.Frame(main_pane)
         main_pane.add(right_frame, weight=1)
+        
+        # Create a canvas with scrollbar for the right panel content
+        right_canvas = tk.Canvas(right_frame, highlightthickness=0)
+        right_scrollbar = ttk.Scrollbar(right_frame, orient=tk.VERTICAL, command=right_canvas.yview)
+        right_content = ttk.Frame(right_canvas)
+        
+        right_canvas.configure(yscrollcommand=right_scrollbar.set)
+        right_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        right_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        right_canvas_frame = right_canvas.create_window((0, 0), window=right_content, anchor="nw")
+        
+        def configure_scroll_region(event):
+            right_canvas.configure(scrollregion=right_canvas.bbox("all"))
+        right_content.bind("<Configure>", configure_scroll_region)
+        
+        def configure_canvas_width(event):
+            right_canvas.itemconfig(right_canvas_frame, width=event.width)
+        right_canvas.bind("<Configure>", configure_canvas_width)
 
-        # Color sample canvas
-        self.color_canvas = tk.Canvas(right_frame, width=200, height=200, bg="#808080",
+        # Color sample canvas - smaller for compact display
+        self.color_canvas = tk.Canvas(right_content, width=120, height=120, bg="#808080",
                                        highlightthickness=1, highlightbackground="black")
-        self.color_canvas.pack(pady=10)
+        self.color_canvas.pack(pady=5)
 
         # Color info with LAB on left, RGB on right (read-only text boxes for copying)
-        # Note: This shows the SELECTED item's info (which may differ from last captured)
-        info_frame = ttk.LabelFrame(right_frame, text="Selected Item Info")
-        info_frame.pack(fill=tk.X, padx=5, pady=5)
+        info_frame = ttk.LabelFrame(right_content, text="Selected Info")
+        info_frame.pack(fill=tk.X, padx=3, pady=3)
 
         self.info_entries = {}
 
-        # Create rows with LAB on left, RGB on right
+        # Create rows with LAB on left, RGB on right - compact layout
         lab_rgb_pairs = [("L*", "R"), ("a*", "G"), ("b*", "B")]
         for lab_label, rgb_label in lab_rgb_pairs:
             row = ttk.Frame(info_frame)
-            row.pack(fill=tk.X, padx=5, pady=2)
+            row.pack(fill=tk.X, padx=3, pady=1)
 
             # LAB value on the left
-            ttk.Label(row, text=f"{lab_label}:", width=4).pack(side=tk.LEFT)
+            ttk.Label(row, text=f"{lab_label}:", width=3).pack(side=tk.LEFT)
             lab_var = tk.StringVar(value="-")
-            lab_entry = ttk.Entry(row, textvariable=lab_var, width=10, state="readonly",
-                                  font=("TkDefaultFont", 10, "bold"))
-            lab_entry.pack(side=tk.LEFT, padx=(0, 10))
+            lab_entry = ttk.Entry(row, textvariable=lab_var, width=8, state="readonly",
+                                  font=("TkDefaultFont", 9, "bold"))
+            lab_entry.pack(side=tk.LEFT, padx=(0, 5))
             self.info_entries[lab_label] = lab_var
 
             # RGB value on the right
-            ttk.Label(row, text=f"{rgb_label}:", width=4).pack(side=tk.LEFT)
+            ttk.Label(row, text=f"{rgb_label}:", width=2).pack(side=tk.LEFT)
             rgb_var = tk.StringVar(value="-")
-            rgb_entry = ttk.Entry(row, textvariable=rgb_var, width=6, state="readonly",
-                                  font=("TkDefaultFont", 10, "bold"))
+            rgb_entry = ttk.Entry(row, textvariable=rgb_var, width=5, state="readonly",
+                                  font=("TkDefaultFont", 9, "bold"))
             rgb_entry.pack(side=tk.LEFT)
             self.info_entries[rgb_label] = rgb_var
 
         # Hex row at bottom
         hex_row = ttk.Frame(info_frame)
-        hex_row.pack(fill=tk.X, padx=5, pady=2)
-        ttk.Label(hex_row, text="Hex:", width=4).pack(side=tk.LEFT)
+        hex_row.pack(fill=tk.X, padx=3, pady=1)
+        ttk.Label(hex_row, text="Hex:", width=3).pack(side=tk.LEFT)
         hex_var = tk.StringVar(value="-")
-        hex_entry = ttk.Entry(hex_row, textvariable=hex_var, width=10, state="readonly",
-                              font=("TkDefaultFont", 10, "bold"))
+        hex_entry = ttk.Entry(hex_row, textvariable=hex_var, width=8, state="readonly",
+                              font=("TkDefaultFont", 9, "bold"))
         hex_entry.pack(side=tk.LEFT)
         self.info_entries["Hex"] = hex_var
 
         # Last captured display - shows the most recently scanned swatch info
-        last_captured_frame = ttk.LabelFrame(right_frame, text="Last Captured")
-        last_captured_frame.pack(fill=tk.X, padx=5, pady=5)
+        last_captured_frame = ttk.LabelFrame(right_content, text="Last Captured")
+        last_captured_frame.pack(fill=tk.X, padx=3, pady=3)
         
         self.last_captured_label = ttk.Label(last_captured_frame, text="No captures yet", 
-                                             wraplength=250, justify=tk.LEFT)
-        self.last_captured_label.pack(padx=5, pady=5)
+                                             wraplength=180, justify=tk.LEFT)
+        self.last_captured_label.pack(padx=3, pady=3)
 
         # Scan guidance frame
-        scan_frame = ttk.LabelFrame(right_frame, text="Scanning")
-        scan_frame.pack(fill=tk.X, padx=5, pady=5)
+        scan_frame = ttk.LabelFrame(right_content, text="Scanning")
+        scan_frame.pack(fill=tk.X, padx=3, pady=3)
 
-        self.scan_status_label = ttk.Label(scan_frame, text="Not scanning", wraplength=250)
-        self.scan_status_label.pack(padx=5, pady=5)
+        self.scan_status_label = ttk.Label(scan_frame, text="Not scanning", wraplength=180)
+        self.scan_status_label.pack(padx=3, pady=3)
 
-        self.scan_button = ttk.Button(scan_frame, text="Capture (Space)", command=self._on_capture_current,
+        self.scan_button = ttk.Button(scan_frame, text="Capture", command=self._on_capture_current,
                                        state=tk.DISABLED)
-        self.scan_button.pack(pady=5)
+        self.scan_button.pack(pady=2)
 
-        self.skip_button = ttk.Button(scan_frame, text="Skip (Alt+K)", command=self._on_skip_current,
+        self.skip_button = ttk.Button(scan_frame, text="Skip", command=self._on_skip_current,
                                        state=tk.DISABLED)
-        self.skip_button.pack(pady=5)
+        self.skip_button.pack(pady=2)
         
         # Kona table status frame
-        kona_frame = ttk.LabelFrame(right_frame, text="Kona Table Status")
-        kona_frame.pack(fill=tk.X, padx=5, pady=5)
+        kona_frame = ttk.LabelFrame(right_content, text="Kona Status")
+        kona_frame.pack(fill=tk.X, padx=3, pady=3)
         
         self.kona_status_label = ttk.Label(kona_frame, text="Not connected", justify=tk.LEFT)
-        self.kona_status_label.pack(padx=5, pady=5)
+        self.kona_status_label.pack(padx=3, pady=3)
         
         # Statistics frame
-        stats_frame = ttk.LabelFrame(right_frame, text="Statistics")
-        stats_frame.pack(fill=tk.X, padx=5, pady=5)
+        stats_frame = ttk.LabelFrame(right_content, text="Stats")
+        stats_frame.pack(fill=tk.X, padx=3, pady=3)
         
         self.stats_label = ttk.Label(stats_frame, text="", justify=tk.LEFT)
-        self.stats_label.pack(padx=5, pady=5)
+        self.stats_label.pack(padx=3, pady=3)
         self._update_stats()
 
         # Bind keyboard shortcuts
