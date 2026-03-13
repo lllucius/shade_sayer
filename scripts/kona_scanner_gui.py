@@ -337,7 +337,7 @@ class KonaScannerApp:
         # Treeview with scrollbars
         tree_label_frame = ttk.Frame(left_frame)
         tree_label_frame.pack(fill=tk.X)
-        ttk.Label(tree_label_frame, text="Swatch List (Alt+T) - Use Shift+Arrow for multi-select").pack(side=tk.LEFT, pady=(2, 0))
+        ttk.Label(tree_label_frame, text="Swatch List (Alt+T) - Ctrl+Space, Shift+Arrows, Home/End").pack(side=tk.LEFT, pady=(2, 0))
         
         tree_frame = ttk.Frame(left_frame)
         tree_frame.pack(fill=tk.BOTH, expand=True)
@@ -485,6 +485,30 @@ class KonaScannerApp:
         
         # Alt+T to focus treeview (swatch list)
         self.root.bind("<Alt-t>", self._on_focus_treeview)
+        
+        # Windows-style keyboard navigation for treeview
+        # Ctrl+Arrow: Move focus without changing selection
+        self.tree.bind("<Control-Up>", self._on_ctrl_up)
+        self.tree.bind("<Control-Down>", self._on_ctrl_down)
+        
+        # Ctrl+Space: Toggle selection of focused item
+        self.tree.bind("<Control-space>", self._on_ctrl_space)
+        
+        # Shift+Arrow: Extend selection (override default for consistent behavior)
+        self.tree.bind("<Shift-Up>", self._on_shift_up)
+        self.tree.bind("<Shift-Down>", self._on_shift_down)
+        
+        # Home/End: Move to first/last item
+        self.tree.bind("<Home>", self._on_home)
+        self.tree.bind("<End>", self._on_end)
+        
+        # Ctrl+Home/End: Move focus to first/last without changing selection
+        self.tree.bind("<Control-Home>", self._on_ctrl_home)
+        self.tree.bind("<Control-End>", self._on_ctrl_end)
+        
+        # Shift+Home/End: Extend selection to first/last item
+        self.tree.bind("<Shift-Home>", self._on_shift_home)
+        self.tree.bind("<Shift-End>", self._on_shift_end)
 
     def _on_focus_filter(self, event=None):
         """Focus the filter entry field and select all text.
@@ -525,6 +549,152 @@ class KonaScannerApp:
                 self.tree.selection_set(children)
             return "break"
         return None  # Allow default behavior for other widgets
+
+    def _get_adjacent_item(self, item: str, direction: int) -> Optional[str]:
+        """Get the item adjacent to the given item in the specified direction.
+        
+        Args:
+            item: The current item ID
+            direction: -1 for previous (up), 1 for next (down)
+            
+        Returns:
+            The adjacent item ID, or None if at boundary
+        """
+        children = self.tree.get_children()
+        if not children:
+            return None
+        try:
+            idx = children.index(item)
+            new_idx = idx + direction
+            if 0 <= new_idx < len(children):
+                return children[new_idx]
+        except ValueError:
+            pass
+        return None
+
+    def _on_ctrl_up(self, event=None):
+        """Move focus up without changing selection (Ctrl+Up)."""
+        focused = self.tree.focus()
+        if focused:
+            prev_item = self._get_adjacent_item(focused, -1)
+            if prev_item:
+                self.tree.focus(prev_item)
+                self.tree.see(prev_item)
+        return "break"
+
+    def _on_ctrl_down(self, event=None):
+        """Move focus down without changing selection (Ctrl+Down)."""
+        focused = self.tree.focus()
+        if focused:
+            next_item = self._get_adjacent_item(focused, 1)
+            if next_item:
+                self.tree.focus(next_item)
+                self.tree.see(next_item)
+        return "break"
+
+    def _on_ctrl_space(self, event=None):
+        """Toggle selection of the focused item (Ctrl+Space)."""
+        focused = self.tree.focus()
+        if focused:
+            if focused in self.tree.selection():
+                self.tree.selection_remove(focused)
+            else:
+                self.tree.selection_add(focused)
+        return "break"
+
+    def _on_shift_up(self, event=None):
+        """Extend selection upward (Shift+Up)."""
+        focused = self.tree.focus()
+        if focused:
+            prev_item = self._get_adjacent_item(focused, -1)
+            if prev_item:
+                self.tree.selection_add(prev_item)
+                self.tree.focus(prev_item)
+                self.tree.see(prev_item)
+        return "break"
+
+    def _on_shift_down(self, event=None):
+        """Extend selection downward (Shift+Down)."""
+        focused = self.tree.focus()
+        if focused:
+            next_item = self._get_adjacent_item(focused, 1)
+            if next_item:
+                self.tree.selection_add(next_item)
+                self.tree.focus(next_item)
+                self.tree.see(next_item)
+        return "break"
+
+    def _on_home(self, event=None):
+        """Move focus and selection to the first item (Home)."""
+        children = self.tree.get_children()
+        if children:
+            first_item = children[0]
+            self.tree.selection_set(first_item)
+            self.tree.focus(first_item)
+            self.tree.see(first_item)
+        return "break"
+
+    def _on_end(self, event=None):
+        """Move focus and selection to the last item (End)."""
+        children = self.tree.get_children()
+        if children:
+            last_item = children[-1]
+            self.tree.selection_set(last_item)
+            self.tree.focus(last_item)
+            self.tree.see(last_item)
+        return "break"
+
+    def _on_ctrl_home(self, event=None):
+        """Move focus to first item without changing selection (Ctrl+Home)."""
+        children = self.tree.get_children()
+        if children:
+            first_item = children[0]
+            self.tree.focus(first_item)
+            self.tree.see(first_item)
+        return "break"
+
+    def _on_ctrl_end(self, event=None):
+        """Move focus to last item without changing selection (Ctrl+End)."""
+        children = self.tree.get_children()
+        if children:
+            last_item = children[-1]
+            self.tree.focus(last_item)
+            self.tree.see(last_item)
+        return "break"
+
+    def _on_shift_home(self, event=None):
+        """Extend selection from focused item to first item (Shift+Home)."""
+        children = self.tree.get_children()
+        focused = self.tree.focus()
+        if children and focused:
+            try:
+                focused_idx = children.index(focused)
+                # Select all items from first to focused (inclusive)
+                for item_idx in range(focused_idx + 1):
+                    self.tree.selection_add(children[item_idx])
+                first_item = children[0]
+                self.tree.focus(first_item)
+                self.tree.see(first_item)
+            except ValueError:
+                pass
+        return "break"
+
+    def _on_shift_end(self, event=None):
+        """Extend selection from focused item to last item (Shift+End)."""
+        children = self.tree.get_children()
+        focused = self.tree.focus()
+        if children and focused:
+            try:
+                focused_idx = children.index(focused)
+                # Select all items from focused to last (inclusive)
+                for item_idx in range(focused_idx, len(children)):
+                    self.tree.selection_add(children[item_idx])
+                last_item = children[-1]
+                self.tree.focus(last_item)
+                self.tree.see(last_item)
+            except ValueError:
+                pass
+        return "break"
 
     def _set_show_filter(self, value: str):
         """Set the show filter radio button value."""
