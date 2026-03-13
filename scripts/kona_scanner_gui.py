@@ -324,7 +324,7 @@ class SerialConnection:
         
         Returns tuple (L, a, b, R, G, B) or None on error.
         """
-        response = self.send_command("SCAN", timeout=10.0)
+        response = self.send_command("SCAN", timeout=20.0)
         if response is None:
             return None
 

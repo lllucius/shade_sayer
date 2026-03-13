@@ -1,0 +1,94 @@
+TX: SCAN
+RX: I (26861) main: Serial command: SCAN
+RX: I (26861) tcs3530: Internal LED turned ON
+RX: I (26913) tcs3530: FIFO before clear: 260 bytes
+RX: I (26913) tcs3530: FIFO after clear: 0 bytes
+RX: I (26914) tcs3530: Measurement triggered
+RX: I (27024) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+RX: I (27024) tcs3530: FIFO Status: 260 bytes available
+RX: I (27032) tcs3530: Raw: X=16770816 Y=15204864 Z=5906432 IR=454144
+RX: I (27032) tcs3530: Measurement complete (gain=8x, int=100ms, sat=0)
+RX: I (27032) color_pipe: SensorCorr: raw X=16770816 Y=15204864 Z=5906432 clear=10677248 IR=454144 gain=4 int_ms=100
+RX: I (27033) color_pipe: SensorCorr: gain_mult=8.0 time_scale=1.0000 base_scale=0.125000
+RX: I (27033) color_pipe: SensorCorr: RESP-norm x_in=7228.7998 y_in=6335.3599 z_in=2953.2161 (pre-black-sub)
+RX: I (27034) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+RX: I (27034) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+RX: I (27034) color_pipe: After D65 scaling: x_in=6870.757 y_in=6335.360 z_in=3215.550
+RX: I (27035) color_pipe: lightness_scale (gain): 0.930
+RX: I (27035) color_pipe: After gain scaling: x_in=6389.804 y_in=5891.885 z_in=2990.462
+RX: I (27035) color_pipe: SensorCorr: after PCCM+scale: X=743.0096 Y=605.2374 Z=224.9882
+RX: I (27036) color_pipe: IRComp: clear_ir_ratio=23.511 t=1.000 ir_normalized=19.3579 (x gain=0.930)
+RX: I (27036) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+RX: I (27036) color_pipe: IRComp: sub_x=6.7753 sub_y=4.8395 sub_z=0.9679
+RX: I (27037) color_pipe: IRComp: XYZ pre-IR: X=743.0096 Y=605.2374 Z=224.9882
+RX: I (27037) color_pipe: IRComp: XYZ post-sub=736.2344/600.3979/224.0203 post-clamp=736.2344/600.3979/224.0203
+RX: I (27038) color_pipe: After CCM+IR: X=736.2 Y=600.4 Z=224.0
+RX: I (27090) tcs3530: FIFO before clear: 0 bytes
+RX: I (27090) tcs3530: FIFO after clear: 0 bytes
+RX: I (27091) tcs3530: Measurement triggered
+RX: I (27201) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+RX: I (27201) tcs3530: FIFO Status: 260 bytes available
+RX: I (27209) tcs3530: Raw: X=16772096 Y=15207680 Z=5911552 IR=454144
+RX: I (27209) tcs3530: Measurement complete (gain=8x, int=100ms, sat=0)
+RX: I (27209) color_pipe: SensorCorr: raw X=16772096 Y=15207680 Z=5911552 clear=10678784 IR=454144 gain=4 int_ms=100
+RX: I (27210) color_pipe: SensorCorr: gain_mult=8.0 time_scale=1.0000 base_scale=0.125000
+RX: I (27210) color_pipe: SensorCorr: RESP-norm x_in=7229.3516 y_in=6336.5332 z_in=2955.7759 (pre-black-sub)
+RX: I (27211) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+RX: I (27211) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+RX: I (27211) color_pipe: After D65 scaling: x_in=6871.282 y_in=6336.533 z_in=3218.337
+RX: I (27212) color_pipe: lightness_scale (gain): 0.930
+RX: I (27212) color_pipe: After gain scaling: x_in=6390.292 y_in=5892.976 z_in=2993.054
+RX: I (27212) color_pipe: SensorCorr: after PCCM+scale: X=743.0369 Y=605.3873 Z=225.3327
+RX: I (27213) color_pipe: IRComp: clear_ir_ratio=23.514 t=1.000 ir_normalized=19.3579 (x gain=0.930)
+RX: I (27213) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+RX: I (27213) color_pipe: IRComp: sub_x=6.7753 sub_y=4.8395 sub_z=0.9679
+RX: I (27214) color_pipe: IRComp: XYZ pre-IR: X=743.0369 Y=605.3873 Z=225.3327
+RX: I (27214) color_pipe: IRComp: XYZ post-sub=736.2617/600.5478/224.3648 post-clamp=736.2617/600.5478/224.3648
+RX: I (27214) color_pipe: After CCM+IR: X=736.3 Y=600.5 Z=224.4
+RX: I (27267) tcs3530: FIFO before clear: 0 bytes
+RX: I (27267) tcs3530: FIFO after clear: 0 bytes
+RX: I (27268) tcs3530: Measurement triggered
+RX: I (27378) tcs3530: SAI_ACTIVE detected (elapsed: 109 ms)
+RX: I (27378) tcs3530: FIFO Status: 260 bytes available
+RX: I (27386) tcs3530: Raw: X=16769024 Y=15208192 Z=5912576 IR=454400
+RX: I (27386) tcs3530: Measurement complete (gain=8x, int=100ms, sat=0)
+RX: I (27386) color_pipe: SensorCorr: raw X=16769024 Y=15208192 Z=5912576 clear=10681088 IR=454400 gain=4 int_ms=100
+RX: I (27387) color_pipe: SensorCorr: gain_mult=8.0 time_scale=1.0000 base_scale=0.125000
+RX: I (27387) color_pipe: SensorCorr: RESP-norm x_in=7228.0273 y_in=6336.7466 z_in=2956.2881 (pre-black-sub)
+RX: I (27388) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+RX: I (27388) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+RX: I (27388) color_pipe: After D65 scaling: x_in=6870.023 y_in=6336.747 z_in=3218.895
+RX: I (27389) color_pipe: lightness_scale (gain): 0.930
+RX: I (27389) color_pipe: After gain scaling: x_in=6389.122 y_in=5893.174 z_in=2993.573
+RX: I (27389) color_pipe: SensorCorr: after PCCM+scale: X=742.8821 Y=605.4427 Z=225.4229
+RX: I (27389) color_pipe: IRComp: clear_ir_ratio=23.506 t=1.000 ir_normalized=19.3688 (x gain=0.930)
+RX: I (27390) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+RX: I (27390) color_pipe: IRComp: sub_x=6.7791 sub_y=4.8422 sub_z=0.9684
+RX: I (27391) color_pipe: IRComp: XYZ pre-IR: X=742.8821 Y=605.4427 Z=225.4229
+RX: I (27391) color_pipe: IRComp: XYZ post-sub=736.1030/600.6005/224.4545 post-clamp=736.1030/600.6005/224.4545
+RX: I (27392) color_pipe: After CCM+IR: X=736.1 Y=600.6 Z=224.5
+RX: I (27392) color_pipe: Measure XYZ (IR+Black Cor): X=736.20 Y=600.52 Z=224.28
+RX: I (27392) color_pipe: XYZ normalized: Y=600.5 -> 100.0 (scale=0.1665)
+RX: I (27393) color_pipe: Lightness correction: raw_L=100.0 -> corrected_L=98.5 (gamma=1.0000, scale=0.9300, offset=-1.50)
+RX: I (27393) color_pipe: Gate: raw_L=100.00 corrected_L=98.50 min_luminance=5.00 lightness_scale=0.9300 effective_min=4.65 low_light=0
+RX: I (27394) color_pipe: Pre-enhance Lab: L=98.5 a=44.3 b=60.0 chroma=74.6
+RX: I (27395) color_pipe: Kona result: best_entry 0x3c07da8c best_delta 51.869701 max delta 2.000000 (temp=0)
+RX: I (27400) tcs3530: Internal LED turned OFF
+RX: Result: No Match (category: Orange, dE=19.94, conf=0%)
+RX: XYZ: X=736.20 Y=600.52 Z=224.28
+RX: Lab: L=98.5 a=66.4 b=90.0
+RX: OK:LAB:98.5000,66.4050,89.9981:RGB:255,190,67
+Parsed scan result: L=98.5000 a=66.4050 b=89.9981 RGB=(255,190,67)
+
+======================================================================
+MEASUREMENT COMPARISON: CANTALOUPE (ID: 59)
+======================================================================
+Reference (stored):  L*=  98.500  a*=  66.309  b*=  90.075
+Scanned (measured):  L*=  98.500  a*=  66.405  b*=  89.998
+----------------------------------------------------------------------
+Difference:          ΔL*=  +0.000  Δa*=  +0.096  Δb*=  -0.077
+CIEDE2000 ΔE:        0.0595
+----------------------------------------------------------------------
+Match Quality:       Excellent match (imperceptible difference)
+Scanned RGB:         (255, 190, 67)
+======================================================================

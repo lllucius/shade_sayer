@@ -736,6 +736,30 @@ static void enter_serial_scan_mode(void)
                             }
                             else
                             {
+                                // Log measurement results
+                                const char* display_name = result.color_name;
+                                if (result.confidence <= 0.01f)
+                                {
+                                    display_name = "No Match";
+                                }
+
+                                if (result.kona_matched)
+                                {
+                                    printf("Result: %s [Kona %u] (category: %s, dE=%.2f, conf=%.0f%%)\n",
+                                             display_name,
+                                             (unsigned int)result.kona_id,
+                                             result.category,
+                                             result.delta_e,
+                                             result.confidence * 100);
+                                }
+                                else
+                                {
+                                    printf("Result: %s (category: %s, dE=%.2f, conf=%.0f%%)\n",
+                                             display_name, result.category, result.delta_e, result.confidence * 100);
+                                }
+                                printf("XYZ: X=%.2f Y=%.2f Z=%.2f\n", result.xyz.x, result.xyz.y, result.xyz.z);
+                                printf("Lab: L=%.1f a=%.1f b=%.1f\n", result.lab.l, result.lab.a, result.lab.b);
+
                                 // Output Lab values and RGB
                                 printf("OK:LAB:%.4f,%.4f,%.4f:RGB:%d,%d,%d\n",
                                        result.lab.l, result.lab.a, result.lab.b,

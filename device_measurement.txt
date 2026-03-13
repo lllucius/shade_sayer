@@ -1,0 +1,88 @@
+I (9950) main: Starting color measurement
+I (9950) main: UI: Indicating measurement in progress
+I (9950) tcs3530: Internal LED turned ON
+I (9950) main: LED: Illumination ON
+I (9950) tts: Speak: Measuring
+I (9953) main: Sensor: Using Fixed Balanced Gains (X8/Y128/Z512)
+I (9953) main: Sensor: Taking XYZ measurement...
+I (9956) tcs3530: FIFO before clear: 260 bytes
+I (9956) tcs3530: FIFO after clear: 0 bytes
+I (9957) tcs3530: Measurement triggered
+I (10114) tcs3530: SAI_ACTIVE detected (elapsed: 157 ms)
+I (10114) tcs3530: FIFO Status: 260 bytes available
+I (10127) tcs3530: Raw: X=16653312 Y=15118080 Z=5881600 IR=449792
+I (10128) tcs3530: Measurement complete (gain=8x, int=100ms, sat=0)
+I (10128) color_pipe: SensorCorr: raw X=16653312 Y=15118080 Z=5881600 clear=10606848 IR=449792 gain=4 int_ms=100
+I (10128) color_pipe: SensorCorr: gain_mult=8.0 time_scale=1.0000 base_scale=0.125000
+I (10129) color_pipe: SensorCorr: RESP-norm x_in=7178.1519 y_in=6299.2002 z_in=2940.8000 (pre-black-sub)
+I (10129) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (10129) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (10130) color_pipe: After D65 scaling: x_in=6822.618 y_in=6299.200 z_in=3202.031
+I (10130) color_pipe: lightness_scale (gain): 0.930
+I (10130) color_pipe: After gain scaling: x_in=6345.035 y_in=5858.256 z_in=2977.889
+I (10131) color_pipe: SensorCorr: after PCCM+scale: X=737.6696 Y=602.0151 Z=224.4838
+I (10131) color_pipe: IRComp: clear_ir_ratio=23.582 t=1.000 ir_normalized=19.1724 (x gain=0.930)
+I (10131) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (10132) color_pipe: IRComp: sub_x=6.7103 sub_y=4.7931 sub_z=0.9586
+I (10132) color_pipe: IRComp: XYZ pre-IR: X=737.6696 Y=602.0151 Z=224.4838
+I (10132) color_pipe: IRComp: XYZ post-sub=730.9593/597.2220/223.5252 post-clamp=730.9593/597.2220/223.5252
+I (10140) color_pipe: After CCM+IR: X=731.0 Y=597.2 Z=223.5
+I (10200) tcs3530: FIFO before clear: 0 bytes
+I (10201) tcs3530: FIFO after clear: 0 bytes
+I (10201) tcs3530: Measurement triggered
+I (10320) tcs3530: SAI_ACTIVE detected (elapsed: 111 ms)
+I (10321) tcs3530: FIFO Status: 260 bytes available
+I (10335) tcs3530: Raw: X=16674048 Y=15137536 Z=5898496 IR=450304
+I (10336) tcs3530: Measurement complete (gain=8x, int=100ms, sat=0)
+I (10336) color_pipe: SensorCorr: raw X=16674048 Y=15137536 Z=5898496 clear=10623488 IR=450304 gain=4 int_ms=100
+I (10336) color_pipe: SensorCorr: gain_mult=8.0 time_scale=1.0000 base_scale=0.125000
+I (10337) color_pipe: SensorCorr: RESP-norm x_in=7187.0898 y_in=6307.3066 z_in=2949.2480 (pre-black-sub)
+I (10337) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (10338) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (10338) color_pipe: After D65 scaling: x_in=6831.113 y_in=6307.307 z_in=3211.230
+I (10338) color_pipe: lightness_scale (gain): 0.930
+I (10338) color_pipe: After gain scaling: x_in=6352.936 y_in=5865.795 z_in=2986.444
+I (10339) color_pipe: SensorCorr: after PCCM+scale: X=738.5336 Y=602.8476 Z=225.4524
+I (10339) color_pipe: IRComp: clear_ir_ratio=23.592 t=1.000 ir_normalized=19.1942 (x gain=0.930)
+I (10340) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (10340) color_pipe: IRComp: sub_x=6.7180 sub_y=4.7986 sub_z=0.9597
+I (10340) color_pipe: IRComp: XYZ pre-IR: X=738.5336 Y=602.8476 Z=225.4524
+I (10341) color_pipe: IRComp: XYZ post-sub=731.8156/598.0491/224.4926 post-clamp=731.8156/598.0491/224.4926
+I (10341) color_pipe: After CCM+IR: X=731.8 Y=598.0 Z=224.5
+I (10397) tcs3530: FIFO before clear: 0 bytes
+I (10398) tcs3530: FIFO after clear: 0 bytes
+I (10398) tcs3530: Measurement triggered
+I (10515) tcs3530: SAI_ACTIVE detected (elapsed: 117 ms)
+I (10516) tcs3530: FIFO Status: 260 bytes available
+I (10530) tcs3530: Raw: X=16671232 Y=15137792 Z=5898496 IR=450304
+I (10531) tcs3530: Measurement complete (gain=8x, int=100ms, sat=0)
+I (10531) color_pipe: SensorCorr: raw X=16671232 Y=15137792 Z=5898496 clear=10624000 IR=450304 gain=4 int_ms=100
+I (10531) color_pipe: SensorCorr: gain_mult=8.0 time_scale=1.0000 base_scale=0.125000
+I (10532) color_pipe: SensorCorr: RESP-norm x_in=7185.8760 y_in=6307.4136 z_in=2949.2480 (pre-black-sub)
+I (10532) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
+I (10533) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
+I (10533) color_pipe: After D65 scaling: x_in=6829.959 y_in=6307.414 z_in=3211.230
+I (10533) color_pipe: lightness_scale (gain): 0.930
+I (10533) color_pipe: After gain scaling: x_in=6351.862 y_in=5865.895 z_in=2986.444
+I (10534) color_pipe: SensorCorr: after PCCM+scale: X=738.3973 Y=602.8831 Z=225.4684
+I (10534) color_pipe: IRComp: clear_ir_ratio=23.593 t=1.000 ir_normalized=19.1942 (x gain=0.930)
+I (10534) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
+I (10535) color_pipe: IRComp: sub_x=6.7180 sub_y=4.7986 sub_z=0.9597
+I (10535) color_pipe: IRComp: XYZ pre-IR: X=738.3973 Y=602.8831 Z=225.4684
+I (10536) color_pipe: IRComp: XYZ post-sub=731.6794/598.0846/224.5087 post-clamp=731.6794/598.0846/224.5087
+I (10536) color_pipe: After CCM+IR: X=731.7 Y=598.1 Z=224.5
+I (10536) color_pipe: Measure XYZ (IR+Black Cor): X=731.48 Y=597.79 Z=224.18
+I (10537) color_pipe: XYZ normalized: Y=597.8 -> 100.0 (scale=0.1673)
+I (10537) color_pipe: Lightness correction: raw_L=100.0 -> corrected_L=98.5 (gamma=1.0000, scale=0.9300, offset=-1.50)
+I (10544) color_pipe: Gate: raw_L=100.00 corrected_L=98.50 min_luminance=5.00 lightness_scale=0.9300 effective_min=4.65 low_light=0
+I (10544) color_pipe: Pre-enhance Lab: L=98.5 a=43.9 b=59.8 chroma=74.2
+I (10545) color_pipe: Kona result: best_entry 0x3c07da8c best_delta 51.769318 max delta 2.000000 (temp=0)
+I (10550) tcs3530: Internal LED turned OFF
+I (10550) main: LED: Illumination OFF
+I (10550) main: Result: No Match (category: Orange, dE=19.87, conf=1%)
+I (10551) main: XYZ: X=731.48 Y=597.79 Z=224.18
+I (10551) main: Lab: L=98.5 a=65.9 b=89.7
+I (10551) main: RGB: R=255 G=191 B=68
+I (10551) main: Description: This might be Peach. It's quite light.
+I (10552) tts: Speak: This might be Peach. It's quite light.
+I (14187) main: Measurement complete
