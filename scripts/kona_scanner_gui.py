@@ -1055,11 +1055,11 @@ class KonaScannerApp:
         """Handle spacebar keypress as shortcut for Capture button."""
         # Only capture if we're in scanning mode, have items in queue, not already capturing,
         # and the Capture button is enabled.
-        # Use instate() for proper ttk button state checking, and _capture_in_progress
-        # to prevent re-entrancy during root.update() calls.
+        # Use instate(['!disabled']) to check if button is NOT disabled (ttk idiomatic approach),
+        # and _capture_in_progress to prevent re-entrancy during root.update() calls.
         if (self.scanning and self.scan_queue and 
             not self._capture_in_progress and
-            not self.scan_button.instate(['disabled'])):
+            self.scan_button.instate(['!disabled'])):
             self._on_capture_current()
         return "break"  # Prevent event propagation
 

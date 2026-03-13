@@ -193,7 +193,7 @@ def test_scan_queue_advancement():
             scanned_items.append(scan_queue.pop(0))
     
     # Simulate scanning 3 items
-    for i in range(3):
+    for _ in range(3):
         if scan_queue:
             current_id = scan_queue[0]
             # Simulate successful scan
