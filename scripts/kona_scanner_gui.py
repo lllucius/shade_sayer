@@ -262,6 +262,8 @@ class KonaScannerApp:
         """Set up the main UI components."""
         self.root.title("Kona Swatch Scanner")
         self.root.geometry("1200x800")
+        # Maximize window on startup
+        self.root.state('zoomed')
 
         # Main frame with paned window
         main_pane = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
@@ -425,6 +427,9 @@ class KonaScannerApp:
         self.stats_label = ttk.Label(stats_frame, text="", justify=tk.LEFT)
         self.stats_label.pack(padx=5, pady=5)
         self._update_stats()
+
+        # Bind spacebar as shortcut for Capture button
+        self.root.bind("<space>", self._on_spacebar_capture)
 
     def _load_csv(self):
         """Load swatch data from CSV file."""
@@ -752,6 +757,14 @@ class KonaScannerApp:
 
         self._advance_scan()
 
+    def _on_spacebar_capture(self, event):
+        """Handle spacebar keypress as shortcut for Capture button."""
+        # Only capture if we're in scanning mode, have items in queue, and the Capture button is enabled.
+        # The button state check is necessary because the button is temporarily disabled during
+        # active capture operations to prevent double-triggering.
+        if self.scanning and self.scan_queue and self.scan_button['state'] != tk.DISABLED:
+            self._on_capture_current()
+
     def _on_skip_current(self):
         """Skip current swatch in queue."""
         if not self.scanning or not self.scan_queue:
@@ -837,7 +850,7 @@ class KonaScannerApp:
         # Generate entry lines
         rows = []
         for s in sorted_swatches:
-            rows.append(f"        {{ {s.id}, {s.L:.6f}f, {s.a:.6f}f, {s.b:.6f}f }},")
+            rows.append(f"        {{ {s.id}, {s.L:.6f}f, {s.a:.6f}f, {s.b:.6f}f }}, // {s.id} {s.name}")
         
         if len(sorted_swatches) < MAX_ENTRIES:
             rows.append("        // Remaining entries are zero-initialized.")
