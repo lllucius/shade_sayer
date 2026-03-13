@@ -257,6 +257,7 @@ class KonaScannerApp:
         self.scanning = False
         self.scan_thread: Optional[threading.Thread] = None
         self._capture_in_progress = False  # Re-entrancy guard for capture operations
+        self._unsaved_changes = False  # Track whether there are unsaved scan changes
 
         self._setup_ui()
         self._load_csv()
@@ -477,6 +478,9 @@ class KonaScannerApp:
         
         # Escape to stop scan
         self.root.bind("<Escape>", lambda e: self._on_stop_scan())
+        
+        # Window close handler to warn about unsaved changes
+        self.root.protocol("WM_DELETE_WINDOW", self._on_window_close)
         
         # Alt+F to focus filter entry
         self.root.bind("<Alt-f>", self._on_focus_filter)
@@ -789,6 +793,7 @@ class KonaScannerApp:
                     ])
 
             print(f"Saved {len(self.swatches)} swatches to {self.csv_path}")
+            self._unsaved_changes = False  # Clear unsaved changes flag
             return True
         except Exception as e:
             print(f"Error saving CSV: {e}", file=sys.stderr)
@@ -1068,6 +1073,9 @@ class KonaScannerApp:
 
                 self.progress_var.set(f"Captured {swatch.name}: L={L:.1f} a={a:.1f} b={b:.1f}")
                 
+                # Mark that we have unsaved changes
+                self._unsaved_changes = True
+                
                 # Play system bell to indicate successful scan
                 self.root.bell()
             else:
@@ -1104,7 +1112,15 @@ class KonaScannerApp:
         if not self.scan_queue:
             self.scanning = False
             self.progress_var.set("Scan complete")
-            messagebox.showinfo("Info", "Scan session complete")
+            # Prompt to save if there are unsaved changes
+            if self._unsaved_changes:
+                save_now = messagebox.askyesno(
+                    "Scan Complete",
+                    "Scan session complete.\n\nYou have unsaved changes. Save CSV now?")
+                if save_now:
+                    self._save_csv()
+            else:
+                messagebox.showinfo("Info", "Scan session complete")
 
         self._update_scan_ui()
 
@@ -1216,7 +1232,22 @@ const kona_table_t kona_reference = {{
         
         self._populate_treeview()
         self._clear_color_info()
+        self._unsaved_changes = True
         self.progress_var.set("Cleared all scanned values")
+
+    def _on_window_close(self):
+        """Handle window close event with unsaved changes check."""
+        if self._unsaved_changes:
+            result = messagebox.askyesnocancel(
+                "Unsaved Changes",
+                "You have unsaved scan changes.\n\nSave before closing?")
+            if result is None:  # Cancel
+                return
+            if result:  # Yes - save
+                if not self._save_csv():
+                    return  # Save failed, don't close
+        self.serial.disconnect()
+        self.root.destroy()
 
 
 def parse_args() -> argparse.Namespace:
