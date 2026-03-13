@@ -487,13 +487,26 @@ class KonaScannerApp:
         self.root.bind("<Alt-t>", self._on_focus_treeview)
 
     def _on_focus_filter(self, event=None):
-        """Focus the filter entry field."""
+        """Focus the filter entry field and select all text.
+        
+        Returns 'break' to prevent the event from propagating further
+        in the Tkinter event system.
+        """
         self.filter_entry.focus_set()
         self.filter_entry.select_range(0, tk.END)
         return "break"
 
     def _on_focus_treeview(self, event=None):
-        """Focus the swatch list treeview."""
+        """Focus the swatch list treeview.
+        
+        Sets widget focus to the treeview. If no item is currently selected,
+        automatically selects and focuses the first item to enable immediate
+        keyboard navigation. Uses focus_set() for widget focus and focus()
+        for item focus within the tree.
+        
+        Returns 'break' to prevent the event from propagating further
+        in the Tkinter event system.
+        """
         self.tree.focus_set()
         # Select first item if nothing is selected
         if not self.tree.selection():
@@ -786,8 +799,10 @@ class KonaScannerApp:
                 # First ensure all originally selected items stay selected
                 if hasattr(self, '_scan_original_selection'):
                     # Filter to only items still in the tree (in case filter changed)
-                    valid_selection = [iid for iid in self._scan_original_selection 
-                                       if self.tree.exists(iid)]
+                    valid_selection = [
+                        iid for iid in self._scan_original_selection
+                        if self.tree.exists(iid)
+                    ]
                     if valid_selection:
                         self.tree.selection_set(valid_selection)
                 
