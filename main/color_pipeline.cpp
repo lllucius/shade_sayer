@@ -1154,12 +1154,12 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
     // b* calculation explodes because b* = 200*(fy - fz) and fz becomes very small.
     // A minimum Z of 20% of Y keeps pre-boost b* around 86, allowing distinct a*
     // values to be preserved even when b* is clamped after saturation boost.
-    const float MIN_Z_RATIO = 0.20f;  // Minimum Z as fraction of Y
-    float min_z = lab_xyz.y * MIN_Z_RATIO;
+    const float MIN_Z_TO_Y_RATIO = 0.20f;  // Minimum Z as fraction of Y
+    float min_z = lab_xyz.y * MIN_Z_TO_Y_RATIO;
     if (lab_xyz.z < min_z)
     {
-        TCS_LOGD(TAG, "Z floor applied: Z=%.4f -> %.4f (min=%.4f, %.1f%% of Y=%.1f)",
-                 lab_xyz.z, min_z, min_z, MIN_Z_RATIO * 100.0f, lab_xyz.y);
+        TCS_LOGD(TAG, "Z floor applied: Z=%.4f -> %.4f (%.1f%% of Y=%.1f)",
+                 lab_xyz.z, min_z, MIN_Z_TO_Y_RATIO * 100.0f, lab_xyz.y);
         lab_xyz.z = min_z;
     }
 
