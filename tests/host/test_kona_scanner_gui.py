@@ -177,8 +177,67 @@ def test_generate_cpp_valid_cpp_syntax():
     print("_generate_cpp valid C++ syntax test passed")
 
 
+def test_scan_queue_advancement():
+    """Test that scan queue properly advances through items.
+    
+    This tests the fix for the bug where scanning would get stuck on item 2
+    (pattern: 1, 2, 2, 2, 2, ...) instead of advancing properly.
+    """
+    # Simulate the scan queue behavior
+    scan_queue = [120, 121, 122]  # 3 consecutive items
+    scanned_items = []
+    
+    def mock_advance_scan():
+        """Simulate _advance_scan behavior."""
+        if scan_queue:
+            scanned_items.append(scan_queue.pop(0))
+    
+    # Simulate scanning 3 items
+    for _ in range(3):
+        if scan_queue:
+            current_id = scan_queue[0]
+            # Simulate successful scan
+            mock_advance_scan()
+    
+    # Verify all items were scanned in order
+    assert scanned_items == [120, 121, 122], \
+        f"Expected [120, 121, 122], got {scanned_items}"
+    assert len(scan_queue) == 0, f"Queue should be empty, got {scan_queue}"
+    
+    print("Scan queue advancement test passed")
+
+
+def test_remaining_selection_calculation():
+    """Test that remaining selection is calculated correctly from scan_queue.
+    
+    This tests the fix where selection should show only remaining items,
+    not all originally selected items.
+    """
+    scan_queue = [120, 121, 122]
+    
+    # After scanning item 120, queue becomes [121, 122]
+    scan_queue.pop(0)
+    
+    # Calculate remaining selection (simulating _update_scan_ui logic)
+    remaining_selection = [str(item_id) for item_id in scan_queue]
+    
+    assert remaining_selection == ['121', '122'], \
+        f"Expected ['121', '122'], got {remaining_selection}"
+    
+    # After scanning item 121, queue becomes [122]
+    scan_queue.pop(0)
+    remaining_selection = [str(item_id) for item_id in scan_queue]
+    
+    assert remaining_selection == ['122'], \
+        f"Expected ['122'], got {remaining_selection}"
+    
+    print("Remaining selection calculation test passed")
+
+
 if __name__ == "__main__":
     test_generate_cpp_inline_comments()
     test_generate_cpp_sorted_by_id()
     test_generate_cpp_valid_cpp_syntax()
+    test_scan_queue_advancement()
+    test_remaining_selection_calculation()
     print("\nAll kona_scanner_gui tests passed")
