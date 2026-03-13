@@ -426,6 +426,9 @@ class KonaScannerApp:
         self.stats_label.pack(padx=5, pady=5)
         self._update_stats()
 
+        # Bind spacebar as shortcut for Capture button
+        self.root.bind("<space>", self._on_spacebar_capture)
+
     def _load_csv(self):
         """Load swatch data from CSV file."""
         self.swatches.clear()
@@ -752,6 +755,12 @@ class KonaScannerApp:
 
         self._advance_scan()
 
+    def _on_spacebar_capture(self, event):
+        """Handle spacebar keypress as shortcut for Capture button."""
+        # Only capture if we're in scanning mode and the Capture button is enabled
+        if self.scanning and self.scan_queue and self.scan_button['state'] != tk.DISABLED:
+            self._on_capture_current()
+
     def _on_skip_current(self):
         """Skip current swatch in queue."""
         if not self.scanning or not self.scan_queue:
@@ -837,7 +846,7 @@ class KonaScannerApp:
         # Generate entry lines
         rows = []
         for s in sorted_swatches:
-            rows.append(f"        {{ {s.id}, {s.L:.6f}f, {s.a:.6f}f, {s.b:.6f}f }},")
+            rows.append(f"        {{ {s.id}, {s.L:.6f}f, {s.a:.6f}f, {s.b:.6f}f }}, // {s.id} {s.name}")
         
         if len(sorted_swatches) < MAX_ENTRIES:
             rows.append("        // Remaining entries are zero-initialized.")
@@ -909,6 +918,8 @@ def main() -> int:
 
     root = tk.Tk()
     app = KonaScannerApp(root, str(csv_path), args.port, debug=args.debug)
+    # Maximize window on startup
+    root.state('zoomed')
     root.mainloop()
 
     return 0
