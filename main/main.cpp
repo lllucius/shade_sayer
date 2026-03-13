@@ -457,7 +457,7 @@ static void perform_measurement(void)
 
     tts_speak_async("Measuring");
 
-    ESP_LOGI(TAG, "Sensor: Using Fixed Balanced Gains (X16/Y128/Z512)");
+    ESP_LOGI(TAG, "Sensor: Using Fixed Balanced Gains (X8/Y128/Z512)");
 
     ESP_LOGI(TAG, "Sensor: Taking XYZ measurement...");
     esp_err_t ret = color_pipeline_identify(s_sensor, &result);
@@ -984,9 +984,9 @@ extern "C" void app_main(void)
     sensor_config.i2c_bus = i2c_bus_manager_get();
 
     // Hardware Gain Balancing Configuration:
-    // Set initial_gain to X16 (base gain) and disable auto_gain.
+    // Set initial_gain to X8 (base gain) and disable auto_gain.
     // Per-channel gains will be applied after initialization.
-    sensor_config.initial_gain = TCS3530Gain::X16;
+    sensor_config.initial_gain = TCS3530Gain::X8;
 
     uint16_t integration_time = ALS_INTEGRATION_TIME_MS;
     if (integration_time == 0)
@@ -1021,14 +1021,14 @@ extern "C" void app_main(void)
 
     // Use Uniform Gain for stability. The Color Pipeline Matrix will handle the
     // specific channel boosting.
-    ret = s_sensor->setGain(TCS3530Gain::X16);
+    ret = s_sensor->setGain(TCS3530Gain::X8);
     
     if (ret != ESP_OK)
     {
         ESP_LOGE(TAG, "Failed to set gain: %s", esp_err_to_name(ret));
         return;
     }
-    ESP_LOGI(TAG, "Sensor configured for Uniform Gain (X16)");
+    ESP_LOGI(TAG, "Sensor configured for Uniform Gain (X8)");
 
     // Initialize color processing pipeline
     ESP_LOGI(TAG, "Initializing color processing pipeline...");

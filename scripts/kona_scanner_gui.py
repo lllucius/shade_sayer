@@ -415,29 +415,29 @@ class KonaScannerApp:
 
         ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
 
-        self.scan_selected_btn = ttk.Button(toolbar, text="Scan Selected (Alt+S)", command=self._on_scan_selected)
+        self.scan_selected_btn = ttk.Button(toolbar, text="Scan (Alt+S)", command=self._on_scan_selected)
         self.scan_selected_btn.pack(side=tk.LEFT, padx=2)
-        self.stop_scan_btn = ttk.Button(toolbar, text="Stop Scan (Esc)", command=self._on_stop_scan)
+        self.stop_scan_btn = ttk.Button(toolbar, text="Stop (Esc)", command=self._on_stop_scan)
         self.stop_scan_btn.pack(side=tk.LEFT, padx=2)
 
         ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
 
-        self.save_csv_btn = ttk.Button(toolbar, text="Save CSV (Ctrl+S)", command=self._on_save_csv)
+        self.save_csv_btn = ttk.Button(toolbar, text="Save (Ctrl+S)", command=self._on_save_csv)
         self.save_csv_btn.pack(side=tk.LEFT, padx=2)
-        self.export_cpp_btn = ttk.Button(toolbar, text="Export C++ (Alt+E)", command=self._on_export_cpp)
+        self.export_cpp_btn = ttk.Button(toolbar, text="Export (Alt+E)", command=self._on_export_cpp)
         self.export_cpp_btn.pack(side=tk.LEFT, padx=2)
 
         ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
 
-        self.clear_scanned_btn = ttk.Button(toolbar, text="Clear Scanned (Alt+L)", command=self._on_clear_scanned)
+        self.clear_scanned_btn = ttk.Button(toolbar, text="Clear (Alt+L)", command=self._on_clear_scanned)
         self.clear_scanned_btn.pack(side=tk.LEFT, padx=2)
 
         ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
 
         # Kona table management buttons
-        self.upload_kona_btn = ttk.Button(toolbar, text="Upload Kona (Alt+U)", command=self._on_upload_kona)
+        self.upload_kona_btn = ttk.Button(toolbar, text="Upload (Alt+U)", command=self._on_upload_kona)
         self.upload_kona_btn.pack(side=tk.LEFT, padx=2)
-        self.clear_kona_btn = ttk.Button(toolbar, text="Clear Kona", command=self._on_clear_kona)
+        self.clear_kona_btn = ttk.Button(toolbar, text="Clear", command=self._on_clear_kona)
         self.clear_kona_btn.pack(side=tk.LEFT, padx=2)
         
         # Filter controls
