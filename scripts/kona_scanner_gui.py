@@ -21,6 +21,7 @@ import csv
 import colorsys
 import dataclasses
 import datetime as dt
+import math
 import os
 import pathlib
 import platform
@@ -126,6 +127,105 @@ def lab_to_rgb(L: float, a: float, b: float) -> Tuple[int, int, int]:
 def rgb_to_hex(r: int, g: int, b: int) -> str:
     """Convert RGB to hex color string."""
     return f"#{r:02x}{g:02x}{b:02x}"
+
+
+def ciede2000(lab1: Tuple[float, float, float], lab2: Tuple[float, float, float]) -> float:
+    """Calculate CIEDE2000 color difference between two Lab colors.
+    
+    Returns the perceptually uniform color difference (ΔE00).
+    A value of ~1.0 is considered the just-noticeable difference.
+    Values under 2.0 are generally considered a close match.
+    """
+    L1, a1, b1 = lab1
+    L2, a2, b2 = lab2
+    
+    # Weighting factors (standard values)
+    kL = 1.0
+    kC = 1.0
+    kH = 1.0
+    
+    # Step 1: Calculate C'i and h'i
+    C1 = math.sqrt(a1 * a1 + b1 * b1)
+    C2 = math.sqrt(a2 * a2 + b2 * b2)
+    C_bar = (C1 + C2) / 2.0
+    
+    C_bar_7 = C_bar ** 7
+    G = 0.5 * (1.0 - math.sqrt(C_bar_7 / (C_bar_7 + 25.0 ** 7)))
+    
+    a1_prime = a1 * (1.0 + G)
+    a2_prime = a2 * (1.0 + G)
+    
+    C1_prime = math.sqrt(a1_prime * a1_prime + b1 * b1)
+    C2_prime = math.sqrt(a2_prime * a2_prime + b2 * b2)
+    
+    def calc_h_prime(a_prime: float, b: float) -> float:
+        if abs(a_prime) < 1e-10 and abs(b) < 1e-10:
+            return 0.0
+        h = math.degrees(math.atan2(b, a_prime))
+        if h < 0:
+            h += 360.0
+        return h
+    
+    h1_prime = calc_h_prime(a1_prime, b1)
+    h2_prime = calc_h_prime(a2_prime, b2)
+    
+    # Step 2: Calculate ΔL', ΔC', ΔH'
+    delta_L_prime = L2 - L1
+    delta_C_prime = C2_prime - C1_prime
+    
+    if C1_prime * C2_prime < 1e-10:
+        delta_h_prime = 0.0
+    else:
+        dh = h2_prime - h1_prime
+        if dh > 180.0:
+            dh -= 360.0
+        elif dh < -180.0:
+            dh += 360.0
+        delta_h_prime = dh
+    
+    delta_H_prime = 2.0 * math.sqrt(C1_prime * C2_prime) * math.sin(math.radians(delta_h_prime / 2.0))
+    
+    # Step 3: Calculate CIEDE2000 color difference
+    L_bar_prime = (L1 + L2) / 2.0
+    C_bar_prime = (C1_prime + C2_prime) / 2.0
+    
+    if C1_prime * C2_prime < 1e-10:
+        h_bar_prime = h1_prime + h2_prime
+    else:
+        h_sum = h1_prime + h2_prime
+        if abs(h1_prime - h2_prime) > 180.0:
+            if h_sum < 360.0:
+                h_sum += 360.0
+            else:
+                h_sum -= 360.0
+        h_bar_prime = h_sum / 2.0
+    
+    T = (1.0 
+         - 0.17 * math.cos(math.radians(h_bar_prime - 30.0))
+         + 0.24 * math.cos(math.radians(2.0 * h_bar_prime))
+         + 0.32 * math.cos(math.radians(3.0 * h_bar_prime + 6.0))
+         - 0.20 * math.cos(math.radians(4.0 * h_bar_prime - 63.0)))
+    
+    delta_theta = 30.0 * math.exp(-((h_bar_prime - 275.0) / 25.0) ** 2)
+    
+    C_bar_prime_7 = C_bar_prime ** 7
+    RC = 2.0 * math.sqrt(C_bar_prime_7 / (C_bar_prime_7 + 25.0 ** 7))
+    
+    L_bar_prime_minus_50_sq = (L_bar_prime - 50.0) ** 2
+    SL = 1.0 + (0.015 * L_bar_prime_minus_50_sq) / math.sqrt(20.0 + L_bar_prime_minus_50_sq)
+    SC = 1.0 + 0.045 * C_bar_prime
+    SH = 1.0 + 0.015 * C_bar_prime * T
+    
+    RT = -math.sin(math.radians(2.0 * delta_theta)) * RC
+    
+    delta_E = math.sqrt(
+        (delta_L_prime / (kL * SL)) ** 2 +
+        (delta_C_prime / (kC * SC)) ** 2 +
+        (delta_H_prime / (kH * SH)) ** 2 +
+        RT * (delta_C_prime / (kC * SC)) * (delta_H_prime / (kH * SH))
+    )
+    
+    return delta_E
 
 
 class SerialConnection:
@@ -437,8 +537,8 @@ class KonaScannerApp:
         # Kona table management buttons
         self.upload_kona_btn = ttk.Button(toolbar, text="Upload (Alt+U)", command=self._on_upload_kona)
         self.upload_kona_btn.pack(side=tk.LEFT, padx=2)
-        self.clear_kona_btn = ttk.Button(toolbar, text="Clear", command=self._on_clear_kona)
-        self.clear_kona_btn.pack(side=tk.LEFT, padx=2)
+        self.measure_btn = ttk.Button(toolbar, text="Measure (Alt+M)", command=self._on_measure)
+        self.measure_btn.pack(side=tk.LEFT, padx=2)
         
         # Filter controls
         filter_frame = ttk.Frame(left_frame)
@@ -607,6 +707,7 @@ class KonaScannerApp:
         self.root.bind("<Alt-l>", lambda e: self._on_clear_scanned())
         self.root.bind("<Alt-k>", lambda e: self._on_skip_current())
         self.root.bind("<Alt-u>", lambda e: self._on_upload_kona())
+        self.root.bind("<Alt-m>", lambda e: self._on_measure())
         
         # Ctrl+S for Save CSV
         self.root.bind("<Control-s>", lambda e: self._on_save_csv())
@@ -1486,28 +1587,98 @@ const kona_table_t kona_reference = {{
             messagebox.showerror("Error", f"Failed to upload table:\n{e}")
             self.progress_var.set(f"Upload error: {e}")
 
-    def _on_clear_kona(self):
-        """Clear temporary Kona table from device."""
+    def _on_measure(self):
+        """Take a measurement and compare to the selected swatch.
+        
+        Triggers a scan on the device and logs detailed comparison information
+        between the scanned values and the selected swatch's reference values
+        to help debug Kona color matching issues.
+        """
         if not self.serial.is_connected():
             messagebox.showerror("Error", "Not connected to device.")
             return
         
-        # Confirm action
-        result = messagebox.askyesno(
-            "Confirm",
-            "Clear temporary Kona table on device?\n\n"
-            "This will revert to the built-in table.")
-        
-        if not result:
+        # Get selected swatch
+        selection = self.tree.selection()
+        if not selection:
+            messagebox.showwarning("Warning", "Please select a swatch first.")
             return
         
-        if self.serial.kona_clear():
-            messagebox.showinfo("Success", "Temporary Kona table cleared.")
-            self.progress_var.set("Kona table cleared")
-            self._update_kona_status()
+        swatch_id = int(selection[0])
+        swatch = self.swatches.get(swatch_id)
+        if not swatch:
+            messagebox.showerror("Error", "Selected swatch not found.")
+            return
+        
+        # Check if swatch has reference values
+        if swatch.L is None or swatch.a is None or swatch.b is None:
+            messagebox.showwarning(
+                "Warning", 
+                f"Swatch '{swatch.name}' has no reference Lab values.\n"
+                "Scan the swatch first to capture reference values.")
+            return
+        
+        self.progress_var.set(f"Measuring {swatch.name}...")
+        self.root.update_idletasks()
+        
+        # Perform the scan
+        result = self.serial.scan()
+        
+        if not result:
+            messagebox.showerror("Error", f"Measurement failed for {swatch.name}")
+            self.progress_var.set("Measurement failed")
+            return
+        
+        scan_L, scan_a, scan_b, scan_R, scan_G, scan_B = result
+        
+        # Calculate delta E using CIEDE2000
+        scan_lab = (scan_L, scan_a, scan_b)
+        ref_lab = (swatch.L, swatch.a, swatch.b)
+        delta_e = ciede2000(scan_lab, ref_lab)
+        
+        # Log detailed comparison (to console)
+        print("\n" + "=" * 70)
+        print(f"MEASUREMENT COMPARISON: {swatch.name} (ID: {swatch.id})")
+        print("=" * 70)
+        print(f"Reference (stored):  L*={swatch.L:7.3f}  a*={swatch.a:7.3f}  b*={swatch.b:7.3f}")
+        print(f"Scanned (measured):  L*={scan_L:7.3f}  a*={scan_a:7.3f}  b*={scan_b:7.3f}")
+        print("-" * 70)
+        print(f"Difference:          ΔL*={scan_L - swatch.L:+7.3f}  Δa*={scan_a - swatch.a:+7.3f}  Δb*={scan_b - swatch.b:+7.3f}")
+        print(f"CIEDE2000 ΔE:        {delta_e:.4f}")
+        print("-" * 70)
+        
+        # Interpret the result
+        if delta_e < 1.0:
+            match_quality = "Excellent match (imperceptible difference)"
+        elif delta_e < 2.0:
+            match_quality = "Good match (within Kona threshold)"
+        elif delta_e < 3.0:
+            match_quality = "Fair match (perceptible difference)"
+        elif delta_e < 5.0:
+            match_quality = "Poor match (noticeable difference)"
         else:
-            messagebox.showerror("Error", "Failed to clear Kona table.")
-            self.progress_var.set("Clear Kona table failed")
+            match_quality = "No match (clearly different)"
+        
+        print(f"Match Quality:       {match_quality}")
+        print(f"Scanned RGB:         ({scan_R}, {scan_G}, {scan_B})")
+        print("=" * 70 + "\n")
+        
+        # Update the "Last Captured" display
+        r, g, b = lab_to_rgb(scan_L, scan_a, scan_b)
+        self._last_captured_color = rgb_to_hex(r, g, b)
+        self.color_canvas.config(bg=self._last_captured_color)
+        
+        self.last_captured_label.config(
+            text=f"Measured: {swatch.name}\n"
+                 f"L*={scan_L:.2f}  a*={scan_a:.2f}  b*={scan_b:.2f}\n"
+                 f"ΔE00={delta_e:.2f} ({match_quality.split('(')[0].strip()})")
+        
+        # Update status bar
+        self.progress_var.set(
+            f"{swatch.name}: ΔE={delta_e:.2f} - {match_quality.split('(')[0].strip()}")
+        
+        self.root.update_idletasks()
+        self.root.bell()
 
     def _generate_kona_binary(self, entries: List[Tuple[int, float, float, float]]) -> bytes:
         """Generate binary kona_table_t data from list of (id, L, a, b) tuples.
