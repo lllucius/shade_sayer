@@ -422,6 +422,12 @@ def test_collect_measured_swatches_for_upload():
     
     This tests the logic used by _on_upload_kona to gather measured swatches
     from self.swatches and convert them to (id, L, a, b) tuples sorted by ID.
+    
+    Edge cases tested:
+    - Unmeasured swatches (measured=False) should be excluded
+    - Swatches with partial Lab values (e.g., missing 'a') should be excluded
+    - Only swatches with complete data should be included
+    - Results should be sorted by swatch ID
     """
     # Create test swatches dict simulating self.swatches
     swatches = {
