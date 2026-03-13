@@ -74,6 +74,7 @@
 #include "hardware_pins.h"
 #include "console_logger.h"
 #include "kona_metadata.h"
+#include "konaref.h"
 
 static const char* TAG = "main";
 
@@ -743,6 +744,119 @@ static void enter_serial_scan_mode(void)
                                 
                                 s_last_result = result;
                                 s_has_last_result = true;
+                            }
+                        }
+                    }
+                    else if (strcmp(cmd_buffer, "KONA_STATUS") == 0)
+                    {
+                        // Report Kona table status
+                        const bool temp_active = kona_ref_is_temp_active();
+                        const size_t entry_count = kona_ref_active_entry_count();
+                        const bool builtin_valid = kona_ref_validate();
+                        printf("OK:KONA_STATUS:temp=%d,entries=%zu,builtin=%d\n",
+                               temp_active, entry_count, builtin_valid);
+                        fflush(stdout);
+                    }
+                    else if (strcmp(cmd_buffer, "KONA_CLEAR") == 0)
+                    {
+                        // Clear temporary Kona table
+                        kona_ref_clear_temp();
+                        printf("OK:KONA_CLEARED\n");
+                        fflush(stdout);
+                        ESP_LOGI(TAG, "Temporary Kona table cleared");
+                    }
+                    else if (strncmp(cmd_buffer, "KONA_LOAD:", 10) == 0)
+                    {
+                        // Parse expected byte count
+                        const char* size_str = cmd_buffer + 10;
+                        const size_t expected_bytes = static_cast<size_t>(atoi(size_str));
+                        
+                        // Validate size
+                        if (expected_bytes != sizeof(kona_table_t))
+                        {
+                            printf("ERR:KONA_LOAD:SIZE_MISMATCH:expected=%zu,got=%zu\n",
+                                   sizeof(kona_table_t), expected_bytes);
+                            fflush(stdout);
+                        }
+                        else
+                        {
+                            // Signal ready to receive
+                            printf("OK:KONA_LOAD:READY:%zu\n", sizeof(kona_table_t));
+                            fflush(stdout);
+                            
+                            // Allocate buffer for receiving binary data
+                            uint8_t* recv_buffer = static_cast<uint8_t*>(malloc(sizeof(kona_table_t)));
+                            if (!recv_buffer)
+                            {
+                                printf("ERR:KONA_LOAD:OUT_OF_MEMORY\n");
+                                fflush(stdout);
+                            }
+                            else
+                            {
+                                // Read binary data with timeout
+                                size_t bytes_received = 0;
+                                const uint32_t timeout_ms = 10000; // 10 second timeout
+                                const TickType_t start_tick = xTaskGetTickCount();
+                                
+                                // Temporarily set stdin to blocking with timeout for bulk read
+                                while (bytes_received < sizeof(kona_table_t))
+                                {
+                                    // Check timeout using tick count subtraction.
+                                    // This handles wrap-around correctly due to unsigned arithmetic,
+                                    // as long as timeout is less than half the tick range.
+                                    const TickType_t elapsed_ticks = xTaskGetTickCount() - start_tick;
+                                    if ((elapsed_ticks * portTICK_PERIOD_MS) > timeout_ms)
+                                    {
+                                        break;
+                                    }
+                                    
+                                    // Try to read available bytes
+                                    int ch;
+                                    while (bytes_received < sizeof(kona_table_t) && (ch = getchar()) != EOF)
+                                    {
+                                        recv_buffer[bytes_received++] = static_cast<uint8_t>(ch);
+                                    }
+                                    
+                                    // Clear EAGAIN from non-blocking read
+                                    if (errno == EAGAIN)
+                                    {
+                                        errno = 0;
+                                    }
+                                    
+                                    // Small delay if no data available
+                                    if (bytes_received < sizeof(kona_table_t))
+                                    {
+                                        vTaskDelay(pdMS_TO_TICKS(10));
+                                    }
+                                }
+                                
+                                if (bytes_received != sizeof(kona_table_t))
+                                {
+                                    printf("ERR:KONA_LOAD:INCOMPLETE:%zu/%zu\n",
+                                           bytes_received, sizeof(kona_table_t));
+                                    fflush(stdout);
+                                }
+                                else
+                                {
+                                    // Try to load the table
+                                    const kona_table_t* table = reinterpret_cast<const kona_table_t*>(recv_buffer);
+                                    if (kona_ref_load_temp(table))
+                                    {
+                                        printf("OK:KONA_LOADED:entries=%u\n",
+                                               static_cast<unsigned int>(table->entry_count));
+                                        fflush(stdout);
+                                        ESP_LOGI(TAG, "Temporary Kona table loaded: %u entries",
+                                                 static_cast<unsigned int>(table->entry_count));
+                                    }
+                                    else
+                                    {
+                                        printf("ERR:KONA_LOAD:VALIDATION_FAILED\n");
+                                        fflush(stdout);
+                                        ESP_LOGW(TAG, "Kona table validation failed");
+                                    }
+                                }
+                                
+                                free(recv_buffer);
                             }
                         }
                     }

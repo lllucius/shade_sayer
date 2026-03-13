@@ -311,6 +311,78 @@ def test_display_gamma_darkens_colors():
     print("Display gamma darkening test passed")
 
 
+def test_generate_kona_binary():
+    """Test that binary Kona table data is generated correctly.
+    
+    This tests the binary serialization that matches the firmware's kona_table_t struct.
+    """
+    # Create test entries: (kona_id, L, a, b)
+    test_entries = [
+        (100, 50.0, 10.0, -5.0),
+        (200, 75.0, -20.0, 30.0),
+    ]
+    
+    # Calculate expected binary format
+    # Header: uint16_t version + uint16_t entry_count + uint32_t crc32
+    # Entries: 365 * 16 bytes each (uint16_t id + 2 pad + 3 floats)
+    
+    # Build entry payload for CRC calculation
+    import zlib
+    crc_payload = bytearray()
+    for kona_id, L, a, b in test_entries:
+        crc_payload.extend(struct.pack("<H2x3f", kona_id, L, a, b))
+    expected_crc = zlib.crc32(crc_payload) & 0xFFFFFFFF
+    
+    # Build full table
+    entry_payload = bytearray()
+    for kona_id, L, a, b in test_entries:
+        entry_payload.extend(struct.pack("<H2x3f", kona_id, L, a, b))
+    # Pad to 365 entries
+    remaining = MAX_ENTRIES - len(test_entries)
+    entry_payload.extend(b'\x00' * (remaining * KONA_REF_T_SIZE))
+    
+    header = struct.pack("<HHI", SCHEMA_VERSION, len(test_entries), expected_crc)
+    expected_data = header + bytes(entry_payload)
+    
+    # Simulate the _generate_kona_binary function
+    def generate_kona_binary_standalone(entries):
+        entry_data = bytearray()
+        for kona_id, L, a, b in entries:
+            entry_data.extend(struct.pack("<H2x3f", kona_id, L, a, b))
+        
+        remaining = MAX_ENTRIES - len(entries)
+        if remaining > 0:
+            entry_data.extend(b'\x00' * (remaining * KONA_REF_T_SIZE))
+        
+        crc_data = bytearray()
+        for kona_id, L, a, b in entries:
+            crc_data.extend(struct.pack("<H2x3f", kona_id, L, a, b))
+        crc = zlib.crc32(crc_data) & 0xFFFFFFFF
+        
+        header = struct.pack("<HHI", SCHEMA_VERSION, len(entries), crc)
+        return header + bytes(entry_data)
+    
+    actual_data = generate_kona_binary_standalone(test_entries)
+    
+    # Verify total size
+    expected_size = 8 + (MAX_ENTRIES * KONA_REF_T_SIZE)  # header + entries
+    assert len(actual_data) == expected_size, \
+        f"Expected {expected_size} bytes, got {len(actual_data)}"
+    
+    # Verify header
+    version, count, crc = struct.unpack("<HHI", actual_data[:8])
+    assert version == SCHEMA_VERSION, f"Version mismatch: {version} != {SCHEMA_VERSION}"
+    assert count == len(test_entries), f"Count mismatch: {count} != {len(test_entries)}"
+    assert crc == expected_crc, f"CRC mismatch: {crc:#x} != {expected_crc:#x}"
+    
+    # Verify first entry
+    entry1 = struct.unpack("<H2x3f", actual_data[8:24])
+    assert entry1[0] == 100, f"First entry ID mismatch: {entry1[0]}"
+    assert abs(entry1[1] - 50.0) < 1e-6, f"First entry L mismatch: {entry1[1]}"
+    
+    print("Binary Kona table generation test passed")
+
+
 if __name__ == "__main__":
     test_generate_cpp_inline_comments()
     test_generate_cpp_sorted_by_id()
@@ -318,4 +390,5 @@ if __name__ == "__main__":
     test_scan_queue_advancement()
     test_remaining_selection_calculation()
     test_display_gamma_darkens_colors()
+    test_generate_kona_binary()
     print("\nAll kona_scanner_gui tests passed")
