@@ -1125,15 +1125,46 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
     }
 
     result->xyz = corrected;
-    result->lab = color_math_xyz_to_lab(corrected);
 
-    // Store raw Lab for Kona matching before any corrections.
-    // The Kona reference table contains raw Lab values (XYZ->Lab conversion only,
-    // no lightness gamma or saturation boost), so we must match against the same
-    // representation. After matching, we apply corrections to result->lab for
-    // display and fallback database matching.
-    lab_t raw_lab = result->lab;
-        
+    // Compute raw Lab for Kona matching BEFORE any normalization/floor.
+    // The Kona reference table contains raw Lab values (XYZ->Lab conversion only),
+    // so we must match against the same representation for accurate deltaE.
+    lab_t raw_lab = color_math_xyz_to_lab(corrected);
+
+    // For display Lab values, normalize XYZ to prevent extreme b* values.
+    // This doesn't affect Kona matching (which uses raw_lab) but improves
+    // the displayed color values and differentiation between similar colors.
+    xyz_t lab_xyz = corrected;
+
+    // Normalize XYZ values when luminance exceeds D65 white reference.
+    // This prevents Lab values from going out of gamut (b* > 200) when the sensor
+    // reports colors brighter than reference white (e.g., saturated yellows).
+    // We scale all channels proportionally to preserve chromaticity (hue).
+    if (lab_xyz.y > D65_Y)
+    {
+        float scale = D65_Y / lab_xyz.y;
+        lab_xyz.x *= scale;
+        lab_xyz.y *= scale;
+        lab_xyz.z *= scale;
+        TCS_LOGD(TAG, "XYZ normalized: Y=%.1f -> %.1f (scale=%.4f)", corrected.y, lab_xyz.y, scale);
+    }
+
+    // Apply minimum Z floor relative to luminance to prevent extreme b* values.
+    // When the PCCM collapses Z to near-zero (e.g., for saturated yellows), the Lab
+    // b* calculation explodes because b* = 200*(fy - fz) and fz becomes very small.
+    // A minimum Z of 20% of Y keeps pre-boost b* around 86, allowing distinct a*
+    // values to be preserved even when b* is clamped after saturation boost.
+    const float MIN_Z_RATIO = 0.20f;  // Minimum Z as fraction of Y
+    float min_z = lab_xyz.y * MIN_Z_RATIO;
+    if (lab_xyz.z < min_z)
+    {
+        TCS_LOGD(TAG, "Z floor applied: Z=%.4f -> %.4f (min=%.4f, %.1f%% of Y=%.1f)",
+                 lab_xyz.z, min_z, min_z, MIN_Z_RATIO * 100.0f, lab_xyz.y);
+        lab_xyz.z = min_z;
+    }
+
+    result->lab = color_math_xyz_to_lab(lab_xyz);
+
     // Log raw and corrected lightness values for diagnostics
     float raw_L = result->lab.l;
 
