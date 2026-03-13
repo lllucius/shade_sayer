@@ -69,10 +69,19 @@ class SwatchData:
     notes: str = ""
 
 
+# Display gamma adjustment for monitor compensation.
+# Values > 1.0 make colors appear darker, < 1.0 makes them lighter.
+# Default 1.1 provides slight darkening which often looks better on typical LCD monitors.
+# Set to 1.0 for mathematically exact sRGB output.
+DISPLAY_GAMMA = 1.1
+
+
 def lab_to_rgb(L: float, a: float, b: float) -> Tuple[int, int, int]:
-    """Convert CIE Lab to sRGB (approximate for display).
+    """Convert CIE Lab to sRGB for display.
     
-    Uses D65 illuminant reference white.
+    Uses D65 illuminant reference white and applies sRGB gamma encoding.
+    An additional display gamma adjustment (DISPLAY_GAMMA) is applied to
+    compensate for typical LCD monitor viewing conditions.
     """
     # Lab to XYZ
     fy = (L + 16.0) / 116.0
@@ -97,11 +106,15 @@ def lab_to_rgb(L: float, a: float, b: float) -> Tuple[int, int, int]:
     g_lin = (-0.9692660 * X + 1.8760108 * Y + 0.0415560 * Z) / 100.0
     b_lin = ( 0.0556434 * X - 0.2040259 * Y + 1.0572252 * Z) / 100.0
 
-    # Gamma correction
+    # sRGB gamma correction with additional display gamma adjustment
     def gamma(u: float) -> float:
         if u <= 0.0031308:
-            return 12.92 * u
-        return 1.055 * (u ** (1.0 / 2.4)) - 0.055
+            v = 12.92 * u
+        else:
+            v = 1.055 * (u ** (1.0 / 2.4)) - 0.055
+        # Apply display gamma to compensate for monitor characteristics
+        # (value clamped to avoid negative numbers from out-of-gamut colors)
+        return max(0.0, v) ** DISPLAY_GAMMA
 
     r = int(max(0, min(255, round(gamma(r_lin) * 255))))
     g = int(max(0, min(255, round(gamma(g_lin) * 255))))
@@ -993,7 +1006,12 @@ class KonaScannerApp:
         self._update_scan_ui()
 
     def _update_scan_ui(self):
-        """Update scan UI state."""
+        """Update scan UI state.
+        
+        Forces an immediate UI refresh via update_idletasks() to ensure the
+        status label and button states are visually updated without waiting
+        for event loop processing.
+        """
         if self.scanning and self.scan_queue:
             current_id = self.scan_queue[0]
             swatch = self.swatches.get(current_id)
@@ -1028,6 +1046,11 @@ class KonaScannerApp:
             # Clean up stored selection
             if hasattr(self, '_scan_original_selection'):
                 del self._scan_original_selection
+        
+        # Force immediate UI refresh so status changes are visible right away
+        # Using update_idletasks() is safer than update() as it doesn't process
+        # user input events which could cause re-entrancy issues.
+        self.root.update_idletasks()
 
 
     def _on_capture_current(self):

@@ -234,10 +234,79 @@ def test_remaining_selection_calculation():
     print("Remaining selection calculation test passed")
 
 
+def test_display_gamma_darkens_colors():
+    """Test that DISPLAY_GAMMA > 1.0 produces darker RGB values.
+    
+    With DISPLAY_GAMMA > 1.0, the lab_to_rgb function should produce
+    darker (lower) RGB values than with DISPLAY_GAMMA = 1.0.
+    """
+    # Test data: Lab values and expected range for darkening
+    test_colors = [
+        (50.0, 0.0, 0.0),   # Mid gray
+        (75.0, 20.0, 60.0), # Orange tone
+        (25.0, 10.0, -30.0), # Dark blue
+    ]
+    
+    # Standalone implementation with configurable gamma
+    def lab_to_rgb_with_gamma(L, a, b, display_gamma=1.0):
+        fy = (L + 16.0) / 116.0
+        fx = a / 500.0 + fy
+        fz = fy - b / 200.0
+        Xn, Yn, Zn = 95.047, 100.0, 108.883
+        
+        def f_inv(t):
+            delta = 6.0 / 29.0
+            if t > delta:
+                return t ** 3
+            return 3 * delta ** 2 * (t - 4.0 / 29.0)
+        
+        X = Xn * f_inv(fx)
+        Y = Yn * f_inv(fy)
+        Z = Zn * f_inv(fz)
+        
+        r_lin = ( 3.2404542 * X - 1.5371385 * Y - 0.4985314 * Z) / 100.0
+        g_lin = (-0.9692660 * X + 1.8760108 * Y + 0.0415560 * Z) / 100.0
+        b_lin = ( 0.0556434 * X - 0.2040259 * Y + 1.0572252 * Z) / 100.0
+        
+        def gamma_func(u):
+            if u <= 0.0031308:
+                v = 12.92 * u
+            else:
+                v = 1.055 * (u ** (1.0 / 2.4)) - 0.055
+            return max(0.0, v) ** display_gamma
+        
+        r = int(max(0, min(255, round(gamma_func(r_lin) * 255))))
+        g = int(max(0, min(255, round(gamma_func(g_lin) * 255))))
+        b = int(max(0, min(255, round(gamma_func(b_lin) * 255))))
+        return r, g, b
+    
+    for L, a, b in test_colors:
+        # Calculate RGB with gamma=1.0 (no adjustment)
+        r1, g1, b1 = lab_to_rgb_with_gamma(L, a, b, 1.0)
+        # Calculate RGB with gamma=1.1 (darkening)
+        r2, g2, b2 = lab_to_rgb_with_gamma(L, a, b, 1.1)
+        
+        # Verify that gamma > 1.0 produces darker or equal values
+        # (darker means lower RGB values)
+        assert r2 <= r1, f"DISPLAY_GAMMA>1.0 should darken R: {r2} > {r1}"
+        assert g2 <= g1, f"DISPLAY_GAMMA>1.0 should darken G: {g2} > {g1}"
+        assert b2 <= b1, f"DISPLAY_GAMMA>1.0 should darken B: {b2} > {b1}"
+        
+        # Verify at least some darkening occurred (not all channels at 0)
+        if r1 > 0 or g1 > 0 or b1 > 0:
+            total_orig = r1 + g1 + b1
+            total_dark = r2 + g2 + b2
+            assert total_dark < total_orig, \
+                f"Lab({L},{a},{b}): Expected darkening, got {total_dark} >= {total_orig}"
+    
+    print("Display gamma darkening test passed")
+
+
 if __name__ == "__main__":
     test_generate_cpp_inline_comments()
     test_generate_cpp_sorted_by_id()
     test_generate_cpp_valid_cpp_syntax()
     test_scan_queue_advancement()
     test_remaining_selection_calculation()
+    test_display_gamma_darkens_colors()
     print("\nAll kona_scanner_gui tests passed")
