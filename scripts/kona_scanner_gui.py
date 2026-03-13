@@ -254,6 +254,7 @@ class KonaScannerApp:
         self.scan_queue: List[int] = []
         self.scanning = False
         self.scan_thread: Optional[threading.Thread] = None
+        self._capture_in_progress = False  # Re-entrancy guard for capture operations
 
         self._setup_ui()
         self._load_csv()
@@ -965,16 +966,12 @@ class KonaScannerApp:
                 self.scan_button.config(state=tk.NORMAL)
                 self.skip_button.config(state=tk.NORMAL)
                 
-                # Scroll to and focus current item without losing other selections
-                # First ensure all originally selected items stay selected
-                if hasattr(self, '_scan_original_selection'):
-                    # Filter to only items still in the tree (in case filter changed)
-                    valid_selection = [
-                        iid for iid in self._scan_original_selection
-                        if self.tree.exists(iid)
-                    ]
-                    if valid_selection:
-                        self.tree.selection_set(valid_selection)
+                # Update selection to show only remaining items to scan
+                # This deselects items as they are scanned
+                remaining_selection = [str(item_id) for item_id in self.scan_queue
+                                       if self.tree.exists(str(item_id))]
+                if remaining_selection:
+                    self.tree.selection_set(remaining_selection)
                 
                 # Focus and scroll to current item
                 self.tree.focus(str(current_id))
@@ -990,68 +987,81 @@ class KonaScannerApp:
             if hasattr(self, '_scan_original_selection'):
                 del self._scan_original_selection
 
+
     def _on_capture_current(self):
         """Capture current swatch in queue."""
         if not self.scanning or not self.scan_queue:
             return
 
-        if not self.serial.is_connected():
-            messagebox.showerror("Error", "Device disconnected")
-            self.scanning = False
-            self._update_scan_ui()
+        # Re-entrancy guard - prevent concurrent captures from root.update() processing events
+        if self._capture_in_progress:
             return
+        self._capture_in_progress = True
 
-        current_id = self.scan_queue[0]
-        swatch = self.swatches.get(current_id)
-        if not swatch:
+        try:
+            if not self.serial.is_connected():
+                messagebox.showerror("Error", "Device disconnected")
+                self.scanning = False
+                self._update_scan_ui()
+                return
+
+            current_id = self.scan_queue[0]
+            swatch = self.swatches.get(current_id)
+            if not swatch:
+                self._advance_scan()
+                return
+
+            self.scan_status_label.config(text=f"Scanning {swatch.name}...")
+            self.scan_button.config(state=tk.DISABLED)
+            self.skip_button.config(state=tk.DISABLED)
+            self.root.update()
+
+            # Perform scan
+            result = self.serial.scan()
+            if result:
+                L, a, b, R, G, B = result
+                swatch.L = L
+                swatch.a = a
+                swatch.b = b
+                swatch.R = R
+                swatch.G = G
+                swatch.B = B
+                swatch.measured = True
+
+                # Update treeview
+                measured_str = "✓"
+                self.tree.set(str(current_id), "measured", measured_str)
+                self.tree.set(str(current_id), "L", f"{L:.1f}")
+                self.tree.set(str(current_id), "a", f"{a:.1f}")
+                self.tree.set(str(current_id), "b", f"{b:.1f}")
+
+                # Update display
+                self._show_color_info(swatch)
+                self._update_stats()
+
+                self.progress_var.set(f"Captured {swatch.name}: L={L:.1f} a={a:.1f} b={b:.1f}")
+                
+                # Play system bell to indicate successful scan
+                self.root.bell()
+            else:
+                messagebox.showerror("Error", f"Failed to scan {swatch.name}")
+                self.progress_var.set(f"Scan failed for {swatch.name}")
+
             self._advance_scan()
-            return
-
-        self.scan_status_label.config(text=f"Scanning {swatch.name}...")
-        self.scan_button.config(state=tk.DISABLED)
-        self.skip_button.config(state=tk.DISABLED)
-        self.root.update()
-
-        # Perform scan
-        result = self.serial.scan()
-        if result:
-            L, a, b, R, G, B = result
-            swatch.L = L
-            swatch.a = a
-            swatch.b = b
-            swatch.R = R
-            swatch.G = G
-            swatch.B = B
-            swatch.measured = True
-
-            # Update treeview
-            measured_str = "✓"
-            self.tree.set(str(current_id), "measured", measured_str)
-            self.tree.set(str(current_id), "L", f"{L:.1f}")
-            self.tree.set(str(current_id), "a", f"{a:.1f}")
-            self.tree.set(str(current_id), "b", f"{b:.1f}")
-
-            # Update display
-            self._show_color_info(swatch)
-            self._update_stats()
-
-            self.progress_var.set(f"Captured {swatch.name}: L={L:.1f} a={a:.1f} b={b:.1f}")
-            
-            # Play system bell to indicate successful scan
-            self.root.bell()
-        else:
-            messagebox.showerror("Error", f"Failed to scan {swatch.name}")
-            self.progress_var.set(f"Scan failed for {swatch.name}")
-
-        self._advance_scan()
+        finally:
+            self._capture_in_progress = False
 
     def _on_spacebar_capture(self, event):
         """Handle spacebar keypress as shortcut for Capture button."""
-        # Only capture if we're in scanning mode, have items in queue, and the Capture button is enabled.
-        # The button state check is necessary because the button is temporarily disabled during
-        # active capture operations to prevent double-triggering.
-        if self.scanning and self.scan_queue and self.scan_button['state'] != tk.DISABLED:
+        # Only capture if we're in scanning mode, have items in queue, not already capturing,
+        # and the Capture button is enabled.
+        # Use instate() for proper ttk button state checking, and _capture_in_progress
+        # to prevent re-entrancy during root.update() calls.
+        if (self.scanning and self.scan_queue and 
+            not self._capture_in_progress and
+            not self.scan_button.instate(['disabled'])):
             self._on_capture_current()
+        return "break"  # Prevent event propagation
 
     def _on_skip_current(self):
         """Skip current swatch in queue."""
