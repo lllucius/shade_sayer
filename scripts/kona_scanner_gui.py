@@ -227,6 +227,8 @@ class SerialConnection:
                 R = int(rgb_parts[0])
                 G = int(rgb_parts[1])
                 B = int(rgb_parts[2])
+                if self.debug:
+                    print(f"Parsed scan result: L={L:.4f} a={a:.4f} b={b:.4f} RGB=({R},{G},{B})")
                 return (L, a, b, R, G, B)
             except (IndexError, ValueError) as e:
                 print(f"Parse error: {e}, response: {response}", file=sys.stderr)
@@ -255,6 +257,7 @@ class KonaScannerApp:
         self.scanning = False
         self.scan_thread: Optional[threading.Thread] = None
         self._capture_in_progress = False  # Re-entrancy guard for capture operations
+        self._unsaved_changes = False  # Track whether there are unsaved scan changes
 
         self._setup_ui()
         self._load_csv()
@@ -391,7 +394,8 @@ class KonaScannerApp:
         self.color_canvas.pack(pady=10)
 
         # Color info with LAB on left, RGB on right (read-only text boxes for copying)
-        info_frame = ttk.LabelFrame(right_frame, text="Color Information")
+        # Note: This shows the SELECTED item's info (which may differ from last captured)
+        info_frame = ttk.LabelFrame(right_frame, text="Selected Item Info")
         info_frame.pack(fill=tk.X, padx=5, pady=5)
 
         self.info_entries = {}
@@ -427,6 +431,14 @@ class KonaScannerApp:
                               font=("TkDefaultFont", 10, "bold"))
         hex_entry.pack(side=tk.LEFT)
         self.info_entries["Hex"] = hex_var
+
+        # Last captured display - shows the most recently scanned swatch info
+        last_captured_frame = ttk.LabelFrame(right_frame, text="Last Captured")
+        last_captured_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        self.last_captured_label = ttk.Label(last_captured_frame, text="No captures yet", 
+                                             wraplength=250, justify=tk.LEFT)
+        self.last_captured_label.pack(padx=5, pady=5)
 
         # Scan guidance frame
         scan_frame = ttk.LabelFrame(right_frame, text="Scanning")
@@ -475,6 +487,9 @@ class KonaScannerApp:
         
         # Escape to stop scan
         self.root.bind("<Escape>", lambda e: self._on_stop_scan())
+        
+        # Window close handler to warn about unsaved changes
+        self.root.protocol("WM_DELETE_WINDOW", self._on_window_close)
         
         # Alt+F to focus filter entry
         self.root.bind("<Alt-f>", self._on_focus_filter)
@@ -751,6 +766,11 @@ class KonaScannerApp:
     def _save_csv(self):
         """Save swatch data to CSV file."""
         try:
+            # Count measured swatches for verification
+            measured_count = sum(1 for s in self.swatches.values() if s.measured)
+            if self.debug:
+                print(f"Saving CSV: {len(self.swatches)} total swatches, {measured_count} measured")
+            
             with self.csv_path.open("w", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
                 writer.writerow(["panel", "panel_index", "id", "name", "L", "a", "b",
@@ -761,6 +781,11 @@ class KonaScannerApp:
                                         key=lambda s: (s.panel, s.panel_index))
 
                 for s in sorted_swatches:
+                    if self.debug and s.measured:
+                        print(f"  Writing swatch[{s.id}] ({s.name}): "
+                              f"L={s.L:.4f if s.L else 'None'} "
+                              f"a={s.a:.4f if s.a else 'None'} "
+                              f"b={s.b:.4f if s.b else 'None'}")
                     writer.writerow([
                         s.panel,
                         s.panel_index,
@@ -777,6 +802,7 @@ class KonaScannerApp:
                     ])
 
             print(f"Saved {len(self.swatches)} swatches to {self.csv_path}")
+            self._unsaved_changes = False  # Clear unsaved changes flag
             return True
         except Exception as e:
             print(f"Error saving CSV: {e}", file=sys.stderr)
@@ -1020,6 +1046,8 @@ class KonaScannerApp:
             result = self.serial.scan()
             if result:
                 L, a, b, R, G, B = result
+                
+                # Store scan results in the swatch object (canonical data store)
                 swatch.L = L
                 swatch.a = a
                 swatch.b = b
@@ -1027,19 +1055,42 @@ class KonaScannerApp:
                 swatch.G = G
                 swatch.B = B
                 swatch.measured = True
+                
+                if self.debug:
+                    print(f"Stored in swatch[{current_id}] ({swatch.name}): "
+                          f"L={swatch.L:.4f} a={swatch.a:.4f} b={swatch.b:.4f} "
+                          f"RGB=({swatch.R},{swatch.G},{swatch.B})")
 
-                # Update treeview
-                measured_str = "✓"
-                self.tree.set(str(current_id), "measured", measured_str)
-                self.tree.set(str(current_id), "L", f"{L:.1f}")
-                self.tree.set(str(current_id), "a", f"{a:.1f}")
-                self.tree.set(str(current_id), "b", f"{b:.1f}")
+                # Update treeview if the item exists (may be filtered out)
+                tree_item_id = str(current_id)
+                if self.tree.exists(tree_item_id):
+                    measured_str = "✓"
+                    self.tree.set(tree_item_id, "measured", measured_str)
+                    self.tree.set(tree_item_id, "L", f"{L:.1f}")
+                    self.tree.set(tree_item_id, "a", f"{a:.1f}")
+                    self.tree.set(tree_item_id, "b", f"{b:.1f}")
+                    if self.debug:
+                        # Verify the treeview was actually updated
+                        tree_values = self.tree.item(tree_item_id, 'values')
+                        print(f"Treeview item {tree_item_id} values: {tree_values}")
+                elif self.debug:
+                    print(f"Warning: Treeview item {tree_item_id} does not exist (filtered?)")
 
-                # Update display
+                # Update display panel - read back from swatch to ensure consistency
                 self._show_color_info(swatch)
                 self._update_stats()
+                
+                # Update "Last Captured" display to show what was just scanned
+                # This persists even when selection changes to next item
+                self.last_captured_label.config(
+                    text=f"{swatch.name}\n"
+                         f"L*={L:.2f}  a*={a:.2f}  b*={b:.2f}\n"
+                         f"RGB=({R}, {G}, {B})")
 
                 self.progress_var.set(f"Captured {swatch.name}: L={L:.1f} a={a:.1f} b={b:.1f}")
+                
+                # Mark that we have unsaved changes
+                self._unsaved_changes = True
                 
                 # Play system bell to indicate successful scan
                 self.root.bell()
@@ -1077,7 +1128,15 @@ class KonaScannerApp:
         if not self.scan_queue:
             self.scanning = False
             self.progress_var.set("Scan complete")
-            messagebox.showinfo("Info", "Scan session complete")
+            # Prompt to save if there are unsaved changes
+            if self._unsaved_changes:
+                save_now = messagebox.askyesno(
+                    "Scan Complete",
+                    "Scan session complete.\n\nYou have unsaved changes. Save CSV now?")
+                if save_now:
+                    self._save_csv()
+            else:
+                messagebox.showinfo("Info", "Scan session complete")
 
         self._update_scan_ui()
 
@@ -1189,7 +1248,30 @@ const kona_table_t kona_reference = {{
         
         self._populate_treeview()
         self._clear_color_info()
+        # Mark as unsaved since clearing Lab values is a change from the loaded CSV state
+        # User should save to persist the cleared state to the CSV file
+        self._unsaved_changes = True
         self.progress_var.set("Cleared all scanned values")
+
+    def _on_window_close(self):
+        """Handle window close event with unsaved changes check."""
+        if self._unsaved_changes:
+            result = messagebox.askyesnocancel(
+                "Unsaved Changes",
+                "You have unsaved scan changes.\n\nSave before closing?")
+            if result is None:  # Cancel - don't close
+                return
+            if result:  # Yes - save first
+                if not self._save_csv():
+                    return  # Save failed, don't close
+            # If No (result is False), proceed to close without saving
+        
+        # Clean up serial connection (ignore errors to ensure window closes)
+        try:
+            self.serial.disconnect()
+        except Exception:
+            pass
+        self.root.destroy()
 
 
 def parse_args() -> argparse.Namespace:
