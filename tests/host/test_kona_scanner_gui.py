@@ -417,6 +417,54 @@ def test_lab_value_formatting():
     print("Lab value formatting test passed")
 
 
+def test_collect_measured_swatches_for_upload():
+    """Test that measured swatches are correctly collected and converted for upload.
+    
+    This tests the logic used by _on_upload_kona to gather measured swatches
+    from self.swatches and convert them to (id, L, a, b) tuples sorted by ID.
+    """
+    # Create test swatches dict simulating self.swatches
+    swatches = {
+        200: SwatchData(panel="A", panel_index=1, id=200, name="SECOND",
+                       L=75.0, a=10.0, b=20.0, measured=True),
+        100: SwatchData(panel="A", panel_index=2, id=100, name="FIRST",
+                       L=50.0, a=5.0, b=10.0, measured=True),
+        300: SwatchData(panel="A", panel_index=3, id=300, name="UNMEASURED",
+                       L=None, a=None, b=None, measured=False),  # Not measured
+        400: SwatchData(panel="A", panel_index=4, id=400, name="PARTIAL",
+                       L=60.0, a=None, b=15.0, measured=True),  # Missing 'a'
+        500: SwatchData(panel="A", panel_index=5, id=500, name="THIRD",
+                       L=80.0, a=15.0, b=25.0, measured=True),
+    }
+    
+    # Collect measured swatches (logic from _on_upload_kona)
+    measured = [s for s in swatches.values() 
+               if s.measured and s.L is not None and s.a is not None and s.b is not None]
+    
+    # Convert to (id, L, a, b) tuples sorted by ID
+    entries = [(s.id, s.L, s.a, s.b) for s in sorted(measured, key=lambda s: s.id)]
+    
+    # Verify only complete measured swatches are included
+    assert len(entries) == 3, f"Expected 3 entries, got {len(entries)}"
+    
+    # Verify entries are sorted by ID
+    assert entries[0][0] == 100, f"First entry should be ID 100, got {entries[0][0]}"
+    assert entries[1][0] == 200, f"Second entry should be ID 200, got {entries[1][0]}"
+    assert entries[2][0] == 500, f"Third entry should be ID 500, got {entries[2][0]}"
+    
+    # Verify Lab values are correct
+    assert entries[0] == (100, 50.0, 5.0, 10.0), f"Entry 0 mismatch: {entries[0]}"
+    assert entries[1] == (200, 75.0, 10.0, 20.0), f"Entry 1 mismatch: {entries[1]}"
+    assert entries[2] == (500, 80.0, 15.0, 25.0), f"Entry 2 mismatch: {entries[2]}"
+    
+    # Verify unmeasured (300) and partial (400) swatches are excluded
+    entry_ids = [e[0] for e in entries]
+    assert 300 not in entry_ids, "Unmeasured swatch (300) should be excluded"
+    assert 400 not in entry_ids, "Partial swatch (400) should be excluded"
+    
+    print("Collect measured swatches for upload test passed")
+
+
 if __name__ == "__main__":
     test_generate_cpp_inline_comments()
     test_generate_cpp_sorted_by_id()
@@ -426,4 +474,5 @@ if __name__ == "__main__":
     test_display_gamma_darkens_colors()
     test_generate_kona_binary()
     test_lab_value_formatting()
+    test_collect_measured_swatches_for_upload()
     print("\nAll kona_scanner_gui tests passed")
