@@ -287,46 +287,58 @@ class KonaScannerApp:
         toolbar = ttk.Frame(left_frame)
         toolbar.pack(fill=tk.X, pady=(0, 5))
 
-        ttk.Button(toolbar, text="Connect", command=self._on_connect).pack(side=tk.LEFT, padx=2)
-        ttk.Button(toolbar, text="Disconnect", command=self._on_disconnect).pack(side=tk.LEFT, padx=2)
+        # Buttons with keyboard shortcuts (shown in parentheses)
+        self.connect_btn = ttk.Button(toolbar, text="Connect (Alt+C)", command=self._on_connect)
+        self.connect_btn.pack(side=tk.LEFT, padx=2)
+        self.disconnect_btn = ttk.Button(toolbar, text="Disconnect (Alt+D)", command=self._on_disconnect)
+        self.disconnect_btn.pack(side=tk.LEFT, padx=2)
         
         self.status_label = ttk.Label(toolbar, text="Disconnected", foreground="red")
         self.status_label.pack(side=tk.LEFT, padx=10)
 
         ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
 
-        ttk.Button(toolbar, text="Scan Selected", command=self._on_scan_selected).pack(side=tk.LEFT, padx=2)
-        ttk.Button(toolbar, text="Stop Scan", command=self._on_stop_scan).pack(side=tk.LEFT, padx=2)
+        self.scan_selected_btn = ttk.Button(toolbar, text="Scan Selected (Alt+S)", command=self._on_scan_selected)
+        self.scan_selected_btn.pack(side=tk.LEFT, padx=2)
+        self.stop_scan_btn = ttk.Button(toolbar, text="Stop Scan (Esc)", command=self._on_stop_scan)
+        self.stop_scan_btn.pack(side=tk.LEFT, padx=2)
 
         ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
 
-        ttk.Button(toolbar, text="Save CSV", command=self._on_save_csv).pack(side=tk.LEFT, padx=2)
-        ttk.Button(toolbar, text="Export C++", command=self._on_export_cpp).pack(side=tk.LEFT, padx=2)
+        self.save_csv_btn = ttk.Button(toolbar, text="Save CSV (Ctrl+S)", command=self._on_save_csv)
+        self.save_csv_btn.pack(side=tk.LEFT, padx=2)
+        self.export_cpp_btn = ttk.Button(toolbar, text="Export C++ (Alt+E)", command=self._on_export_cpp)
+        self.export_cpp_btn.pack(side=tk.LEFT, padx=2)
 
         ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
 
-        ttk.Button(toolbar, text="Clear Scanned", command=self._on_clear_scanned).pack(side=tk.LEFT, padx=2)
+        self.clear_scanned_btn = ttk.Button(toolbar, text="Clear Scanned (Alt+L)", command=self._on_clear_scanned)
+        self.clear_scanned_btn.pack(side=tk.LEFT, padx=2)
         
         # Filter controls
         filter_frame = ttk.Frame(left_frame)
         filter_frame.pack(fill=tk.X, pady=(0, 5))
         
-        ttk.Label(filter_frame, text="Filter:").pack(side=tk.LEFT)
+        ttk.Label(filter_frame, text="Filter (Alt+F):").pack(side=tk.LEFT)
         self.filter_var = tk.StringVar()
         self.filter_var.trace_add("write", self._on_filter_change)
-        filter_entry = ttk.Entry(filter_frame, textvariable=self.filter_var, width=20)
-        filter_entry.pack(side=tk.LEFT, padx=5)
+        self.filter_entry = ttk.Entry(filter_frame, textvariable=self.filter_var, width=20)
+        self.filter_entry.pack(side=tk.LEFT, padx=5)
         
         ttk.Label(filter_frame, text="Show:").pack(side=tk.LEFT, padx=(10, 0))
         self.show_var = tk.StringVar(value="all")
-        ttk.Radiobutton(filter_frame, text="All", variable=self.show_var, value="all",
+        ttk.Radiobutton(filter_frame, text="All (Alt+1)", variable=self.show_var, value="all",
                        command=self._on_filter_change).pack(side=tk.LEFT)
-        ttk.Radiobutton(filter_frame, text="Scanned", variable=self.show_var, value="scanned",
+        ttk.Radiobutton(filter_frame, text="Scanned (Alt+2)", variable=self.show_var, value="scanned",
                        command=self._on_filter_change).pack(side=tk.LEFT)
-        ttk.Radiobutton(filter_frame, text="Not Scanned", variable=self.show_var, value="not_scanned",
+        ttk.Radiobutton(filter_frame, text="Not Scanned (Alt+3)", variable=self.show_var, value="not_scanned",
                        command=self._on_filter_change).pack(side=tk.LEFT)
 
         # Treeview with scrollbars
+        tree_label_frame = ttk.Frame(left_frame)
+        tree_label_frame.pack(fill=tk.X)
+        ttk.Label(tree_label_frame, text="Swatch List (Alt+T) - Use Shift+Arrow for multi-select").pack(side=tk.LEFT, pady=(2, 0))
+        
         tree_frame = ttk.Frame(left_frame)
         tree_frame.pack(fill=tk.BOTH, expand=True)
 
@@ -422,11 +434,11 @@ class KonaScannerApp:
         self.scan_status_label = ttk.Label(scan_frame, text="Not scanning", wraplength=250)
         self.scan_status_label.pack(padx=5, pady=5)
 
-        self.scan_button = ttk.Button(scan_frame, text="Capture", command=self._on_capture_current,
+        self.scan_button = ttk.Button(scan_frame, text="Capture (Space)", command=self._on_capture_current,
                                        state=tk.DISABLED)
         self.scan_button.pack(pady=5)
 
-        self.skip_button = ttk.Button(scan_frame, text="Skip", command=self._on_skip_current,
+        self.skip_button = ttk.Button(scan_frame, text="Skip (Alt+K)", command=self._on_skip_current,
                                        state=tk.DISABLED)
         self.skip_button.pack(pady=5)
         
@@ -438,8 +450,86 @@ class KonaScannerApp:
         self.stats_label.pack(padx=5, pady=5)
         self._update_stats()
 
-        # Bind spacebar as shortcut for Capture button
+        # Bind keyboard shortcuts
+        self._setup_keyboard_shortcuts()
+
+    def _setup_keyboard_shortcuts(self):
+        """Set up keyboard shortcuts for the application."""
+        # Spacebar for Capture
         self.root.bind("<space>", self._on_spacebar_capture)
+        
+        # Alt key shortcuts for toolbar buttons
+        self.root.bind("<Alt-c>", lambda e: self._on_connect())
+        self.root.bind("<Alt-d>", lambda e: self._on_disconnect())
+        self.root.bind("<Alt-s>", lambda e: self._on_scan_selected())
+        self.root.bind("<Alt-e>", lambda e: self._on_export_cpp())
+        self.root.bind("<Alt-l>", lambda e: self._on_clear_scanned())
+        self.root.bind("<Alt-k>", lambda e: self._on_skip_current())
+        
+        # Ctrl+S for Save CSV
+        self.root.bind("<Control-s>", lambda e: self._on_save_csv())
+        
+        # Ctrl+A for Select All in treeview
+        self.root.bind("<Control-a>", self._on_select_all)
+        
+        # Escape to stop scan
+        self.root.bind("<Escape>", lambda e: self._on_stop_scan())
+        
+        # Alt+F to focus filter entry
+        self.root.bind("<Alt-f>", self._on_focus_filter)
+        
+        # Alt+1/2/3 for filter radio buttons
+        self.root.bind("<Alt-Key-1>", lambda e: self._set_show_filter("all"))
+        self.root.bind("<Alt-Key-2>", lambda e: self._set_show_filter("scanned"))
+        self.root.bind("<Alt-Key-3>", lambda e: self._set_show_filter("not_scanned"))
+        
+        # Alt+T to focus treeview (swatch list)
+        self.root.bind("<Alt-t>", self._on_focus_treeview)
+
+    def _on_focus_filter(self, event=None):
+        """Focus the filter entry field and select all text.
+        
+        Returns 'break' to prevent the event from propagating further
+        in the Tkinter event system.
+        """
+        self.filter_entry.focus_set()
+        self.filter_entry.select_range(0, tk.END)
+        return "break"
+
+    def _on_focus_treeview(self, event=None):
+        """Focus the swatch list treeview.
+        
+        Sets widget focus to the treeview. If no item is currently selected,
+        automatically selects and focuses the first item to enable immediate
+        keyboard navigation. Uses focus_set() for widget focus and focus()
+        for item focus within the tree.
+        
+        Returns 'break' to prevent the event from propagating further
+        in the Tkinter event system.
+        """
+        self.tree.focus_set()
+        # Select first item if nothing is selected
+        if not self.tree.selection():
+            children = self.tree.get_children()
+            if children:
+                self.tree.selection_set(children[0])
+                self.tree.focus(children[0])
+        return "break"
+
+    def _on_select_all(self, event=None):
+        """Select all visible items in the treeview."""
+        # Only select all if treeview is focused, otherwise let default Ctrl+A behavior work
+        if self.root.focus_get() == self.tree:
+            children = self.tree.get_children()
+            if children:
+                self.tree.selection_set(children)
+            return "break"
+        return None  # Allow default behavior for other widgets
+
+    def _set_show_filter(self, value: str):
+        """Set the show filter radio button value."""
+        self.show_var.set(value)
+        self._on_filter_change()
 
     def _load_csv(self):
         """Load swatch data from CSV file."""
@@ -685,8 +775,9 @@ class KonaScannerApp:
             messagebox.showwarning("Warning", "No swatches selected")
             return
 
-        # Build scan queue from selection
+        # Build scan queue from selection and store original selection
         self.scan_queue = [int(item_id) for item_id in selection]
+        self._scan_original_selection = list(selection)  # Store original selection
         self.scanning = True
         self._update_scan_ui()
 
@@ -704,8 +795,19 @@ class KonaScannerApp:
                 self.scan_button.config(state=tk.NORMAL)
                 self.skip_button.config(state=tk.NORMAL)
                 
-                # Select and scroll to current item in tree
-                self.tree.selection_set(str(current_id))
+                # Scroll to and focus current item without losing other selections
+                # First ensure all originally selected items stay selected
+                if hasattr(self, '_scan_original_selection'):
+                    # Filter to only items still in the tree (in case filter changed)
+                    valid_selection = [
+                        iid for iid in self._scan_original_selection
+                        if self.tree.exists(iid)
+                    ]
+                    if valid_selection:
+                        self.tree.selection_set(valid_selection)
+                
+                # Focus and scroll to current item
+                self.tree.focus(str(current_id))
                 self.tree.see(str(current_id))
             else:
                 self._advance_scan()
@@ -714,6 +816,9 @@ class KonaScannerApp:
             self.scan_button.config(state=tk.DISABLED)
             self.skip_button.config(state=tk.DISABLED)
             self.scanning = False
+            # Clean up stored selection
+            if hasattr(self, '_scan_original_selection'):
+                del self._scan_original_selection
 
     def _on_capture_current(self):
         """Capture current swatch in queue."""
@@ -761,6 +866,9 @@ class KonaScannerApp:
             self._update_stats()
 
             self.progress_var.set(f"Captured {swatch.name}: L={L:.1f} a={a:.1f} b={b:.1f}")
+            
+            # Play system bell to indicate successful scan
+            self.root.bell()
         else:
             messagebox.showerror("Error", f"Failed to scan {swatch.name}")
             self.progress_var.set(f"Scan failed for {swatch.name}")
