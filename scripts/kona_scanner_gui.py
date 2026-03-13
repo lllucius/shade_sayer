@@ -1444,35 +1444,27 @@ const kona_table_t kona_reference = {{
         self.progress_var.set("Cleared all scanned values")
 
     def _on_upload_kona(self):
-        """Upload a Kona reference table to the device."""
+        """Upload the currently loaded Kona reference table to the device."""
         if not self.serial.is_connected():
             messagebox.showerror("Error", "Not connected to device.\nConnect first, then upload.")
             return
 
-        # Ask for CSV file to upload
-        csv_file = filedialog.askopenfilename(
-            title="Select Kona CSV File",
-            filetypes=[("CSV Files", "*.csv"), ("All Files", "*.*")],
-            initialdir=self.csv_path.parent
-        )
+        # Collect measured swatches from currently loaded table
+        measured = [s for s in self.swatches.values() 
+                   if s.measured and s.L is not None and s.a is not None and s.b is not None]
         
-        if not csv_file:
+        if not measured:
+            messagebox.showwarning("Warning", "No scanned swatches to upload.\nScan some swatches first.")
             return
         
-        csv_path = pathlib.Path(csv_file)
+        # Convert to (id, L, a, b) tuples sorted by ID
+        entries = [(s.id, s.L, s.a, s.b) for s in sorted(measured, key=lambda s: s.id)]
+        
+        if len(entries) > MAX_ENTRIES:
+            messagebox.showerror("Error", f"Too many entries ({len(entries)}), max is {MAX_ENTRIES}")
+            return
         
         try:
-            # Parse the CSV file to get kona entries
-            entries = self._parse_kona_csv(csv_path)
-            
-            if not entries:
-                messagebox.showwarning("Warning", "No valid entries found in CSV file.")
-                return
-            
-            if len(entries) > MAX_ENTRIES:
-                messagebox.showerror("Error", f"Too many entries ({len(entries)}), max is {MAX_ENTRIES}")
-                return
-            
             # Generate binary table data
             table_data = self._generate_kona_binary(entries)
             
@@ -1491,7 +1483,7 @@ const kona_table_t kona_reference = {{
                 self.progress_var.set(f"Upload failed: {message}")
                 
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to process CSV file:\n{e}")
+            messagebox.showerror("Error", f"Failed to upload table:\n{e}")
             self.progress_var.set(f"Upload error: {e}")
 
     def _on_clear_kona(self):
@@ -1516,63 +1508,6 @@ const kona_table_t kona_reference = {{
         else:
             messagebox.showerror("Error", "Failed to clear Kona table.")
             self.progress_var.set("Clear Kona table failed")
-
-    def _parse_kona_csv(self, csv_path: pathlib.Path) -> List[Tuple[int, float, float, float]]:
-        """Parse a Kona CSV file and return list of (id, L, a, b) tuples.
-        
-        Supports multiple CSV formats:
-        - Scanner GUI format: id, name, L, a, b, measured, ...
-        - Generate format: kona_id, mean_lab_l, mean_lab_a, mean_lab_b
-        """
-        entries = {}  # Use dict to deduplicate by ID
-        
-        with csv_path.open(newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                # Try different column name formats
-                kona_id = None
-                L = a = b = None
-                
-                # Try id column names
-                for id_col in ["id", "kona_id"]:
-                    if id_col in row and row[id_col]:
-                        try:
-                            kona_id = int(row[id_col])
-                            break
-                        except ValueError:
-                            pass
-                
-                if kona_id is None:
-                    continue
-                
-                # Try Lab column names (scanner GUI format)
-                if "L" in row and row["L"]:
-                    try:
-                        L = float(row["L"])
-                        a = float(row.get("a", 0) or 0)
-                        b = float(row.get("b", 0) or 0)
-                    except ValueError:
-                        pass
-                
-                # Try Lab column names (generate_kona_table format)
-                if L is None and "mean_lab_l" in row and row["mean_lab_l"]:
-                    try:
-                        L = float(row["mean_lab_l"])
-                        a = float(row.get("mean_lab_a", 0) or 0)
-                        b = float(row.get("mean_lab_b", 0) or 0)
-                    except ValueError:
-                        pass
-                
-                # Check if we need "measured" flag (scanner GUI format)
-                if "measured" in row:
-                    if row["measured"].lower() != "true":
-                        continue  # Skip unmeasured entries
-                
-                if L is not None:
-                    entries[kona_id] = (kona_id, L, a, b)
-        
-        # Sort by ID and return
-        return [entries[k] for k in sorted(entries.keys())]
 
     def _generate_kona_binary(self, entries: List[Tuple[int, float, float, float]]) -> bytes:
         """Generate binary kona_table_t data from list of (id, L, a, b) tuples.
