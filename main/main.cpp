@@ -796,14 +796,16 @@ static void enter_serial_scan_mode(void)
                                 // Read binary data with timeout
                                 size_t bytes_received = 0;
                                 const uint32_t timeout_ms = 10000; // 10 second timeout
-                                const uint32_t start_tick = xTaskGetTickCount();
+                                const TickType_t start_tick = xTaskGetTickCount();
                                 
                                 // Temporarily set stdin to blocking with timeout for bulk read
                                 while (bytes_received < sizeof(kona_table_t))
                                 {
-                                    // Check timeout
-                                    const uint32_t elapsed = (xTaskGetTickCount() - start_tick) * portTICK_PERIOD_MS;
-                                    if (elapsed > timeout_ms)
+                                    // Check timeout using tick count subtraction.
+                                    // This handles wrap-around correctly due to unsigned arithmetic,
+                                    // as long as timeout is less than half the tick range.
+                                    const TickType_t elapsed_ticks = xTaskGetTickCount() - start_tick;
+                                    if ((elapsed_ticks * portTICK_PERIOD_MS) > timeout_ms)
                                     {
                                         break;
                                     }

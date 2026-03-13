@@ -1573,29 +1573,30 @@ const kona_table_t kona_reference = {{
         
         Returns bytes that can be sent directly to the device.
         """
-        # Build the entries payload first to calculate CRC
-        entry_payload = bytearray()
-        for kona_id, L, a, b in entries:
+        # Pack entries into binary format matching firmware kona_ref_t struct
+        def pack_entry(kona_id: int, L: float, a: float, b: float) -> bytes:
             # Pack as: uint16_t + 2 padding bytes + 3 floats (little-endian)
             # This must match sizeof(kona_ref_t) = 16 bytes
-            entry_payload.extend(struct.pack("<H2x3f", kona_id, L, a, b))
+            return struct.pack("<H2x3f", kona_id, L, a, b)
+        
+        # Build entry payload - used for both CRC and final output
+        entry_data = bytearray()
+        for kona_id, L, a, b in entries:
+            entry_data.extend(pack_entry(kona_id, L, a, b))
+        
+        # Calculate CRC32 over actual entries only (not padding)
+        crc = zlib.crc32(entry_data) & 0xFFFFFFFF
         
         # Pad to full 365 entries (all zeros)
         remaining = MAX_ENTRIES - len(entries)
         if remaining > 0:
-            entry_payload.extend(b'\x00' * (remaining * KONA_REF_T_SIZE))
-        
-        # Calculate CRC32 over actual entries only (not padding)
-        crc_payload = bytearray()
-        for kona_id, L, a, b in entries:
-            crc_payload.extend(struct.pack("<H2x3f", kona_id, L, a, b))
-        crc = zlib.crc32(crc_payload) & 0xFFFFFFFF
+            entry_data.extend(b'\x00' * (remaining * KONA_REF_T_SIZE))
         
         # Build complete table: header + entries
         # Header: uint16_t version + uint16_t entry_count + uint32_t crc32
         header = struct.pack("<HHI", SCHEMA_VERSION, len(entries), crc)
         
-        return header + bytes(entry_payload)
+        return header + bytes(entry_data)
 
     def _on_window_close(self):
         """Handle window close event with unsaved changes check."""
