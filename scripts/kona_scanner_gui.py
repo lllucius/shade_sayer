@@ -262,6 +262,8 @@ class KonaScannerApp:
         """Set up the main UI components."""
         self.root.title("Kona Swatch Scanner")
         self.root.geometry("1200x800")
+        # Maximize window on startup
+        self.root.state('zoomed')
 
         # Main frame with paned window
         main_pane = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
@@ -757,7 +759,9 @@ class KonaScannerApp:
 
     def _on_spacebar_capture(self, event):
         """Handle spacebar keypress as shortcut for Capture button."""
-        # Only capture if we're in scanning mode and the Capture button is enabled
+        # Only capture if we're in scanning mode, have items in queue, and the Capture button is enabled.
+        # The button state check is necessary because the button is temporarily disabled during
+        # active capture operations to prevent double-triggering.
         if self.scanning and self.scan_queue and self.scan_button['state'] != tk.DISABLED:
             self._on_capture_current()
 
@@ -918,8 +922,6 @@ def main() -> int:
 
     root = tk.Tk()
     app = KonaScannerApp(root, str(csv_path), args.port, debug=args.debug)
-    # Maximize window on startup
-    root.state('zoomed')
     root.mainloop()
 
     return 0
