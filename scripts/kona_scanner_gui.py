@@ -255,6 +255,105 @@ class SerialConnection:
         response = self.send_command("EXIT", timeout=2.0)
         return response is not None and response.startswith("OK:")
 
+    def kona_status(self) -> Optional[dict]:
+        """Query Kona table status from device.
+        
+        Returns dict with keys: temp (bool), entries (int), builtin (bool)
+        or None on error.
+        """
+        response = self.send_command("KONA_STATUS", timeout=2.0)
+        if response and response.startswith("OK:KONA_STATUS:"):
+            try:
+                # Parse: OK:KONA_STATUS:temp=0,entries=5,builtin=1
+                parts = response.split(":")[2].split(",")
+                status = {}
+                for part in parts:
+                    key, value = part.split("=")
+                    if key == "entries":
+                        status[key] = int(value)
+                    else:
+                        status[key] = value == "1"
+                return status
+            except (IndexError, ValueError) as e:
+                print(f"Parse error for KONA_STATUS: {e}", file=sys.stderr)
+        return None
+
+    def kona_clear(self) -> bool:
+        """Clear temporary Kona table on device."""
+        response = self.send_command("KONA_CLEAR", timeout=2.0)
+        return response is not None and response.startswith("OK:KONA_CLEARED")
+
+    def kona_load(self, table_data: bytes) -> Tuple[bool, str]:
+        """Upload a temporary Kona table to the device.
+        
+        Args:
+            table_data: Binary kona_table_t struct data
+            
+        Returns:
+            Tuple of (success, message)
+        """
+        if not self.is_connected():
+            return (False, "Not connected")
+
+        with self._lock:
+            try:
+                # Clear input buffer
+                self.serial.reset_input_buffer()
+                
+                # Send load command with size
+                cmd = f"KONA_LOAD:{len(table_data)}\n"
+                if self.debug:
+                    print(f"TX: KONA_LOAD:{len(table_data)}")
+                self.serial.write(cmd.encode("utf-8"))
+                self.serial.flush()
+                
+                # Wait for READY response
+                start_time = time.time()
+                ready_received = False
+                while time.time() - start_time < 5.0:
+                    if self.serial.in_waiting > 0:
+                        line = self.serial.readline().decode("utf-8", errors="replace").strip()
+                        if self.debug:
+                            print(f"RX: {line}")
+                        if line.startswith("OK:KONA_LOAD:READY:"):
+                            ready_received = True
+                            break
+                        if line.startswith("ERR:"):
+                            return (False, line)
+                    time.sleep(0.05)
+                
+                if not ready_received:
+                    return (False, "Timeout waiting for READY")
+                
+                # Send binary data
+                if self.debug:
+                    print(f"TX: <binary data {len(table_data)} bytes>")
+                self.serial.write(table_data)
+                self.serial.flush()
+                
+                # Wait for result
+                start_time = time.time()
+                while time.time() - start_time < 10.0:
+                    if self.serial.in_waiting > 0:
+                        line = self.serial.readline().decode("utf-8", errors="replace").strip()
+                        if self.debug:
+                            print(f"RX: {line}")
+                        if line.startswith("OK:KONA_LOADED:"):
+                            # Parse entry count
+                            try:
+                                entries = int(line.split("=")[1])
+                                return (True, f"Loaded {entries} entries")
+                            except (IndexError, ValueError):
+                                return (True, "Loaded successfully")
+                        if line.startswith("ERR:"):
+                            return (False, line)
+                    time.sleep(0.05)
+                
+                return (False, "Timeout waiting for result")
+                
+            except serial.SerialException as e:
+                return (False, f"Serial error: {e}")
+
 
 class KonaScannerApp:
     """Main application class for Kona Swatch Scanner GUI."""
@@ -332,6 +431,14 @@ class KonaScannerApp:
 
         self.clear_scanned_btn = ttk.Button(toolbar, text="Clear Scanned (Alt+L)", command=self._on_clear_scanned)
         self.clear_scanned_btn.pack(side=tk.LEFT, padx=2)
+
+        ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
+
+        # Kona table management buttons
+        self.upload_kona_btn = ttk.Button(toolbar, text="Upload Kona (Alt+U)", command=self._on_upload_kona)
+        self.upload_kona_btn.pack(side=tk.LEFT, padx=2)
+        self.clear_kona_btn = ttk.Button(toolbar, text="Clear Kona", command=self._on_clear_kona)
+        self.clear_kona_btn.pack(side=tk.LEFT, padx=2)
         
         # Filter controls
         filter_frame = ttk.Frame(left_frame)
@@ -469,6 +576,13 @@ class KonaScannerApp:
                                        state=tk.DISABLED)
         self.skip_button.pack(pady=5)
         
+        # Kona table status frame
+        kona_frame = ttk.LabelFrame(right_frame, text="Kona Table Status")
+        kona_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        self.kona_status_label = ttk.Label(kona_frame, text="Not connected", justify=tk.LEFT)
+        self.kona_status_label.pack(padx=5, pady=5)
+        
         # Statistics frame
         stats_frame = ttk.LabelFrame(right_frame, text="Statistics")
         stats_frame.pack(fill=tk.X, padx=5, pady=5)
@@ -492,6 +606,7 @@ class KonaScannerApp:
         self.root.bind("<Alt-e>", lambda e: self._on_export_cpp())
         self.root.bind("<Alt-l>", lambda e: self._on_clear_scanned())
         self.root.bind("<Alt-k>", lambda e: self._on_skip_current())
+        self.root.bind("<Alt-u>", lambda e: self._on_upload_kona())
         
         # Ctrl+S for Save CSV
         self.root.bind("<Control-s>", lambda e: self._on_save_csv())
@@ -867,6 +982,27 @@ class KonaScannerApp:
         scanned = sum(1 for s in self.swatches.values() if s.measured)
         self.stats_label.config(text=f"Total: {total}\nScanned: {scanned}\nRemaining: {total - scanned}")
 
+    def _update_kona_status(self):
+        """Update Kona table status display from device."""
+        if not self.serial.is_connected():
+            self.kona_status_label.config(text="Not connected")
+            return
+        
+        status = self.serial.kona_status()
+        if status:
+            if status.get("temp", False):
+                text = f"Temporary table active\nEntries: {status.get('entries', 0)}"
+            else:
+                builtin = status.get("builtin", False)
+                entries = status.get("entries", 0)
+                if builtin:
+                    text = f"Built-in table\nEntries: {entries}"
+                else:
+                    text = "No valid table loaded"
+            self.kona_status_label.config(text=text)
+        else:
+            self.kona_status_label.config(text="Status query failed")
+
     def _sort_column(self, col: str):
         """Sort treeview by column."""
         items = [(self.tree.set(k, col), k) for k in self.tree.get_children("")]
@@ -962,6 +1098,8 @@ class KonaScannerApp:
                 self.connect_btn.config(state=tk.DISABLED)
                 self.disconnect_btn.config(state=tk.NORMAL)
                 self.progress_var.set("Connected to device")
+                # Update Kona table status
+                self._update_kona_status()
             else:
                 self.serial.disconnect()
                 self.progress_var.set("Device connected but not in serial mode")
@@ -986,6 +1124,7 @@ class KonaScannerApp:
         # Update button states to reflect disconnection
         self.connect_btn.config(state=tk.NORMAL)
         self.disconnect_btn.config(state=tk.DISABLED)
+        self.kona_status_label.config(text="Not connected")
         self.progress_var.set("Disconnected")
 
     def _on_scan_selected(self):
@@ -1297,6 +1436,166 @@ const kona_table_t kona_reference = {{
         # User should save to persist the cleared state to the CSV file
         self._unsaved_changes = True
         self.progress_var.set("Cleared all scanned values")
+
+    def _on_upload_kona(self):
+        """Upload a Kona reference table to the device."""
+        if not self.serial.is_connected():
+            messagebox.showerror("Error", "Not connected to device.\nConnect first, then upload.")
+            return
+
+        # Ask for CSV file to upload
+        csv_file = filedialog.askopenfilename(
+            title="Select Kona CSV File",
+            filetypes=[("CSV Files", "*.csv"), ("All Files", "*.*")],
+            initialdir=self.csv_path.parent
+        )
+        
+        if not csv_file:
+            return
+        
+        csv_path = pathlib.Path(csv_file)
+        
+        try:
+            # Parse the CSV file to get kona entries
+            entries = self._parse_kona_csv(csv_path)
+            
+            if not entries:
+                messagebox.showwarning("Warning", "No valid entries found in CSV file.")
+                return
+            
+            if len(entries) > MAX_ENTRIES:
+                messagebox.showerror("Error", f"Too many entries ({len(entries)}), max is {MAX_ENTRIES}")
+                return
+            
+            # Generate binary table data
+            table_data = self._generate_kona_binary(entries)
+            
+            self.progress_var.set(f"Uploading {len(entries)} entries to device...")
+            self.root.update()
+            
+            # Upload to device
+            success, message = self.serial.kona_load(table_data)
+            
+            if success:
+                messagebox.showinfo("Success", f"Kona table uploaded successfully.\n{message}")
+                self.progress_var.set(f"Kona table uploaded: {message}")
+                self._update_kona_status()
+            else:
+                messagebox.showerror("Error", f"Upload failed:\n{message}")
+                self.progress_var.set(f"Upload failed: {message}")
+                
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to process CSV file:\n{e}")
+            self.progress_var.set(f"Upload error: {e}")
+
+    def _on_clear_kona(self):
+        """Clear temporary Kona table from device."""
+        if not self.serial.is_connected():
+            messagebox.showerror("Error", "Not connected to device.")
+            return
+        
+        # Confirm action
+        result = messagebox.askyesno(
+            "Confirm",
+            "Clear temporary Kona table on device?\n\n"
+            "This will revert to the built-in table.")
+        
+        if not result:
+            return
+        
+        if self.serial.kona_clear():
+            messagebox.showinfo("Success", "Temporary Kona table cleared.")
+            self.progress_var.set("Kona table cleared")
+            self._update_kona_status()
+        else:
+            messagebox.showerror("Error", "Failed to clear Kona table.")
+            self.progress_var.set("Clear Kona table failed")
+
+    def _parse_kona_csv(self, csv_path: pathlib.Path) -> List[Tuple[int, float, float, float]]:
+        """Parse a Kona CSV file and return list of (id, L, a, b) tuples.
+        
+        Supports multiple CSV formats:
+        - Scanner GUI format: id, name, L, a, b, measured, ...
+        - Generate format: kona_id, mean_lab_l, mean_lab_a, mean_lab_b
+        """
+        entries = {}  # Use dict to deduplicate by ID
+        
+        with csv_path.open(newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                # Try different column name formats
+                kona_id = None
+                L = a = b = None
+                
+                # Try id column names
+                for id_col in ["id", "kona_id"]:
+                    if id_col in row and row[id_col]:
+                        try:
+                            kona_id = int(row[id_col])
+                            break
+                        except ValueError:
+                            pass
+                
+                if kona_id is None:
+                    continue
+                
+                # Try Lab column names (scanner GUI format)
+                if "L" in row and row["L"]:
+                    try:
+                        L = float(row["L"])
+                        a = float(row.get("a", 0) or 0)
+                        b = float(row.get("b", 0) or 0)
+                    except ValueError:
+                        pass
+                
+                # Try Lab column names (generate_kona_table format)
+                if L is None and "mean_lab_l" in row and row["mean_lab_l"]:
+                    try:
+                        L = float(row["mean_lab_l"])
+                        a = float(row.get("mean_lab_a", 0) or 0)
+                        b = float(row.get("mean_lab_b", 0) or 0)
+                    except ValueError:
+                        pass
+                
+                # Check if we need "measured" flag (scanner GUI format)
+                if "measured" in row:
+                    if row["measured"].lower() != "true":
+                        continue  # Skip unmeasured entries
+                
+                if L is not None:
+                    entries[kona_id] = (kona_id, L, a, b)
+        
+        # Sort by ID and return
+        return [entries[k] for k in sorted(entries.keys())]
+
+    def _generate_kona_binary(self, entries: List[Tuple[int, float, float, float]]) -> bytes:
+        """Generate binary kona_table_t data from list of (id, L, a, b) tuples.
+        
+        Returns bytes that can be sent directly to the device.
+        """
+        # Build the entries payload first to calculate CRC
+        entry_payload = bytearray()
+        for kona_id, L, a, b in entries:
+            # Pack as: uint16_t + 2 padding bytes + 3 floats (little-endian)
+            # This must match sizeof(kona_ref_t) = 16 bytes
+            entry_payload.extend(struct.pack("<H2x3f", kona_id, L, a, b))
+        
+        # Pad to full 365 entries (all zeros)
+        remaining = MAX_ENTRIES - len(entries)
+        if remaining > 0:
+            entry_payload.extend(b'\x00' * (remaining * KONA_REF_T_SIZE))
+        
+        # Calculate CRC32 over actual entries only (not padding)
+        crc_payload = bytearray()
+        for kona_id, L, a, b in entries:
+            crc_payload.extend(struct.pack("<H2x3f", kona_id, L, a, b))
+        crc = zlib.crc32(crc_payload) & 0xFFFFFFFF
+        
+        # Build complete table: header + entries
+        # Header: uint16_t version + uint16_t entry_count + uint32_t crc32
+        header = struct.pack("<HHI", SCHEMA_VERSION, len(entries), crc)
+        
+        return header + bytes(entry_payload)
 
     def _on_window_close(self):
         """Handle window close event with unsaved changes check."""

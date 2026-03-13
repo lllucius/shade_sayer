@@ -119,6 +119,42 @@ size_t kona_ref_entry_count(void);
  */
 const kona_ref_t* kona_ref_entries(void);
 
+/**
+ * @brief Load a temporary Kona reference table into RAM.
+ *
+ * The temporary table takes precedence over the built-in table until
+ * kona_ref_clear_temp() is called or the device is reset.
+ *
+ * @param table Pointer to the table data to load (copied to internal storage)
+ * @return true if table was loaded successfully, false if validation failed
+ *
+ * @note The table is copied, so the input buffer can be freed after this call.
+ * @note Validates version, entry count, and CRC32 before accepting.
+ */
+bool kona_ref_load_temp(const kona_table_t* table);
+
+/**
+ * @brief Clear the temporary Kona reference table.
+ *
+ * After calling this function, kona_ref_* functions will return data from
+ * the built-in table (if valid) instead of the temporary table.
+ */
+void kona_ref_clear_temp(void);
+
+/**
+ * @brief Check if a temporary table is currently active.
+ *
+ * @return true if a temporary table is loaded and active, false otherwise
+ */
+bool kona_ref_is_temp_active(void);
+
+/**
+ * @brief Get the entry count of the currently active table (temp or built-in).
+ *
+ * @return Number of entries in the active table, or 0 if no valid table
+ */
+size_t kona_ref_active_entry_count(void);
+
 #ifdef __cplusplus
 }
 #endif

@@ -174,13 +174,22 @@ static esp_err_t apply_sensor_correction(const sensor_reading_t* reading, xyz_t*
  */
 static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
 {
-    if (!s_kona_reference_ready || !lab || !result)
+    // Check for temporary table first, then fall back to built-in
+    const bool have_temp = kona_ref_is_temp_active();
+    const bool have_builtin = s_kona_reference_ready;
+    
+    if (!have_temp && !have_builtin)
+    {
+        return false;
+    }
+    
+    if (!lab || !result)
     {
         return false;
     }
 
     const kona_ref_t* entries = kona_ref_entries();
-    const size_t count = kona_ref_entry_count();
+    const size_t count = kona_ref_active_entry_count();
 
     // Linear search for closest match (O(n) for up to 365 entries)
     float best_delta_e = FLT_MAX;
@@ -197,8 +206,8 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
         }
     }
 
-    ESP_LOGI(TAG, "Kona result: best_entry %p best_delta %f max delta %f",
-             best_entry, best_delta_e, s_config.kona_max_delta_e);
+    ESP_LOGI(TAG, "Kona result: best_entry %p best_delta %f max delta %f (temp=%d)",
+             best_entry, best_delta_e, s_config.kona_max_delta_e, have_temp);
     // Reject if no match or distance exceeds threshold
     if (!best_entry || best_delta_e >= s_config.kona_max_delta_e)
     {
