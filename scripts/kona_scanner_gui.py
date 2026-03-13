@@ -355,18 +355,43 @@ class KonaScannerApp:
                                        highlightthickness=1, highlightbackground="black")
         self.color_canvas.pack(pady=10)
 
-        # Color info labels
+        # Color info with LAB on left, RGB on right (read-only text boxes for copying)
         info_frame = ttk.LabelFrame(right_frame, text="Color Information")
         info_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        self.info_labels = {}
-        for label in ["Name", "Panel", "Index", "ID", "L*", "a*", "b*", "R", "G", "B", "Hex"]:
+        self.info_entries = {}
+
+        # Create rows with LAB on left, RGB on right
+        lab_rgb_pairs = [("L*", "R"), ("a*", "G"), ("b*", "B")]
+        for lab_label, rgb_label in lab_rgb_pairs:
             row = ttk.Frame(info_frame)
             row.pack(fill=tk.X, padx=5, pady=2)
-            ttk.Label(row, text=f"{label}:", width=8).pack(side=tk.LEFT)
-            lbl = ttk.Label(row, text="-", font=("TkDefaultFont", 10, "bold"))
-            lbl.pack(side=tk.LEFT, fill=tk.X, expand=True)
-            self.info_labels[label] = lbl
+
+            # LAB value on the left
+            ttk.Label(row, text=f"{lab_label}:", width=4).pack(side=tk.LEFT)
+            lab_var = tk.StringVar(value="-")
+            lab_entry = ttk.Entry(row, textvariable=lab_var, width=10, state="readonly",
+                                  font=("TkDefaultFont", 10, "bold"))
+            lab_entry.pack(side=tk.LEFT, padx=(0, 10))
+            self.info_entries[lab_label] = lab_var
+
+            # RGB value on the right
+            ttk.Label(row, text=f"{rgb_label}:", width=4).pack(side=tk.LEFT)
+            rgb_var = tk.StringVar(value="-")
+            rgb_entry = ttk.Entry(row, textvariable=rgb_var, width=6, state="readonly",
+                                  font=("TkDefaultFont", 10, "bold"))
+            rgb_entry.pack(side=tk.LEFT)
+            self.info_entries[rgb_label] = rgb_var
+
+        # Hex row at bottom
+        hex_row = ttk.Frame(info_frame)
+        hex_row.pack(fill=tk.X, padx=5, pady=2)
+        ttk.Label(hex_row, text="Hex:", width=4).pack(side=tk.LEFT)
+        hex_var = tk.StringVar(value="-")
+        hex_entry = ttk.Entry(hex_row, textvariable=hex_var, width=10, state="readonly",
+                              font=("TkDefaultFont", 10, "bold"))
+        hex_entry.pack(side=tk.LEFT)
+        self.info_entries["Hex"] = hex_var
 
         # Scan guidance frame
         scan_frame = ttk.LabelFrame(right_frame, text="Scanning")
@@ -549,15 +574,10 @@ class KonaScannerApp:
 
     def _show_color_info(self, swatch: SwatchData):
         """Display color information for a swatch."""
-        self.info_labels["Name"].config(text=swatch.name)
-        self.info_labels["Panel"].config(text=swatch.panel)
-        self.info_labels["Index"].config(text=str(swatch.panel_index))
-        self.info_labels["ID"].config(text=str(swatch.id))
-
         if swatch.L is not None and swatch.a is not None and swatch.b is not None:
-            self.info_labels["L*"].config(text=f"{swatch.L:.2f}")
-            self.info_labels["a*"].config(text=f"{swatch.a:.2f}")
-            self.info_labels["b*"].config(text=f"{swatch.b:.2f}")
+            self.info_entries["L*"].set(f"{swatch.L:.2f}")
+            self.info_entries["a*"].set(f"{swatch.a:.2f}")
+            self.info_entries["b*"].set(f"{swatch.b:.2f}")
 
             # Convert Lab to RGB for display
             if swatch.R is not None and swatch.G is not None and swatch.B is not None:
@@ -565,24 +585,24 @@ class KonaScannerApp:
             else:
                 r, g, b = lab_to_rgb(swatch.L, swatch.a, swatch.b)
 
-            self.info_labels["R"].config(text=str(r))
-            self.info_labels["G"].config(text=str(g))
-            self.info_labels["B"].config(text=str(b))
+            self.info_entries["R"].set(str(r))
+            self.info_entries["G"].set(str(g))
+            self.info_entries["B"].set(str(b))
 
             hex_color = rgb_to_hex(r, g, b)
-            self.info_labels["Hex"].config(text=hex_color)
+            self.info_entries["Hex"].set(hex_color)
 
             # Update color sample
             self.color_canvas.config(bg=hex_color)
         else:
             for key in ["L*", "a*", "b*", "R", "G", "B", "Hex"]:
-                self.info_labels[key].config(text="-")
+                self.info_entries[key].set("-")
             self.color_canvas.config(bg="#808080")
 
     def _clear_color_info(self):
         """Clear color information display."""
-        for label in self.info_labels.values():
-            label.config(text="-")
+        for var in self.info_entries.values():
+            var.set("-")
         self.color_canvas.config(bg="#808080")
 
     def _on_connect(self):
