@@ -227,6 +227,8 @@ class SerialConnection:
                 R = int(rgb_parts[0])
                 G = int(rgb_parts[1])
                 B = int(rgb_parts[2])
+                if self.debug:
+                    print(f"Parsed scan result: L={L:.4f} a={a:.4f} b={b:.4f} RGB=({R},{G},{B})")
                 return (L, a, b, R, G, B)
             except (IndexError, ValueError) as e:
                 print(f"Parse error: {e}, response: {response}", file=sys.stderr)
@@ -751,6 +753,11 @@ class KonaScannerApp:
     def _save_csv(self):
         """Save swatch data to CSV file."""
         try:
+            # Count measured swatches for verification
+            measured_count = sum(1 for s in self.swatches.values() if s.measured)
+            if self.debug:
+                print(f"Saving CSV: {len(self.swatches)} total swatches, {measured_count} measured")
+            
             with self.csv_path.open("w", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
                 writer.writerow(["panel", "panel_index", "id", "name", "L", "a", "b",
@@ -761,6 +768,11 @@ class KonaScannerApp:
                                         key=lambda s: (s.panel, s.panel_index))
 
                 for s in sorted_swatches:
+                    if self.debug and s.measured:
+                        print(f"  Writing swatch[{s.id}] ({s.name}): "
+                              f"L={s.L:.4f if s.L else 'None'} "
+                              f"a={s.a:.4f if s.a else 'None'} "
+                              f"b={s.b:.4f if s.b else 'None'}")
                     writer.writerow([
                         s.panel,
                         s.panel_index,
@@ -1020,6 +1032,8 @@ class KonaScannerApp:
             result = self.serial.scan()
             if result:
                 L, a, b, R, G, B = result
+                
+                # Store scan results in the swatch object (canonical data store)
                 swatch.L = L
                 swatch.a = a
                 swatch.b = b
@@ -1027,15 +1041,28 @@ class KonaScannerApp:
                 swatch.G = G
                 swatch.B = B
                 swatch.measured = True
+                
+                if self.debug:
+                    print(f"Stored in swatch[{current_id}] ({swatch.name}): "
+                          f"L={swatch.L:.4f} a={swatch.a:.4f} b={swatch.b:.4f} "
+                          f"RGB=({swatch.R},{swatch.G},{swatch.B})")
 
-                # Update treeview
-                measured_str = "✓"
-                self.tree.set(str(current_id), "measured", measured_str)
-                self.tree.set(str(current_id), "L", f"{L:.1f}")
-                self.tree.set(str(current_id), "a", f"{a:.1f}")
-                self.tree.set(str(current_id), "b", f"{b:.1f}")
+                # Update treeview if the item exists (may be filtered out)
+                tree_item_id = str(current_id)
+                if self.tree.exists(tree_item_id):
+                    measured_str = "✓"
+                    self.tree.set(tree_item_id, "measured", measured_str)
+                    self.tree.set(tree_item_id, "L", f"{L:.1f}")
+                    self.tree.set(tree_item_id, "a", f"{a:.1f}")
+                    self.tree.set(tree_item_id, "b", f"{b:.1f}")
+                    if self.debug:
+                        # Verify the treeview was actually updated
+                        tree_values = self.tree.item(tree_item_id, 'values')
+                        print(f"Treeview item {tree_item_id} values: {tree_values}")
+                elif self.debug:
+                    print(f"Warning: Treeview item {tree_item_id} does not exist (filtered?)")
 
-                # Update display
+                # Update display panel - read back from swatch to ensure consistency
                 self._show_color_info(swatch)
                 self._update_stats()
 
