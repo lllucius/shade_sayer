@@ -13,7 +13,7 @@ Features:
 - Export to C++ header file for firmware use
 
 Usage:
-    python3 kona_scanner_gui.py [--port /dev/ttyACM0] [--csv kona_swatches.csv]
+    python3 kona_scanner_gui.py [--port /dev/ttyACM0] [--csv kona_swatches.csv] [--debug]
 """
 
 import argparse
@@ -117,9 +117,10 @@ def rgb_to_hex(r: int, g: int, b: int) -> str:
 class SerialConnection:
     """Manages serial communication with the shade_sayer device."""
 
-    def __init__(self, port: str = "/dev/ttyACM0", baudrate: int = 115200):
+    def __init__(self, port: str = "/dev/ttyACM0", baudrate: int = 115200, debug: bool = False):
         self.port = port
         self.baudrate = baudrate
+        self.debug = debug
         self.serial: Optional[serial.Serial] = None
         self._lock = threading.Lock()
 
@@ -164,6 +165,7 @@ class SerialConnection:
         """Send a command and wait for response.
         
         Returns the response line or None on error/timeout.
+        When debug mode is enabled, prints all TX/RX communication.
         """
         if not self.is_connected():
             return None
@@ -174,6 +176,8 @@ class SerialConnection:
                 self.serial.reset_input_buffer()
                 
                 # Send command with newline
+                if self.debug:
+                    print(f"TX: {cmd}")
                 self.serial.write((cmd + "\n").encode("utf-8"))
                 self.serial.flush()
 
@@ -182,10 +186,15 @@ class SerialConnection:
                 while time.time() - start_time < timeout:
                     if self.serial.in_waiting > 0:
                         line = self.serial.readline().decode("utf-8", errors="replace").strip()
+                        if self.debug:
+                            print(f"RX: {line}")
                         if line.startswith("OK:") or line.startswith("ERR:"):
                             return line
+                        # Continue reading - device may send log lines before response
                     time.sleep(0.05)
 
+                if self.debug:
+                    print(f"RX: (timeout after {timeout}s)")
                 return None  # Timeout
             except serial.SerialException as e:
                 print(f"Serial error: {e}", file=sys.stderr)
@@ -234,11 +243,12 @@ class SerialConnection:
 class KonaScannerApp:
     """Main application class for Kona Swatch Scanner GUI."""
 
-    def __init__(self, root: tk.Tk, csv_path: str, serial_port: str):
+    def __init__(self, root: tk.Tk, csv_path: str, serial_port: str, debug: bool = False):
         self.root = root
         self.csv_path = pathlib.Path(csv_path)
         self.serial_port = serial_port
-        self.serial = SerialConnection(serial_port)
+        self.debug = debug
+        self.serial = SerialConnection(serial_port, debug=debug)
         self.swatches: Dict[int, SwatchData] = {}
         self.scan_queue: List[int] = []
         self.scanning = False
@@ -878,6 +888,8 @@ def parse_args() -> argparse.Namespace:
                        help="Serial port for device communication")
     parser.add_argument("--csv", default="kona_365_sensor_ready.csv",
                        help="CSV file for swatch data")
+    parser.add_argument("--debug", action="store_true",
+                       help="Print all serial TX/RX communications for debugging")
     return parser.parse_args()
 
 
@@ -892,8 +904,11 @@ def main() -> int:
         repo_root = script_dir.parent               # repository root
         csv_path = repo_root / csv_path
 
+    if args.debug:
+        print("Debug mode enabled - all serial TX/RX will be printed")
+
     root = tk.Tk()
-    app = KonaScannerApp(root, str(csv_path), args.port)
+    app = KonaScannerApp(root, str(csv_path), args.port, debug=args.debug)
     root.mainloop()
 
     return 0
