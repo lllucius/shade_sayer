@@ -239,8 +239,14 @@ def test_display_gamma_darkens_colors():
     
     With DISPLAY_GAMMA > 1.0, the lab_to_rgb function should produce
     darker (lower) RGB values than with DISPLAY_GAMMA = 1.0.
+    
+    Note: This test uses a standalone implementation rather than importing
+    from kona_scanner_gui.py because tkinter is not available in the test
+    environment. The test verifies the mathematical behavior of the gamma
+    adjustment algorithm.
     """
-    # Test data: Lab values and expected range for darkening
+    # Test data: Lab values that produce non-black colors
+    # (black colors produce (0,0,0) with any gamma, so we skip them)
     test_colors = [
         (50.0, 0.0, 0.0),   # Mid gray
         (75.0, 20.0, 60.0), # Orange tone
@@ -248,6 +254,7 @@ def test_display_gamma_darkens_colors():
     ]
     
     # Standalone implementation with configurable gamma
+    # (mirrors kona_scanner_gui.lab_to_rgb implementation)
     def lab_to_rgb_with_gamma(L, a, b, display_gamma=1.0):
         fy = (L + 16.0) / 116.0
         fx = a / 500.0 + fy
@@ -292,12 +299,14 @@ def test_display_gamma_darkens_colors():
         assert g2 <= g1, f"DISPLAY_GAMMA>1.0 should darken G: {g2} > {g1}"
         assert b2 <= b1, f"DISPLAY_GAMMA>1.0 should darken B: {b2} > {b1}"
         
-        # Verify at least some darkening occurred (not all channels at 0)
-        if r1 > 0 or g1 > 0 or b1 > 0:
-            total_orig = r1 + g1 + b1
-            total_dark = r2 + g2 + b2
-            assert total_dark < total_orig, \
-                f"Lab({L},{a},{b}): Expected darkening, got {total_dark} >= {total_orig}"
+        # Calculate total brightness and verify darkening occurred
+        total_orig = r1 + g1 + b1
+        total_dark = r2 + g2 + b2
+        
+        # All test colors should be non-black, so darkening should occur
+        assert total_orig > 0, f"Lab({L},{a},{b}) should produce non-black color"
+        assert total_dark < total_orig, \
+            f"Lab({L},{a},{b}): Expected darkening, got {total_dark} >= {total_orig}"
     
     print("Display gamma darkening test passed")
 
