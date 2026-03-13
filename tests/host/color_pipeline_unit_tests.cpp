@@ -56,14 +56,14 @@ int main()
     xyz_t sunny_xyz = color_math_lab_to_xyz(sunny_lab);
     color_result_t sunny_result{};
     assert(color_pipeline_process_xyz(&sunny_xyz, true, &sunny_result) == ESP_OK);
-    std::printf("SUNNY input test: kona_matched=%d kona_id=%u name=%s delta_e=%.3f\n",
+    std::printf("SUNNY test: kona_matched=%d kona_id=%u name=%s delta_e=%.3f\n",
                 (int)sunny_result.kona_matched,
                 (unsigned int)sunny_result.kona_id,
                 sunny_result.color_name ? sunny_result.color_name : "(null)",
                 sunny_result.delta_e);
     // Verify Kona matching works and produces a reasonable deltaE
-    assert(sunny_result.kona_matched && "Yellow input should match some Kona reference");
-    assert(sunny_result.delta_e < 2.0f && "Delta_e should be under threshold");
+    assert(sunny_result.kona_matched && "SUNNY should match some Kona reference");
+    assert(sunny_result.delta_e < 2.0f && "SUNNY delta_e should be under threshold");
 
     // Test PAPAYA reference (id=149): L=98.500000, a=37.309000, b=110.000000
     // Note: Due to Z floor effects, this input produces a deltaE of ~2.5 which is
@@ -74,13 +74,13 @@ int main()
     xyz_t papaya_xyz = color_math_lab_to_xyz(papaya_lab);
     color_result_t papaya_result{};
     assert(color_pipeline_process_xyz(&papaya_xyz, true, &papaya_result) == ESP_OK);
-    std::printf("PAPAYA input test: kona_matched=%d kona_id=%u name=%s delta_e=%.3f\n",
+    std::printf("PAPAYA test: kona_matched=%d kona_id=%u name=%s delta_e=%.3f\n",
                 (int)papaya_result.kona_matched,
                 (unsigned int)papaya_result.kona_id,
                 papaya_result.color_name ? papaya_result.color_name : "(null)",
                 papaya_result.delta_e);
     // Verify processing completed and color was identified (either Kona or fallback)
-    assert(papaya_result.color_name != nullptr && "Should identify a color");
+    assert(papaya_result.color_name != nullptr && "PAPAYA should identify a color");
 
     std::printf("All Kona matching tests passed!\n");
     return 0;
