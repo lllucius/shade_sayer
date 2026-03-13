@@ -1640,26 +1640,31 @@ const kona_table_t kona_reference = {{
         print("\n" + "=" * 70)
         print(f"MEASUREMENT COMPARISON: {swatch.name} (ID: {swatch.id})")
         print("=" * 70)
-        print(f"Reference (stored):  L*={swatch.L:7.3f}  a*={swatch.a:7.3f}  b*={swatch.b:7.3f}")
-        print(f"Scanned (measured):  L*={scan_L:7.3f}  a*={scan_a:7.3f}  b*={scan_b:7.3f}")
+        print(f"Reference (stored):  L*={swatch.L:8.3f}  a*={swatch.a:8.3f}  b*={swatch.b:8.3f}")
+        print(f"Scanned (measured):  L*={scan_L:8.3f}  a*={scan_a:8.3f}  b*={scan_b:8.3f}")
         print("-" * 70)
-        print(f"Difference:          ΔL*={scan_L - swatch.L:+7.3f}  Δa*={scan_a - swatch.a:+7.3f}  Δb*={scan_b - swatch.b:+7.3f}")
+        print(f"Difference:          ΔL*={scan_L - swatch.L:+8.3f}  Δa*={scan_a - swatch.a:+8.3f}  Δb*={scan_b - swatch.b:+8.3f}")
         print(f"CIEDE2000 ΔE:        {delta_e:.4f}")
         print("-" * 70)
         
-        # Interpret the result
+        # Interpret the result - separate quality level and description
         if delta_e < 1.0:
-            match_quality = "Excellent match (imperceptible difference)"
+            quality_level = "Excellent match"
+            quality_desc = "imperceptible difference"
         elif delta_e < 2.0:
-            match_quality = "Good match (within Kona threshold)"
+            quality_level = "Good match"
+            quality_desc = "within Kona threshold"
         elif delta_e < 3.0:
-            match_quality = "Fair match (perceptible difference)"
+            quality_level = "Fair match"
+            quality_desc = "perceptible difference"
         elif delta_e < 5.0:
-            match_quality = "Poor match (noticeable difference)"
+            quality_level = "Poor match"
+            quality_desc = "noticeable difference"
         else:
-            match_quality = "No match (clearly different)"
+            quality_level = "No match"
+            quality_desc = "clearly different"
         
-        print(f"Match Quality:       {match_quality}")
+        print(f"Match Quality:       {quality_level} ({quality_desc})")
         print(f"Scanned RGB:         ({scan_R}, {scan_G}, {scan_B})")
         print("=" * 70 + "\n")
         
@@ -1671,11 +1676,10 @@ const kona_table_t kona_reference = {{
         self.last_captured_label.config(
             text=f"Measured: {swatch.name}\n"
                  f"L*={scan_L:.2f}  a*={scan_a:.2f}  b*={scan_b:.2f}\n"
-                 f"ΔE00={delta_e:.2f} ({match_quality.split('(')[0].strip()})")
+                 f"ΔE00={delta_e:.2f} ({quality_level})")
         
         # Update status bar
-        self.progress_var.set(
-            f"{swatch.name}: ΔE={delta_e:.2f} - {match_quality.split('(')[0].strip()}")
+        self.progress_var.set(f"{swatch.name}: ΔE={delta_e:.2f} - {quality_level}")
         
         self.root.update_idletasks()
         self.root.bell()
