@@ -401,7 +401,7 @@ def test_lab_value_formatting():
         (50.0, None, -5.0, "50.0000", "None", "-5.0000"),  # a is None
         (50.0, 10.0, None, "50.0000", "10.0000", "None"),  # b is None
         (None, None, None, "None", "None", "None"),  # All None
-        (0.0, 0.0, 0.0, "0.0000", "0.0000", "0.0000"),  # Zero values (truthy test)
+        (0.0, 0.0, 0.0, "0.0000", "0.0000", "0.0000"),  # Zero values are valid and formatted
     ]
     
     for L, a, b, expected_L, expected_a, expected_b in test_cases:
