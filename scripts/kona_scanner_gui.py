@@ -1248,6 +1248,8 @@ const kona_table_t kona_reference = {{
         
         self._populate_treeview()
         self._clear_color_info()
+        # Mark as unsaved since clearing Lab values is a change from the loaded CSV state
+        # User should save to persist the cleared state to the CSV file
         self._unsaved_changes = True
         self.progress_var.set("Cleared all scanned values")
 
@@ -1263,7 +1265,12 @@ const kona_table_t kona_reference = {{
                 if not self._save_csv():
                     return  # Save failed, don't close
             # If No (result is False), proceed to close without saving
-        self.serial.disconnect()
+        
+        # Clean up serial connection (ignore errors to ensure window closes)
+        try:
+            self.serial.disconnect()
+        except Exception:
+            pass
         self.root.destroy()
 
 
