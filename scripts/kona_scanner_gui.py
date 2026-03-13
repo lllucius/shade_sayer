@@ -258,6 +258,7 @@ class KonaScannerApp:
         self.scan_thread: Optional[threading.Thread] = None
         self._capture_in_progress = False  # Re-entrancy guard for capture operations
         self._unsaved_changes = False  # Track whether there are unsaved scan changes
+        self._last_captured_color: Optional[str] = None  # Hex color of last captured swatch
 
         self._setup_ui()
         self._load_csv()
@@ -292,13 +293,13 @@ class KonaScannerApp:
         toolbar.pack(fill=tk.X, pady=(0, 5))
 
         # Buttons with keyboard shortcuts (shown in parentheses)
+        # Button enablement reflects connection state: Connect enabled when disconnected,
+        # Disconnect enabled when connected.
         self.connect_btn = ttk.Button(toolbar, text="Connect (Alt+C)", command=self._on_connect)
         self.connect_btn.pack(side=tk.LEFT, padx=2)
-        self.disconnect_btn = ttk.Button(toolbar, text="Disconnect (Alt+D)", command=self._on_disconnect)
+        self.disconnect_btn = ttk.Button(toolbar, text="Disconnect (Alt+D)", command=self._on_disconnect,
+                                          state=tk.DISABLED)
         self.disconnect_btn.pack(side=tk.LEFT, padx=2)
-        
-        self.status_label = ttk.Label(toolbar, text="Disconnected", foreground="red")
-        self.status_label.pack(side=tk.LEFT, padx=10)
 
         ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
 
@@ -882,20 +883,29 @@ class KonaScannerApp:
         swatch_id = int(selection[0])
         swatch = self.swatches.get(swatch_id)
         if swatch:
-            self._show_color_info(swatch)
+            # During scanning, preserve the last captured color in the canvas
+            # so the user can verify the captured color matches the swatch.
+            # The info panel will still show the next item's values.
+            update_canvas = not self.scanning or self._last_captured_color is None
+            self._show_color_info(swatch, update_canvas=update_canvas)
 
-    def _show_color_info(self, swatch: SwatchData):
-        """Display color information for a swatch."""
+    def _show_color_info(self, swatch: SwatchData, update_canvas: bool = True):
+        """Display color information for a swatch.
+        
+        Args:
+            swatch: The swatch data to display
+            update_canvas: Whether to update the color canvas. Set to False during
+                          scanning to preserve the last captured color for verification.
+        """
         if swatch.L is not None and swatch.a is not None and swatch.b is not None:
             self.info_entries["L*"].set(f"{swatch.L:.2f}")
             self.info_entries["a*"].set(f"{swatch.a:.2f}")
             self.info_entries["b*"].set(f"{swatch.b:.2f}")
 
-            # Convert Lab to RGB for display
-            if swatch.R is not None and swatch.G is not None and swatch.B is not None:
-                r, g, b = swatch.R, swatch.G, swatch.B
-            else:
-                r, g, b = lab_to_rgb(swatch.L, swatch.a, swatch.b)
+            # Always compute RGB from Lab for accurate color display.
+            # The device-reported RGB values have saturation/lightness corrections
+            # applied which can make colors appear different from the physical swatch.
+            r, g, b = lab_to_rgb(swatch.L, swatch.a, swatch.b)
 
             self.info_entries["R"].set(str(r))
             self.info_entries["G"].set(str(g))
@@ -904,12 +914,14 @@ class KonaScannerApp:
             hex_color = rgb_to_hex(r, g, b)
             self.info_entries["Hex"].set(hex_color)
 
-            # Update color sample
-            self.color_canvas.config(bg=hex_color)
+            # Update color sample (unless preserving last captured color during scanning)
+            if update_canvas:
+                self.color_canvas.config(bg=hex_color)
         else:
             for key in ["L*", "a*", "b*", "R", "G", "B", "Hex"]:
                 self.info_entries[key].set("-")
-            self.color_canvas.config(bg="#808080")
+            if update_canvas:
+                self.color_canvas.config(bg="#808080")
 
     def _clear_color_info(self):
         """Clear color information display."""
@@ -933,11 +945,12 @@ class KonaScannerApp:
         if self.serial.connect():
             # Test connection
             if self.serial.ping():
-                self.status_label.config(text="Connected", foreground="green")
+                # Update button states to reflect connection
+                self.connect_btn.config(state=tk.DISABLED)
+                self.disconnect_btn.config(state=tk.NORMAL)
                 self.progress_var.set("Connected to device")
             else:
                 self.serial.disconnect()
-                self.status_label.config(text="Device not responding", foreground="orange")
                 self.progress_var.set("Device connected but not in serial mode")
                 messagebox.showwarning("Warning", 
                     "Serial port opened but device not responding.\n\n"
@@ -946,7 +959,6 @@ class KonaScannerApp:
                     "2. Press button 5 times quickly\n"
                     "3. Wait for 'Serial scan mode active' announcement")
         else:
-            self.status_label.config(text="Connection failed", foreground="red")
             self.progress_var.set("Failed to connect")
             messagebox.showerror("Error", f"Failed to connect to {self.serial_port}")
 
@@ -958,7 +970,9 @@ class KonaScannerApp:
         # Send exit command if connected
         self.serial.exit_mode()
         self.serial.disconnect()
-        self.status_label.config(text="Disconnected", foreground="red")
+        # Update button states to reflect disconnection
+        self.connect_btn.config(state=tk.NORMAL)
+        self.disconnect_btn.config(state=tk.DISABLED)
         self.progress_var.set("Disconnected")
 
     def _on_scan_selected(self):
@@ -1009,6 +1023,8 @@ class KonaScannerApp:
             self.scan_button.config(state=tk.DISABLED)
             self.skip_button.config(state=tk.DISABLED)
             self.scanning = False
+            # Clear last captured color when scanning ends so selection changes update canvas normally
+            self._last_captured_color = None
             # Clean up stored selection
             if hasattr(self, '_scan_original_selection'):
                 del self._scan_original_selection
@@ -1080,12 +1096,18 @@ class KonaScannerApp:
                 self._show_color_info(swatch)
                 self._update_stats()
                 
+                # Store the last captured color for the canvas display during scanning.
+                # This allows visual verification that the captured color matches the swatch.
+                r, g, b = lab_to_rgb(swatch.L, swatch.a, swatch.b)
+                self._last_captured_color = rgb_to_hex(r, g, b)
+                self.color_canvas.config(bg=self._last_captured_color)
+                
                 # Update "Last Captured" display to show what was just scanned
                 # This persists even when selection changes to next item
                 self.last_captured_label.config(
                     text=f"{swatch.name}\n"
                          f"L*={L:.2f}  a*={a:.2f}  b*={b:.2f}\n"
-                         f"RGB=({R}, {G}, {B})")
+                         f"RGB=({r}, {g}, {b})")
 
                 self.progress_var.set(f"Captured {swatch.name}: L={L:.1f} a={a:.1f} b={b:.1f}")
                 
