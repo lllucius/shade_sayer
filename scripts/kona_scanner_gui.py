@@ -23,6 +23,7 @@ import dataclasses
 import datetime as dt
 import os
 import pathlib
+import platform
 import struct
 import sys
 import threading
@@ -262,8 +263,17 @@ class KonaScannerApp:
         """Set up the main UI components."""
         self.root.title("Kona Swatch Scanner")
         self.root.geometry("1200x800")
-        # Maximize window on startup
-        self.root.state('zoomed')
+        # Maximize window on startup (cross-platform with fallback)
+        if platform.system() == 'Windows':
+            self.root.state('zoomed')
+        elif platform.system() == 'Darwin':  # macOS
+            self.root.attributes('-fullscreen', True)  # or use geometry
+        else:  # Linux
+            try:
+                self.root.attributes('-zoomed', True)
+            except:
+                # Fallback: set geometry to screen size
+                self.root.geometry(f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}+0+0")
 
         # Main frame with paned window
         main_pane = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
