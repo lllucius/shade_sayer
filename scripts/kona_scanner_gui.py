@@ -1746,7 +1746,7 @@ class KonaScannerApp:
             self.progress_var.set("Measurement failed")
             return
         
-        scan_L, scan_a, scan_b, scan_R, scan_G, scan_B = result
+        scan_L, scan_a, scan_b, scan_R, scan_G, scan_B = result[:6]
         
         # Calculate delta E using CIEDE2000
         scan_lab = (scan_L, scan_a, scan_b)
