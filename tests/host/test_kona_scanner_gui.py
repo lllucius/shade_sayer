@@ -637,6 +637,66 @@ def test_swatchdata_has_raw_fields():
     print("SwatchData raw fields test passed")
 
 
+def test_scan_response_parsing():
+    """Test that scan() parses both legacy (no RAW) and new (with RAW) response formats."""
+
+    # Simulate parsing logic from SerialConnection.scan()
+    def parse_scan_response(response):
+        if not response.startswith("OK:LAB:"):
+            return None
+        try:
+            parts = response.split(":")
+            lab_parts = parts[2].split(",")
+            rgb_parts = parts[4].split(",")
+            L = float(lab_parts[0])
+            a = float(lab_parts[1])
+            b = float(lab_parts[2])
+            R = int(rgb_parts[0])
+            G = int(rgb_parts[1])
+            B = int(rgb_parts[2])
+            raw_x = raw_y = raw_z = raw_ir = raw_clear = raw_gain = raw_int_ms = None
+            try:
+                raw_idx = next(i for i, p in enumerate(parts) if p == "RAW")
+                raw_parts = parts[raw_idx + 1].split(",")
+                raw_x     = int(raw_parts[0])
+                raw_y     = int(raw_parts[1])
+                raw_z     = int(raw_parts[2])
+                raw_ir    = int(raw_parts[3])
+                raw_clear = int(raw_parts[4])
+                raw_gain  = int(raw_parts[5])
+                raw_int_ms = int(raw_parts[6])
+            except (StopIteration, IndexError, ValueError):
+                pass
+            return (L, a, b, R, G, B, raw_x, raw_y, raw_z, raw_ir, raw_clear,
+                    raw_gain, raw_int_ms)
+        except (IndexError, ValueError):
+            return None
+
+    # Legacy format — no RAW section
+    legacy = "OK:LAB:98.5000,26.0264,110.0000:RGB:255,228,0"
+    result = parse_scan_response(legacy)
+    assert result is not None
+    assert abs(result[0] - 98.5) < 1e-4
+    assert result[3] == 255 and result[4] == 228 and result[5] == 0
+    assert result[6] is None  # raw_x
+    assert result[12] is None  # raw_integration_ms
+
+    # New format — with RAW section
+    new_fmt = "OK:LAB:98.5000,26.0264,110.0000:RGB:255,228,0:RAW:32200000,33400000,27900000,619520,21435649,5,100"
+    result = parse_scan_response(new_fmt)
+    assert result is not None
+    assert abs(result[0] - 98.5) < 1e-4
+    assert result[6] == 32200000  # raw_x
+    assert result[7] == 33400000  # raw_y
+    assert result[8] == 27900000  # raw_z
+    assert result[9] == 619520    # raw_ir
+    assert result[10] == 21435649 # raw_clear
+    assert result[11] == 5        # raw_gain
+    assert result[12] == 100      # raw_integration_ms
+
+    print("Scan response parsing test passed")
+
+
 if __name__ == "__main__":
     test_generate_cpp_inline_comments()
     test_generate_cpp_sorted_by_id()
@@ -651,4 +711,5 @@ if __name__ == "__main__":
     test_json_roundtrip_null_raw()
     test_json_unmeasured_not_included_in_cpp()
     test_swatchdata_has_raw_fields()
+    test_scan_response_parsing()
     print("\nAll kona_scanner_gui tests passed")

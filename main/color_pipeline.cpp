@@ -377,6 +377,14 @@ static esp_err_t capture_averaged_xyz(TCS3530* sensor,
             stats->integration_ms = reading.integration_ms;
             stats->status2 = reading.status2;
             stats->status6 = reading.status6;
+            // Capture the raw ADC counts from the first accepted reading. These values
+            // are stored once (accepted_samples == 1) and are used for kona pipeline
+            // replay via regenerate_kona_lab.py after pipeline parameter changes.
+            stats->raw_x = reading.x;
+            stats->raw_y = reading.y;
+            stats->raw_z = reading.z;
+            stats->raw_ir = reading.ir;
+            stats->raw_clear = reading.clear;
         }
 
 sample_delay:
@@ -394,6 +402,13 @@ sample_delay:
             stats->integration_ms = last_reading.integration_ms;
             stats->status2 = last_reading.status2;
             stats->status6 = last_reading.status6;
+            // All samples were rejected (saturated or below signal floor); fall back to
+            // the last reading's raw ADC counts so pipeline replay can still be attempted.
+            stats->raw_x = last_reading.x;
+            stats->raw_y = last_reading.y;
+            stats->raw_z = last_reading.z;
+            stats->raw_ir = last_reading.ir;
+            stats->raw_clear = last_reading.clear;
         }
 
         // If all samples were below the luminance acceptance floor, keep the
@@ -907,7 +922,8 @@ esp_err_t color_pipeline_capture_csv(TCS3530* sensor,
     return ESP_OK;
 }
 
-esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
+esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
+                                  color_capture_stats_t* stats_out)
 {
     if (!sensor || !result)
     {
@@ -926,6 +942,9 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
     {
         return ret;
     }
+
+    // Track which capture produced the accepted result so raw values can be reported.
+    color_capture_stats_t winning_stats = capture_stats;
 
     result->saturated = capture_stats.any_saturated;
     result->flicker_detected = capture_stats.flicker_detected;
@@ -997,6 +1016,7 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
                     if (set_ret == ESP_OK && (!retry_result.low_light || retry_result.luminance > result->luminance))
                     {
                         *result = retry_result;
+                        winning_stats = retry_stats;
                     }
                 }
             }
@@ -1051,6 +1071,7 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
                     if (set_ret == ESP_OK && (!retry_result.saturated || retry_result.luminance < result->luminance))
                     {
                         *result = retry_result;
+                        winning_stats = retry_stats;
                     }
                 }
 
@@ -1106,6 +1127,7 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
                     if (set_ret == ESP_OK && !retry_result.saturated)
                     {
                         *result = retry_result;
+                        winning_stats = retry_stats;
                     }
                 }
 
@@ -1116,6 +1138,11 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
                 }
             }
         }
+    }
+
+    if (stats_out)
+    {
+        *stats_out = winning_stats;
     }
 
     return ret;

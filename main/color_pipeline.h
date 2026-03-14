@@ -131,6 +131,16 @@ typedef struct
     xyz_t mean_xyz;                 //< Mean corrected XYZ across accepted samples
     xyz_t stddev_xyz;               //< Standard deviation of corrected XYZ across accepted samples
     lab_t mean_lab;                 //< Lab derived from mean XYZ
+
+    // Raw ADC values from the representative (first accepted, or fallback) sensor reading.
+    // Stored as the original counts from the TCS3530, before responsivity correction or
+    // IR compensation.  Used by the kona capture workflow so that kona_regenerate can
+    // replay the measurement through the colour pipeline after pipeline changes.
+    uint32_t raw_x;                 //< Raw ADC X count from representative reading
+    uint32_t raw_y;                 //< Raw ADC Y count from representative reading
+    uint32_t raw_z;                 //< Raw ADC Z count from representative reading
+    uint32_t raw_ir;                //< Raw ADC IR count from representative reading
+    uint32_t raw_clear;             //< Raw ADC Clear count from representative reading
 } color_capture_stats_t;
 
 /**
@@ -138,9 +148,12 @@ typedef struct
  *
  * @param sensor TCS3530 driver pointer
  * @param result Output color identification result
+ * @param stats_out Optional output for the capture statistics of the winning measurement,
+ *                  including raw ADC values for pipeline replay.  Pass nullptr to ignore.
  * @return ESP_OK on success
  */
-esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result);
+esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
+                                  color_capture_stats_t* stats_out = nullptr);
 
 /**
  * @brief Capture and average multiple sensor readings with quality filtering.

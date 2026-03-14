@@ -331,10 +331,12 @@ class SerialConnection:
         response = self.send_command("PING", timeout=2.0)
         return response == "OK:PONG"
 
-    def scan(self) -> Optional[Tuple[float, float, float, int, int, int]]:
-        """Request a scan and return Lab and RGB values.
-        
-        Returns tuple (L, a, b, R, G, B) or None on error.
+    def scan(self) -> Optional[Tuple]:
+        """Request a scan and return Lab, RGB, and raw sensor values.
+
+        Returns tuple (L, a, b, R, G, B, raw_x, raw_y, raw_z, raw_ir, raw_clear,
+        raw_gain, raw_integration_ms) or None on error.
+        raw_* values are None when the firmware does not include the RAW section.
         """
         response = self.send_command("SCAN", timeout=20.0)
         if response is None:
@@ -342,7 +344,7 @@ class SerialConnection:
 
         if response.startswith("OK:LAB:"):
             try:
-                # Parse: OK:LAB:L,a,b:RGB:R,G,B
+                # Parse: OK:LAB:L,a,b:RGB:R,G,B[:RAW:x,y,z,ir,clear,gain,integration_ms]
                 parts = response.split(":")
                 lab_parts = parts[2].split(",")
                 rgb_parts = parts[4].split(",")
@@ -352,9 +354,28 @@ class SerialConnection:
                 R = int(rgb_parts[0])
                 G = int(rgb_parts[1])
                 B = int(rgb_parts[2])
+
+                # Parse optional RAW section (firmware 2+)
+                raw_x = raw_y = raw_z = raw_ir = raw_clear = raw_gain = raw_int_ms = None
+                try:
+                    raw_idx = next(i for i, p in enumerate(parts) if p == "RAW")
+                    raw_parts = parts[raw_idx + 1].split(",")
+                    raw_x     = int(raw_parts[0])
+                    raw_y     = int(raw_parts[1])
+                    raw_z     = int(raw_parts[2])
+                    raw_ir    = int(raw_parts[3])
+                    raw_clear = int(raw_parts[4])
+                    raw_gain  = int(raw_parts[5])
+                    raw_int_ms = int(raw_parts[6])
+                except (StopIteration, IndexError, ValueError):
+                    pass  # Older firmware without RAW section — raw values stay None
+
                 if self.debug:
-                    print(f"Parsed scan result: L={L:.4f} a={a:.4f} b={b:.4f} RGB=({R},{G},{B})")
-                return (L, a, b, R, G, B)
+                    print(f"Parsed scan: L={L:.4f} a={a:.4f} b={b:.4f} RGB=({R},{G},{B})"
+                          f" RAW=({raw_x},{raw_y},{raw_z},{raw_ir},{raw_clear},"
+                          f"gain={raw_gain},int={raw_int_ms}ms)")
+                return (L, a, b, R, G, B, raw_x, raw_y, raw_z, raw_ir, raw_clear,
+                        raw_gain, raw_int_ms)
             except (IndexError, ValueError) as e:
                 print(f"Parse error: {e}, response: {response}", file=sys.stderr)
                 return None
@@ -1073,7 +1094,7 @@ class KonaScannerApp:
                         raw_gain=raw_gain,
                         raw_integration_ms=raw_integration_ms,
                     )
-                except (ValueError, KeyError, TypeError) as e:
+                except (ValueError, KeyError, TypeError, AttributeError) as e:
                     print(f"Skipping invalid JSON swatch entry: {entry} ({e})", file=sys.stderr)
 
             print(f"Loaded {len(self.swatches)} swatches from {self.data_path}")
@@ -1449,7 +1470,7 @@ class KonaScannerApp:
             # Perform scan
             result = self.serial.scan()
             if result:
-                L, a, b, R, G, B = result
+                L, a, b, R, G, B, raw_x, raw_y, raw_z, raw_ir, raw_clear, raw_gain, raw_int_ms = result
                 
                 # Store scan results in the swatch object (canonical data store)
                 swatch.L = L
@@ -1458,6 +1479,13 @@ class KonaScannerApp:
                 swatch.R = R
                 swatch.G = G
                 swatch.B = B
+                swatch.raw_x = raw_x
+                swatch.raw_y = raw_y
+                swatch.raw_z = raw_z
+                swatch.raw_ir = raw_ir
+                swatch.raw_clear = raw_clear
+                swatch.raw_gain = raw_gain
+                swatch.raw_integration_ms = raw_int_ms
                 swatch.measured = True
                 
                 if self.debug:

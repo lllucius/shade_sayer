@@ -725,7 +725,8 @@ static void enter_serial_scan_mode(void)
                             vTaskDelay(pdMS_TO_TICKS(50));
                             
                             color_result_t result = {};
-                            esp_err_t ret = color_pipeline_identify(s_sensor, &result);
+                            color_capture_stats_t scan_stats = {};
+                            esp_err_t ret = color_pipeline_identify(s_sensor, &result, &scan_stats);
                             
                             s_sensor->setLed(false);
                             
@@ -736,10 +737,17 @@ static void enter_serial_scan_mode(void)
                             }
                             else
                             {
-                                // Output Lab values and RGB
-                                printf("OK:LAB:%.4f,%.4f,%.4f:RGB:%d,%d,%d\n",
+                                // Output Lab, RGB, and raw ADC values for pipeline replay
+                                printf("OK:LAB:%.4f,%.4f,%.4f:RGB:%d,%d,%d:RAW:%lu,%lu,%lu,%lu,%lu,%u,%u\n",
                                        result.lab.l, result.lab.a, result.lab.b,
-                                       result.rgb[0], result.rgb[1], result.rgb[2]);
+                                       result.rgb[0], result.rgb[1], result.rgb[2],
+                                       (unsigned long)scan_stats.raw_x,
+                                       (unsigned long)scan_stats.raw_y,
+                                       (unsigned long)scan_stats.raw_z,
+                                       (unsigned long)scan_stats.raw_ir,
+                                       (unsigned long)scan_stats.raw_clear,
+                                       (unsigned int)scan_stats.gain_code,
+                                       (unsigned int)scan_stats.integration_ms);
                                 fflush(stdout);
                                 
                                 s_last_result = result;

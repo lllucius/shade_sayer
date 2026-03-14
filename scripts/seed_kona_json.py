@@ -47,7 +47,7 @@ def load_csv(csv_path):
                     g_val = int(row["G"]) if row.get("G", "").strip() else None
                     b_rgb = int(row["B"]) if row.get("B", "").strip() else None
                     if r_val is not None and g_val is not None and b_rgb is not None:
-                        rgb = [r_val, g_val, b_rgb]
+                        rgb = {"r": r_val, "g": g_val, "b": b_rgb}
                 except (ValueError, KeyError) as e:
                     print(f"  Warning: could not parse RGB for id={row.get('id')}: {e}", file=sys.stderr)
 
