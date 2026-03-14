@@ -751,8 +751,12 @@ static void enter_serial_scan_mode(void)
                                 uint8_t scan_r, scan_g, scan_b;
                                 color_math_lab_to_rgb(result.scan_lab,
                                                       &scan_r, &scan_g, &scan_b);
-                                printf("OK:LAB:%.4f,%.4f,%.4f:RGB:%d,%d,%d\n",
-                                       result.scan_lab.l, result.scan_lab.a, result.scan_lab.b,
+                                // Split into two printf calls to avoid mixing float and
+                                // integer format specifiers — ESP-IDF newlib hangs when
+                                // %.4f and %d are used in the same printf.
+                                printf("OK:LAB:%.4f,%.4f,%.4f",
+                                       result.scan_lab.l, result.scan_lab.a, result.scan_lab.b);
+                                printf(":RGB:%d,%d,%d\n",
                                        (int)scan_r, (int)scan_g, (int)scan_b);
                                 fflush(stdout);
                                 
