@@ -1226,13 +1226,19 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         TCS_LOGD(TAG, "XYZ normalized: Y=%.1f -> %.1f (scale=%.4f)", corrected.y, lab_xyz.y, scale);
     }
 
-    // === SCAN LAB PATH (no Z floor) ===
-    // Compute scan_lab from the Y-normalized XYZ WITHOUT applying the Z floor.
-    // The Kona reference table was built from kona_captures.json values that were
-    // captured using this same computation (Y-normalized, no Z floor, with saturation
-    // boost). Using no Z floor preserves the natural b* variation between swatches:
-    // e.g., CANTALOUPE b*≈90 vs SUNNY b*≈110 instead of both collapsing to b*≈85
-    // when the Z floor forces identical Z for all saturated yellows/oranges.
+    // === SCAN LAB PATH (no Z floor, no saturation boost) ===
+    // Compute scan_lab from the Y-normalized XYZ WITHOUT applying the Z floor or
+    // saturation boost. This produces the raw perceptual Lab value for each swatch
+    // that is stored in kona_captures.json and used to build the Kona reference table.
+    //
+    // Why no saturation boost: the 1.5× boost + ±110 clamp collapses deeply-saturated
+    // swatches (e.g., CARROT, TORCH, ORANGEADE) to identical a*=110 b*=110, making
+    // them impossible to distinguish.  Pre-boost Lab values naturally differ in both
+    // a* and b* (driven by the PCCM-corrected XYZ) and remain distinct.
+    //
+    // Why no Z floor: the Z floor forces a minimum Z of 20% of Y, which gives all
+    // saturated yellows/oranges the same b*≈85 before boost. Without the Z floor the
+    // natural b* variation (CANTALOUPE b*≈60 vs SUNNY b*≈73) is preserved.
     {
         // CRITICAL: Use scale=1.0 to prevent double-scaling (same as display path below).
         // s_params.lightness_scale is already applied in apply_sensor_correction() in XYZ
@@ -1244,15 +1250,8 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         lab_t scan_lab = color_math_xyz_to_lab(lab_xyz);
         scan_lab.l = color_math_correct_lightness(scan_lab.l, &scan_lightness_params);
 
-        // Apply saturation boost and ±110 clamp to produce the value stored in JSON
-        // and used for Kona reference table generation.
-        color_math_enhance_saturation(&scan_lab,
-                                      s_config.gray_threshold,
-                                      s_config.color_threshold,
-                                      s_config.saturation_boost);
-        scan_lab.a = fminf(fmaxf(scan_lab.a, -110.0f), 110.0f);
-        scan_lab.b = fminf(fmaxf(scan_lab.b, -110.0f), 110.0f);
-
+        // No saturation boost and no clamp — preserve natural Lab values so that
+        // highly-saturated swatches remain distinguishable in kona_captures.json.
         result->scan_lab = scan_lab;
     }
 
@@ -1322,10 +1321,13 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
     }
     else
     {
-        // Use scan_lab (Y-normalized, no Z floor, saturation-boosted) for Kona matching.
+        // Use scan_lab (Y-normalized, no Z floor, no saturation boost) for Kona matching.
         // The Kona reference table is built from kona_captures.json values that were
         // captured using this same scan_lab computation, so matching against scan_lab
         // ensures accurate deltaE between measured colors and stored references.
+        // Using pre-boost values keeps highly saturated swatches (e.g., CARROT, TORCH)
+        // distinguishable where boost+clamp would otherwise collapse them to identical
+        // a*=110, b*=110 values.
         if (try_match_kona_reference(&result->scan_lab, result))
         {
             result->description = nullptr;

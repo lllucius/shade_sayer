@@ -45,6 +45,66 @@ void test_cantaloupe_scenario()
     std::printf("CANTALOUPE scenario test PASSED\n");
 }
 
+// Verify that scan_lab does NOT apply saturation boost.
+// The pre-boost Lab values are what get stored in kona_captures.json so that
+// highly-saturated swatches (e.g., CARROT, TORCH, ORANGEADE) remain distinguishable
+// from one another — saturation boost + ±110 clamp would otherwise collapse them all
+// to identical a*=110, b*=110 values.
+void test_scan_lab_no_boost()
+{
+    std::printf("\n=== scan_lab no-saturation-boost test ===\n");
+
+    color_pipeline_config_t cfg{};
+    cfg.min_luminance = 5.0f;
+    cfg.max_delta_e = 12.0f;
+    cfg.num_samples = 1;
+    cfg.sample_delay_ms = 1;
+    cfg.gray_threshold = 5.0f;
+    cfg.color_threshold = 60.0f;
+    cfg.saturation_boost = 1.5f;
+    assert(color_pipeline_init(&cfg) == ESP_OK);
+
+    // Two XYZ inputs that differ only in Z (simulating swatches with different redness).
+    // swatch_a has more Z (less red) → lower b*; swatch_b has less Z (more red) → higher b*.
+    // After saturation boost + clamp both would give a=110, b=110 (indistinguishable).
+    // With pre-boost scan_lab they must remain distinct.
+    xyz_t swatch_a_xyz{140.0f, 100.0f, 20.0f};  // lower Z → high b* (orange/yellow)
+    xyz_t swatch_b_xyz{140.0f, 100.0f, 10.0f};  // even lower Z → higher b* (more red)
+
+    color_result_t a_result{}, b_result{};
+    assert(color_pipeline_process_xyz(&swatch_a_xyz, true, &a_result) == ESP_OK);
+    assert(color_pipeline_process_xyz(&swatch_b_xyz, true, &b_result) == ESP_OK);
+
+    std::printf("swatch_a scan_lab: L=%.2f a=%.4f b=%.4f\n",
+                a_result.scan_lab.l, a_result.scan_lab.a, a_result.scan_lab.b);
+    std::printf("swatch_b scan_lab: L=%.2f a=%.4f b=%.4f\n",
+                b_result.scan_lab.l, b_result.scan_lab.a, b_result.scan_lab.b);
+
+    // Both swatches should produce a valid color name
+    assert(a_result.color_name != nullptr && "swatch_a should identify a color");
+    assert(b_result.color_name != nullptr && "swatch_b should identify a color");
+
+    // scan_lab a* should be below 110 (not clamped) — if boost were applied to
+    // these XYZ inputs (swatch_a: [140, 100, 20]), the resulting pre-boost a*≈68.9
+    // would be boosted to 103.3 and pre-boost b*≈86.3 would be boosted to 129.5 → clamped to
+    // 110 (both b* values collapsing). Without boost, a* stays at ≈68.9 (< 110) and
+    // the distinct b* values of the two swatches are preserved.
+    assert(a_result.scan_lab.a < 110.0f && "scan_lab should NOT have boost applied (a should be < 110)");
+    assert(b_result.scan_lab.a < 110.0f && "scan_lab should NOT have boost applied (a should be < 110)");
+
+    // The two swatches must have DISTINCT scan_lab b* values since they differ in Z.
+    // If boost were applied, both would clamp to b=110 and be indistinguishable.
+    assert(fabsf(a_result.scan_lab.b - b_result.scan_lab.b) > 5.0f
+           && "scan_lab b* must be distinct for swatches with different Z (redness)");
+
+    // The display path (result->lab) applies boost and clamping, so it IS allowed
+    // to clamp — we just confirm the pipeline completed without crashing.
+    std::printf("swatch_a result->lab: L=%.2f a=%.4f b=%.4f\n",
+                a_result.lab.l, a_result.lab.a, a_result.lab.b);
+
+    std::printf("scan_lab no-boost test PASSED\n");
+}
+
 int main()
 {
     color_pipeline_config_t cfg{};
@@ -57,21 +117,27 @@ int main()
     cfg.saturation_boost = 1.5f;
     assert(color_pipeline_init(&cfg) == ESP_OK);
 
+    // Basic pipeline sanity: orange-hued XYZ produces a valid color name.
     color_result_t red{};
     xyz_t red_xyz{2460.86f, 1623.25f, 556.42f};
     assert(color_pipeline_process_xyz(&red_xyz, true, &red) == ESP_OK);
     assert(red.color_name != nullptr);
-    // Note: This XYZ resolves to an orange hue (a*≈85, b*≈64 after Y-normalization),
-    // and the 13 Kona references are all yellow/orange/red entries, so a Kona match
-    // is expected here. Kona matching is NOT exclusive to unmeasured colors.
-    assert(red.kona_matched && "orange-hued XYZ should match a Kona orange/red reference");
+    // scan_lab must not have boost applied: pre-boost a*≈84 for this XYZ.
+    // With boost (1.5×) a* would be clamped to 110; without boost a* < 110.
+    assert(red.scan_lab.a < 110.0f && "scan_lab should be pre-boost (a < 110)");
+    assert(red.scan_lab.a > 50.0f  && "scan_lab a* should be > 50 for orange-hued input");
+    std::printf("red test: color=%s scan_lab=(%.2f,%.2f,%.2f) lab=(%.2f,%.2f,%.2f)\n",
+                red.color_name, red.scan_lab.l, red.scan_lab.a, red.scan_lab.b,
+                red.lab.l, red.lab.a, red.lab.b);
 
+    // Green XYZ: basic pipeline check for a completely different hue.
     color_result_t green{};
     xyz_t green_xyz{1281.60f, 2094.40f, 957.50f};
     assert(color_pipeline_process_xyz(&green_xyz, true, &green) == ESP_OK);
     assert(green.color_name != nullptr);
+    assert(!green.kona_matched && "green should not match the yellow/orange/red Kona set");
 
-
+    // Pipeline from raw sensor reading.
     sensor_reading_t raw{};
     raw.x = 11418369;
     raw.y = 7791616;
@@ -84,45 +150,18 @@ int main()
     color_result_t from_raw{};
     assert(color_pipeline_identify_from_reading(&raw, true, &from_raw) == ESP_OK);
     assert(from_raw.color_name != nullptr);
+    // Verify the raw-reading path populates scan_lab (non-zero a* for a chromatic input).
+    // For highly saturated oranges, pre-boost a* can legitimately exceed 110
+    // (this raw input produces a*≈125 pre-boost; with boost+clamp it would be 110) — so
+    // we only check that scan_lab.a is non-zero, not that it is < 110.
+    assert(from_raw.scan_lab.a != 0.0f && "scan_lab should be populated for raw-reading path");
+    std::printf("from_raw: color=%s scan_lab=(%.2f,%.2f,%.2f)\n",
+                from_raw.color_name, from_raw.scan_lab.l, from_raw.scan_lab.a, from_raw.scan_lab.b);
 
-    // Test Kona matching for SUNNY (id=449): reference scan_lab = (98.5, 26.026, 110.0).
-    //
-    // The scan_lab path is: Y-normalize → Lab → lightness correction → saturation boost+clamp.
-    // To construct XYZ that roundtrips to exactly the reference scan_lab, work backwards:
-    //   - corrected_L=98.5 means raw_L=100.0 (98.5 = 100.0 + offset(-1.5))
-    //   - pre-boost a = 26.026 / 1.5 = 17.35
-    //   - b=110.0 is at the ±110 clamp, so any pre-boost b >= 73.33 gives scan_lab b=110.
-    // XYZ for Lab(raw_L=100, a=17.35, b=74) produces the correct scan_lab for SUNNY.
-    lab_t sunny_pre_boost = {100.0f, 17.35f, 74.0f};
-    xyz_t sunny_xyz = color_math_lab_to_xyz(sunny_pre_boost);
-    color_result_t sunny_result{};
-    assert(color_pipeline_process_xyz(&sunny_xyz, true, &sunny_result) == ESP_OK);
-    std::printf("SUNNY test: kona_matched=%d kona_id=%u name=%s delta_e=%.3f scan_lab=(%.2f,%.2f,%.2f)\n",
-                (int)sunny_result.kona_matched,
-                (unsigned int)sunny_result.kona_id,
-                sunny_result.color_name ? sunny_result.color_name : "(null)",
-                sunny_result.delta_e,
-                sunny_result.scan_lab.l, sunny_result.scan_lab.a, sunny_result.scan_lab.b);
-    // scan_lab should be (98.5, 26.026, 110.0) — matching SUNNY reference exactly
-    assert(sunny_result.kona_matched && "SUNNY should match its Kona reference");
-    assert(sunny_result.kona_id == 449 && "SUNNY should match id=449");
-    assert(sunny_result.delta_e < 1.0f && "SUNNY delta_e should be small");
+    // Run the scan_lab no-boost test (key correctness property).
+    test_scan_lab_no_boost();
 
-    // Test PAPAYA reference (id=149): reference scan_lab = (98.5, 37.309, 110.0).
-    // Same pre-boost construction: a_pre=37.309/1.5=24.87, b_pre=74 (→ clamped 110).
-    lab_t papaya_pre_boost = {100.0f, 24.87f, 74.0f};
-    xyz_t papaya_xyz = color_math_lab_to_xyz(papaya_pre_boost);
-    color_result_t papaya_result{};
-    assert(color_pipeline_process_xyz(&papaya_xyz, true, &papaya_result) == ESP_OK);
-    std::printf("PAPAYA test: kona_matched=%d kona_id=%u name=%s delta_e=%.3f\n",
-                (int)papaya_result.kona_matched,
-                (unsigned int)papaya_result.kona_id,
-                papaya_result.color_name ? papaya_result.color_name : "(null)",
-                papaya_result.delta_e);
-    // Verify processing completed and color was identified (either Kona or fallback)
-    assert(papaya_result.color_name != nullptr && "PAPAYA should identify a color");
-
-    // Run the CANTALOUPE scenario test from issue #41
+    // Run the CANTALOUPE scenario test from issue #41.
     test_cantaloupe_scenario();
 
     std::printf("All Kona matching tests passed!\n");

@@ -41,7 +41,7 @@ typedef struct
     // Color values in different spaces
     xyz_t xyz;                       //< CIE XYZ tristimulus values
     lab_t lab;                       //< CIE L*a*b* color space (post saturation-boost; for display and speech)
-    lab_t scan_lab;                  //< CIE L*a*b* before saturation boost (for SCAN capture and Kona matching)
+    lab_t scan_lab;                  //< CIE L*a*b* before saturation boost, no Z floor (for SCAN capture and Kona matching)
     uint8_t rgb[3];                  //< sRGB for display/reference
 
     // Quality metrics
