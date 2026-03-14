@@ -680,9 +680,10 @@ class KonaScannerApp:
         self.console_text.bind("<ButtonRelease-1>", self._console_disable_select)
         self.console_text.bind("<B1-Motion>", self._console_enable_select)
 
-        # Prevent keyboard edits while still allowing Ctrl shortcuts
+        # Prevent keyboard edits while still allowing Ctrl+A / Ctrl+C
         self.console_text.bind("<Key>", lambda e: "break"
-                               if e.keysym not in ("c", "a") or not (e.state & 0x4)
+                               if e.keysym not in ("c", "a")
+                               or not (e.state & 0x4)  # 0x4 = Control modifier
                                else None)
 
         # Right-click context menu for console (Select All + Copy)
