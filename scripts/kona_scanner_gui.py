@@ -613,9 +613,12 @@ class KonaScannerApp:
         ttk.Radiobutton(filter_frame, text="Not Scanned", variable=self.show_var, value="not_scanned",
                        command=self._on_filter_change).pack(side=tk.LEFT)
 
+        # Vertical PanedWindow so the treeview and console are resizable
+        left_pane = ttk.PanedWindow(left_frame, orient=tk.VERTICAL)
+        left_pane.pack(fill=tk.BOTH, expand=True)
+
         # Treeview with scrollbars
-        tree_frame = ttk.Frame(left_frame)
-        tree_frame.pack(fill=tk.BOTH, expand=True)
+        tree_frame = ttk.Frame(left_pane)
 
         columns = ("panel", "index", "id", "name", "measured", "L", "a", "b")
         self.tree = ttk.Treeview(tree_frame, columns=columns, show="headings", selectmode="extended")
@@ -651,18 +654,48 @@ class KonaScannerApp:
 
         self.tree.bind("<<TreeviewSelect>>", self._on_selection_change)
 
+        left_pane.add(tree_frame, weight=3)
+
         # Console output area — shows serial TX/RX and measurement details
-        console_frame = ttk.LabelFrame(left_frame, text="Console")
-        console_frame.pack(fill=tk.BOTH, pady=(3, 0))
-        # Give the console a fixed minimum height via the text widget
-        self.console_text = tk.Text(console_frame, height=8, wrap=tk.WORD, state=tk.DISABLED,
-                                    font=("Courier", 9), bg="#1e1e1e", fg="#d4d4d4",
+        console_frame = ttk.LabelFrame(left_pane, text="Console")
+        # Use wrap=NONE with horizontal scrollbar so lines don't wrap
+        self.console_text = tk.Text(console_frame, height=8, wrap=tk.NONE, state=tk.DISABLED,
+                                    font=("Courier", 11), bg="#1e1e1e", fg="#d4d4d4",
                                     insertbackground="#d4d4d4")
         console_vsb = ttk.Scrollbar(console_frame, orient=tk.VERTICAL,
                                     command=self.console_text.yview)
-        self.console_text.configure(yscrollcommand=console_vsb.set)
-        self.console_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        console_vsb.pack(side=tk.RIGHT, fill=tk.Y)
+        console_hsb = ttk.Scrollbar(console_frame, orient=tk.HORIZONTAL,
+                                    command=self.console_text.xview)
+        self.console_text.configure(yscrollcommand=console_vsb.set,
+                                    xscrollcommand=console_hsb.set)
+        self.console_text.grid(row=0, column=0, sticky="nsew")
+        console_vsb.grid(row=0, column=1, sticky="ns")
+        console_hsb.grid(row=1, column=0, sticky="ew")
+        console_frame.grid_rowconfigure(0, weight=1)
+        console_frame.grid_columnconfigure(0, weight=1)
+
+        # Allow mouse text selection even though the widget is DISABLED.
+        # Temporarily switch to NORMAL during mouse drag operations.
+        self.console_text.bind("<ButtonPress-1>", self._console_enable_select)
+        self.console_text.bind("<ButtonRelease-1>", self._console_disable_select)
+        self.console_text.bind("<B1-Motion>", self._console_enable_select)
+
+        # Prevent keyboard edits while still allowing Ctrl shortcuts
+        self.console_text.bind("<Key>", lambda e: "break"
+                               if e.keysym not in ("c", "a") or not (e.state & 0x4)
+                               else None)
+
+        # Right-click context menu for console (Select All + Copy)
+        self._console_menu = tk.Menu(self.console_text, tearoff=0)
+        self._console_menu.add_command(label="Select All    Ctrl+A",
+                                       command=self._console_select_all)
+        self._console_menu.add_command(label="Copy            Ctrl+C",
+                                       command=self._console_copy)
+        self.console_text.bind("<Button-3>", self._console_context_menu)
+        self.console_text.bind("<Control-a>", lambda e: self._console_select_all())
+        self.console_text.bind("<Control-c>", lambda e: self._console_copy())
+
+        left_pane.add(console_frame, weight=1)
 
         # Status bar
         self.progress_var = tk.StringVar(value="Ready")
@@ -881,6 +914,35 @@ class KonaScannerApp:
         except RuntimeError:
             # Fallback if Tk mainloop has already exited
             pass
+
+    def _console_select_all(self):
+        """Select all text in the console output area."""
+        self.console_text.configure(state=tk.NORMAL)
+        self.console_text.tag_add(tk.SEL, "1.0", tk.END)
+        self.console_text.configure(state=tk.DISABLED)
+        return "break"
+
+    def _console_copy(self):
+        """Copy selected text from the console to the clipboard."""
+        try:
+            sel = self.console_text.get(tk.SEL_FIRST, tk.SEL_LAST)
+            self.root.clipboard_clear()
+            self.root.clipboard_append(sel)
+        except tk.TclError:
+            pass  # No selection
+        return "break"
+
+    def _console_context_menu(self, event):
+        """Show right-click context menu on the console output area."""
+        self._console_menu.tk_popup(event.x_root, event.y_root)
+
+    def _console_enable_select(self, event=None):
+        """Temporarily enable the console text widget for mouse selection."""
+        self.console_text.configure(state=tk.NORMAL)
+
+    def _console_disable_select(self, event=None):
+        """Re-disable the console text widget after mouse selection."""
+        self.console_text.configure(state=tk.DISABLED)
 
     def _on_focus_filter(self, event=None):
         """Focus the filter entry field and select all text.
