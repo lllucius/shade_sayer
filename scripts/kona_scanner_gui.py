@@ -9,11 +9,11 @@ Features:
 - Display all 365 Kona swatches in a sortable list
 - Show color sample and Lab/RGB info for selected swatches
 - Support single or multi-swatch scanning via EXTENDED selection
-- Maintain scanned values in CSV file
+- Maintain scanned values in JSON (preferred) or CSV file
 - Export to C++ header file for firmware use
 
 Usage:
-    python3 kona_scanner_gui.py [--port /dev/ttyACM0] [--csv kona_swatches.csv] [--debug]
+    python3 kona_scanner_gui.py [--port /dev/ttyACM0] [--csv kona_captures.json] [--debug]
 """
 
 import argparse
@@ -21,6 +21,7 @@ import csv
 import colorsys
 import dataclasses
 import datetime as dt
+import json
 import math
 import os
 import pathlib
@@ -72,6 +73,14 @@ class SwatchData:
     B: Optional[int] = None
     measured: bool = False
     notes: str = ""
+    # Raw sensor data for pipeline replay (populated when device protocol provides it)
+    raw_x: Optional[int] = None
+    raw_y: Optional[int] = None
+    raw_z: Optional[int] = None
+    raw_ir: Optional[int] = None
+    raw_clear: Optional[int] = None
+    raw_gain: Optional[int] = None
+    raw_integration_ms: Optional[int] = None
 
 
 # Display gamma adjustment for monitor compensation.
@@ -477,7 +486,7 @@ class KonaScannerApp:
         self._last_captured_color: Optional[str] = None  # Hex color of last captured swatch
 
         self._setup_ui()
-        self._load_csv()
+        self._load_data()
         self._populate_treeview()
 
     def _setup_ui(self):
@@ -997,6 +1006,19 @@ class KonaScannerApp:
         self.show_var.set(value)
         self._on_filter_change()
 
+    def _load_data(self):
+        """Load swatch data from file, auto-detecting CSV or JSON format."""
+        if self.csv_path.suffix.lower() == ".json":
+            self._load_json()
+        else:
+            self._load_csv()
+
+    def _save_data(self) -> bool:
+        """Save swatch data to file, dispatching to JSON or CSV based on extension."""
+        if self.csv_path.suffix.lower() == ".json":
+            return self._save_json()
+        return self._save_csv()
+
     def _load_csv(self):
         """Load swatch data from CSV file."""
         self.swatches.clear()
@@ -1043,6 +1065,73 @@ class KonaScannerApp:
         except Exception as e:
             print(f"Error loading CSV: {e}", file=sys.stderr)
 
+    def _load_json(self):
+        """Load swatch data from a kona_captures.json file."""
+        self.swatches.clear()
+
+        if not self.csv_path.exists():
+            print(f"JSON file not found: {self.csv_path}", file=sys.stderr)
+            return
+
+        try:
+            with self.csv_path.open(encoding="utf-8") as f:
+                data = json.load(f)
+
+            for entry in data.get("swatches", []):
+                try:
+                    swatch_id = int(entry.get("id", 0))
+                    if swatch_id == 0:
+                        continue
+
+                    lab = entry.get("lab") or {}
+                    L = float(lab["l"]) if lab.get("l") is not None else None
+                    a = float(lab["a"]) if lab.get("a") is not None else None
+                    b = float(lab["b"]) if lab.get("b") is not None else None
+
+                    rgb = entry.get("rgb") or {}
+                    R = int(rgb["r"]) if rgb.get("r") is not None else None
+                    G = int(rgb["g"]) if rgb.get("g") is not None else None
+                    B = int(rgb["b"]) if rgb.get("b") is not None else None
+
+                    raw = entry.get("raw") or {}
+                    raw_x = int(raw["x"]) if raw.get("x") is not None else None
+                    raw_y = int(raw["y"]) if raw.get("y") is not None else None
+                    raw_z = int(raw["z"]) if raw.get("z") is not None else None
+                    raw_ir = int(raw["ir"]) if raw.get("ir") is not None else None
+                    raw_clear = int(raw["clear"]) if raw.get("clear") is not None else None
+                    raw_gain = int(raw["gain"]) if raw.get("gain") is not None else None
+                    raw_integration_ms = int(raw["integration_ms"]) if raw.get("integration_ms") is not None else None
+
+                    measured = bool(entry.get("measured", False))
+
+                    self.swatches[swatch_id] = SwatchData(
+                        panel=str(entry.get("panel", "")),
+                        panel_index=int(entry.get("panel_index", 0)),
+                        id=swatch_id,
+                        name=str(entry.get("name", "")),
+                        L=L,
+                        a=a,
+                        b=b,
+                        R=R,
+                        G=G,
+                        B=B,
+                        measured=measured,
+                        notes=str(entry.get("notes", "")),
+                        raw_x=raw_x,
+                        raw_y=raw_y,
+                        raw_z=raw_z,
+                        raw_ir=raw_ir,
+                        raw_clear=raw_clear,
+                        raw_gain=raw_gain,
+                        raw_integration_ms=raw_integration_ms,
+                    )
+                except (ValueError, KeyError, TypeError) as e:
+                    print(f"Skipping invalid JSON swatch entry: {entry} ({e})", file=sys.stderr)
+
+            print(f"Loaded {len(self.swatches)} swatches from {self.csv_path}")
+        except Exception as e:
+            print(f"Error loading JSON: {e}", file=sys.stderr)
+
     def _save_csv(self):
         """Save swatch data to CSV file."""
         try:
@@ -1088,6 +1177,90 @@ class KonaScannerApp:
         except Exception as e:
             print(f"Error saving CSV: {e}", file=sys.stderr)
             messagebox.showerror("Error", f"Failed to save CSV: {e}")
+            return False
+
+    def _save_json(self) -> bool:
+        """Save swatch data to a kona_captures.json file.
+
+        Preserves existing top-level metadata (schema_version, capture_date,
+        device, pipeline_config_snapshot) from the loaded JSON when possible.
+        Raw sensor fields are written for swatches that have them so they can
+        be used for pipeline replay via regenerate_kona_lab.py.
+        """
+        try:
+            # Preserve existing top-level metadata if the file exists
+            existing: dict = {}
+            if self.csv_path.exists():
+                try:
+                    with self.csv_path.open(encoding="utf-8") as f:
+                        existing = json.load(f)
+                except Exception:
+                    pass
+
+            measured_count = sum(1 for s in self.swatches.values() if s.measured)
+            if self.debug:
+                print(f"Saving JSON: {len(self.swatches)} total swatches, {measured_count} measured")
+
+            # Build swatch list sorted by panel / panel_index (same order as CSV)
+            sorted_swatches = sorted(self.swatches.values(),
+                                     key=lambda s: (s.panel, s.panel_index))
+
+            swatch_entries = []
+            for s in sorted_swatches:
+                if self.debug and s.measured:
+                    L_str = f"{s.L:.4f}" if s.L is not None else "None"
+                    a_str = f"{s.a:.4f}" if s.a is not None else "None"
+                    b_str = f"{s.b:.4f}" if s.b is not None else "None"
+                    print(f"  Writing swatch[{s.id}] ({s.name}): "
+                          f"L={L_str} a={a_str} b={b_str}")
+
+                entry: dict = {
+                    "panel": s.panel,
+                    "panel_index": s.panel_index,
+                    "id": s.id,
+                    "name": s.name,
+                    "measured": s.measured,
+                    "raw": {
+                        "x": s.raw_x,
+                        "y": s.raw_y,
+                        "z": s.raw_z,
+                        "ir": s.raw_ir,
+                        "clear": s.raw_clear,
+                        "gain": s.raw_gain,
+                        "integration_ms": s.raw_integration_ms,
+                    },
+                    "lab": {
+                        "l": round(s.L, 6) if s.L is not None else None,
+                        "a": round(s.a, 6) if s.a is not None else None,
+                        "b": round(s.b, 6) if s.b is not None else None,
+                    },
+                    "rgb": {
+                        "r": s.R,
+                        "g": s.G,
+                        "b": s.B,
+                    },
+                    "notes": s.notes,
+                }
+                swatch_entries.append(entry)
+
+            output = {
+                "schema_version": existing.get("schema_version", 1),
+                "capture_date": existing.get("capture_date", ""),
+                "device": existing.get("device", {"firmware_version": "", "firmware_commit": ""}),
+                "pipeline_config_snapshot": existing.get("pipeline_config_snapshot", {}),
+                "swatches": swatch_entries,
+            }
+
+            with self.csv_path.open("w", encoding="utf-8") as f:
+                json.dump(output, f, indent=2)
+                f.write("\n")  # Trailing newline for POSIX compliance
+
+            print(f"Saved {len(self.swatches)} swatches to {self.csv_path}")
+            self._unsaved_changes = False
+            return True
+        except Exception as e:
+            print(f"Error saving JSON: {e}", file=sys.stderr)
+            messagebox.showerror("Error", f"Failed to save JSON: {e}")
             return False
 
     def _populate_treeview(self):
@@ -1473,9 +1646,9 @@ class KonaScannerApp:
             if self._unsaved_changes:
                 save_now = messagebox.askyesno(
                     "Scan Complete",
-                    "Scan session complete.\n\nYou have unsaved changes. Save CSV now?")
+                    "Scan session complete.\n\nYou have unsaved changes. Save data now?")
                 if save_now:
-                    self._save_csv()
+                    self._save_data()
             else:
                 messagebox.showinfo("Info", "Scan session complete")
 
@@ -1489,8 +1662,8 @@ class KonaScannerApp:
         self.progress_var.set("Scan stopped")
 
     def _on_save_csv(self):
-        """Save CSV file."""
-        if self._save_csv():
+        """Save data file (CSV or JSON based on file extension)."""
+        if self._save_data():
             messagebox.showinfo("Info", f"Saved to {self.csv_path}")
 
     def _on_export_cpp(self):
@@ -1733,7 +1906,7 @@ class KonaScannerApp:
             if result is None:  # Cancel - don't close
                 return
             if result:  # Yes - save first
-                if not self._save_csv():
+                if not self._save_data():
                     return  # Save failed, don't close
             # If No (result is False), proceed to close without saving
         
@@ -1750,8 +1923,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", default="/dev/ttyACM0",
                        help="Serial port for device communication")
-    parser.add_argument("--csv", default="kona_cotton_solids_k001.csv",
-                       help="CSV file for swatch data")
+    parser.add_argument("--csv", default="kona_captures.json",
+                       help="Data file for swatch data (.json preferred, .csv legacy)")
     parser.add_argument("--debug", action="store_true",
                        help="Print all serial TX/RX communications for debugging")
     return parser.parse_args()
@@ -1761,7 +1934,7 @@ def main() -> int:
     """Main entry point."""
     args = parse_args()
 
-    # Make CSV path relative to repository root (one level up from scripts directory)
+    # Make data path relative to repository root (one level up from scripts directory)
     csv_path = args.csv
     if not os.path.isabs(csv_path):
         script_dir = pathlib.Path(__file__).parent  # scripts directory

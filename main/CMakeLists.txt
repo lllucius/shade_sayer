@@ -1,18 +1,37 @@
 set(KONA_REF_TABLE_SRC "konaref_default.cpp")
 
-set(KONA_CAPTURE_CSV "${CMAKE_SOURCE_DIR}/kona_365_sensor_ready.csv")
+# Prefer kona_captures.json only if it contains measured swatches with Lab values.
+# An empty or template JSON falls through to the legacy CSV for backward compatibility.
+set(KONA_CAPTURE_JSON "${CMAKE_SOURCE_DIR}/kona_captures.json")
+set(KONA_CAPTURE_CSV "${CMAKE_SOURCE_DIR}/kona_cotton_solids_k001.csv")
 set(KONA_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/generate_kona_table.py")
 
-if(EXISTS "${KONA_CAPTURE_CSV}" AND EXISTS "${KONA_GENERATOR}")
+if(EXISTS "${KONA_CAPTURE_JSON}" AND EXISTS "${KONA_GENERATOR}")
+    execute_process(
+        COMMAND python3 -c
+            "import json,sys; d=json.load(open('${KONA_CAPTURE_JSON}')); sw=[s for s in d.get('swatches',[]) if s.get('measured') and (s.get('lab') or {}).get('l') is not None]; sys.exit(0 if sw else 1)"
+        RESULT_VARIABLE _JSON_HAS_DATA
+        OUTPUT_QUIET ERROR_QUIET
+    )
+    if(_JSON_HAS_DATA EQUAL 0)
+        set(KONA_ACTIVE_INPUT "${KONA_CAPTURE_JSON}")
+    endif()
+endif()
+
+if(NOT DEFINED KONA_ACTIVE_INPUT AND EXISTS "${KONA_CAPTURE_CSV}" AND EXISTS "${KONA_GENERATOR}")
+    set(KONA_ACTIVE_INPUT "${KONA_CAPTURE_CSV}")
+endif()
+
+if(DEFINED KONA_ACTIVE_INPUT AND EXISTS "${KONA_GENERATOR}")
     set(KONA_REF_GENERATED "${CMAKE_BINARY_DIR}/generated/konaref_generated.cpp")
     add_custom_command(
         OUTPUT "${KONA_REF_GENERATED}"
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/generated"
         COMMAND python3 "${KONA_GENERATOR}"
-                --input "${KONA_CAPTURE_CSV}"
+                --input "${KONA_ACTIVE_INPUT}"
                 --output "${KONA_REF_GENERATED}"
-        DEPENDS "${KONA_GENERATOR}" "${KONA_CAPTURE_CSV}"
-        COMMENT "Generating Kona reference table from kona_365_sensor_ready.csv"
+        DEPENDS "${KONA_GENERATOR}" "${KONA_ACTIVE_INPUT}"
+        COMMENT "Generating Kona reference table from ${KONA_ACTIVE_INPUT}"
         VERBATIM)
     set(KONA_REF_TABLE_SRC "${KONA_REF_GENERATED}")
 endif()

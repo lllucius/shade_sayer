@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Generate a Kona reference data C++ table from kona_cotton_solids_k001.csv.
+"""Generate a Kona reference data C++ table from kona_captures.json or a CSV file.
 
-This script reads Lab measurements from the Kona 365 sensor-ready CSV file and
-produces a C++ source file containing a kona_table_t struct for firmware use.
-Only rows with measured=true and complete L/a/b values are included.
+This script reads Lab measurements from a kona_captures.json (preferred) or the
+legacy kona_cotton_solids_k001.csv file and produces a C++ source file containing
+a kona_table_t struct for firmware use.  Only rows with measured=true and complete
+L/a/b values are included.
 
 The generated table includes:
 - Schema version for compatibility checking
@@ -11,6 +12,10 @@ The generated table includes:
 - Lab values for each measured Kona swatch
 
 Usage:
+    python3 generate_kona_table.py --input ../kona_captures.json \\
+                                   --output ../main/konaref_generated.cpp
+
+    # Legacy CSV format still supported:
     python3 generate_kona_table.py --input ../kona_cotton_solids_k001.csv \\
                                    --output ../main/konaref_generated.cpp
 """
@@ -19,6 +24,7 @@ import argparse
 import csv
 import dataclasses
 import datetime as dt
+import json
 import pathlib
 import struct
 import zlib
@@ -87,6 +93,59 @@ def parse_sensor_ready_csv(path: pathlib.Path) -> List[KonaEntry]:
     return ordered
 
 
+def parse_json_captures(path: pathlib.Path) -> List[KonaEntry]:
+    """Parse Lab measurements from a kona_captures.json file.
+
+    Reads the 'swatches' array and extracts entries where measured=true and
+    the 'lab' object has all three values (l, a, b).
+    Duplicate IDs are deduplicated (last entry wins).
+    Output is sorted by kona_id.
+    """
+    with path.open(encoding="utf-8") as f:
+        data = json.load(f)
+
+    entries = {}
+    for swatch in data.get("swatches", []):
+        if not swatch.get("measured", False):
+            continue
+
+        lab = swatch.get("lab") or {}
+        l = lab.get("l")
+        a = lab.get("a")
+        b = lab.get("b")
+        if l is None or a is None or b is None:
+            continue
+
+        kona_id_raw = swatch.get("id")
+        if kona_id_raw is None:
+            continue
+
+        kona_id = int(kona_id_raw)
+        entries[kona_id] = KonaEntry(
+            kona_id=kona_id,
+            l=float(l),
+            a=float(a),
+            b=float(b),
+            name=str(swatch.get("name", "")).strip(),
+        )
+
+    ordered = sorted(entries.values(), key=lambda e: e.kona_id)
+    if len(ordered) > MAX_ENTRIES:
+        raise ValueError(f"Too many entries ({len(ordered)}), max is {MAX_ENTRIES}")
+    return ordered
+
+
+def parse_captures(path: pathlib.Path) -> List[KonaEntry]:
+    """Auto-detect format and parse Kona capture data.
+
+    Dispatches to parse_json_captures() for .json files and
+    parse_sensor_ready_csv() for all other extensions.
+    """
+    if path.suffix.lower() == ".json":
+        return parse_json_captures(path)
+    return parse_sensor_ready_csv(path)
+
+
 def crc32_entries(entries: Iterable[KonaEntry]) -> int:
     """Compute CRC32 checksum of entry data matching firmware struct layout.
     
@@ -149,8 +208,8 @@ const kona_table_t kona_reference = {{
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--input", default="../kona_cotton_solids_k001.csv", type=pathlib.Path,
-                   help="Input kona_cotton_solids_k001.csv file with measured Lab values")
+    p.add_argument("--input", default="../kona_captures.json", type=pathlib.Path,
+                   help="Input kona_captures.json (preferred) or legacy CSV file with measured Lab values")
     p.add_argument("--output", default=pathlib.Path("../main/konaref_generated.cpp"), type=pathlib.Path,
                    help="Output C++ source file path")
     return p.parse_args()
@@ -158,7 +217,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    entries = parse_sensor_ready_csv(args.input)
+    entries = parse_captures(args.input)
     output_text = render_cpp(entries, args.input)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(output_text)

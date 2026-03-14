@@ -7,11 +7,13 @@ Tests will be skipped if tkinter is not available.
 
 import dataclasses
 import datetime as dt
+import json
 import pathlib
 import struct
 import sys
+import tempfile
 import zlib
-from typing import List
+from typing import List, Optional
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
@@ -28,7 +30,7 @@ except ImportError:
     print("Note: tkinter not available, using standalone test implementation")
 
 
-# Standalone SwatchData for testing without tkinter
+# Standalone SwatchData for testing without tkinter – must mirror kona_scanner_gui.SwatchData
 @dataclasses.dataclass
 class SwatchData:
     """Data for a single Kona swatch."""
@@ -36,14 +38,22 @@ class SwatchData:
     panel_index: int
     id: int
     name: str
-    L: float = None
-    a: float = None
-    b: float = None
-    R: int = None
-    G: int = None
-    B: int = None
+    L: Optional[float] = None
+    a: Optional[float] = None
+    b: Optional[float] = None
+    R: Optional[int] = None
+    G: Optional[int] = None
+    B: Optional[int] = None
     measured: bool = False
     notes: str = ""
+    # Raw sensor data for pipeline replay
+    raw_x: Optional[int] = None
+    raw_y: Optional[int] = None
+    raw_z: Optional[int] = None
+    raw_ir: Optional[int] = None
+    raw_clear: Optional[int] = None
+    raw_gain: Optional[int] = None
+    raw_integration_ms: Optional[int] = None
 
 
 # Constants (must match kona_scanner_gui.py)
@@ -433,6 +443,200 @@ def test_collect_measured_swatches_for_upload():
     print("Collect measured swatches for upload test passed")
 
 
+# ---------------------------------------------------------------------------
+# JSON round-trip tests (standalone – no tkinter required)
+# ---------------------------------------------------------------------------
+
+def _make_json_data(swatches: list) -> dict:
+    """Build a minimal kona_captures.json structure."""
+    return {
+        "schema_version": 1,
+        "capture_date": "2026-01-01T00:00:00Z",
+        "device": {"firmware_version": "1.0.0", "firmware_commit": "aabbccdd"},
+        "pipeline_config_snapshot": {},
+        "swatches": swatches,
+    }
+
+
+def _swatch_to_json_entry(s: SwatchData) -> dict:
+    """Convert a SwatchData to the JSON swatch entry format (mirrors _save_json logic)."""
+    return {
+        "panel": s.panel,
+        "panel_index": s.panel_index,
+        "id": s.id,
+        "name": s.name,
+        "measured": s.measured,
+        "raw": {
+            "x": s.raw_x,
+            "y": s.raw_y,
+            "z": s.raw_z,
+            "ir": s.raw_ir,
+            "clear": s.raw_clear,
+            "gain": s.raw_gain,
+            "integration_ms": s.raw_integration_ms,
+        },
+        "lab": {
+            "l": round(s.L, 6) if s.L is not None else None,
+            "a": round(s.a, 6) if s.a is not None else None,
+            "b": round(s.b, 6) if s.b is not None else None,
+        },
+        "rgb": {
+            "r": s.R,
+            "g": s.G,
+            "b": s.B,
+        },
+        "notes": s.notes,
+    }
+
+
+def _load_json_swatches(path: pathlib.Path) -> dict:
+    """Load swatches from a JSON file (mirrors _load_json logic)."""
+    with path.open(encoding="utf-8") as f:
+        data = json.load(f)
+    swatches = {}
+    for entry in data.get("swatches", []):
+        swatch_id = int(entry.get("id", 0))
+        if swatch_id == 0:
+            continue
+        lab = entry.get("lab") or {}
+        rgb = entry.get("rgb") or {}
+        raw = entry.get("raw") or {}
+        swatches[swatch_id] = SwatchData(
+            panel=str(entry.get("panel", "")),
+            panel_index=int(entry.get("panel_index", 0)),
+            id=swatch_id,
+            name=str(entry.get("name", "")),
+            L=float(lab["l"]) if lab.get("l") is not None else None,
+            a=float(lab["a"]) if lab.get("a") is not None else None,
+            b=float(lab["b"]) if lab.get("b") is not None else None,
+            R=int(rgb["r"]) if rgb.get("r") is not None else None,
+            G=int(rgb["g"]) if rgb.get("g") is not None else None,
+            B=int(rgb["b"]) if rgb.get("b") is not None else None,
+            measured=bool(entry.get("measured", False)),
+            notes=str(entry.get("notes", "")),
+            raw_x=int(raw["x"]) if raw.get("x") is not None else None,
+            raw_y=int(raw["y"]) if raw.get("y") is not None else None,
+            raw_z=int(raw["z"]) if raw.get("z") is not None else None,
+            raw_ir=int(raw["ir"]) if raw.get("ir") is not None else None,
+            raw_clear=int(raw["clear"]) if raw.get("clear") is not None else None,
+            raw_gain=int(raw["gain"]) if raw.get("gain") is not None else None,
+            raw_integration_ms=int(raw["integration_ms"]) if raw.get("integration_ms") is not None else None,
+        )
+    return swatches
+
+
+def test_json_roundtrip_lab_values():
+    """Test that Lab values survive a JSON write/read cycle without precision loss."""
+    with tempfile.TemporaryDirectory() as tmp:
+        json_path = pathlib.Path(tmp) / "kona_captures.json"
+
+        original = SwatchData(
+            panel="yellow_orange_red", panel_index=1, id=449, name="SUNNY",
+            L=98.5, a=26.026400, b=110.0,
+            R=255, G=228, B=0,
+            measured=True, notes="test",
+            raw_x=32200000, raw_y=33400000, raw_z=27900000,
+            raw_ir=619520, raw_clear=21435649, raw_gain=5, raw_integration_ms=100,
+        )
+
+        data = _make_json_data([_swatch_to_json_entry(original)])
+        with json_path.open("w") as f:
+            json.dump(data, f, indent=2)
+            f.write("\n")
+
+        loaded = _load_json_swatches(json_path)
+        assert 449 in loaded, "Swatch 449 should be present after JSON round-trip"
+
+        s = loaded[449]
+        assert abs(s.L - 98.5) < 1e-5, f"L mismatch: {s.L}"
+        assert abs(s.a - 26.0264) < 1e-3, f"a mismatch: {s.a}"
+        assert abs(s.b - 110.0) < 1e-5, f"b mismatch: {s.b}"
+        assert s.R == 255
+        assert s.raw_x == 32200000
+        assert s.raw_gain == 5
+        assert s.raw_integration_ms == 100
+
+    print("JSON round-trip Lab values test passed")
+
+
+def test_json_roundtrip_null_raw():
+    """Test that swatches with null raw data survive JSON round-trip."""
+    with tempfile.TemporaryDirectory() as tmp:
+        json_path = pathlib.Path(tmp) / "kona_captures.json"
+
+        original = SwatchData(
+            panel="blues", panel_index=3, id=120, name="AZURE",
+            L=44.0, a=2.0, b=3.0, measured=True,
+        )
+
+        data = _make_json_data([_swatch_to_json_entry(original)])
+        with json_path.open("w") as f:
+            json.dump(data, f, indent=2)
+            f.write("\n")
+
+        loaded = _load_json_swatches(json_path)
+        assert 120 in loaded
+
+        s = loaded[120]
+        assert s.raw_x is None
+        assert s.raw_gain is None
+        assert abs(s.L - 44.0) < 1e-6
+
+    print("JSON round-trip null raw data test passed")
+
+
+def test_json_unmeasured_not_included_in_cpp():
+    """Test that unmeasured JSON swatches are excluded from C++ output."""
+    from generate_kona_table import parse_json_captures, render_cpp
+
+    with tempfile.TemporaryDirectory() as tmp:
+        json_path = pathlib.Path(tmp) / "kona_captures.json"
+
+        measured = SwatchData(panel="t", panel_index=1, id=100, name="MEASURED",
+                              L=50.0, a=5.0, b=5.0, measured=True)
+        unmeasured = SwatchData(panel="t", panel_index=2, id=200, name="UNMEASURED",
+                                L=None, a=None, b=None, measured=False)
+
+        data = _make_json_data([
+            _swatch_to_json_entry(measured),
+            _swatch_to_json_entry(unmeasured),
+        ])
+        with json_path.open("w") as f:
+            json.dump(data, f, indent=2)
+
+        entries = parse_json_captures(json_path)
+        assert len(entries) == 1, f"Expected 1 entry, got {len(entries)}"
+        assert entries[0].kona_id == 100
+
+        cpp = render_cpp(entries, json_path)
+        assert "// 100 MEASURED" in cpp
+        assert "200" not in cpp
+
+    print("JSON unmeasured exclusion test passed")
+
+
+def test_swatchdata_has_raw_fields():
+    """Test that SwatchData has all expected raw sensor fields."""
+    s = SwatchData(panel="t", panel_index=1, id=1, name="TEST")
+    # Verify raw fields exist with None defaults
+    assert hasattr(s, "raw_x") and s.raw_x is None
+    assert hasattr(s, "raw_y") and s.raw_y is None
+    assert hasattr(s, "raw_z") and s.raw_z is None
+    assert hasattr(s, "raw_ir") and s.raw_ir is None
+    assert hasattr(s, "raw_clear") and s.raw_clear is None
+    assert hasattr(s, "raw_gain") and s.raw_gain is None
+    assert hasattr(s, "raw_integration_ms") and s.raw_integration_ms is None
+
+    # Verify raw fields can be set
+    s.raw_x = 32200000
+    s.raw_gain = 5
+    s.raw_integration_ms = 100
+    assert s.raw_x == 32200000
+    assert s.raw_gain == 5
+
+    print("SwatchData raw fields test passed")
+
+
 if __name__ == "__main__":
     test_generate_cpp_inline_comments()
     test_generate_cpp_sorted_by_id()
@@ -443,4 +647,8 @@ if __name__ == "__main__":
     test_generate_kona_binary()
     test_lab_value_formatting()
     test_collect_measured_swatches_for_upload()
+    test_json_roundtrip_lab_values()
+    test_json_roundtrip_null_raw()
+    test_json_unmeasured_not_included_in_cpp()
+    test_swatchdata_has_raw_fields()
     print("\nAll kona_scanner_gui tests passed")

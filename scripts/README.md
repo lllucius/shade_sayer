@@ -10,10 +10,13 @@ This directory contains Python scripts for generating and managing the xkcd colo
 
 **Usage:**
 ```bash
-# Launch GUI with default settings
+# Launch GUI with default settings (opens kona_captures.json)
 python3 kona_scanner_gui.py
 
-# Specify serial port and CSV file
+# Specify serial port and data file
+python3 kona_scanner_gui.py --port /dev/ttyACM0 --csv ../kona_captures.json
+
+# Legacy CSV format still supported
 python3 kona_scanner_gui.py --port /dev/ttyACM0 --csv ../kona_cotton_solids_k001.csv
 ```
 
@@ -24,18 +27,166 @@ python3 kona_scanner_gui.py --port /dev/ttyACM0 --csv ../kona_cotton_solids_k001
 - Bidirectional serial communication with device
 - Export to C++ header file for firmware use
 - Filter by panel, name, ID, or scan status
+- Save scan results in JSON (preferred) or CSV format
 
 **Device Setup:**
 1. Connect device via USB cable
 2. Press button 5 times quickly to enter serial scan mode
 3. Launch GUI and click "Connect"
 4. Select swatches to scan and click "Scan Selected"
-5. Position device on each swatch and click "Capture"
 
 **Requirements:**
 - Python 3.8+
 - Tkinter (usually included with Python)
 - pyserial (`pip install pyserial`)
+
+### generate_kona_table.py
+
+Generates a Kona table source file (default: `main/konaref_generated.cpp`) from
+`kona_captures.json` (preferred) or `kona_cotton_solids_k001.csv` (legacy).
+
+Also provides the shared `render_cpp`, `KonaEntry`, and `crc32_entries` helpers
+used by `kona_scanner_gui.py` to export C++ from the GUI.
+
+**Usage:**
+```bash
+# JSON (preferred)
+python3 generate_kona_table.py --input ../kona_captures.json --output ../main/konaref_generated.cpp
+
+# Legacy CSV
+python3 generate_kona_table.py --input ../kona_cotton_solids_k001.csv --output ../main/konaref_generated.cpp
+```
+
+**Features:**
+- Auto-detects format based on file extension (.json vs .csv)
+- For JSON: reads cached `lab` values from the `swatches` array
+- For CSV: reads `L`, `a`, `b` columns from the CSV
+- Only includes rows/entries where `measured=true` and all Lab values are present
+- Deduplicates by `id` (last entry wins), sorted by numeric swatch id
+- Emits `kona_table_t kona_reference` with schema version, entry count, and CRC32
+- Caps table size to 365 entries for firmware flash layout compatibility
+- Shared by `kona_scanner_gui.py` for C++ export
+
+### regenerate_kona_lab.py *(new)*
+
+**Pipeline replay script** — rebuilds cached Lab values in `kona_captures.json` from
+raw sensor data after the color pipeline changes.
+
+**Usage:**
+```bash
+# Build host binary and regenerate (from scripts/ directory)
+python3 regenerate_kona_lab.py
+
+# Specify paths explicitly
+python3 regenerate_kona_lab.py --json ../kona_captures.json --host-build ../host/build
+
+# Dry-run: show what would change without writing
+python3 regenerate_kona_lab.py --dry-run
+
+# Use a pre-built binary
+python3 regenerate_kona_lab.py --binary ../host/build/kona_regenerate
+```
+
+**Workflow after a pipeline change:**
+1. Edit pipeline parameters (PCCM, responsivity, IR compensation, etc.)
+2. Run `python3 regenerate_kona_lab.py` — it builds the host binary and replays raw data
+3. Review the printed summary of Lab changes (ΔE per swatch)
+4. Commit the updated `kona_captures.json`
+5. Normal builds pick up the new Lab values automatically
+
+**Requirements:**
+- CMake and a C++ compiler (for building the `kona_regenerate` host binary)
+- `kona_captures.json` with swatches containing raw sensor data in the `raw` field
+
+## JSON Capture Format: kona_captures.json
+
+The `kona_captures.json` file at the repository root is the **single source of truth**
+for Kona swatch capture data.  It stores both raw sensor readings (for pipeline replay)
+and cached Lab values (for fast builds).
+
+### Top-level Structure
+
+```json
+{
+  "schema_version": 1,
+  "capture_date": "2026-01-01T00:00:00Z",
+  "device": {
+    "firmware_version": "1.0.0",
+    "firmware_commit": "aa55fb9d"
+  },
+  "pipeline_config_snapshot": {},
+  "swatches": [ ... ]
+}
+```
+
+### Per-Swatch Entry
+
+```json
+{
+  "panel": "yellow_orange_red",
+  "panel_index": 1,
+  "id": 449,
+  "name": "SUNNY",
+  "measured": true,
+  "raw": {
+    "x": 32200000,
+    "y": 33400000,
+    "z": 27900000,
+    "ir": 619520,
+    "clear": 21435649,
+    "gain": 5,
+    "integration_ms": 100
+  },
+  "lab": {
+    "l": 98.5,
+    "a": 26.0264,
+    "b": 110.0
+  },
+  "rgb": {
+    "r": 255,
+    "g": 228,
+    "b": 0
+  },
+  "notes": ""
+}
+```
+
+### Fields
+
+| Field | Description |
+|---|---|
+| `panel` / `panel_index` / `id` / `name` | Metadata matching the Kona 365 swatch catalog |
+| `measured` | `true` once a scan has been captured for this swatch |
+| `raw.x/y/z` | Raw TCS3530 ADC counts for the X/Y/Z tristimulus channels |
+| `raw.ir` | Raw infrared channel count |
+| `raw.clear` | Raw broadband clear channel count |
+| `raw.gain` | TCS3530 gain code used during capture |
+| `raw.integration_ms` | Integration time in milliseconds |
+| `lab.l/a/b` | Cached Lab values from the current pipeline (used by normal builds) |
+| `rgb.r/g/b` | Display RGB values (informational) |
+
+### Normal vs. Regeneration Build Paths
+
+```
+Normal build (99% of the time):
+  kona_captures.json (cached lab) → generate_kona_table.py → konaref_generated.cpp
+
+After pipeline change:
+  python3 regenerate_kona_lab.py
+    → builds kona_regenerate (host C++ binary)
+    → feeds raw data through color_pipeline_identify_from_reading()
+    → updates lab values in kona_captures.json
+    → commit updated JSON
+  Next build: picks up new Lab values automatically
+```
+
+### Why Not Replay on Every Build?
+
+- Avoids a circular dependency (the host binary needs `konaref_generated.cpp`)
+- Calibration decisions (which config to use) require human judgement
+- Makes Lab changes explicit and auditable via git history
+
+## Legacy Scripts
 
 ### import_xkcd_colors.py
 
@@ -132,28 +283,6 @@ cat ../console.txt | python3 kona_scan_collect.py --input-log - --output kona_av
 **Requirements:**
 - Python 3.8+
 
-### generate_kona_table.py
-
-Generates a Kona table source file (default: `main/konaref_generated.cpp`) from
-`kona_cotton_solids_k001.csv` so firmware can match against
-Kona swatch Lab references directly in flash.
-
-Also provides the shared `render_cpp`, `KonaEntry`, and `crc32_entries` helpers
-used by `kona_scanner_gui.py` to export C++ from the GUI.
-
-**Usage:**
-```bash
-python3 generate_kona_table.py --input ../kona_cotton_solids_k001.csv --output ../main/konaref_generated.cpp
-```
-
-**Features:**
-- Parses `id`, `name`, and `L/a/b` from `kona_cotton_solids_k001.csv`
-- Only includes rows where `measured=true` and all Lab values are present
-- Deduplicates by `id` (last row wins), sorted by numeric swatch id
-- Emits `kona_table_t kona_reference` with schema version, entry count, and CRC32
-- Caps table size to 365 entries for firmware flash layout compatibility
-- Shared by `kona_scanner_gui.py` for C++ export
-
 ### Legacy Scripts
 
 - **import_resene_colors.py**: Previous import script for Resene paint colors from Excel.
@@ -166,6 +295,11 @@ python3 generate_kona_table.py --input ../kona_cotton_solids_k001.csv --output .
   ```
 
 ## Data Files
+
+### kona_captures.json *(new – preferred)*
+
+Hybrid raw + cached Lab capture file.  Scan once; rebuild Lab from raw data after
+pipeline changes.  See [JSON Capture Format](#json-capture-format-kona_capturesjson) above.
 
 ### xkcd_colors.json
 
