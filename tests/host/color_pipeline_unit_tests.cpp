@@ -14,16 +14,17 @@ void test_cantaloupe_scenario()
 {
     std::printf("\n=== CANTALOUPE scenario test (Issue #41) ===\n");
     
-    // Reference values from konaref_default.cpp
-    // CANTALOUPE (id=59): L=98.500000, a=66.308800, b=90.075200
+    // Reference values from konaref_default.cpp - verified against the Kona table
+    // Entry: { 59, 98.500000f, 66.308800f, 90.075200f }  // 59 CANTALOUPE
     
-    // Measured Lab from problem statement (device log)
+    // Measured Lab from problem statement (device log: L=98.5 a=65.9 b=90.0)
+    // Note: GUI measurement was slightly different (a=66.2, b=90.2) giving dE=0.07
     lab_t measured = {98.5f, 65.9f, 90.0f};
     
-    // Reference Lab from Kona table
+    // Reference Lab from Kona table (CANTALOUPE, id=59)
     lab_t cantaloupe_ref = {98.500000f, 66.308800f, 90.075200f};
     
-    // Expected deltaE: ~0.15 (very small due to similar values)
+    // Compute actual deltaE - varies by exact measurement but should be ~0.1-0.15
     float expected_de = color_math_delta_e_ciede2000(&measured, &cantaloupe_ref);
     std::printf("Direct CIEDE2000: measured (%.1f, %.1f, %.1f) vs CANTALOUPE ref -> dE=%.4f\n",
                 measured.l, measured.a, measured.b, expected_de);
