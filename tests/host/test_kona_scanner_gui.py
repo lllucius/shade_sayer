@@ -638,9 +638,9 @@ def test_swatchdata_has_raw_fields():
 
 
 def test_scan_response_parsing():
-    """Test that scan() parses both legacy (no RAW) and new (with RAW) response formats."""
+    """Test SCAN and RAWDATA response parsing used by SerialConnection.scan()."""
 
-    # Simulate parsing logic from SerialConnection.scan()
+    # --- SCAN response (Lab + RGB only) ---
     def parse_scan_response(response):
         if not response.startswith("OK:LAB:"):
             return None
@@ -654,45 +654,47 @@ def test_scan_response_parsing():
             R = int(rgb_parts[0])
             G = int(rgb_parts[1])
             B = int(rgb_parts[2])
-            raw_x = raw_y = raw_z = raw_ir = raw_clear = raw_gain = raw_int_ms = None
-            try:
-                raw_idx = next(i for i, p in enumerate(parts) if p == "RAW")
-                raw_parts = parts[raw_idx + 1].split(",")
-                raw_x     = int(raw_parts[0])
-                raw_y     = int(raw_parts[1])
-                raw_z     = int(raw_parts[2])
-                raw_ir    = int(raw_parts[3])
-                raw_clear = int(raw_parts[4])
-                raw_gain  = int(raw_parts[5])
-                raw_int_ms = int(raw_parts[6])
-            except (StopIteration, IndexError, ValueError):
-                pass
-            return (L, a, b, R, G, B, raw_x, raw_y, raw_z, raw_ir, raw_clear,
-                    raw_gain, raw_int_ms)
+            return (L, a, b, R, G, B)
         except (IndexError, ValueError):
             return None
 
-    # Legacy format — no RAW section
-    legacy = "OK:LAB:98.5000,26.0264,110.0000:RGB:255,228,0"
-    result = parse_scan_response(legacy)
+    scan_resp = "OK:LAB:98.5000,26.0264,110.0000:RGB:255,228,0"
+    result = parse_scan_response(scan_resp)
     assert result is not None
     assert abs(result[0] - 98.5) < 1e-4
     assert result[3] == 255 and result[4] == 228 and result[5] == 0
-    assert result[6] is None  # raw_x
-    assert result[12] is None  # raw_integration_ms
 
-    # New format — with RAW section
-    new_fmt = "OK:LAB:98.5000,26.0264,110.0000:RGB:255,228,0:RAW:32200000,33400000,27900000,619520,21435649,5,100"
-    result = parse_scan_response(new_fmt)
-    assert result is not None
-    assert abs(result[0] - 98.5) < 1e-4
-    assert result[6] == 32200000  # raw_x
-    assert result[7] == 33400000  # raw_y
-    assert result[8] == 27900000  # raw_z
-    assert result[9] == 619520    # raw_ir
-    assert result[10] == 21435649 # raw_clear
-    assert result[11] == 5        # raw_gain
-    assert result[12] == 100      # raw_integration_ms
+    # --- RAWDATA response ---
+    def parse_rawdata_response(response):
+        prefix = "OK:RAWDATA:"
+        if not response.startswith(prefix):
+            return None
+        try:
+            raw_parts = response[len(prefix):].split(",")
+            raw_x     = int(raw_parts[0])
+            raw_y     = int(raw_parts[1])
+            raw_z     = int(raw_parts[2])
+            raw_ir    = int(raw_parts[3])
+            raw_clear = int(raw_parts[4])
+            raw_gain  = int(raw_parts[5])
+            raw_int_ms = int(raw_parts[6])
+            return (raw_x, raw_y, raw_z, raw_ir, raw_clear, raw_gain, raw_int_ms)
+        except (IndexError, ValueError):
+            return None
+
+    rawdata_resp = "OK:RAWDATA:32200000,33400000,27900000,619520,21435649,5,100"
+    raw = parse_rawdata_response(rawdata_resp)
+    assert raw is not None
+    assert raw[0] == 32200000  # raw_x
+    assert raw[1] == 33400000  # raw_y
+    assert raw[2] == 27900000  # raw_z
+    assert raw[3] == 619520    # raw_ir
+    assert raw[4] == 21435649  # raw_clear
+    assert raw[5] == 5         # raw_gain
+    assert raw[6] == 100       # raw_integration_ms
+
+    # ERR:NO_RAWDATA when no scan has happened yet
+    assert parse_rawdata_response("ERR:NO_RAWDATA") is None
 
     print("Scan response parsing test passed")
 

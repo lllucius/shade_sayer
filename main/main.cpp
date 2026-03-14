@@ -126,6 +126,12 @@ static char s_description_buffer[TTS_DESCRIPTION_BUFFER_SIZE];
 static color_result_t s_last_result;
 static bool s_has_last_result = false;
 
+// Raw capture statistics from the most recent SCAN command, for pipeline replay.
+// Updated only by the SCAN command handler and queried by the RAWDATA command.
+// Persists across multiple RAWDATA queries until the next SCAN.
+static color_capture_stats_t s_last_scan_stats = {};
+static bool s_has_last_scan_stats = false;
+
 // Next swatch index for Kona scan workflow
 static uint16_t s_kona_scan_index = 0;
 static bool s_kona_scan_active = false;
@@ -737,22 +743,41 @@ static void enter_serial_scan_mode(void)
                             }
                             else
                             {
-                                // Output Lab, RGB, and raw ADC values for pipeline replay
-                                printf("OK:LAB:%.4f,%.4f,%.4f:RGB:%d,%d,%d:RAW:%lu,%lu,%lu,%lu,%lu,%u,%u\n",
+                                // Output Lab values and RGB (original format, preserved for compatibility)
+                                printf("OK:LAB:%.4f,%.4f,%.4f:RGB:%d,%d,%d\n",
                                        result.lab.l, result.lab.a, result.lab.b,
-                                       result.rgb[0], result.rgb[1], result.rgb[2],
-                                       (unsigned long)scan_stats.raw_x,
-                                       (unsigned long)scan_stats.raw_y,
-                                       (unsigned long)scan_stats.raw_z,
-                                       (unsigned long)scan_stats.raw_ir,
-                                       (unsigned long)scan_stats.raw_clear,
-                                       (unsigned int)scan_stats.gain_code,
-                                       (unsigned int)scan_stats.integration_ms);
+                                       result.rgb[0], result.rgb[1], result.rgb[2]);
                                 fflush(stdout);
                                 
                                 s_last_result = result;
                                 s_has_last_result = true;
+
+                                // Store raw capture stats for retrieval via the RAWDATA command
+                                s_last_scan_stats = scan_stats;
+                                s_has_last_scan_stats = true;
                             }
+                        }
+                    }
+                    else if (strcmp(cmd_buffer, "RAWDATA") == 0)
+                    {
+                        // Return raw ADC sensor values from the most recent SCAN for pipeline replay.
+                        // Format: OK:RAWDATA:x,y,z,ir,clear,gain,integration_ms
+                        if (!s_has_last_scan_stats)
+                        {
+                            printf("ERR:NO_RAWDATA\n");
+                            fflush(stdout);
+                        }
+                        else
+                        {
+                            printf("OK:RAWDATA:%u,%u,%u,%u,%u,%u,%u\n",
+                                   (unsigned)s_last_scan_stats.raw_x,
+                                   (unsigned)s_last_scan_stats.raw_y,
+                                   (unsigned)s_last_scan_stats.raw_z,
+                                   (unsigned)s_last_scan_stats.raw_ir,
+                                   (unsigned)s_last_scan_stats.raw_clear,
+                                   (unsigned)s_last_scan_stats.gain_code,
+                                   (unsigned)s_last_scan_stats.integration_ms);
+                            fflush(stdout);
                         }
                     }
                     else if (strcmp(cmd_buffer, "KONA_STATUS") == 0)

@@ -334,9 +334,12 @@ class SerialConnection:
     def scan(self) -> Optional[Tuple]:
         """Request a scan and return Lab, RGB, and raw sensor values.
 
+        Sends SCAN to get Lab+RGB, then RAWDATA to retrieve the raw ADC counts
+        from the same measurement for pipeline replay.
+
         Returns tuple (L, a, b, R, G, B, raw_x, raw_y, raw_z, raw_ir, raw_clear,
         raw_gain, raw_integration_ms) or None on error.
-        raw_* values are None when the firmware does not include the RAW section.
+        raw_* values are None when RAWDATA is unavailable or returns an error.
         """
         response = self.send_command("SCAN", timeout=20.0)
         if response is None:
@@ -344,7 +347,7 @@ class SerialConnection:
 
         if response.startswith("OK:LAB:"):
             try:
-                # Parse: OK:LAB:L,a,b:RGB:R,G,B[:RAW:x,y,z,ir,clear,gain,integration_ms]
+                # Parse: OK:LAB:L,a,b:RGB:R,G,B
                 parts = response.split(":")
                 lab_parts = parts[2].split(",")
                 rgb_parts = parts[4].split(",")
@@ -354,12 +357,18 @@ class SerialConnection:
                 R = int(rgb_parts[0])
                 G = int(rgb_parts[1])
                 B = int(rgb_parts[2])
+            except (IndexError, ValueError) as e:
+                print(f"Parse error: {e}, response: {response}", file=sys.stderr)
+                return None
 
-                # Parse optional RAW section (firmware 2+)
-                raw_x = raw_y = raw_z = raw_ir = raw_clear = raw_gain = raw_int_ms = None
+            # Retrieve raw ADC values from the just-completed scan via RAWDATA command.
+            # These values are used by regenerate_kona_lab.py to replay the measurement
+            # through the color pipeline after pipeline parameter changes.
+            raw_x = raw_y = raw_z = raw_ir = raw_clear = raw_gain = raw_int_ms = None
+            raw_resp = self.send_command("RAWDATA", timeout=2.0)
+            if raw_resp and raw_resp.startswith("OK:RAWDATA:"):
                 try:
-                    raw_idx = next(i for i, p in enumerate(parts) if p == "RAW")
-                    raw_parts = parts[raw_idx + 1].split(",")
+                    raw_parts = raw_resp[len("OK:RAWDATA:"):].split(",")
                     raw_x     = int(raw_parts[0])
                     raw_y     = int(raw_parts[1])
                     raw_z     = int(raw_parts[2])
@@ -367,18 +376,15 @@ class SerialConnection:
                     raw_clear = int(raw_parts[4])
                     raw_gain  = int(raw_parts[5])
                     raw_int_ms = int(raw_parts[6])
-                except (StopIteration, IndexError, ValueError):
-                    pass  # Older firmware without RAW section — raw values stay None
+                except (IndexError, ValueError) as e:
+                    print(f"RAWDATA parse error: {e}, response: {raw_resp}", file=sys.stderr)
 
-                if self.debug:
-                    print(f"Parsed scan: L={L:.4f} a={a:.4f} b={b:.4f} RGB=({R},{G},{B})"
-                          f" RAW=({raw_x},{raw_y},{raw_z},{raw_ir},{raw_clear},"
-                          f"gain={raw_gain},int={raw_int_ms}ms)")
-                return (L, a, b, R, G, B, raw_x, raw_y, raw_z, raw_ir, raw_clear,
-                        raw_gain, raw_int_ms)
-            except (IndexError, ValueError) as e:
-                print(f"Parse error: {e}, response: {response}", file=sys.stderr)
-                return None
+            if self.debug:
+                print(f"Parsed scan: L={L:.4f} a={a:.4f} b={b:.4f} RGB=({R},{G},{B})"
+                      f" RAW=({raw_x},{raw_y},{raw_z},{raw_ir},{raw_clear},"
+                      f"gain={raw_gain},int={raw_int_ms}ms)")
+            return (L, a, b, R, G, B, raw_x, raw_y, raw_z, raw_ir, raw_clear,
+                    raw_gain, raw_int_ms)
 
         print(f"Scan error: {response}", file=sys.stderr)
         return None
