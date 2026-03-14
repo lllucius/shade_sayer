@@ -875,6 +875,11 @@ esp_err_t color_pipeline_capture_csv(TCS3530* sensor,
     // swatch_id,swatch_name,led_enabled,gain_code,integration_ms,status2,status6,
     // requested_samples,accepted_samples,rejected_saturated,rejected_low_signal,
     // mean_x,mean_y,mean_z,stddev_x,stddev_y,stddev_z,mean_L,mean_a,mean_b,timestamp_us
+    //
+    // IMPORTANT: mean_L/a/b are the fully-processed Lab values from color_pipeline_process_xyz()
+    // (after XYZ normalization, Z floor, lightness correction, saturation boost, and clamping).
+    // These match the values used by try_match_kona_reference(), ensuring that reference tables
+    // built from this CSV data are consistent with the matching algorithm.
     ESP_LOGI("KONA_SCAN_CSV",
              "%s,%s,%u,%u,%u,0x%02X,0x%02X,%u,%u,%u,%u,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%llu",
              swatch_id ? swatch_id : "",
@@ -894,9 +899,9 @@ esp_err_t color_pipeline_capture_csv(TCS3530* sensor,
              stats.stddev_xyz.x,
              stats.stddev_xyz.y,
              stats.stddev_xyz.z,
-             stats.mean_lab.l,
-             stats.mean_lab.a,
-             stats.mean_lab.b,
+             out->lab.l,
+             out->lab.a,
+             out->lab.b,
              (unsigned long long)out->timestamp_us);
 
     return ESP_OK;
