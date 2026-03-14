@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "capture_date": "",
+  "device": {
+    "firmware_version": "",
+    "firmware_commit": ""
+  },
+  "pipeline_config_snapshot": {},
+  "swatches": []
+}

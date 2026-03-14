@@ -10,7 +10,7 @@ import sys
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
-from generate_kona_table import MAX_ENTRIES, crc32_entries, parse_sensor_ready_csv, render_cpp
+from generate_kona_table import MAX_ENTRIES, crc32_entries, parse_sensor_ready_csv, render_cpp, parse_json_captures, parse_captures
 
 
 def _write_csv(path: pathlib.Path, rows):
@@ -165,10 +165,135 @@ def test_name_comment_in_output():
         assert "// 59 CANTALOUPE" in cpp, "Missing name comment in output"
 
 
+def _write_json(path: pathlib.Path, swatches: list, schema_version: int = 1):
+    """Helper to write test kona_captures.json files."""
+    import json
+    data = {
+        "schema_version": schema_version,
+        "capture_date": "",
+        "device": {"firmware_version": "", "firmware_commit": ""},
+        "pipeline_config_snapshot": {},
+        "swatches": swatches,
+    }
+    with path.open("w") as f:
+        json.dump(data, f, indent=2)
+
+
+def test_parse_json_basic():
+    """Test basic JSON capture parsing with measured swatches."""
+    with tempfile.TemporaryDirectory() as tmp:
+        json_path = pathlib.Path(tmp) / "kona_captures.json"
+        _write_json(json_path, [
+            {
+                "panel": "test", "panel_index": 1,
+                "id": 249, "name": "CRIMSON",
+                "measured": True,
+                "raw": {"x": 0, "y": 0, "z": 0, "ir": 0, "clear": 0, "gain": 5, "integration_ms": 100},
+                "lab": {"l": 55.0, "a": 12.0, "b": -18.0},
+                "rgb": {"r": None, "g": None, "b": None},
+                "notes": "",
+            },
+            {
+                "panel": "test", "panel_index": 2,
+                "id": 120, "name": "AZURE",
+                "measured": True,
+                "raw": {"x": 0, "y": 0, "z": 0, "ir": 0, "clear": 0, "gain": 5, "integration_ms": 100},
+                "lab": {"l": 44.0, "a": 2.0, "b": 3.0},
+                "rgb": {"r": None, "g": None, "b": None},
+                "notes": "",
+            },
+            # Unmeasured – should be skipped
+            {
+                "panel": "test", "panel_index": 3,
+                "id": 300, "name": "IGNORE",
+                "measured": False,
+                "raw": {},
+                "lab": {"l": None, "a": None, "b": None},
+                "rgb": {},
+                "notes": "",
+            },
+        ])
+
+        entries = parse_json_captures(json_path)
+        assert len(entries) == 2
+        assert entries[0].kona_id == 120
+        assert entries[1].kona_id == 249
+        assert abs(entries[1].l - 55.0) < 1e-6
+        assert entries[0].name == "AZURE"
+
+        cpp = render_cpp(entries, json_path)
+        assert "// 120 AZURE" in cpp
+        assert "// 249 CRIMSON" in cpp
+
+
+def test_parse_json_missing_lab():
+    """Test that JSON entries with null Lab values are skipped."""
+    with tempfile.TemporaryDirectory() as tmp:
+        json_path = pathlib.Path(tmp) / "kona_captures.json"
+        _write_json(json_path, [
+            {
+                "id": 100, "name": "COMPLETE", "panel": "t", "panel_index": 1,
+                "measured": True,
+                "raw": {},
+                "lab": {"l": 50.0, "a": 5.0, "b": 5.0},
+                "rgb": {}, "notes": "",
+            },
+            {
+                "id": 200, "name": "NO_LAB", "panel": "t", "panel_index": 2,
+                "measured": True,
+                "raw": {},
+                "lab": {"l": None, "a": None, "b": None},
+                "rgb": {}, "notes": "",
+            },
+        ])
+
+        entries = parse_json_captures(json_path)
+        assert len(entries) == 1
+        assert entries[0].kona_id == 100
+
+
+def test_parse_captures_autodetect():
+    """Test that parse_captures() dispatches based on file extension."""
+    with tempfile.TemporaryDirectory() as tmp:
+        json_path = pathlib.Path(tmp) / "captures.json"
+        _write_json(json_path, [
+            {
+                "id": 59, "name": "CANTALOUPE", "panel": "t", "panel_index": 1,
+                "measured": True,
+                "raw": {},
+                "lab": {"l": 98.5, "a": 66.3088, "b": 90.0752},
+                "rgb": {}, "notes": "",
+            },
+        ])
+
+        entries = parse_captures(json_path)
+        assert len(entries) == 1
+        assert entries[0].kona_id == 59
+        assert abs(entries[0].l - 98.5) < 1e-4
+
+        # CSV path should still dispatch to CSV parser
+        csv_path = pathlib.Path(tmp) / "swatches.csv"
+        header = ["panel", "panel_index", "id", "name", "L", "a", "b",
+                  "R", "G", "B", "measured", "notes"]
+        import csv as csv_mod
+        with csv_path.open("w", newline="") as f:
+            w = csv_mod.DictWriter(f, fieldnames=header, extrasaction="ignore")
+            w.writeheader()
+            w.writerow({"id": "59", "name": "CANTALOUPE", "panel": "t",
+                        "panel_index": "1", "L": "98.5", "a": "66.3088",
+                        "b": "90.0752", "measured": "true"})
+        entries_csv = parse_captures(csv_path)
+        assert len(entries_csv) == 1
+        assert entries_csv[0].kona_id == 59
+
+
 if __name__ == "__main__":
     test_struct_size()
     test_parse_and_render()
     test_skip_incomplete_lab()
     test_entry_limit()
     test_name_comment_in_output()
+    test_parse_json_basic()
+    test_parse_json_missing_lab()
+    test_parse_captures_autodetect()
     print("generate_kona_table tests passed")
