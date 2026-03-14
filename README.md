@@ -165,15 +165,18 @@ tcs/
 │   ├── import_xkcd_colors.py      # Import xkcd color CSV
 │   ├── generate_color_database.py # Generate color_database.cpp
 │   ├── generate_vptree.py         # Generate vptree_data.h
-│   └── generate_kona_table.py     # Generate Kona table source from Kona scan captures
+│   └── generate_kona_table.py     # Generate Kona table source from kona_365_sensor_ready.csv
 └── TCS3530_DS.txt          # Sensor datasheet extract
 ```
 
 ### Kona scan reference table flow
 
 ```bash
-python3 scripts/kona_scan_collect.py --input-log console.txt --output kona_avg_captures.csv
-python3 scripts/generate_kona_table.py --input kona_avg_captures.csv --output main/konaref_generated.cpp
+# Option 1: Generate directly from kona_365_sensor_ready.csv (requires measured=true rows)
+python3 scripts/generate_kona_table.py --input kona_365_sensor_ready.csv --output main/konaref_generated.cpp
+
+# Option 2: Use the GUI to scan swatches and export
+python3 scripts/kona_scanner_gui.py
 ```
 
 The firmware validates the generated Kona table via schema version + CRC32 at startup. If the table is
