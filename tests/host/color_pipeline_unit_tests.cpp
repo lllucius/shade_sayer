@@ -1,9 +1,49 @@
 #include "color_pipeline.h"
 #include "color_math.h"
+#include "konaref.h"
 #include <cassert>
 #include <cstdio>
 #include <cstring>
 #include <cmath>
+#include <cfloat>
+
+// Test case from problem statement: verify CANTALOUPE detection
+// The issue reports that measured Lab (98.5, 65.9, 90.0) should give dE=0.07 to CANTALOUPE
+// but device was reporting dE=25.8
+void test_cantaloupe_scenario()
+{
+    std::printf("\n=== CANTALOUPE scenario test (Issue #41) ===\n");
+    
+    // Reference values from konaref_default.cpp - verified against the Kona table
+    // Entry: { 59, 98.500000f, 66.308800f, 90.075200f }  // 59 CANTALOUPE
+    
+    // Measured Lab from problem statement (device log: L=98.5 a=65.9 b=90.0)
+    // Note: GUI measurement was slightly different (a=66.2, b=90.2) giving dE=0.07
+    lab_t measured = {98.5f, 65.9f, 90.0f};
+    
+    // Reference Lab from Kona table (CANTALOUPE, id=59)
+    lab_t cantaloupe_ref = {98.500000f, 66.308800f, 90.075200f};
+    
+    // Compute actual deltaE - varies by exact measurement but should be ~0.1-0.15
+    float expected_de = color_math_delta_e_ciede2000(&measured, &cantaloupe_ref);
+    std::printf("Direct CIEDE2000: measured (%.1f, %.1f, %.1f) vs CANTALOUPE ref -> dE=%.4f\n",
+                measured.l, measured.a, measured.b, expected_de);
+    
+    // The deltaE should be small (< 1.0) since the values are very close
+    assert(expected_de < 1.0f && "CANTALOUPE dE should be < 1.0");
+    assert(expected_de > 0.0f && "CANTALOUPE dE should be > 0.0");
+    
+    // Also test that swapping L and a gives the wrong high value (~25)
+    lab_t swapped = {65.9f, 98.5f, 90.0f};  // L and a swapped
+    float swapped_de = color_math_delta_e_ciede2000(&swapped, &cantaloupe_ref);
+    std::printf("SWAPPED L/a CIEDE2000: measured (%.1f, %.1f, %.1f) vs CANTALOUPE ref -> dE=%.4f\n",
+                swapped.l, swapped.a, swapped.b, swapped_de);
+    
+    // The swapped deltaE should be high (~24-25), matching the bug report
+    assert(swapped_de > 20.0f && "Swapped L/a should give dE > 20");
+    
+    std::printf("CANTALOUPE scenario test PASSED\n");
+}
 
 int main()
 {
@@ -81,6 +121,9 @@ int main()
                 papaya_result.delta_e);
     // Verify processing completed and color was identified (either Kona or fallback)
     assert(papaya_result.color_name != nullptr && "PAPAYA should identify a color");
+
+    // Run the CANTALOUPE scenario test from issue #41
+    test_cantaloupe_scenario();
 
     std::printf("All Kona matching tests passed!\n");
     return 0;

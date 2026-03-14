@@ -191,9 +191,14 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
     const kona_ref_t* entries = kona_ref_entries();
     const size_t count = kona_ref_active_entry_count();
 
+    // Diagnostic: log input Lab values for debugging CIEDE2000 discrepancy
+    ESP_LOGI(TAG, "Kona input: measured Lab L=%.4f a=%.4f b=%.4f (count=%zu)",
+             lab->l, lab->a, lab->b, count);
+
     // Linear search for closest match (O(n) for up to 365 entries)
     float best_delta_e = FLT_MAX;
     const kona_ref_t* best_entry = nullptr;
+    size_t best_index = 0;
 
     for (size_t i = 0; i < count; ++i)
     {
@@ -203,7 +208,16 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
         {
             best_delta_e = de;
             best_entry = &entries[i];
+            best_index = i;
         }
+    }
+
+    // Diagnostic: log the best match entry details for debugging
+    if (best_entry)
+    {
+        ESP_LOGI(TAG, "Kona best: [%zu] id=%u ref Lab L=%.4f a=%.4f b=%.4f dE=%.4f",
+                 best_index, best_entry->kona_id, best_entry->l, best_entry->a, best_entry->b,
+                 best_delta_e);
     }
 
     ESP_LOGI(TAG, "Kona result: best_entry %p best_delta %f max delta %f (temp=%d)",
@@ -742,6 +756,31 @@ esp_err_t color_pipeline_init(const color_pipeline_config_t* config)
                  "Kona reference table ready: version=%u entries=%u",
                  (unsigned int)kona_reference.version,
                  (unsigned int)kona_reference.entry_count);
+
+        // Diagnostic: Verify CIEDE2000 implementation with a known test case.
+        // This helps identify if the CIEDE2000 calculation is broken on the device.
+        // Test case from CIE Technical Report 142-2001 (CIEDE2000 Color-Difference Formula):
+        // Reference pair #1: (50, 2.6772, -79.7751) vs (50, 0, -82.7485) = 2.0425
+        lab_t test1 = {50.0f, 2.6772f, -79.7751f};
+        lab_t test2 = {50.0f, 0.0f, -82.7485f};
+        float test_de = color_math_delta_e_ciede2000(&test1, &test2);
+        ESP_LOGI(TAG, "CIEDE2000 selftest: dE=%.4f (expected=2.0425, err=%.4f)",
+                 test_de, fabsf(test_de - 2.0425f));
+
+        // Also test with first Kona entry as a sanity check using small Lab offsets
+        if (kona_reference.entry_count > 0)
+        {
+            // Small offset to verify the dE calculation produces reasonable values
+            // for nearly identical colors (should give dE < 0.1 for offsets of 0.1)
+            static constexpr float SMALL_LAB_OFFSET = 0.1f;
+            
+            const kona_ref_t* first = &kona_reference.entries[0];
+            lab_t first_lab = {first->l, first->a, first->b};
+            lab_t test_similar = {first->l, first->a + SMALL_LAB_OFFSET, first->b - SMALL_LAB_OFFSET};
+            float similar_de = color_math_delta_e_ciede2000(&first_lab, &test_similar);
+            ESP_LOGI(TAG, "Kona entry[0] selftest: id=%u L=%.2f a=%.4f b=%.4f; dE vs +/-%.1f = %.4f",
+                     first->kona_id, first->l, first->a, first->b, SMALL_LAB_OFFSET, similar_de);
+        }
     }
     else
     {
