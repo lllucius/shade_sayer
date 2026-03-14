@@ -726,6 +726,13 @@ static void enter_serial_scan_mode(void)
                         }
                         else
                         {
+                            // Suppress ESP logging during the scan to prevent
+                            // ESP_LOGx output (which goes to stdout) from
+                            // interfering with the SCAN response.  Mixing
+                            // ESP_LOG and stdio on the same stdout causes
+                            // intermittent hangs on subsequent scans.
+                            esp_log_level_set("*", ESP_LOG_NONE);
+
                             // Turn on LED for measurement
                             s_sensor->setLed(true);
                             vTaskDelay(pdMS_TO_TICKS(50));
@@ -751,13 +758,7 @@ static void enter_serial_scan_mode(void)
                                 uint8_t scan_r, scan_g, scan_b;
                                 color_math_lab_to_rgb(result.scan_lab,
                                                       &scan_r, &scan_g, &scan_b);
-                                // Format into a stack buffer with snprintf, then output
-                                // the finished string with puts.  Calling printf/fprintf
-                                // on stdout with float format specifiers (%.4f) causes
-                                // intermittent hangs on ESP-IDF newlib — snprintf to a
-                                // memory buffer is unaffected, and puts outputs a plain
-                                // string with no format-specifier processing.
-                                char scan_resp[96];  // max ~52 chars: "OK:LAB:-128.0000,..." + ":RGB:255,255,255"
+                                char scan_resp[96];
                                 snprintf(scan_resp, sizeof(scan_resp),
                                          "OK:LAB:%.4f,%.4f,%.4f:RGB:%d,%d,%d",
                                          (double)result.scan_lab.l,
@@ -774,6 +775,9 @@ static void enter_serial_scan_mode(void)
                                 s_last_scan_stats = scan_stats;
                                 s_has_last_scan_stats = true;
                             }
+
+                            // Restore logging
+                            esp_log_level_set("*", ESP_LOG_INFO);
                         }
                     }
                     else if (strcmp(cmd_buffer, "RAWDATA") == 0)
