@@ -1235,6 +1235,9 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
     // when the Z floor forces identical Z for all saturated yellows/oranges.
     {
         // CRITICAL: Use scale=1.0 to prevent double-scaling (same as display path below).
+        // s_params.lightness_scale is already applied in apply_sensor_correction() in XYZ
+        // space (it scales the whole XYZ triplet). Re-applying it here in Lab space would
+        // scale L a second time. Only apply gamma and offset in Lab space.
         color_calib_params_t scan_lightness_params = s_params;
         scan_lightness_params.lightness_scale = 1.0f;
 
@@ -1257,9 +1260,13 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
     // Apply minimum Z floor relative to luminance to prevent extreme b* values on display.
     // When the PCCM collapses Z to near-zero (e.g., for saturated yellows), the Lab
     // b* calculation explodes because b* = 200*(fy - fz) and fz becomes very small.
+    // A minimum Z of 20% of Y caps b* at roughly 86 pre-boost (at Y=100, Z_floor=20
+    // gives f(20/108.883)=0.573, so b=200*(1.0-0.573)=85.4). This prevents runaway
+    // display values while still allowing saturation boost to bring b* up to 110 for
+    // fully saturated colors.
     // The Z floor only affects the display path (result->lab); scan_lab uses the
     // natural Z (above) to maintain distinct b* values across different swatches.
-    const float MIN_Z_TO_Y_RATIO = 0.20f;  // Minimum Z as fraction of Y
+    const float MIN_Z_TO_Y_RATIO = 0.20f;  // 20% of Y → pre-boost b* cap ≈ 86
     float min_z = lab_xyz.y * MIN_Z_TO_Y_RATIO;
     if (lab_xyz.z < min_z)
     {

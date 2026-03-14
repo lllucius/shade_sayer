@@ -61,10 +61,10 @@ int main()
     xyz_t red_xyz{2460.86f, 1623.25f, 556.42f};
     assert(color_pipeline_process_xyz(&red_xyz, true, &red) == ESP_OK);
     assert(red.color_name != nullptr);
-    // Note: This XYZ (orange-red after Y normalization) can plausibly match Kona
-    // references that are in the yellow/orange/red range. We only check that the
-    // pipeline succeeded and identified a color — not whether Kona matched — because
-    // with 13 Kona entries all in the yellow/orange/red panel a match is expected.
+    // Note: This XYZ resolves to an orange hue (a*≈85, b*≈64 after Y-normalization),
+    // and the 13 Kona references are all yellow/orange/red entries, so a Kona match
+    // is expected here. Kona matching is NOT exclusive to unmeasured colors.
+    assert(red.kona_matched && "orange-hued XYZ should match a Kona orange/red reference");
 
     color_result_t green{};
     xyz_t green_xyz{1281.60f, 2094.40f, 957.50f};
