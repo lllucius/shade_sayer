@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate a Kona reference data C++ table from kona_365_sensor_ready.csv.
+"""Generate a Kona reference data C++ table from kona_cotton_solids_k001.csv.
 
 This script reads Lab measurements from the Kona 365 sensor-ready CSV file and
 produces a C++ source file containing a kona_table_t struct for firmware use.
@@ -11,7 +11,7 @@ The generated table includes:
 - Lab values for each measured Kona swatch
 
 Usage:
-    python3 generate_kona_table.py --input ../kona_365_sensor_ready.csv \\
+    python3 generate_kona_table.py --input ../kona_cotton_solids_k001.csv \\
                                    --output ../main/konaref_generated.cpp
 """
 
@@ -47,7 +47,7 @@ def _float_or_none(row: dict, key: str) -> Optional[float]:
 
 
 def parse_sensor_ready_csv(path: pathlib.Path) -> List[KonaEntry]:
-    """Parse Lab measurements from a kona_365_sensor_ready.csv file.
+    """Parse Lab measurements from a kona_cotton_solids_k001.csv file.
     
     Expected columns: id, name, L, a, b, measured
     Only rows where measured=true and L/a/b are all present are included.
@@ -149,8 +149,8 @@ const kona_table_t kona_reference = {{
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--input", default="../kona_365_sensor_ready.csv", type=pathlib.Path,
-                   help="Input kona_365_sensor_ready.csv file with measured Lab values")
+    p.add_argument("--input", default="../kona_cotton_solids_k001.csv", type=pathlib.Path,
+                   help="Input kona_cotton_solids_k001.csv file with measured Lab values")
     p.add_argument("--output", default=pathlib.Path("../main/konaref_generated.cpp"), type=pathlib.Path,
                    help="Output C++ source file path")
     return p.parse_args()

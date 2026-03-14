@@ -14,7 +14,7 @@ This directory contains Python scripts for generating and managing the xkcd colo
 python3 kona_scanner_gui.py
 
 # Specify serial port and CSV file
-python3 kona_scanner_gui.py --port /dev/ttyACM0 --csv ../kona_365_sensor_ready.csv
+python3 kona_scanner_gui.py --port /dev/ttyACM0 --csv ../kona_cotton_solids_k001.csv
 ```
 
 **Features:**
@@ -115,8 +115,8 @@ Collects `KONA_SCAN_CSV` log lines emitted by firmware scan mode and appends the
 ```bash
 python3 kona_scan_collect.py --input-log ../console.txt --output kona_avg_captures.csv
 
-# Optional metadata mapping (default: kona_365_sensor_ready.csv)
-python3 kona_scan_collect.py --input-log ../console.txt --metadata ../kona_365_sensor_ready.csv
+# Optional metadata mapping (default: kona_cotton_solids_k001.csv)
+python3 kona_scan_collect.py --input-log ../console.txt --metadata ../kona_cotton_solids_k001.csv
 
 # Or stream from stdin
 cat ../console.txt | python3 kona_scan_collect.py --input-log - --output kona_avg_captures.csv
@@ -125,7 +125,7 @@ cat ../console.txt | python3 kona_scan_collect.py --input-log - --output kona_av
 **Features:**
 - Reads a saved firmware console log text file (or stdin)
 - Filters lines tagged with `KONA_SCAN_CSV:`
-- Resolves firmware `idx_###` placeholders against `kona_365_sensor_ready.csv` when available
+- Resolves firmware `idx_###` placeholders against `kona_cotton_solids_k001.csv` when available
 - Writes panel/panel_index/id/name plus averaged XYZ/Lab and quality counters
 - Skips malformed lines with a warning
 
@@ -135,7 +135,7 @@ cat ../console.txt | python3 kona_scan_collect.py --input-log - --output kona_av
 ### generate_kona_table.py
 
 Generates a Kona table source file (default: `main/konaref_generated.cpp`) from
-`kona_365_sensor_ready.csv` so firmware can match against
+`kona_cotton_solids_k001.csv` so firmware can match against
 Kona swatch Lab references directly in flash.
 
 Also provides the shared `render_cpp`, `KonaEntry`, and `crc32_entries` helpers
@@ -143,11 +143,11 @@ used by `kona_scanner_gui.py` to export C++ from the GUI.
 
 **Usage:**
 ```bash
-python3 generate_kona_table.py --input ../kona_365_sensor_ready.csv --output ../main/konaref_generated.cpp
+python3 generate_kona_table.py --input ../kona_cotton_solids_k001.csv --output ../main/konaref_generated.cpp
 ```
 
 **Features:**
-- Parses `id`, `name`, and `L/a/b` from `kona_365_sensor_ready.csv`
+- Parses `id`, `name`, and `L/a/b` from `kona_cotton_solids_k001.csv`
 - Only includes rows where `measured=true` and all Lab values are present
 - Deduplicates by `id` (last row wins), sorted by numeric swatch id
 - Emits `kona_table_t kona_reference` with schema version, entry count, and CRC32

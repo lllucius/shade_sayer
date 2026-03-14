@@ -14,7 +14,7 @@ from generate_kona_table import MAX_ENTRIES, crc32_entries, parse_sensor_ready_c
 
 
 def _write_csv(path: pathlib.Path, rows):
-    """Helper to write test CSV files in kona_365_sensor_ready.csv format."""
+    """Helper to write test CSV files in kona_cotton_solids_k001.csv format."""
     header = [
         "panel",
         "panel_index",
@@ -54,7 +54,7 @@ def test_struct_size():
 def test_parse_and_render():
     """Test parsing CSV and rendering C++ output."""
     with tempfile.TemporaryDirectory() as tmp:
-        csv_path = pathlib.Path(tmp) / "kona_365_sensor_ready.csv"
+        csv_path = pathlib.Path(tmp) / "kona_cotton_solids_k001.csv"
         _write_csv(csv_path, [
             {
                 "panel": "test", "panel_index": "1",
@@ -102,7 +102,7 @@ def test_parse_and_render():
 def test_skip_incomplete_lab():
     """Test that rows with missing L/a/b values are skipped even if measured=true."""
     with tempfile.TemporaryDirectory() as tmp:
-        csv_path = pathlib.Path(tmp) / "kona_365_sensor_ready.csv"
+        csv_path = pathlib.Path(tmp) / "kona_cotton_solids_k001.csv"
         _write_csv(csv_path, [
             {
                 "panel": "test", "panel_index": "1",
@@ -126,7 +126,7 @@ def test_skip_incomplete_lab():
 def test_entry_limit():
     """Test that MAX_ENTRIES limit is enforced."""
     with tempfile.TemporaryDirectory() as tmp:
-        csv_path = pathlib.Path(tmp) / "kona_365_sensor_ready.csv"
+        csv_path = pathlib.Path(tmp) / "kona_cotton_solids_k001.csv"
         rows = []
         for i in range(MAX_ENTRIES + 1):
             rows.append(
@@ -150,7 +150,7 @@ def test_entry_limit():
 def test_name_comment_in_output():
     """Test that rendered C++ includes name comments per entry."""
     with tempfile.TemporaryDirectory() as tmp:
-        csv_path = pathlib.Path(tmp) / "kona_365_sensor_ready.csv"
+        csv_path = pathlib.Path(tmp) / "kona_cotton_solids_k001.csv"
         _write_csv(csv_path, [
             {
                 "panel": "test", "panel_index": "1",

@@ -1709,7 +1709,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", default="/dev/ttyACM0",
                        help="Serial port for device communication")
-    parser.add_argument("--csv", default="kona_365_sensor_ready.csv",
+    parser.add_argument("--csv", default="kona_cotton_solids_k001.csv",
                        help="CSV file for swatch data")
     parser.add_argument("--debug", action="store_true",
                        help="Print all serial TX/RX communications for debugging")
