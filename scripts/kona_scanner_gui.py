@@ -243,12 +243,21 @@ def ciede2000(lab1: Tuple[float, float, float], lab2: Tuple[float, float, float]
 class SerialConnection:
     """Manages serial communication with the shade_sayer device."""
 
-    def __init__(self, port: str = "/dev/ttyACM0", baudrate: int = 115200, debug: bool = False):
+    def __init__(self, port: str = "/dev/ttyACM0", baudrate: int = 115200, debug: bool = False,
+                 log_callback=None):
         self.port = port
         self.baudrate = baudrate
         self.debug = debug
         self.serial: Optional[serial.Serial] = None
         self._lock = threading.Lock()
+        self._log_callback = log_callback
+
+    def _log(self, msg: str):
+        """Log a message via the callback (GUI console) or stdout."""
+        if self._log_callback:
+            self._log_callback(msg)
+        else:
+            print(msg)
 
     def connect(self) -> bool:
         """Establish serial connection."""
@@ -269,7 +278,7 @@ class SerialConnection:
                 self.serial.reset_output_buffer()
             return True
         except serial.SerialException as e:
-            print(f"Serial connection error: {e}", file=sys.stderr)
+            self._log(f"Serial connection error: {e}")
             return False
 
     def disconnect(self):
@@ -291,7 +300,7 @@ class SerialConnection:
         """Send a command and wait for response.
         
         Returns the response line or None on error/timeout.
-        When debug mode is enabled, prints all TX/RX communication.
+        All TX/RX communication is logged to the console output area.
         """
         if not self.is_connected():
             return None
@@ -302,8 +311,7 @@ class SerialConnection:
                 self.serial.reset_input_buffer()
                 
                 # Send command with newline
-                if self.debug:
-                    print(f"TX: {cmd}")
+                self._log(f"TX: {cmd}")
                 self.serial.write((cmd + "\n").encode("utf-8"))
                 self.serial.flush()
 
@@ -312,18 +320,16 @@ class SerialConnection:
                 while time.time() - start_time < timeout:
                     if self.serial.in_waiting > 0:
                         line = self.serial.readline().decode("utf-8", errors="replace").strip()
-                        if self.debug:
-                            print(f"RX: {line}")
+                        self._log(f"RX: {line}")
                         if line.startswith("OK:") or line.startswith("ERR:"):
                             return line
                         # Continue reading - device may send log lines before response
                     time.sleep(0.05)
 
-                if self.debug:
-                    print(f"RX: (timeout after {timeout}s)")
+                self._log(f"RX: (timeout after {timeout}s)")
                 return None  # Timeout
             except serial.SerialException as e:
-                print(f"Serial error: {e}", file=sys.stderr)
+                self._log(f"Serial error: {e}")
                 return None
 
     def ping(self) -> bool:
@@ -358,7 +364,7 @@ class SerialConnection:
                 G = int(rgb_parts[1])
                 B = int(rgb_parts[2])
             except (IndexError, ValueError) as e:
-                print(f"Parse error: {e}, response: {response}", file=sys.stderr)
+                self._log(f"Parse error: {e}, response: {response}")
                 return None
 
             # Retrieve raw ADC values from the just-completed scan via RAWDATA command.
@@ -377,16 +383,16 @@ class SerialConnection:
                     raw_gain  = int(raw_parts[5])
                     raw_int_ms = int(raw_parts[6])
                 except (IndexError, ValueError) as e:
-                    print(f"RAWDATA parse error: {e}, response: {raw_resp}", file=sys.stderr)
+                    self._log(f"RAWDATA parse error: {e}, response: {raw_resp}")
 
             if self.debug:
-                print(f"Parsed scan: L={L:.4f} a={a:.4f} b={b:.4f} RGB=({R},{G},{B})"
-                      f" RAW=({raw_x},{raw_y},{raw_z},{raw_ir},{raw_clear},"
-                      f"gain={raw_gain},int={raw_int_ms}ms)")
+                self._log(f"Parsed scan: L={L:.4f} a={a:.4f} b={b:.4f} RGB=({R},{G},{B})"
+                          f" RAW=({raw_x},{raw_y},{raw_z},{raw_ir},{raw_clear},"
+                          f"gain={raw_gain},int={raw_int_ms}ms)")
             return (L, a, b, R, G, B, raw_x, raw_y, raw_z, raw_ir, raw_clear,
                     raw_gain, raw_int_ms)
 
-        print(f"Scan error: {response}", file=sys.stderr)
+        self._log(f"Scan error: {response}")
         return None
 
     def exit_mode(self) -> bool:
@@ -414,7 +420,7 @@ class SerialConnection:
                         status[key] = value == "1"
                 return status
             except (IndexError, ValueError) as e:
-                print(f"Parse error for KONA_STATUS: {e}", file=sys.stderr)
+                self._log(f"Parse error for KONA_STATUS: {e}")
         return None
 
     def kona_clear(self) -> bool:
@@ -441,8 +447,7 @@ class SerialConnection:
                 
                 # Send load command with size
                 cmd = f"KONA_LOAD:{len(table_data)}\n"
-                if self.debug:
-                    print(f"TX: KONA_LOAD:{len(table_data)}")
+                self._log(f"TX: KONA_LOAD:{len(table_data)}")
                 self.serial.write(cmd.encode("utf-8"))
                 self.serial.flush()
                 
@@ -452,8 +457,7 @@ class SerialConnection:
                 while time.time() - start_time < 5.0:
                     if self.serial.in_waiting > 0:
                         line = self.serial.readline().decode("utf-8", errors="replace").strip()
-                        if self.debug:
-                            print(f"RX: {line}")
+                        self._log(f"RX: {line}")
                         if line.startswith("OK:KONA_LOAD:READY:"):
                             ready_received = True
                             break
@@ -465,8 +469,7 @@ class SerialConnection:
                     return (False, "Timeout waiting for READY")
                 
                 # Send binary data
-                if self.debug:
-                    print(f"TX: <binary data {len(table_data)} bytes>")
+                self._log(f"TX: <binary data {len(table_data)} bytes>")
                 self.serial.write(table_data)
                 self.serial.flush()
                 
@@ -475,8 +478,7 @@ class SerialConnection:
                 while time.time() - start_time < 10.0:
                     if self.serial.in_waiting > 0:
                         line = self.serial.readline().decode("utf-8", errors="replace").strip()
-                        if self.debug:
-                            print(f"RX: {line}")
+                        self._log(f"RX: {line}")
                         if line.startswith("OK:KONA_LOADED:"):
                             # Parse entry count
                             try:
@@ -502,7 +504,6 @@ class KonaScannerApp:
         self.data_path = pathlib.Path(data_path)
         self.serial_port = serial_port
         self.debug = debug
-        self.serial = SerialConnection(serial_port, debug=debug)
         self.swatches: Dict[int, SwatchData] = {}
         self.scan_queue: List[int] = []
         self.scanning = False
@@ -512,6 +513,9 @@ class KonaScannerApp:
         self._last_captured_color: Optional[str] = None  # Hex color of last captured swatch
 
         self._setup_ui()
+        # Create serial connection after UI setup so log callback can use console widget
+        self.serial = SerialConnection(serial_port, debug=debug,
+                                       log_callback=self._log_console)
         self._load_data()
         self._populate_treeview()
 
@@ -646,6 +650,19 @@ class KonaScannerApp:
         tree_frame.grid_columnconfigure(0, weight=1)
 
         self.tree.bind("<<TreeviewSelect>>", self._on_selection_change)
+
+        # Console output area — shows serial TX/RX and measurement details
+        console_frame = ttk.LabelFrame(left_frame, text="Console")
+        console_frame.pack(fill=tk.BOTH, pady=(3, 0))
+        # Give the console a fixed minimum height via the text widget
+        self.console_text = tk.Text(console_frame, height=8, wrap=tk.WORD, state=tk.DISABLED,
+                                    font=("Courier", 9), bg="#1e1e1e", fg="#d4d4d4",
+                                    insertbackground="#d4d4d4")
+        console_vsb = ttk.Scrollbar(console_frame, orient=tk.VERTICAL,
+                                    command=self.console_text.yview)
+        self.console_text.configure(yscrollcommand=console_vsb.set)
+        self.console_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        console_vsb.pack(side=tk.RIGHT, fill=tk.Y)
 
         # Status bar
         self.progress_var = tk.StringVar(value="Ready")
@@ -840,6 +857,30 @@ class KonaScannerApp:
         # Shift+Home/End: Extend selection to first/last item
         self.tree.bind("<Shift-Home>", self._on_shift_home)
         self.tree.bind("<Shift-End>", self._on_shift_end)
+
+    def _log_console(self, msg: str):
+        """Append a message to the console output text area.
+
+        Thread-safe: schedules the update on the Tk main thread when called
+        from a background thread (e.g. serial I/O).  Automatically scrolls
+        to the latest line and caps the buffer at 2000 lines.
+        """
+        def _append():
+            self.console_text.configure(state=tk.NORMAL)
+            self.console_text.insert(tk.END, msg + "\n")
+            # Cap buffer at 2000 lines to avoid unbounded memory growth
+            line_count = int(self.console_text.index("end-1c").split(".")[0])
+            if line_count > 2000:
+                self.console_text.delete("1.0", f"{line_count - 2000}.0")
+            self.console_text.see(tk.END)
+            self.console_text.configure(state=tk.DISABLED)
+
+        # Schedule on the main thread if called from a background thread
+        try:
+            self.root.after_idle(_append)
+        except RuntimeError:
+            # Fallback if Tk mainloop has already exited
+            pass
 
     def _on_focus_filter(self, event=None):
         """Focus the filter entry field and select all text.
@@ -1045,7 +1086,7 @@ class KonaScannerApp:
         self.swatches.clear()
 
         if not self.data_path.exists():
-            print(f"Data file not found: {self.data_path}", file=sys.stderr)
+            self._log_console(f"Data file not found: {self.data_path}")
             return
 
         try:
@@ -1101,11 +1142,11 @@ class KonaScannerApp:
                         raw_integration_ms=raw_integration_ms,
                     )
                 except (ValueError, KeyError, TypeError, AttributeError) as e:
-                    print(f"Skipping invalid JSON swatch entry: {entry} ({e})", file=sys.stderr)
+                    self._log_console(f"Skipping invalid JSON swatch entry: {entry} ({e})")
 
-            print(f"Loaded {len(self.swatches)} swatches from {self.data_path}")
+            self._log_console(f"Loaded {len(self.swatches)} swatches from {self.data_path}")
         except Exception as e:
-            print(f"Error loading JSON: {e}", file=sys.stderr)
+            self._log_console(f"Error loading JSON: {e}")
 
     def _save_json(self) -> bool:
         """Save swatch data to a kona_captures.json file.
@@ -1127,7 +1168,7 @@ class KonaScannerApp:
 
             measured_count = sum(1 for s in self.swatches.values() if s.measured)
             if self.debug:
-                print(f"Saving JSON: {len(self.swatches)} total swatches, {measured_count} measured")
+                self._log_console(f"Saving JSON: {len(self.swatches)} total swatches, {measured_count} measured")
 
             # Build swatch list sorted by panel / panel_index
             sorted_swatches = sorted(self.swatches.values(),
@@ -1139,8 +1180,8 @@ class KonaScannerApp:
                     L_str = f"{s.L:.4f}" if s.L is not None else "None"
                     a_str = f"{s.a:.4f}" if s.a is not None else "None"
                     b_str = f"{s.b:.4f}" if s.b is not None else "None"
-                    print(f"  Writing swatch[{s.id}] ({s.name}): "
-                          f"L={L_str} a={a_str} b={b_str}")
+                    self._log_console(f"  Writing swatch[{s.id}] ({s.name}): "
+                                      f"L={L_str} a={a_str} b={b_str}")
 
                 entry: dict = {
                     "panel": s.panel,
@@ -1183,11 +1224,11 @@ class KonaScannerApp:
                 json.dump(output, f, indent=2)
                 f.write("\n")  # Trailing newline for POSIX compliance
 
-            print(f"Saved {len(self.swatches)} swatches to {self.data_path}")
+            self._log_console(f"Saved {len(self.swatches)} swatches to {self.data_path}")
             self._unsaved_changes = False
             return True
         except Exception as e:
-            print(f"Error saving JSON: {e}", file=sys.stderr)
+            self._log_console(f"Error saving JSON: {e}")
             messagebox.showerror("Error", f"Failed to save JSON: {e}")
             return False
 
@@ -1495,9 +1536,9 @@ class KonaScannerApp:
                 swatch.measured = True
                 
                 if self.debug:
-                    print(f"Stored in swatch[{current_id}] ({swatch.name}): "
-                          f"L={swatch.L:.4f} a={swatch.a:.4f} b={swatch.b:.4f} "
-                          f"RGB=({swatch.R},{swatch.G},{swatch.B})")
+                    self._log_console(f"Stored in swatch[{current_id}] ({swatch.name}): "
+                                      f"L={swatch.L:.4f} a={swatch.a:.4f} b={swatch.b:.4f} "
+                                      f"RGB=({swatch.R},{swatch.G},{swatch.B})")
 
                 # Update treeview if the item exists (may be filtered out)
                 tree_item_id = str(current_id)
@@ -1510,9 +1551,9 @@ class KonaScannerApp:
                     if self.debug:
                         # Verify the treeview was actually updated
                         tree_values = self.tree.item(tree_item_id, 'values')
-                        print(f"Treeview item {tree_item_id} values: {tree_values}")
+                        self._log_console(f"Treeview item {tree_item_id} values: {tree_values}")
                 elif self.debug:
-                    print(f"Warning: Treeview item {tree_item_id} does not exist (filtered?)")
+                    self._log_console(f"Warning: Treeview item {tree_item_id} does not exist (filtered?)")
 
                 # Update display panel - read back from swatch to ensure consistency
                 self._show_color_info(swatch)
@@ -1753,16 +1794,16 @@ class KonaScannerApp:
         ref_lab = (swatch.L, swatch.a, swatch.b)
         delta_e = ciede2000(scan_lab, ref_lab)
         
-        # Log detailed comparison (to console)
-        print("\n" + "=" * 70)
-        print(f"MEASUREMENT COMPARISON: {swatch.name} (ID: {swatch.id})")
-        print("=" * 70)
-        print(f"Reference (stored):  L*={swatch.L:8.3f}  a*={swatch.a:8.3f}  b*={swatch.b:8.3f}")
-        print(f"Scanned (measured):  L*={scan_L:8.3f}  a*={scan_a:8.3f}  b*={scan_b:8.3f}")
-        print("-" * 70)
-        print(f"Difference:          ΔL*={scan_L - swatch.L:+8.3f}  Δa*={scan_a - swatch.a:+8.3f}  Δb*={scan_b - swatch.b:+8.3f}")
-        print(f"CIEDE2000 ΔE:        {delta_e:.4f}")
-        print("-" * 70)
+        # Log detailed comparison to console output area
+        self._log_console("=" * 70)
+        self._log_console(f"MEASUREMENT COMPARISON: {swatch.name} (ID: {swatch.id})")
+        self._log_console("=" * 70)
+        self._log_console(f"Reference (stored):  L*={swatch.L:8.3f}  a*={swatch.a:8.3f}  b*={swatch.b:8.3f}")
+        self._log_console(f"Scanned (measured):  L*={scan_L:8.3f}  a*={scan_a:8.3f}  b*={scan_b:8.3f}")
+        self._log_console("-" * 70)
+        self._log_console(f"Difference:          ΔL*={scan_L - swatch.L:+8.3f}  Δa*={scan_a - swatch.a:+8.3f}  Δb*={scan_b - swatch.b:+8.3f}")
+        self._log_console(f"CIEDE2000 ΔE:        {delta_e:.4f}")
+        self._log_console("-" * 70)
         
         # Interpret the result - separate quality level and description
         if delta_e < 1.0:
@@ -1781,9 +1822,9 @@ class KonaScannerApp:
             quality_level = "No match"
             quality_desc = "clearly different"
         
-        print(f"Match Quality:       {quality_level} ({quality_desc})")
-        print(f"Scanned RGB:         ({scan_R}, {scan_G}, {scan_B})")
-        print("=" * 70 + "\n")
+        self._log_console(f"Match Quality:       {quality_level} ({quality_desc})")
+        self._log_console(f"Scanned RGB:         ({scan_R}, {scan_G}, {scan_B})")
+        self._log_console("=" * 70)
         
         # Update the "Last Captured" display
         r, g, b = lab_to_rgb(scan_L, scan_a, scan_b)
@@ -1860,7 +1901,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--data", default="kona_captures.json",
                        help="kona_captures.json data file path")
     parser.add_argument("--debug", action="store_true",
-                       help="Print all serial TX/RX communications for debugging")
+                       help="Enable extra verbose debug logging in the console")
     return parser.parse_args()
 
 
@@ -1874,9 +1915,6 @@ def main() -> int:
         script_dir = pathlib.Path(__file__).parent  # scripts directory
         repo_root = script_dir.parent               # repository root
         data_path = repo_root / data_path
-
-    if args.debug:
-        print("Debug mode enabled - all serial TX/RX will be printed")
 
     root = tk.Tk()
     app = KonaScannerApp(root, str(data_path), args.port, debug=args.debug)
