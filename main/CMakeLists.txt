@@ -1,6 +1,6 @@
 set(KONA_REF_TABLE_SRC "konaref_default.cpp")
 
-set(KONA_CAPTURE_CSV "${CMAKE_SOURCE_DIR}/kona_avg_captures.csv")
+set(KONA_CAPTURE_CSV "${CMAKE_SOURCE_DIR}/kona_365_sensor_ready.csv")
 set(KONA_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/generate_kona_table.py")
 
 if(EXISTS "${KONA_CAPTURE_CSV}" AND EXISTS "${KONA_GENERATOR}")
@@ -12,7 +12,7 @@ if(EXISTS "${KONA_CAPTURE_CSV}" AND EXISTS "${KONA_GENERATOR}")
                 --input "${KONA_CAPTURE_CSV}"
                 --output "${KONA_REF_GENERATED}"
         DEPENDS "${KONA_GENERATOR}" "${KONA_CAPTURE_CSV}"
-        COMMENT "Generating Kona reference table from kona_avg_captures.csv"
+        COMMENT "Generating Kona reference table from kona_365_sensor_ready.csv"
         VERBATIM)
     set(KONA_REF_TABLE_SRC "${KONA_REF_GENERATED}")
 endif()
