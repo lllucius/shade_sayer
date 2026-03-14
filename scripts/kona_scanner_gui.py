@@ -545,7 +545,7 @@ class KonaScannerApp:
                 screen_height = self.root.winfo_screenheight()
                 self.root.geometry(f"{screen_width}x{screen_height}+0+0")
         # Make mouse pointer black (standard arrow cursor)
-        self.root.config(cursor="arrow")
+        self.root.config(cursor="left_ptr black")
 
         # Main frame with paned window
         main_pane = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)

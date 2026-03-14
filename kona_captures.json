@@ -13,9 +13,25 @@
       "id": 846,
       "name": "SEA GLASS",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -24,9 +40,25 @@
       "id": 1005,
       "name": "AQUA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -35,9 +67,25 @@
       "id": 1514,
       "name": "ROBIN EGG",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -46,9 +94,25 @@
       "id": 1011,
       "name": "BAHAMA BLUE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -57,9 +121,25 @@
       "id": 491,
       "name": "JAMAICA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -68,9 +148,25 @@
       "id": 1282,
       "name": "PEACOCK",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -79,9 +175,25 @@
       "id": 139,
       "name": "LAGOON",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -90,9 +202,25 @@
       "id": 1376,
       "name": "TURQUOISE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -101,9 +229,25 @@
       "id": 151,
       "name": "CYAN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -112,9 +256,25 @@
       "id": 446,
       "name": "OASIS",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -123,9 +283,25 @@
       "id": 479,
       "name": "MEDITERRANEAN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -134,9 +310,25 @@
       "id": 233,
       "name": "CELESTIAL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -145,9 +337,25 @@
       "id": 1852,
       "name": "SEA MIST",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -156,9 +364,25 @@
       "id": 1173,
       "name": "ICE FRAPPE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -167,9 +391,25 @@
       "id": 1833,
       "name": "ALOHA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -178,9 +418,25 @@
       "id": 45,
       "name": "POOL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -189,9 +445,25 @@
       "id": 1061,
       "name": "CANDY GREEN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -200,9 +472,25 @@
       "id": 1321,
       "name": "SAGE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -211,9 +499,25 @@
       "id": 1009,
       "name": "AZURE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -222,9 +526,25 @@
       "id": 442,
       "name": "CAPRI",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -233,9 +553,25 @@
       "id": 440,
       "name": "BREAKERS",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -244,9 +580,25 @@
       "id": 1183,
       "name": "JADE GREEN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -255,9 +607,25 @@
       "id": 1064,
       "name": "CARIBBEAN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -266,9 +634,25 @@
       "id": 1373,
       "name": "TEAL BLUE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -277,9 +661,25 @@
       "id": 837,
       "name": "ARUBA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -288,9 +688,25 @@
       "id": 200,
       "name": "POND",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -299,9 +715,25 @@
       "id": 197,
       "name": "ALOE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -310,9 +742,25 @@
       "id": 1474,
       "name": "CYPRESS",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -321,9 +769,25 @@
       "id": 445,
       "name": "KALE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -332,9 +796,25 @@
       "id": 1031,
       "name": "BLUEGRASS",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -343,9 +823,25 @@
       "id": 1135,
       "name": "EMERALD",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -354,9 +850,25 @@
       "id": 483,
       "name": "ULTRA MARINE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -365,9 +877,25 @@
       "id": 146,
       "name": "GLACIER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -376,9 +904,25 @@
       "id": 356,
       "name": "EVERGLADE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -387,9 +931,25 @@
       "id": 1361,
       "name": "SPRUCE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -398,9 +958,25 @@
       "id": 1137,
       "name": "EVERGREEN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -409,9 +985,25 @@
       "id": 316,
       "name": "TARRAGON",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -420,9 +1012,25 @@
       "id": 29,
       "name": "SPRING",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -431,9 +1039,25 @@
       "id": 1065,
       "name": "CELADON",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -442,9 +1066,25 @@
       "id": 1259,
       "name": "OLD GREEN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -453,9 +1093,25 @@
       "id": 30,
       "name": "LAUREL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -464,9 +1120,25 @@
       "id": 28,
       "name": "LEAF",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -475,9 +1147,25 @@
       "id": 1840,
       "name": "DILL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -486,9 +1174,25 @@
       "id": 31,
       "name": "PALM",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -497,9 +1201,25 @@
       "id": 136,
       "name": "BASIL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -508,9 +1228,25 @@
       "id": 409,
       "name": "JUNIPER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -519,9 +1255,25 @@
       "id": 1145,
       "name": "FOREST",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -530,9 +1282,25 @@
       "id": 1166,
       "name": "HUNTER GREEN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -541,9 +1309,25 @@
       "id": 1234,
       "name": "MINT",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -552,9 +1336,25 @@
       "id": 145,
       "name": "PEAR",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -563,9 +1363,25 @@
       "id": 221,
       "name": "PARAKEET",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -574,9 +1390,25 @@
       "id": 1842,
       "name": "FERNDALE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -585,9 +1417,25 @@
       "id": 348,
       "name": "ASPARAGUS",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -596,9 +1444,25 @@
       "id": 1293,
       "name": "PISTACHIO",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -607,9 +1471,25 @@
       "id": 1141,
       "name": "FERN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -618,9 +1498,25 @@
       "id": 135,
       "name": "CLOVER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -629,9 +1525,25 @@
       "id": 1161,
       "name": "HOLLY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -640,9 +1552,25 @@
       "id": 1834,
       "name": "BALSAM",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -651,9 +1579,25 @@
       "id": 1388,
       "name": "WILLOW",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -662,9 +1606,25 @@
       "id": 1185,
       "name": "KELLY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -673,9 +1633,25 @@
       "id": 1386,
       "name": "WHEAT",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -684,9 +1660,25 @@
       "id": 492,
       "name": "LATTE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -695,9 +1687,25 @@
       "id": 1473,
       "name": "BISCUIT",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -706,9 +1714,25 @@
       "id": 1371,
       "name": "TAUPE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -717,9 +1741,25 @@
       "id": 178,
       "name": "LEATHER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -728,9 +1768,25 @@
       "id": 857,
       "name": "ROASTED PECAN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -739,9 +1795,25 @@
       "id": 138,
       "name": "EARTH",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -750,9 +1822,25 @@
       "id": 275,
       "name": "SABLE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -761,9 +1849,25 @@
       "id": 1237,
       "name": "MOCHA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -772,9 +1876,25 @@
       "id": 406,
       "name": "CAPPUCCINO",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -783,9 +1903,25 @@
       "id": 407,
       "name": "CHESTNUT",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -794,9 +1930,25 @@
       "id": 1851,
       "name": "OTTER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -805,9 +1957,25 @@
       "id": 1332,
       "name": "SIENNA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -816,9 +1984,25 @@
       "id": 482,
       "name": "TERRACOTTA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -827,9 +2011,25 @@
       "id": 157,
       "name": "SPICE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -838,9 +2038,25 @@
       "id": 150,
       "name": "PAPRIKA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -849,9 +2065,25 @@
       "id": 1075,
       "name": "CINNAMON",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -860,9 +2092,25 @@
       "id": 1082,
       "name": "COCOA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -871,9 +2119,25 @@
       "id": 1042,
       "name": "BRICK",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -882,9 +2146,25 @@
       "id": 1215,
       "name": "MAHOGANY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -893,9 +2173,25 @@
       "id": 1045,
       "name": "BROWN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -904,9 +2200,25 @@
       "id": 1073,
       "name": "CHOCOLATE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -915,9 +2227,25 @@
       "id": 1083,
       "name": "COFFEE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -926,9 +2254,25 @@
       "id": 1136,
       "name": "ESPRESSO",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -937,9 +2281,25 @@
       "id": 143,
       "name": "PETAL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -948,9 +2308,25 @@
       "id": 485,
       "name": "BALLERINA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -959,9 +2335,25 @@
       "id": 1393,
       "name": "WOODROSE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -970,9 +2362,25 @@
       "id": 1036,
       "name": "BLUSH PINK",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -981,9 +2389,25 @@
       "id": 1097,
       "name": "DEEP ROSE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -992,9 +2416,25 @@
       "id": 956,
       "name": "FOXGLOVE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1003,9 +2443,25 @@
       "id": 1310,
       "name": "ROSE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1014,9 +2470,25 @@
       "id": 1294,
       "name": "PLUM",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1025,9 +2497,25 @@
       "id": 1039,
       "name": "BORDEAUX",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1036,9 +2524,25 @@
       "id": 1151,
       "name": "GARNET",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1047,9 +2551,25 @@
       "id": 1054,
       "name": "BURGUNDY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1058,9 +2578,25 @@
       "id": 1469,
       "name": "RAISIN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1069,9 +2605,25 @@
       "id": 24,
       "name": "PETUNIA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1080,9 +2632,25 @@
       "id": 487,
       "name": "CORSAGE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1091,9 +2659,25 @@
       "id": 258,
       "name": "PANSY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1102,9 +2686,25 @@
       "id": 1484,
       "name": "LUPINE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1113,9 +2713,25 @@
       "id": 1383,
       "name": "VIOLET",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1124,9 +2740,25 @@
       "id": 489,
       "name": "GUMDROP",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1135,9 +2767,25 @@
       "id": 1214,
       "name": "MAGENTA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1146,9 +2794,25 @@
       "id": 473,
       "name": "GERANIUM",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1157,9 +2821,25 @@
       "id": 80,
       "name": "MULBERRY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1168,9 +2848,25 @@
       "id": 1485,
       "name": "DK. VIOLET",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1179,9 +2875,25 @@
       "id": 1016,
       "name": "BERRY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1190,9 +2902,25 @@
       "id": 1133,
       "name": "EGGPLANT",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1201,9 +2929,25 @@
       "id": 1266,
       "name": "ORCHID",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1212,9 +2956,25 @@
       "id": 134,
       "name": "THISTLE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1223,9 +2983,25 @@
       "id": 1850,
       "name": "ORCHID ICE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1234,9 +3010,25 @@
       "id": 1392,
       "name": "WISTERIA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1245,9 +3037,25 @@
       "id": 488,
       "name": "DAHLIA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1256,9 +3064,25 @@
       "id": 495,
       "name": "MORNING GLORY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1267,9 +3091,25 @@
       "id": 477,
       "name": "HELIOTROPE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1278,9 +3118,25 @@
       "id": 142,
       "name": "CROCUS",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1289,9 +3145,25 @@
       "id": 1857,
       "name": "VELVET",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1300,9 +3172,25 @@
       "id": 327,
       "name": "TULIP",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1311,9 +3199,25 @@
       "id": 1301,
       "name": "PURPLE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1322,9 +3226,25 @@
       "id": 188,
       "name": "HIBISCUS",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1333,9 +3253,25 @@
       "id": 1007,
       "name": "ASH",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1344,9 +3280,25 @@
       "id": 456,
       "name": "SHALE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1355,9 +3307,25 @@
       "id": 500,
       "name": "TITANIUM",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1366,9 +3334,25 @@
       "id": 408,
       "name": "IRON",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1377,9 +3361,25 @@
       "id": 854,
       "name": "OVERCAST",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1388,9 +3388,25 @@
       "id": 1854,
       "name": "SHARK",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1399,9 +3415,25 @@
       "id": 1223,
       "name": "MED. GREY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1410,9 +3442,25 @@
       "id": 91,
       "name": "STEEL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1421,9 +3469,25 @@
       "id": 1837,
       "name": "CHALKBOARD",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1432,9 +3496,25 @@
       "id": 106,
       "name": "METAL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1443,9 +3523,25 @@
       "id": 1080,
       "name": "COAL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1454,9 +3550,25 @@
       "id": 1071,
       "name": "CHARCOAL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1465,9 +3577,25 @@
       "id": 1387,
       "name": "WHITE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1476,9 +3604,25 @@
       "id": 1287,
       "name": "PFD BLEACH WHITE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1487,9 +3631,25 @@
       "id": 1339,
       "name": "SNOW",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1498,9 +3658,25 @@
       "id": 1037,
       "name": "BONE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1509,9 +3685,25 @@
       "id": 863,
       "name": "HAZE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1520,9 +3712,25 @@
       "id": 839,
       "name": "DOVE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1531,9 +3739,25 @@
       "id": 1333,
       "name": "SILVER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1542,9 +3766,25 @@
       "id": 457,
       "name": "SHADOW",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1553,9 +3793,25 @@
       "id": 856,
       "name": "QUICKSILVER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1564,9 +3820,25 @@
       "id": 1847,
       "name": "LIGHTHOUSE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1575,9 +3847,25 @@
       "id": 858,
       "name": "SHITAKE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1586,9 +3874,25 @@
       "id": 1470,
       "name": "PEWTER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1597,9 +3901,25 @@
       "id": 849,
       "name": "DESERT GREEN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1608,9 +3928,25 @@
       "id": 1328,
       "name": "SEAFOAM",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1619,9 +3955,25 @@
       "id": 841,
       "name": "EUCALYPTUS",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1630,9 +3982,25 @@
       "id": 186,
       "name": "STRAW",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1641,9 +4009,25 @@
       "id": 478,
       "name": "LIMESTONE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1652,9 +4036,25 @@
       "id": 198,
       "name": "PARSLEY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1663,9 +4063,25 @@
       "id": 201,
       "name": "SWEET PEA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1674,9 +4090,25 @@
       "id": 1238,
       "name": "MOSS",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1685,9 +4117,25 @@
       "id": 1256,
       "name": "O.D. GREEN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1696,9 +4144,25 @@
       "id": 340,
       "name": "HERB",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1707,9 +4171,25 @@
       "id": 1713,
       "name": "SMOKE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1718,9 +4198,25 @@
       "id": 859,
       "name": "ZINC",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1729,9 +4225,25 @@
       "id": 1176,
       "name": "ICE PEACH",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1740,9 +4252,25 @@
       "id": 1205,
       "name": "LT. PARFAIT",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1751,9 +4279,25 @@
       "id": 1271,
       "name": "SHELL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1762,9 +4306,25 @@
       "id": 843,
       "name": "LINGERIE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1773,9 +4333,25 @@
       "id": 1181,
       "name": "IVORY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1784,9 +4360,25 @@
       "id": 413,
       "name": "PARCHMENT",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1795,9 +4387,25 @@
       "id": 1362,
       "name": "STONE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1806,9 +4414,25 @@
       "id": 486,
       "name": "COBBLESTONE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1817,9 +4441,25 @@
       "id": 1017,
       "name": "BISON",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1828,9 +4468,25 @@
       "id": 1239,
       "name": "MUSHROOM",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1839,9 +4495,25 @@
       "id": 850,
       "name": "DOESKIN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1850,9 +4522,25 @@
       "id": 1855,
       "name": "SUEDE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1861,9 +4549,25 @@
       "id": 1242,
       "name": "NATURAL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1872,9 +4576,25 @@
       "id": 1268,
       "name": "OYSTER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1883,9 +4603,25 @@
       "id": 184,
       "name": "EGGSHELL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1894,9 +4630,25 @@
       "id": 1090,
       "name": "CREAM",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1905,9 +4657,25 @@
       "id": 1303,
       "name": "PUTTY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1916,9 +4684,25 @@
       "id": 1323,
       "name": "SAND",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1927,9 +4711,25 @@
       "id": 1369,
       "name": "TAN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1938,9 +4738,25 @@
       "id": 1069,
       "name": "CHAMPAGNE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1949,9 +4765,25 @@
       "id": 1187,
       "name": "KHAKI",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1960,9 +4792,25 @@
       "id": 1306,
       "name": "RAFFIA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1971,9 +4819,25 @@
       "id": 499,
       "name": "SCONE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1982,9 +4846,25 @@
       "id": 1162,
       "name": "HONEY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -1993,9 +4873,25 @@
       "id": 295,
       "name": "GRAPHITE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2004,9 +4900,25 @@
       "id": 1844,
       "name": "GRIZZLY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2015,9 +4927,25 @@
       "id": 862,
       "name": "GOTHAM GREY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2026,9 +4954,25 @@
       "id": 359,
       "name": "PEPPER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2037,9 +4981,25 @@
       "id": 1019,
       "name": "BLACK",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2048,9 +5008,25 @@
       "id": 844,
       "name": "PRINCESS",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2059,9 +5035,25 @@
       "id": 1191,
       "name": "LILAC",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2070,9 +5062,25 @@
       "id": 1189,
       "name": "LAVENDER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2081,9 +5089,25 @@
       "id": 1003,
       "name": "AMETHYST",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2092,9 +5116,25 @@
       "id": 1048,
       "name": "BRT. PERI",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2103,9 +5143,25 @@
       "id": 852,
       "name": "NOBLE PURPLE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2114,9 +5170,25 @@
       "id": 1541,
       "name": "DEEP BLUE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2125,9 +5197,25 @@
       "id": 415,
       "name": "REGAL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2136,9 +5224,25 @@
       "id": 140,
       "name": "NIGHTFALL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2147,9 +5251,25 @@
       "id": 1232,
       "name": "MIDNIGHT",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2158,9 +5278,25 @@
       "id": 412,
       "name": "NAUTICAL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2169,9 +5305,25 @@
       "id": 1178,
       "name": "INDIGO",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2180,9 +5332,25 @@
       "id": 152,
       "name": "CLOUD",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2191,9 +5359,25 @@
       "id": 1029,
       "name": "BLUE BELL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2202,9 +5386,25 @@
       "id": 27,
       "name": "CORNFLOWER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2213,9 +5413,25 @@
       "id": 318,
       "name": "GRAPEMIST",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2224,9 +5440,25 @@
       "id": 1171,
       "name": "HYACINTH",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2235,9 +5467,25 @@
       "id": 357,
       "name": "LAPIS",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2246,9 +5494,25 @@
       "id": 346,
       "name": "REGATTA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2257,9 +5521,25 @@
       "id": 1314,
       "name": "ROYAL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2268,9 +5548,25 @@
       "id": 454,
       "name": "PRUSSIAN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2279,9 +5575,25 @@
       "id": 1389,
       "name": "WINDSOR",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2290,9 +5602,25 @@
       "id": 458,
       "name": "STORM",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2301,9 +5629,25 @@
       "id": 1243,
       "name": "NAVY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2312,9 +5656,25 @@
       "id": 847,
       "name": "SPA BLUE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2323,9 +5683,25 @@
       "id": 277,
       "name": "BLUEBERRY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2334,9 +5710,25 @@
       "id": 1060,
       "name": "CANDY BLUE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2345,9 +5737,25 @@
       "id": 1285,
       "name": "PERIWINKLE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2356,9 +5764,25 @@
       "id": 196,
       "name": "BLUE JAY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2367,9 +5791,25 @@
       "id": 1452,
       "name": "DENIM",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2378,9 +5818,25 @@
       "id": 1123,
       "name": "DRESDEN BLUE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2389,9 +5845,25 @@
       "id": 1101,
       "name": "DELFT",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2400,9 +5872,25 @@
       "id": 195,
       "name": "EVENING",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2411,9 +5899,25 @@
       "id": 1084,
       "name": "COPEN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2422,9 +5926,25 @@
       "id": 1058,
       "name": "CADET",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2433,9 +5953,25 @@
       "id": 1336,
       "name": "SLATE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2444,9 +5980,25 @@
       "id": 1028,
       "name": "BLUE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2455,9 +6007,25 @@
       "id": 266,
       "name": "BREEZE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2466,9 +6034,25 @@
       "id": 194,
       "name": "LAKE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2477,9 +6061,25 @@
       "id": 855,
       "name": "PRAIRIE SKY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2488,9 +6088,25 @@
       "id": 448,
       "name": "STRATOSPHERE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2499,9 +6115,25 @@
       "id": 484,
       "name": "ASTRAL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2510,9 +6142,25 @@
       "id": 1845,
       "name": "HARBOR",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2521,9 +6169,25 @@
       "id": 32,
       "name": "SURF",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2532,9 +6196,25 @@
       "id": 848,
       "name": "BLUEPRINT",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2543,9 +6223,25 @@
       "id": 25,
       "name": "OCEAN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2554,9 +6250,25 @@
       "id": 455,
       "name": "RIVIERA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2565,9 +6277,25 @@
       "id": 1218,
       "name": "MARINE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2576,9 +6304,25 @@
       "id": 1513,
       "name": "SKY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2587,9 +6331,25 @@
       "id": 1010,
       "name": "BABY BLUE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2598,9 +6358,25 @@
       "id": 362,
       "name": "DUSTY BLUE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2609,9 +6385,25 @@
       "id": 444,
       "name": "FOG",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2620,9 +6412,25 @@
       "id": 866,
       "name": "WATERFALL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2631,9 +6439,25 @@
       "id": 1853,
       "name": "SEASCAPE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2642,9 +6466,25 @@
       "id": 497,
       "name": "NIAGARA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2653,9 +6493,25 @@
       "id": 405,
       "name": "ALEGRIA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2664,9 +6520,25 @@
       "id": 171,
       "name": "WATER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2675,9 +6547,25 @@
       "id": 864,
       "name": "PARIS BLUE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2686,9 +6574,25 @@
       "id": 494,
       "name": "MALIBU",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2697,9 +6601,25 @@
       "id": 90,
       "name": "PACIFIC",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2708,9 +6628,25 @@
       "id": 333,
       "name": "SUNFLOWER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2719,9 +6655,25 @@
       "id": 148,
       "name": "DAFFODIL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2730,9 +6682,25 @@
       "id": 350,
       "name": "CHEDDAR",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2741,9 +6709,25 @@
       "id": 85,
       "name": "MAC N CHEESE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2752,9 +6736,25 @@
       "id": 474,
       "name": "GOLDFISH",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2763,9 +6763,25 @@
       "id": 1479,
       "name": "AMBER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2774,9 +6790,25 @@
       "id": 443,
       "name": "CEDAR",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2785,9 +6817,25 @@
       "id": 1154,
       "name": "GOLD",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2796,9 +6844,25 @@
       "id": 1898,
       "name": "CARAMEL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2807,9 +6871,25 @@
       "id": 1478,
       "name": "YARROW",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2818,9 +6898,25 @@
       "id": 349,
       "name": "BUTTERSCOTCH",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2829,9 +6925,25 @@
       "id": 1704,
       "name": "OCHRE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2840,9 +6952,25 @@
       "id": 1481,
       "name": "BANANA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2851,9 +6979,25 @@
       "id": 1056,
       "name": "BUTTERCUP",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2862,9 +7006,25 @@
       "id": 23,
       "name": "LEMON",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2873,9 +7033,25 @@
       "id": 838,
       "name": "BRIGHT IDEA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2884,9 +7060,25 @@
       "id": 1077,
       "name": "CITRUS",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2895,9 +7087,25 @@
       "id": 26,
       "name": "CANARY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2906,9 +7114,25 @@
       "id": 1098,
       "name": "CORN YELLOW",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2917,9 +7141,25 @@
       "id": 840,
       "name": "DUCKLING",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2928,9 +7168,25 @@
       "id": 1835,
       "name": "BANANA PEPPER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2939,9 +7195,25 @@
       "id": 476,
       "name": "YELLOW",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2950,9 +7222,25 @@
       "id": 1677,
       "name": "CURRY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2961,9 +7249,25 @@
       "id": 1240,
       "name": "MUSTARD",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2972,9 +7276,25 @@
       "id": 1229,
       "name": "MERINGUE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2983,9 +7303,25 @@
       "id": 1055,
       "name": "BUTTER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -2994,9 +7330,25 @@
       "id": 1216,
       "name": "MAIZE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3005,9 +7357,25 @@
       "id": 1846,
       "name": "LEMON ICE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3016,9 +7384,25 @@
       "id": 1706,
       "name": "CELERY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3027,9 +7411,25 @@
       "id": 354,
       "name": "ZUCCHINI",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3038,9 +7438,25 @@
       "id": 452,
       "name": "WASABI",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3049,9 +7465,25 @@
       "id": 480,
       "name": "PICKLE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3060,9 +7492,25 @@
       "id": 347,
       "name": "ARTICHOKE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3071,9 +7519,25 @@
       "id": 1263,
       "name": "OLIVE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3082,9 +7546,25 @@
       "id": 441,
       "name": "BONSAI",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3093,9 +7573,25 @@
       "id": 1843,
       "name": "GECKO",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3104,9 +7600,25 @@
       "id": 254,
       "name": "SPROUT",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3115,9 +7627,25 @@
       "id": 842,
       "name": "KEY LIME",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3126,9 +7654,25 @@
       "id": 860,
       "name": "ACID LIME",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3137,9 +7681,25 @@
       "id": 199,
       "name": "CACTUS",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3148,9 +7708,25 @@
       "id": 493,
       "name": "LIMELIGHT",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3159,9 +7735,25 @@
       "id": 1072,
       "name": "CHARTREUSE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3170,9 +7762,25 @@
       "id": 414,
       "name": "PEAPOD",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3181,9 +7789,25 @@
       "id": 1192,
       "name": "LIME",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3192,9 +7816,25 @@
       "id": 1703,
       "name": "GRASS GREEN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3203,9 +7843,25 @@
       "id": 317,
       "name": "PERIDOT",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3214,9 +7870,25 @@
       "id": 165,
       "name": "IVY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3225,9 +7897,25 @@
       "id": 1451,
       "name": "AVOCADO",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3236,9 +7924,25 @@
       "id": 1865,
       "name": "SUMMER PEAR",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3247,9 +7951,25 @@
       "id": 21,
       "name": "HONEY DEW",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3258,9 +7978,25 @@
       "id": 351,
       "name": "GREEN TEA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3269,9 +8005,25 @@
       "id": 472,
       "name": "CABBAGE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3280,9 +8032,25 @@
       "id": 144,
       "name": "SOUR APPLE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3291,9 +8059,25 @@
       "id": 1203,
       "name": "BOTANICAL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3302,9 +8086,25 @@
       "id": 498,
       "name": "PARROT",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3313,9 +8113,25 @@
       "id": 1188,
       "name": "KIWI",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3324,9 +8140,25 @@
       "id": 411,
       "name": "LEPRECHAUN",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3335,9 +8167,25 @@
       "id": 475,
       "name": "GRASSHOPPER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3346,9 +8194,25 @@
       "id": 147,
       "name": "JUNGLE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3357,9 +8221,25 @@
       "id": 453,
       "name": "PESTO",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3367,18 +8247,26 @@
       "panel_index": 1,
       "id": 449,
       "name": "SUNNY",
-      "measured": true,
+      "measured": false,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
       "lab": {
-        "l": 98.5,
-        "a": 26.0264,
-        "b": 110.0
+        "l": null,
+        "a": null,
+        "b": null
       },
       "rgb": {
-        "r": 255,
-        "g": 228,
-        "b": 0
+        "r": null,
+        "g": null,
+        "b": null
       },
-      "raw": null,
       "notes": ""
     },
     {
@@ -3386,18 +8274,26 @@
       "panel_index": 2,
       "id": 149,
       "name": "PAPAYA",
-      "measured": true,
+      "measured": false,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
       "lab": {
-        "l": 98.5,
-        "a": 37.309,
-        "b": 110.0
+        "l": null,
+        "a": null,
+        "b": null
       },
       "rgb": {
-        "r": 255,
-        "g": 219,
-        "b": 0
+        "r": null,
+        "g": null,
+        "b": null
       },
-      "raw": null,
       "notes": ""
     },
     {
@@ -3405,18 +8301,26 @@
       "panel_index": 3,
       "id": 1849,
       "name": "NACHO CHEESE",
-      "measured": true,
+      "measured": false,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
       "lab": {
-        "l": 98.5,
-        "a": 45.164,
-        "b": 110.0
+        "l": null,
+        "a": null,
+        "b": null
       },
       "rgb": {
-        "r": 255,
-        "g": 212,
-        "b": 0
+        "r": null,
+        "g": null,
+        "b": null
       },
-      "raw": null,
       "notes": ""
     },
     {
@@ -3424,18 +8328,26 @@
       "panel_index": 4,
       "id": 1482,
       "name": "SCHOOL BUS",
-      "measured": true,
+      "measured": false,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
       "lab": {
-        "l": 98.5,
-        "a": 61.4961,
-        "b": 110.0
+        "l": null,
+        "a": null,
+        "b": null
       },
       "rgb": {
-        "r": 255,
-        "g": 195,
-        "b": 0
+        "r": null,
+        "g": null,
+        "b": null
       },
-      "raw": null,
       "notes": ""
     },
     {
@@ -3443,18 +8355,26 @@
       "panel_index": 5,
       "id": 1320,
       "name": "SAFFRON",
-      "measured": true,
+      "measured": false,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
       "lab": {
-        "l": 98.5,
-        "a": 61.5912,
-        "b": 110.0
+        "l": null,
+        "a": null,
+        "b": null
       },
       "rgb": {
-        "r": 255,
-        "g": 195,
-        "b": 0
+        "r": null,
+        "g": null,
+        "b": null
       },
-      "raw": null,
       "notes": ""
     },
     {
@@ -3462,18 +8382,26 @@
       "panel_index": 6,
       "id": 1265,
       "name": "ORANGE",
-      "measured": true,
+      "measured": false,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
       "lab": {
-        "l": 98.5,
-        "a": 92.8157,
-        "b": 110.0
+        "l": null,
+        "a": null,
+        "b": null
       },
       "rgb": {
-        "r": 255,
-        "g": 154,
-        "b": 0
+        "r": null,
+        "g": null,
+        "b": null
       },
-      "raw": null,
       "notes": ""
     },
     {
@@ -3481,18 +8409,26 @@
       "panel_index": 7,
       "id": 1839,
       "name": "CLEMENTINE",
-      "measured": true,
+      "measured": false,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
       "lab": {
-        "l": 98.5,
-        "a": 97.6217,
-        "b": 110.0
+        "l": null,
+        "a": null,
+        "b": null
       },
       "rgb": {
-        "r": 255,
-        "g": 146,
-        "b": 0
+        "r": null,
+        "g": null,
+        "b": null
       },
-      "raw": null,
       "notes": ""
     },
     {
@@ -3500,18 +8436,26 @@
       "panel_index": 8,
       "id": 1848,
       "name": "MARMALADE",
-      "measured": true,
+      "measured": false,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
       "lab": {
-        "l": 98.5,
-        "a": 99.4593,
-        "b": 110.0
+        "l": null,
+        "a": null,
+        "b": null
       },
       "rgb": {
-        "r": 255,
-        "g": 142,
-        "b": 0
+        "r": null,
+        "g": null,
+        "b": null
       },
-      "raw": null,
       "notes": ""
     },
     {
@@ -3519,18 +8463,26 @@
       "panel_index": 9,
       "id": 410,
       "name": "KUMQUAT",
-      "measured": true,
+      "measured": false,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
       "lab": {
-        "l": 98.5,
-        "a": 106.3419,
-        "b": 110.0
+        "l": null,
+        "a": null,
+        "b": null
       },
       "rgb": {
-        "r": 255,
-        "g": 128,
-        "b": 0
+        "r": null,
+        "g": null,
+        "b": null
       },
-      "raw": null,
       "notes": ""
     },
     {
@@ -3538,18 +8490,26 @@
       "panel_index": 10,
       "id": 84,
       "name": "PERSIMMON",
-      "measured": true,
+      "measured": false,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
       "lab": {
-        "l": 98.5,
-        "a": 101.1798,
-        "b": 110.0
+        "l": null,
+        "a": null,
+        "b": null
       },
       "rgb": {
-        "r": 255,
-        "g": 139,
-        "b": 0
+        "r": null,
+        "g": null,
+        "b": null
       },
-      "raw": null,
       "notes": ""
     },
     {
@@ -3557,18 +8517,26 @@
       "panel_index": 11,
       "id": 192,
       "name": "MANGO",
-      "measured": true,
+      "measured": false,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
       "lab": {
-        "l": 98.5,
-        "a": 68.6455,
-        "b": 103.4606
+        "l": null,
+        "a": null,
+        "b": null
       },
       "rgb": {
-        "r": 255,
-        "g": 187,
-        "b": 0
+        "r": null,
+        "g": null,
+        "b": null
       },
-      "raw": null,
       "notes": ""
     },
     {
@@ -3576,18 +8544,26 @@
       "panel_index": 12,
       "id": 59,
       "name": "CANTALOUPE",
-      "measured": true,
+      "measured": false,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
       "lab": {
-        "l": 98.5,
-        "a": 66.3088,
-        "b": 90.0752
+        "l": null,
+        "a": null,
+        "b": null
       },
       "rgb": {
-        "r": 255,
-        "g": 190,
-        "b": 67
+        "r": null,
+        "g": null,
+        "b": null
       },
-      "raw": null,
       "notes": ""
     },
     {
@@ -3595,18 +8571,26 @@
       "panel_index": 13,
       "id": 496,
       "name": "NECTARINE",
-      "measured": true,
+      "measured": false,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
       "lab": {
-        "l": 98.5,
-        "a": 101.2829,
-        "b": 93.5892
+        "l": null,
+        "a": null,
+        "b": null
       },
       "rgb": {
-        "r": 255,
-        "g": 139,
-        "b": 66
+        "r": null,
+        "g": null,
+        "b": null
       },
-      "raw": null,
       "notes": ""
     },
     {
@@ -3615,9 +8599,25 @@
       "id": 853,
       "name": "ORANGEADE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": 13540097,
+        "y": 11047936,
+        "z": 3415040,
+        "ir": 414720,
+        "clear": 8150272,
+        "gain": 4,
+        "integration_ms": 100
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3626,9 +8626,25 @@
       "id": 400,
       "name": "CARROT",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": 10315009,
+        "y": 8416256,
+        "z": 1790720,
+        "ir": 380672,
+        "clear": 6387968,
+        "gain": 4,
+        "integration_ms": 100
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3637,9 +8653,25 @@
       "id": 450,
       "name": "TORCH",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": 12186625,
+        "y": 10118144,
+        "z": 1569280,
+        "ir": 402944,
+        "clear": 7202304,
+        "gain": 4,
+        "integration_ms": 100
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3648,9 +8680,25 @@
       "id": 1370,
       "name": "TANGERINE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3659,9 +8707,25 @@
       "id": 323,
       "name": "FLAME",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3670,9 +8734,25 @@
       "id": 1838,
       "name": "CHILI",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3681,9 +8761,25 @@
       "id": 865,
       "name": "PIMENTO",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3692,9 +8788,25 @@
       "id": 7,
       "name": "TOMATO",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3703,9 +8815,25 @@
       "id": 1194,
       "name": "LIPSTICK",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3714,9 +8842,25 @@
       "id": 1296,
       "name": "POPPY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3725,9 +8869,25 @@
       "id": 355,
       "name": "CAYENNE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3736,9 +8896,25 @@
       "id": 1283,
       "name": "PEARL PINK",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3747,9 +8923,25 @@
       "id": 1281,
       "name": "PEACH",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3758,9 +8950,25 @@
       "id": 185,
       "name": "CREAMSICLE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3769,9 +8977,25 @@
       "id": 1483,
       "name": "SALMON",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3780,9 +9004,25 @@
       "id": 1087,
       "name": "CORAL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3791,9 +9031,25 @@
       "id": 1308,
       "name": "RED",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3802,9 +9058,25 @@
       "id": 1063,
       "name": "CARDINAL",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3813,9 +9085,25 @@
       "id": 1480,
       "name": "CHINESE RED",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3824,9 +9112,25 @@
       "id": 1551,
       "name": "RICH RED",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3835,9 +9139,25 @@
       "id": 352,
       "name": "RUBY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3846,9 +9166,25 @@
       "id": 1390,
       "name": "WINE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3857,9 +9193,25 @@
       "id": 1091,
       "name": "CRIMSON",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3868,9 +9220,25 @@
       "id": 861,
       "name": "BALLET SLIPPER",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3879,9 +9247,25 @@
       "id": 1291,
       "name": "PINK",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3890,9 +9274,25 @@
       "id": 1144,
       "name": "BELLINI",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3901,9 +9301,25 @@
       "id": 1465,
       "name": "DUSTY PEACH",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3912,9 +9328,25 @@
       "id": 274,
       "name": "PRIMROSE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3923,9 +9355,25 @@
       "id": 1228,
       "name": "MELON",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3934,9 +9382,25 @@
       "id": 190,
       "name": "CAMELLIA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3945,9 +9409,25 @@
       "id": 419,
       "name": "AZALEA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3956,9 +9436,25 @@
       "id": 447,
       "name": "PUNCH",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3967,9 +9463,25 @@
       "id": 1384,
       "name": "WATERMELON",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3978,9 +9490,25 @@
       "id": 1295,
       "name": "POMEGRANATE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -3989,9 +9517,25 @@
       "id": 481,
       "name": "SANGRIA",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -4000,9 +9544,25 @@
       "id": 189,
       "name": "BABY PINK",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -4011,9 +9571,25 @@
       "id": 110,
       "name": "PEONY",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -4022,9 +9598,25 @@
       "id": 1225,
       "name": "MED. PINK",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -4033,9 +9625,25 @@
       "id": 141,
       "name": "CARNATION",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -4044,9 +9652,25 @@
       "id": 261,
       "name": "BUBBLE GUM",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -4055,9 +9679,25 @@
       "id": 1062,
       "name": "CANDY PINK",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -4066,9 +9706,25 @@
       "id": 845,
       "name": "SASSY PINK",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -4077,9 +9733,25 @@
       "id": 1841,
       "name": "DRAGON FRUIT",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -4088,9 +9760,25 @@
       "id": 1049,
       "name": "BRT. PINK",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -4099,9 +9787,25 @@
       "id": 490,
       "name": "HONEYSUCKLE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -4110,9 +9814,25 @@
       "id": 451,
       "name": "VALENTINE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     },
     {
@@ -4121,9 +9841,25 @@
       "id": 1066,
       "name": "CERISE",
       "measured": false,
-      "lab": null,
-      "rgb": null,
-      "raw": null,
+      "raw": {
+        "x": null,
+        "y": null,
+        "z": null,
+        "ir": null,
+        "clear": null,
+        "gain": null,
+        "integration_ms": null
+      },
+      "lab": {
+        "l": null,
+        "a": null,
+        "b": null
+      },
+      "rgb": {
+        "r": null,
+        "g": null,
+        "b": null
+      },
       "notes": ""
     }
   ]
