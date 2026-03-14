@@ -489,9 +489,22 @@ class KonaScannerApp:
         # Maximize window on startup (cross-platform)
         if platform.system() == 'Windows':
             self.root.state('zoomed')
+        elif platform.system() == 'Darwin':
+            # macOS: Use screen geometry to maximize
+            self.root.update_idletasks()
+            screen_width = self.root.winfo_screenwidth()
+            screen_height = self.root.winfo_screenheight()
+            self.root.geometry(f"{screen_width}x{screen_height}+0+0")
         else:
-            # For Linux/macOS, use attributes or full screen geometry
-            self.root.attributes('-zoomed', True)
+            # Linux: Use -zoomed attribute
+            try:
+                self.root.attributes('-zoomed', True)
+            except tk.TclError:
+                # Fallback for environments that don't support -zoomed
+                self.root.update_idletasks()
+                screen_width = self.root.winfo_screenwidth()
+                screen_height = self.root.winfo_screenheight()
+                self.root.geometry(f"{screen_width}x{screen_height}+0+0")
         # Make mouse pointer black (standard arrow cursor)
         self.root.config(cursor="arrow")
 
@@ -632,9 +645,9 @@ class KonaScannerApp:
                                        highlightthickness=1, highlightbackground="black")
         self.color_canvas.pack(pady=5)
 
-        # Monospaced font for aligned values
-        mono_font = ("Courier", 10)
-        label_font = ("TkDefaultFont", 9)
+        # Monospaced font for aligned values (size 11 for better readability)
+        mono_font = ("Courier", 11)
+        label_font = ("TkDefaultFont", 10)
 
         # Color info with LAB on left, RGB on right (read-only text boxes for copying)
         info_frame = ttk.LabelFrame(right_content, text="Selected Info")
