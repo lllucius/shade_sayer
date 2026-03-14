@@ -69,9 +69,10 @@ typedef struct
     // Quality thresholds
     float min_luminance;             //< Minimum acceptable luminance (L*) for valid reading
     float max_delta_e;               //< Maximum acceptable DeltaE for "good" general match
-    float kona_max_delta_e;          //< Maximum CIEDE2000 ΔE for Kona swatch match (default: 2.0)
-                                     //  2.0 ΔE is approximately the "just noticeable difference"
-                                     //  for trained observers. Values 0.5-3.0 are typical.
+    float kona_max_delta_e;          //< Maximum CIEDE2000 ΔE for Kona swatch match (default: 5.0)
+                                     //  2.0 ΔE is the "just noticeable difference" for trained observers,
+                                     //  but 5.0 is used to accommodate measurement variability in
+                                     //  highly saturated colors near the a*/b* clamping boundary.
 
     // Calibration - Dual white balance profiles + Black Level
     bool use_white_balance;          //< Apply white point correction
