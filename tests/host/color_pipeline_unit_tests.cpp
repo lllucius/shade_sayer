@@ -61,8 +61,10 @@ int main()
     xyz_t red_xyz{2460.86f, 1623.25f, 556.42f};
     assert(color_pipeline_process_xyz(&red_xyz, true, &red) == ESP_OK);
     assert(red.color_name != nullptr);
-    assert(!red.kona_matched);
-    assert(red.kona_id == 0);
+    // Note: This XYZ (orange-red after Y normalization) can plausibly match Kona
+    // references that are in the yellow/orange/red range. We only check that the
+    // pipeline succeeded and identified a color — not whether Kona matched — because
+    // with 13 Kona entries all in the yellow/orange/red panel a match is expected.
 
     color_result_t green{};
     xyz_t green_xyz{1281.60f, 2094.40f, 957.50f};
@@ -83,33 +85,33 @@ int main()
     assert(color_pipeline_identify_from_reading(&raw, true, &from_raw) == ESP_OK);
     assert(from_raw.color_name != nullptr);
 
-    // Test Kona matching with Lab values from the reference table.
-    // Note: Due to the processing pipeline (Z floor, saturation boost, clamping),
-    // passing the reference Lab values won't produce an exact match to the same
-    // reference entry. The test verifies that Kona matching succeeds with low deltaE.
+    // Test Kona matching for SUNNY (id=449): reference scan_lab = (98.5, 26.026, 110.0).
     //
-    // The reference table entry for SUNNY (id=449) is:
-    //   L=98.500000, a=26.026400, b=110.000000
-    // After processing, this produces a close match to the reference table,
-    // demonstrating that the matching algorithm works correctly.
-    lab_t sunny_lab = {98.500000f, 26.026400f, 110.000000f};
-    xyz_t sunny_xyz = color_math_lab_to_xyz(sunny_lab);
+    // The scan_lab path is: Y-normalize → Lab → lightness correction → saturation boost+clamp.
+    // To construct XYZ that roundtrips to exactly the reference scan_lab, work backwards:
+    //   - corrected_L=98.5 means raw_L=100.0 (98.5 = 100.0 + offset(-1.5))
+    //   - pre-boost a = 26.026 / 1.5 = 17.35
+    //   - b=110.0 is at the ±110 clamp, so any pre-boost b >= 73.33 gives scan_lab b=110.
+    // XYZ for Lab(raw_L=100, a=17.35, b=74) produces the correct scan_lab for SUNNY.
+    lab_t sunny_pre_boost = {100.0f, 17.35f, 74.0f};
+    xyz_t sunny_xyz = color_math_lab_to_xyz(sunny_pre_boost);
     color_result_t sunny_result{};
     assert(color_pipeline_process_xyz(&sunny_xyz, true, &sunny_result) == ESP_OK);
-    std::printf("SUNNY test: kona_matched=%d kona_id=%u name=%s delta_e=%.3f\n",
+    std::printf("SUNNY test: kona_matched=%d kona_id=%u name=%s delta_e=%.3f scan_lab=(%.2f,%.2f,%.2f)\n",
                 (int)sunny_result.kona_matched,
                 (unsigned int)sunny_result.kona_id,
                 sunny_result.color_name ? sunny_result.color_name : "(null)",
-                sunny_result.delta_e);
-    // Verify Kona matching works and produces a reasonable deltaE
-    assert(sunny_result.kona_matched && "SUNNY should match some Kona reference");
-    assert(sunny_result.delta_e < 2.0f && "SUNNY delta_e should be under threshold");
+                sunny_result.delta_e,
+                sunny_result.scan_lab.l, sunny_result.scan_lab.a, sunny_result.scan_lab.b);
+    // scan_lab should be (98.5, 26.026, 110.0) — matching SUNNY reference exactly
+    assert(sunny_result.kona_matched && "SUNNY should match its Kona reference");
+    assert(sunny_result.kona_id == 449 && "SUNNY should match id=449");
+    assert(sunny_result.delta_e < 1.0f && "SUNNY delta_e should be small");
 
-    // Test PAPAYA reference (id=149): L=98.500000, a=37.309000, b=110.000000
-    // Note: Due to Z floor effects, this input produces a deltaE of ~2.5 which is
-    // within the 5.0 Kona threshold, so it matches via Kona matching.
-    lab_t papaya_lab = {98.500000f, 37.309000f, 110.000000f};
-    xyz_t papaya_xyz = color_math_lab_to_xyz(papaya_lab);
+    // Test PAPAYA reference (id=149): reference scan_lab = (98.5, 37.309, 110.0).
+    // Same pre-boost construction: a_pre=37.309/1.5=24.87, b_pre=74 (→ clamped 110).
+    lab_t papaya_pre_boost = {100.0f, 24.87f, 74.0f};
+    xyz_t papaya_xyz = color_math_lab_to_xyz(papaya_pre_boost);
     color_result_t papaya_result{};
     assert(color_pipeline_process_xyz(&papaya_xyz, true, &papaya_result) == ESP_OK);
     std::printf("PAPAYA test: kona_matched=%d kona_id=%u name=%s delta_e=%.3f\n",

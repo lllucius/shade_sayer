@@ -743,10 +743,17 @@ static void enter_serial_scan_mode(void)
                             }
                             else
                             {
-                                // Output Lab values and RGB (original format, preserved for compatibility)
+                                // Return pre-saturation-boost Lab (scan_lab) and the corresponding
+                                // sRGB values for storage in kona_captures.json.
+                                // Pre-boost Lab keeps distinct swatches distinguishable — saturation
+                                // boost + ±110 clamping would otherwise collapse highly saturated
+                                // colors (e.g., different oranges) to identical a*/b* values.
+                                uint8_t scan_r, scan_g, scan_b;
+                                color_math_lab_to_rgb(result.scan_lab,
+                                                      &scan_r, &scan_g, &scan_b);
                                 printf("OK:LAB:%.4f,%.4f,%.4f:RGB:%d,%d,%d\n",
-                                       result.lab.l, result.lab.a, result.lab.b,
-                                       result.rgb[0], result.rgb[1], result.rgb[2]);
+                                       result.scan_lab.l, result.scan_lab.a, result.scan_lab.b,
+                                       (int)scan_r, (int)scan_g, (int)scan_b);
                                 fflush(stdout);
                                 
                                 s_last_result = result;

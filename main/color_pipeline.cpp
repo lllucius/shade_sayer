@@ -1206,15 +1206,17 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
 
     result->xyz = corrected;
 
-    // For display Lab values and Kona matching, normalize XYZ to prevent extreme
-    // b* values. The Kona reference table was generated using normalized Lab values,
-    // so we must use the same normalization for accurate deltaE matching.
+    // For display Lab values, normalize XYZ to prevent extreme b* values for display.
+    // The Z floor is applied for display only — it is NOT applied when computing scan_lab
+    // (the Lab values captured by SCAN and stored in kona_captures.json) to preserve the
+    // natural b* variation between similarly-saturated swatches.
     xyz_t lab_xyz = corrected;
 
     // Normalize XYZ values when luminance exceeds D65 white reference.
     // This prevents Lab values from going out of gamut (b* > 200) when the sensor
     // reports colors brighter than reference white (e.g., saturated yellows).
     // We scale all channels proportionally to preserve chromaticity (hue).
+    // Applied to BOTH display and scan paths.
     if (lab_xyz.y > D65_Y)
     {
         float scale = D65_Y / lab_xyz.y;
@@ -1224,11 +1226,39 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         TCS_LOGD(TAG, "XYZ normalized: Y=%.1f -> %.1f (scale=%.4f)", corrected.y, lab_xyz.y, scale);
     }
 
-    // Apply minimum Z floor relative to luminance to prevent extreme b* values.
+    // === SCAN LAB PATH (no Z floor) ===
+    // Compute scan_lab from the Y-normalized XYZ WITHOUT applying the Z floor.
+    // The Kona reference table was built from kona_captures.json values that were
+    // captured using this same computation (Y-normalized, no Z floor, with saturation
+    // boost). Using no Z floor preserves the natural b* variation between swatches:
+    // e.g., CANTALOUPE b*≈90 vs SUNNY b*≈110 instead of both collapsing to b*≈85
+    // when the Z floor forces identical Z for all saturated yellows/oranges.
+    {
+        // CRITICAL: Use scale=1.0 to prevent double-scaling (same as display path below).
+        color_calib_params_t scan_lightness_params = s_params;
+        scan_lightness_params.lightness_scale = 1.0f;
+
+        lab_t scan_lab = color_math_xyz_to_lab(lab_xyz);
+        scan_lab.l = color_math_correct_lightness(scan_lab.l, &scan_lightness_params);
+
+        // Apply saturation boost and ±110 clamp to produce the value stored in JSON
+        // and used for Kona reference table generation.
+        color_math_enhance_saturation(&scan_lab,
+                                      s_config.gray_threshold,
+                                      s_config.color_threshold,
+                                      s_config.saturation_boost);
+        scan_lab.a = fminf(fmaxf(scan_lab.a, -110.0f), 110.0f);
+        scan_lab.b = fminf(fmaxf(scan_lab.b, -110.0f), 110.0f);
+
+        result->scan_lab = scan_lab;
+    }
+
+    // === DISPLAY LAB PATH (with Z floor) ===
+    // Apply minimum Z floor relative to luminance to prevent extreme b* values on display.
     // When the PCCM collapses Z to near-zero (e.g., for saturated yellows), the Lab
     // b* calculation explodes because b* = 200*(fy - fz) and fz becomes very small.
-    // A minimum Z of 20% of Y keeps pre-boost b* around 86, allowing distinct a*
-    // values to be preserved even when b* is clamped after saturation boost.
+    // The Z floor only affects the display path (result->lab); scan_lab uses the
+    // natural Z (above) to maintain distinct b* values across different swatches.
     const float MIN_Z_TO_Y_RATIO = 0.20f;  // Minimum Z as fraction of Y
     float min_z = lab_xyz.y * MIN_Z_TO_Y_RATIO;
     if (lab_xyz.z < min_z)
@@ -1285,10 +1315,11 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
     }
     else
     {
-        // Use fully processed Lab (after saturation boost and clamping) for Kona matching.
-        // The Kona reference table stores Lab values from device SCAN responses, which
-        // include all processing. Using result->lab ensures consistent comparison.
-        if (try_match_kona_reference(&result->lab, result))
+        // Use scan_lab (Y-normalized, no Z floor, saturation-boosted) for Kona matching.
+        // The Kona reference table is built from kona_captures.json values that were
+        // captured using this same scan_lab computation, so matching against scan_lab
+        // ensures accurate deltaE between measured colors and stored references.
+        if (try_match_kona_reference(&result->scan_lab, result))
         {
             result->description = nullptr;
             TCS_LOGD(TAG, "Kona match: id=%u name=%s dE=%.3f",
