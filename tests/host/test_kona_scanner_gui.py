@@ -61,7 +61,7 @@ SCHEMA_VERSION = 1
 KONA_REF_T_SIZE = 16
 
 
-def _generate_cpp_standalone(swatches: List[SwatchData], csv_path: str) -> str:
+def _generate_cpp_standalone(swatches: List[SwatchData], data_path: str) -> str:
     """Standalone wrapper around the shared render_cpp for testing.
     
     Converts SwatchData to KonaEntry objects and calls render_cpp, mirroring
@@ -71,7 +71,7 @@ def _generate_cpp_standalone(swatches: List[SwatchData], csv_path: str) -> str:
         KonaEntry(kona_id=s.id, l=s.L, a=s.a, b=s.b, name=s.name)
         for s in swatches
     ]
-    return render_cpp(entries, pathlib.Path(csv_path), source_script="kona_scanner_gui.py")
+    return render_cpp(entries, pathlib.Path(data_path), source_script="kona_scanner_gui.py")
 
 
 def test_generate_cpp_inline_comments():
@@ -85,7 +85,7 @@ def test_generate_cpp_inline_comments():
     ]
     
     # Generate C++ content using standalone implementation
-    cpp_content = _generate_cpp_standalone(test_swatches, "/test/path.csv")
+    cpp_content = _generate_cpp_standalone(test_swatches, "/test/kona_captures.json")
     
     # Verify that inline comments with id and name are present
     assert "// 120 AZURE" in cpp_content, "Missing inline comment for AZURE"
@@ -114,7 +114,7 @@ def test_generate_cpp_sorted_by_id():
                    L=20.0, a=2.0, b=2.0, measured=True),
     ]
     
-    cpp_content = _generate_cpp_standalone(test_swatches, "/test/path.csv")
+    cpp_content = _generate_cpp_standalone(test_swatches, "/test/kona_captures.json")
     
     # Find positions of each entry
     pos_first = cpp_content.find("// 100 FIRST")
@@ -135,7 +135,7 @@ def test_generate_cpp_valid_cpp_syntax():
                    L=50.0, a=0.0, b=0.0, measured=True),
     ]
     
-    cpp_content = _generate_cpp_standalone(test_swatches, "/test/path.csv")
+    cpp_content = _generate_cpp_standalone(test_swatches, "/test/kona_captures.json")
     
     # Check required C++ elements
     assert '#include "konaref.h"' in cpp_content, "Missing include statement"
@@ -377,7 +377,7 @@ def test_lab_value_formatting():
     ]
     
     for L, a, b, expected_L, expected_a, expected_b in test_cases:
-        # Use the same formatting logic as the fixed _save_csv code
+        # Use the same formatting logic as the debug output in _save_json
         L_str = f"{L:.4f}" if L is not None else "None"
         a_str = f"{a:.4f}" if a is not None else "None"
         b_str = f"{b:.4f}" if b is not None else "None"

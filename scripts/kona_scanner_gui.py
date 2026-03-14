@@ -9,15 +9,14 @@ Features:
 - Display all 365 Kona swatches in a sortable list
 - Show color sample and Lab/RGB info for selected swatches
 - Support single or multi-swatch scanning via EXTENDED selection
-- Maintain scanned values in JSON (preferred) or CSV file
+- Maintain scanned values in kona_captures.json
 - Export to C++ header file for firmware use
 
 Usage:
-    python3 kona_scanner_gui.py [--port /dev/ttyACM0] [--csv kona_captures.json] [--debug]
+    python3 kona_scanner_gui.py [--port /dev/ttyACM0] [--data kona_captures.json] [--debug]
 """
 
 import argparse
-import csv
 import colorsys
 import dataclasses
 import datetime as dt
@@ -471,9 +470,9 @@ class SerialConnection:
 class KonaScannerApp:
     """Main application class for Kona Swatch Scanner GUI."""
 
-    def __init__(self, root: tk.Tk, csv_path: str, serial_port: str, debug: bool = False):
+    def __init__(self, root: tk.Tk, data_path: str, serial_port: str, debug: bool = False):
         self.root = root
-        self.csv_path = pathlib.Path(csv_path)
+        self.data_path = pathlib.Path(data_path)
         self.serial_port = serial_port
         self.debug = debug
         self.serial = SerialConnection(serial_port, debug=debug)
@@ -546,8 +545,8 @@ class KonaScannerApp:
 
         ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=3)
 
-        self.save_csv_btn = ttk.Button(toolbar, text="Save", command=self._on_save_csv)
-        self.save_csv_btn.pack(side=tk.LEFT, padx=1)
+        self.save_btn = ttk.Button(toolbar, text="Save", command=self._on_save)
+        self.save_btn.pack(side=tk.LEFT, padx=1)
         self.export_cpp_btn = ttk.Button(toolbar, text="Export", command=self._on_export_cpp)
         self.export_cpp_btn.pack(side=tk.LEFT, padx=1)
 
@@ -768,8 +767,8 @@ class KonaScannerApp:
         self.root.bind("<Alt-u>", lambda e: self._on_upload_kona())
         self.root.bind("<Alt-m>", lambda e: self._on_measure())
         
-        # Ctrl+S for Save CSV
-        self.root.bind("<Control-s>", lambda e: self._on_save_csv())
+        # Ctrl+S for Save
+        self.root.bind("<Control-s>", lambda e: self._on_save())
         
         # Ctrl+A for Select All in treeview
         self.root.bind("<Control-a>", self._on_select_all)
@@ -1007,74 +1006,23 @@ class KonaScannerApp:
         self._on_filter_change()
 
     def _load_data(self):
-        """Load swatch data from file, auto-detecting CSV or JSON format."""
-        if self.csv_path.suffix.lower() == ".json":
-            self._load_json()
-        else:
-            self._load_csv()
+        """Load swatch data from kona_captures.json."""
+        self._load_json()
 
     def _save_data(self) -> bool:
-        """Save swatch data to file, dispatching to JSON or CSV based on extension."""
-        if self.csv_path.suffix.lower() == ".json":
-            return self._save_json()
-        return self._save_csv()
-
-    def _load_csv(self):
-        """Load swatch data from CSV file."""
-        self.swatches.clear()
-
-        if not self.csv_path.exists():
-            print(f"CSV file not found: {self.csv_path}", file=sys.stderr)
-            return
-
-        try:
-            with self.csv_path.open(newline="", encoding="utf-8") as f:
-                reader = csv.DictReader(f)
-                for row in reader:
-                    try:
-                        swatch_id = int(row.get("id", 0))
-                        if swatch_id == 0:
-                            continue
-
-                        L = float(row["L"]) if row.get("L") else None
-                        a = float(row["a"]) if row.get("a") else None
-                        b = float(row["b"]) if row.get("b") else None
-                        R = int(row["R"]) if row.get("R") else None
-                        G = int(row["G"]) if row.get("G") else None
-                        B = int(row["B"]) if row.get("B") else None
-                        measured = row.get("measured", "").lower() == "true"
-
-                        self.swatches[swatch_id] = SwatchData(
-                            panel=row.get("panel", ""),
-                            panel_index=int(row.get("panel_index", 0)),
-                            id=swatch_id,
-                            name=row.get("name", ""),
-                            L=L,
-                            a=a,
-                            b=b,
-                            R=R,
-                            G=G,
-                            B=B,
-                            measured=measured,
-                            notes=row.get("notes", "")
-                        )
-                    except (ValueError, KeyError) as e:
-                        print(f"Skipping invalid row: {row} ({e})", file=sys.stderr)
-
-            print(f"Loaded {len(self.swatches)} swatches from {self.csv_path}")
-        except Exception as e:
-            print(f"Error loading CSV: {e}", file=sys.stderr)
+        """Save swatch data to kona_captures.json."""
+        return self._save_json()
 
     def _load_json(self):
         """Load swatch data from a kona_captures.json file."""
         self.swatches.clear()
 
-        if not self.csv_path.exists():
-            print(f"JSON file not found: {self.csv_path}", file=sys.stderr)
+        if not self.data_path.exists():
+            print(f"Data file not found: {self.data_path}", file=sys.stderr)
             return
 
         try:
-            with self.csv_path.open(encoding="utf-8") as f:
+            with self.data_path.open(encoding="utf-8") as f:
                 data = json.load(f)
 
             for entry in data.get("swatches", []):
@@ -1128,56 +1076,9 @@ class KonaScannerApp:
                 except (ValueError, KeyError, TypeError) as e:
                     print(f"Skipping invalid JSON swatch entry: {entry} ({e})", file=sys.stderr)
 
-            print(f"Loaded {len(self.swatches)} swatches from {self.csv_path}")
+            print(f"Loaded {len(self.swatches)} swatches from {self.data_path}")
         except Exception as e:
             print(f"Error loading JSON: {e}", file=sys.stderr)
-
-    def _save_csv(self):
-        """Save swatch data to CSV file."""
-        try:
-            # Count measured swatches for verification
-            measured_count = sum(1 for s in self.swatches.values() if s.measured)
-            if self.debug:
-                print(f"Saving CSV: {len(self.swatches)} total swatches, {measured_count} measured")
-            
-            with self.csv_path.open("w", newline="", encoding="utf-8") as f:
-                writer = csv.writer(f)
-                writer.writerow(["panel", "panel_index", "id", "name", "L", "a", "b",
-                                "R", "G", "B", "measured", "notes"])
-
-                # Sort by panel, then panel_index
-                sorted_swatches = sorted(self.swatches.values(),
-                                        key=lambda s: (s.panel, s.panel_index))
-
-                for s in sorted_swatches:
-                    if self.debug and s.measured:
-                        L_str = f"{s.L:.4f}" if s.L is not None else "None"
-                        a_str = f"{s.a:.4f}" if s.a is not None else "None"
-                        b_str = f"{s.b:.4f}" if s.b is not None else "None"
-                        print(f"  Writing swatch[{s.id}] ({s.name}): "
-                              f"L={L_str} a={a_str} b={b_str}")
-                    writer.writerow([
-                        s.panel,
-                        s.panel_index,
-                        s.id,
-                        s.name,
-                        f"{s.L:.4f}" if s.L is not None else "",
-                        f"{s.a:.4f}" if s.a is not None else "",
-                        f"{s.b:.4f}" if s.b is not None else "",
-                        s.R if s.R is not None else "",
-                        s.G if s.G is not None else "",
-                        s.B if s.B is not None else "",
-                        "true" if s.measured else "false",
-                        s.notes
-                    ])
-
-            print(f"Saved {len(self.swatches)} swatches to {self.csv_path}")
-            self._unsaved_changes = False  # Clear unsaved changes flag
-            return True
-        except Exception as e:
-            print(f"Error saving CSV: {e}", file=sys.stderr)
-            messagebox.showerror("Error", f"Failed to save CSV: {e}")
-            return False
 
     def _save_json(self) -> bool:
         """Save swatch data to a kona_captures.json file.
@@ -1190,9 +1091,9 @@ class KonaScannerApp:
         try:
             # Preserve existing top-level metadata if the file exists
             existing: dict = {}
-            if self.csv_path.exists():
+            if self.data_path.exists():
                 try:
-                    with self.csv_path.open(encoding="utf-8") as f:
+                    with self.data_path.open(encoding="utf-8") as f:
                         existing = json.load(f)
                 except Exception:
                     pass
@@ -1201,7 +1102,7 @@ class KonaScannerApp:
             if self.debug:
                 print(f"Saving JSON: {len(self.swatches)} total swatches, {measured_count} measured")
 
-            # Build swatch list sorted by panel / panel_index (same order as CSV)
+            # Build swatch list sorted by panel / panel_index
             sorted_swatches = sorted(self.swatches.values(),
                                      key=lambda s: (s.panel, s.panel_index))
 
@@ -1251,11 +1152,11 @@ class KonaScannerApp:
                 "swatches": swatch_entries,
             }
 
-            with self.csv_path.open("w", encoding="utf-8") as f:
+            with self.data_path.open("w", encoding="utf-8") as f:
                 json.dump(output, f, indent=2)
                 f.write("\n")  # Trailing newline for POSIX compliance
 
-            print(f"Saved {len(self.swatches)} swatches to {self.csv_path}")
+            print(f"Saved {len(self.swatches)} swatches to {self.data_path}")
             self._unsaved_changes = False
             return True
         except Exception as e:
@@ -1661,10 +1562,10 @@ class KonaScannerApp:
         self._update_scan_ui()
         self.progress_var.set("Scan stopped")
 
-    def _on_save_csv(self):
-        """Save data file (CSV or JSON based on file extension)."""
+    def _on_save(self):
+        """Save data to kona_captures.json."""
         if self._save_data():
-            messagebox.showinfo("Info", f"Saved to {self.csv_path}")
+            messagebox.showinfo("Info", f"Saved to {self.data_path}")
 
     def _on_export_cpp(self):
         """Export to C++ header file."""
@@ -1703,7 +1604,7 @@ class KonaScannerApp:
             KonaEntry(kona_id=s.id, l=s.L, a=s.a, b=s.b, name=s.name)
             for s in swatches
         ]
-        return render_cpp(entries, self.csv_path, source_script="kona_scanner_gui.py")
+        return render_cpp(entries, self.data_path, source_script="kona_scanner_gui.py")
 
     def _on_clear_scanned(self):
         """Clear all scanned values."""
@@ -1722,8 +1623,7 @@ class KonaScannerApp:
         
         self._populate_treeview()
         self._clear_color_info()
-        # Mark as unsaved since clearing Lab values is a change from the loaded CSV state
-        # User should save to persist the cleared state to the CSV file
+        # Mark as unsaved since clearing Lab values is a change from the loaded state
         self._unsaved_changes = True
         self.progress_var.set("Cleared all scanned values")
 
@@ -1923,8 +1823,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", default="/dev/ttyACM0",
                        help="Serial port for device communication")
-    parser.add_argument("--csv", default="kona_captures.json",
-                       help="Data file for swatch data (.json preferred, .csv legacy)")
+    parser.add_argument("--data", default="kona_captures.json",
+                       help="kona_captures.json data file path")
     parser.add_argument("--debug", action="store_true",
                        help="Print all serial TX/RX communications for debugging")
     return parser.parse_args()
@@ -1935,17 +1835,17 @@ def main() -> int:
     args = parse_args()
 
     # Make data path relative to repository root (one level up from scripts directory)
-    csv_path = args.csv
-    if not os.path.isabs(csv_path):
+    data_path = args.data
+    if not os.path.isabs(data_path):
         script_dir = pathlib.Path(__file__).parent  # scripts directory
         repo_root = script_dir.parent               # repository root
-        csv_path = repo_root / csv_path
+        data_path = repo_root / data_path
 
     if args.debug:
         print("Debug mode enabled - all serial TX/RX will be printed")
 
     root = tk.Tk()
-    app = KonaScannerApp(root, str(csv_path), args.port, debug=args.debug)
+    app = KonaScannerApp(root, str(data_path), args.port, debug=args.debug)
     root.mainloop()
 
     return 0
