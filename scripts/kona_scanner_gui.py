@@ -637,28 +637,28 @@ class KonaScannerApp:
             row.pack(fill=tk.X, padx=3, pady=1)
 
             # LAB value on the left
-            ttk.Label(row, text=f"{lab_label}:", width=3).pack(side=tk.LEFT)
+            ttk.Label(row, text=f"{lab_label}:", width=3, anchor=tk.W).pack(side=tk.LEFT)
             lab_var = tk.StringVar(value="-")
             lab_entry = ttk.Entry(row, textvariable=lab_var, width=8, state="readonly",
-                                  font=("TkDefaultFont", 9, "bold"))
+                                  font=("TkDefaultFont", 9, "bold"), justify=tk.LEFT)
             lab_entry.pack(side=tk.LEFT, padx=(0, 5))
             self.info_entries[lab_label] = lab_var
 
             # RGB value on the right
-            ttk.Label(row, text=f"{rgb_label}:", width=2).pack(side=tk.LEFT)
+            ttk.Label(row, text=f"{rgb_label}:", width=2, anchor=tk.W).pack(side=tk.LEFT)
             rgb_var = tk.StringVar(value="-")
             rgb_entry = ttk.Entry(row, textvariable=rgb_var, width=5, state="readonly",
-                                  font=("TkDefaultFont", 9, "bold"))
+                                  font=("TkDefaultFont", 9, "bold"), justify=tk.LEFT)
             rgb_entry.pack(side=tk.LEFT)
             self.info_entries[rgb_label] = rgb_var
 
         # Hex row at bottom
         hex_row = ttk.Frame(info_frame)
         hex_row.pack(fill=tk.X, padx=3, pady=1)
-        ttk.Label(hex_row, text="Hex:", width=3).pack(side=tk.LEFT)
+        ttk.Label(hex_row, text="Hex:", width=3, anchor=tk.W).pack(side=tk.LEFT)
         hex_var = tk.StringVar(value="-")
         hex_entry = ttk.Entry(hex_row, textvariable=hex_var, width=8, state="readonly",
-                              font=("TkDefaultFont", 9, "bold"))
+                              font=("TkDefaultFont", 9, "bold"), justify=tk.LEFT)
         hex_entry.pack(side=tk.LEFT)
         self.info_entries["Hex"] = hex_var
 
@@ -674,16 +674,21 @@ class KonaScannerApp:
         scan_frame = ttk.LabelFrame(right_content, text="Scanning")
         scan_frame.pack(fill=tk.X, padx=3, pady=3)
 
-        self.scan_status_label = ttk.Label(scan_frame, text="Not scanning", wraplength=180)
-        self.scan_status_label.pack(padx=3, pady=3)
+        self.scan_status_label = ttk.Label(scan_frame, text="Not scanning", wraplength=180,
+                                            justify=tk.LEFT, anchor=tk.W)
+        self.scan_status_label.pack(fill=tk.X, padx=3, pady=3)
 
-        self.scan_button = ttk.Button(scan_frame, text="Capture", command=self._on_capture_current,
-                                       state=tk.DISABLED)
-        self.scan_button.pack(pady=2)
+        # Button row - Capture bottom-left, Skip bottom-right
+        btn_row = ttk.Frame(scan_frame)
+        btn_row.pack(fill=tk.X, padx=3, pady=2)
 
-        self.skip_button = ttk.Button(scan_frame, text="Skip", command=self._on_skip_current,
+        self.scan_button = ttk.Button(btn_row, text="Capture", command=self._on_capture_current,
                                        state=tk.DISABLED)
-        self.skip_button.pack(pady=2)
+        self.scan_button.pack(side=tk.LEFT)
+
+        self.skip_button = ttk.Button(btn_row, text="Skip", command=self._on_skip_current,
+                                       state=tk.DISABLED)
+        self.skip_button.pack(side=tk.RIGHT)
         
         # Kona table status frame
         kona_frame = ttk.LabelFrame(right_content, text="Kona Status")

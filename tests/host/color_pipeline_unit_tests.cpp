@@ -107,9 +107,7 @@ int main()
 
     // Test PAPAYA reference (id=149): L=98.500000, a=37.309000, b=110.000000
     // Note: Due to Z floor effects, this input produces a deltaE of ~2.5 which is
-    // slightly above the 2.0 Kona threshold, causing it to fall back to the
-    // general color matcher. This is expected behavior for inputs that don't
-    // quite match the reference after re-processing.
+    // within the 5.0 Kona threshold, so it matches via Kona matching.
     lab_t papaya_lab = {98.500000f, 37.309000f, 110.000000f};
     xyz_t papaya_xyz = color_math_lab_to_xyz(papaya_lab);
     color_result_t papaya_result{};

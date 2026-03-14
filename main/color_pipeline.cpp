@@ -37,7 +37,7 @@ static color_pipeline_config_t s_config =
 {
     .min_luminance = 5.0f,
     .max_delta_e = 10.0f,
-    .kona_max_delta_e = 2.0f,
+    .kona_max_delta_e = 5.0f,
     .use_white_balance = false,
     .white_reference_led = {D65_X, D65_Y, D65_Z},
     .white_reference_ambient = {D65_X, D65_Y, D65_Z},
@@ -706,7 +706,7 @@ esp_err_t color_pipeline_init(const color_pipeline_config_t* config)
 
     if (s_config.kona_max_delta_e <= 0.0f)
     {
-        s_config.kona_max_delta_e = 2.0f;
+        s_config.kona_max_delta_e = 5.0f;
     }
 
     color_database_init();
