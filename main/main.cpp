@@ -757,8 +757,11 @@ static void enter_serial_scan_mode(void)
                                     printf("Result: %s (category: %s, dE=%.2f, conf=%.0f%%)\n",
                                              display_name, result.category, result.delta_e, result.confidence * 100);
                                 }
+                                fflush(stdout);
                                 printf("XYZ: X=%.2f Y=%.2f Z=%.2f\n", result.xyz.x, result.xyz.y, result.xyz.z);
+                                fflush(stdout);
                                 printf("Lab: L=%.1f a=%.1f b=%.1f\n", result.lab.l, result.lab.a, result.lab.b);
+                                fflush(stdout);
 
                                 // Output Lab values and RGB
                                 printf("OK:LAB:%.4f,%.4f,%.4f:RGB:%d,%d,%d\n",

@@ -486,6 +486,27 @@ class KonaScannerApp:
         # Default geometry fits 1097x617 (4K at 350% scaling)
         self.root.geometry("1050x600")
         self.root.minsize(800, 500)  # Minimum usable size
+        # Maximize window on startup (cross-platform)
+        if platform.system() == 'Windows':
+            self.root.state('zoomed')
+        elif platform.system() == 'Darwin':
+            # macOS: Use screen geometry to maximize
+            self.root.update_idletasks()
+            screen_width = self.root.winfo_screenwidth()
+            screen_height = self.root.winfo_screenheight()
+            self.root.geometry(f"{screen_width}x{screen_height}+0+0")
+        else:
+            # Linux: Use -zoomed attribute
+            try:
+                self.root.attributes('-zoomed', True)
+            except tk.TclError:
+                # Fallback for environments that don't support -zoomed
+                self.root.update_idletasks()
+                screen_width = self.root.winfo_screenwidth()
+                screen_height = self.root.winfo_screenheight()
+                self.root.geometry(f"{screen_width}x{screen_height}+0+0")
+        # Make mouse pointer black (standard arrow cursor)
+        self.root.config(cursor="arrow")
 
         # Main frame with paned window
         main_pane = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
@@ -624,51 +645,64 @@ class KonaScannerApp:
                                        highlightthickness=1, highlightbackground="black")
         self.color_canvas.pack(pady=5)
 
+        # Monospaced font for aligned values (size 11 for better readability)
+        mono_font = ("Courier", 11)
+        label_font = ("TkDefaultFont", 10)
+
         # Color info with LAB on left, RGB on right (read-only text boxes for copying)
         info_frame = ttk.LabelFrame(right_content, text="Selected Info")
         info_frame.pack(fill=tk.X, padx=3, pady=3)
 
         self.info_entries = {}
 
-        # Create rows with LAB on left, RGB on right - compact layout
+        # Use grid layout for aligned labels and values
+        # Row 0: L* and R
+        # Row 1: a* and G
+        # Row 2: b* and B
+        # Row 3: Hex (spanning)
         lab_rgb_pairs = [("L*", "R"), ("a*", "G"), ("b*", "B")]
-        for lab_label, rgb_label in lab_rgb_pairs:
-            row = ttk.Frame(info_frame)
-            row.pack(fill=tk.X, padx=3, pady=1)
-
-            # LAB value on the left
-            ttk.Label(row, text=f"{lab_label}:", width=3, anchor=tk.W).pack(side=tk.LEFT)
+        for row_idx, (lab_label, rgb_label) in enumerate(lab_rgb_pairs):
+            # LAB label - left justified
+            ttk.Label(info_frame, text=f"{lab_label}:", font=label_font, anchor=tk.W).grid(
+                row=row_idx, column=0, sticky=tk.W, padx=(5, 2), pady=1)
+            # LAB value - readonly entry with monospace font
             lab_var = tk.StringVar(value="-")
-            lab_entry = ttk.Entry(row, textvariable=lab_var, width=8, state="readonly",
-                                  font=("TkDefaultFont", 9, "bold"), justify=tk.LEFT)
-            lab_entry.pack(side=tk.LEFT, padx=(0, 5))
+            lab_entry = ttk.Entry(info_frame, textvariable=lab_var, width=10, state="readonly",
+                                  font=mono_font, justify=tk.RIGHT)
+            lab_entry.grid(row=row_idx, column=1, sticky=tk.W, padx=(0, 10), pady=1)
             self.info_entries[lab_label] = lab_var
 
-            # RGB value on the right
-            ttk.Label(row, text=f"{rgb_label}:", width=2, anchor=tk.W).pack(side=tk.LEFT)
+            # RGB label - left justified
+            ttk.Label(info_frame, text=f"{rgb_label}:", font=label_font, anchor=tk.W).grid(
+                row=row_idx, column=2, sticky=tk.W, padx=(5, 2), pady=1)
+            # RGB value - readonly entry with monospace font
             rgb_var = tk.StringVar(value="-")
-            rgb_entry = ttk.Entry(row, textvariable=rgb_var, width=5, state="readonly",
-                                  font=("TkDefaultFont", 9, "bold"), justify=tk.LEFT)
-            rgb_entry.pack(side=tk.LEFT)
+            rgb_entry = ttk.Entry(info_frame, textvariable=rgb_var, width=5, state="readonly",
+                                  font=mono_font, justify=tk.RIGHT)
+            rgb_entry.grid(row=row_idx, column=3, sticky=tk.W, pady=1)
             self.info_entries[rgb_label] = rgb_var
 
-        # Hex row at bottom
-        hex_row = ttk.Frame(info_frame)
-        hex_row.pack(fill=tk.X, padx=3, pady=1)
-        ttk.Label(hex_row, text="Hex:", width=3, anchor=tk.W).pack(side=tk.LEFT)
+        # Hex row at bottom - spans columns
+        ttk.Label(info_frame, text="Hex:", font=label_font, anchor=tk.W).grid(
+            row=3, column=0, sticky=tk.W, padx=(5, 2), pady=1)
         hex_var = tk.StringVar(value="-")
-        hex_entry = ttk.Entry(hex_row, textvariable=hex_var, width=8, state="readonly",
-                              font=("TkDefaultFont", 9, "bold"), justify=tk.LEFT)
-        hex_entry.pack(side=tk.LEFT)
+        hex_entry = ttk.Entry(info_frame, textvariable=hex_var, width=10, state="readonly",
+                              font=mono_font, justify=tk.LEFT)
+        hex_entry.grid(row=3, column=1, sticky=tk.W, pady=1)
         self.info_entries["Hex"] = hex_var
+
+        # Configure column weights for proper resizing
+        info_frame.columnconfigure(1, weight=1)
+        info_frame.columnconfigure(3, weight=1)
 
         # Last captured display - shows the most recently scanned swatch info
         last_captured_frame = ttk.LabelFrame(right_content, text="Last Captured")
         last_captured_frame.pack(fill=tk.X, padx=3, pady=3)
         
         self.last_captured_label = ttk.Label(last_captured_frame, text="No captures yet", 
-                                             wraplength=180, justify=tk.LEFT)
-        self.last_captured_label.pack(padx=3, pady=3)
+                                             wraplength=180, justify=tk.LEFT, anchor=tk.W,
+                                             font=mono_font)
+        self.last_captured_label.pack(fill=tk.X, padx=5, pady=3)
 
         # Scan guidance frame
         scan_frame = ttk.LabelFrame(right_content, text="Scanning")
@@ -676,7 +710,7 @@ class KonaScannerApp:
 
         self.scan_status_label = ttk.Label(scan_frame, text="Not scanning", wraplength=180,
                                             justify=tk.LEFT, anchor=tk.W)
-        self.scan_status_label.pack(fill=tk.X, padx=3, pady=3)
+        self.scan_status_label.pack(fill=tk.X, padx=5, pady=3)
 
         # Button row - Capture bottom-left, Skip bottom-right
         btn_row = ttk.Frame(scan_frame)
@@ -694,15 +728,17 @@ class KonaScannerApp:
         kona_frame = ttk.LabelFrame(right_content, text="Kona Status")
         kona_frame.pack(fill=tk.X, padx=3, pady=3)
         
-        self.kona_status_label = ttk.Label(kona_frame, text="Not connected", justify=tk.LEFT)
-        self.kona_status_label.pack(padx=3, pady=3)
+        self.kona_status_label = ttk.Label(kona_frame, text="Not connected", justify=tk.LEFT, 
+                                           anchor=tk.W, font=mono_font)
+        self.kona_status_label.pack(fill=tk.X, padx=5, pady=3)
         
         # Statistics frame
         stats_frame = ttk.LabelFrame(right_content, text="Stats")
         stats_frame.pack(fill=tk.X, padx=3, pady=3)
         
-        self.stats_label = ttk.Label(stats_frame, text="", justify=tk.LEFT)
-        self.stats_label.pack(padx=3, pady=3)
+        self.stats_label = ttk.Label(stats_frame, text="", justify=tk.LEFT, anchor=tk.W,
+                                     font=mono_font)
+        self.stats_label.pack(fill=tk.X, padx=5, pady=3)
         self._update_stats()
 
         # Bind keyboard shortcuts
