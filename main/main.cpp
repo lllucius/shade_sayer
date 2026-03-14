@@ -751,13 +751,20 @@ static void enter_serial_scan_mode(void)
                                 uint8_t scan_r, scan_g, scan_b;
                                 color_math_lab_to_rgb(result.scan_lab,
                                                       &scan_r, &scan_g, &scan_b);
-                                // Split into two printf calls to avoid mixing float and
-                                // integer format specifiers — ESP-IDF newlib hangs when
-                                // %.4f and %d are used in the same printf.
-                                printf("OK:LAB:%.4f,%.4f,%.4f",
-                                       result.scan_lab.l, result.scan_lab.a, result.scan_lab.b);
-                                printf(":RGB:%d,%d,%d\n",
-                                       (int)scan_r, (int)scan_g, (int)scan_b);
+                                // Format into a stack buffer with snprintf, then output
+                                // the finished string with puts.  Calling printf/fprintf
+                                // on stdout with float format specifiers (%.4f) causes
+                                // intermittent hangs on ESP-IDF newlib — snprintf to a
+                                // memory buffer is unaffected, and puts outputs a plain
+                                // string with no format-specifier processing.
+                                char scan_resp[96];  // max ~52 chars: "OK:LAB:-128.0000,..." + ":RGB:255,255,255"
+                                snprintf(scan_resp, sizeof(scan_resp),
+                                         "OK:LAB:%.4f,%.4f,%.4f:RGB:%d,%d,%d",
+                                         (double)result.scan_lab.l,
+                                         (double)result.scan_lab.a,
+                                         (double)result.scan_lab.b,
+                                         (int)scan_r, (int)scan_g, (int)scan_b);
+                                puts(scan_resp);
                                 fflush(stdout);
                                 
                                 s_last_result = result;
