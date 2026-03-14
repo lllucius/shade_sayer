@@ -38,7 +38,7 @@
  * These values must stay in sync with the production configuration in main/main.cpp.
  * When pipeline constants change, update both files together.
  */
-static bool init_pipeline()
+static bool initPipeline()
 {
     color_pipeline_config_t cfg{};
     cfg.min_luminance      = 5.0f;
@@ -61,7 +61,7 @@ static bool init_pipeline()
 
 int main()
 {
-    if (!init_pipeline())
+    if (!initPipeline())
     {
         std::fprintf(stderr, "kona_regenerate: color_pipeline_init() failed\n");
         return 1;
