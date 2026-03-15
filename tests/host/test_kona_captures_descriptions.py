@@ -53,9 +53,9 @@ class KonaCaptureDescriptionTests(unittest.TestCase):
             with self.subTest(name=swatch["name"]):
                 description = swatch["description"].lower()
                 for term in FORBIDDEN_TERMS:
-                    self.assertNotRegex(description, rf"\\b{re.escape(term)}\\b")
-                self.assertNotRegex(description, r"#[0-9a-f]{3,8}\\b")
-                self.assertNotRegex(description, r"\\b\\d{2,4}\\s*nm\\b")
+                    self.assertNotRegex(description, rf"\b{re.escape(term)}\b")
+                self.assertNotRegex(description, r"#[0-9a-f]{3,8}\b")
+                self.assertNotRegex(description, r"\b\d{2,4}\s*nm\b")
 
 
 if __name__ == "__main__":
