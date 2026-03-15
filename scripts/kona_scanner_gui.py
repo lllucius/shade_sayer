@@ -442,6 +442,9 @@ class KonaScannerApp:
         # Make mouse pointer black (standard arrow cursor)
         self.root.config(cursor="left_ptr black")
 
+        # Dark mode theme configuration
+        self._setup_dark_theme()
+
         # Main frame with paned window
         main_pane = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
         main_pane.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
@@ -579,7 +582,9 @@ class KonaScannerApp:
                                else None)
 
         # Right-click context menu for console (Select All + Copy)
-        self._console_menu = tk.Menu(self.console_text, tearoff=0)
+        self._console_menu = tk.Menu(self.console_text, tearoff=0,
+                                     bg="#2d2d2d", fg="#d4d4d4",
+                                     activebackground="#0078d4", activeforeground="#ffffff")
         self._console_menu.add_command(label="Select All    Ctrl+A",
                                        command=self._console_select_all)
         self._console_menu.add_command(label="Copy            Ctrl+C",
@@ -600,7 +605,7 @@ class KonaScannerApp:
         main_pane.add(right_frame, weight=1)
         
         # Create a canvas with scrollbar for the right panel content
-        right_canvas = tk.Canvas(right_frame, highlightthickness=0)
+        right_canvas = tk.Canvas(right_frame, highlightthickness=0, bg="#1e1e1e")
         right_scrollbar = ttk.Scrollbar(right_frame, orient=tk.VERTICAL, command=right_canvas.yview)
         right_content = ttk.Frame(right_canvas)
         
@@ -619,8 +624,8 @@ class KonaScannerApp:
         right_canvas.bind("<Configure>", configure_canvas_width)
 
         # Color sample canvas - smaller for compact display
-        self.color_canvas = tk.Canvas(right_content, width=120, height=120, bg="#808080",
-                                       highlightthickness=1, highlightbackground="black")
+        self.color_canvas = tk.Canvas(right_content, width=120, height=120, bg="#404040",
+                                       highlightthickness=1, highlightbackground="#555555")
         self.color_canvas.pack(pady=5)
 
         # Monospaced font for aligned values (size 11 for better readability)
@@ -757,6 +762,116 @@ class KonaScannerApp:
 
         # Bind keyboard shortcuts
         self._setup_keyboard_shortcuts()
+
+    def _setup_dark_theme(self):
+        """Configure the dark mode theme for the application."""
+        # Dark mode color palette
+        bg_dark = "#1e1e1e"       # Main background
+        bg_medium = "#2d2d2d"     # Slightly lighter background (for contrast)
+        bg_light = "#3c3c3c"      # Lighter elements (entry fields, etc.)
+        fg_main = "#d4d4d4"       # Main text color
+        fg_dim = "#808080"        # Dimmed text
+        accent = "#0078d4"        # Selection/accent color
+        accent_dark = "#005a9e"   # Darker accent for pressed states
+        border = "#555555"        # Border color
+
+        # Configure root window background
+        self.root.configure(bg=bg_dark)
+
+        # Create and configure ttk style
+        style = ttk.Style()
+
+        # Use 'clam' theme as a base - it provides more customization options
+        style.theme_use("clam")
+
+        # Configure main frame and widget backgrounds
+        style.configure(".", background=bg_dark, foreground=fg_main,
+                        fieldbackground=bg_light, troughcolor=bg_medium,
+                        bordercolor=border, lightcolor=bg_light, darkcolor=bg_dark)
+
+        # Frame style
+        style.configure("TFrame", background=bg_dark)
+
+        # LabelFrame style
+        style.configure("TLabelframe", background=bg_dark, foreground=fg_main,
+                        bordercolor=border)
+        style.configure("TLabelframe.Label", background=bg_dark, foreground=fg_main)
+
+        # Label style
+        style.configure("TLabel", background=bg_dark, foreground=fg_main)
+
+        # Button style
+        style.configure("TButton", background=bg_medium, foreground=fg_main,
+                        bordercolor=border, lightcolor=bg_light, darkcolor=bg_dark,
+                        focuscolor=accent)
+        style.map("TButton",
+                  background=[("active", bg_light), ("pressed", accent_dark),
+                              ("disabled", bg_dark)],
+                  foreground=[("disabled", fg_dim)])
+
+        # Entry style
+        style.configure("TEntry", fieldbackground=bg_light, foreground=fg_main,
+                        insertcolor=fg_main, bordercolor=border,
+                        lightcolor=border, darkcolor=border)
+        style.map("TEntry",
+                  fieldbackground=[("readonly", bg_medium), ("disabled", bg_dark)],
+                  foreground=[("readonly", fg_main), ("disabled", fg_dim)])
+
+        # Combobox style
+        style.configure("TCombobox", fieldbackground=bg_light, foreground=fg_main,
+                        background=bg_medium, arrowcolor=fg_main,
+                        bordercolor=border)
+        style.map("TCombobox",
+                  fieldbackground=[("readonly", bg_light)],
+                  background=[("active", bg_light)])
+
+        # Radiobutton style
+        style.configure("TRadiobutton", background=bg_dark, foreground=fg_main,
+                        indicatorcolor=bg_light)
+        style.map("TRadiobutton",
+                  background=[("active", bg_medium)],
+                  indicatorcolor=[("selected", accent)])
+
+        # Checkbutton style
+        style.configure("TCheckbutton", background=bg_dark, foreground=fg_main,
+                        indicatorcolor=bg_light)
+        style.map("TCheckbutton",
+                  background=[("active", bg_medium)],
+                  indicatorcolor=[("selected", accent)])
+
+        # Scrollbar style
+        style.configure("TScrollbar", background=bg_medium, troughcolor=bg_dark,
+                        bordercolor=bg_dark, arrowcolor=fg_main,
+                        lightcolor=bg_medium, darkcolor=bg_medium)
+        style.map("TScrollbar",
+                  background=[("active", bg_light), ("pressed", bg_light)])
+
+        # PanedWindow style
+        style.configure("TPanedwindow", background=bg_dark)
+        style.configure("Sash", background=border, sashthickness=4)
+
+        # Separator style
+        style.configure("TSeparator", background=border)
+
+        # Treeview style - dark theme for the swatch list
+        style.configure("Treeview",
+                        background=bg_medium,
+                        foreground=fg_main,
+                        fieldbackground=bg_medium,
+                        bordercolor=border,
+                        lightcolor=bg_medium,
+                        darkcolor=bg_medium)
+        style.configure("Treeview.Heading",
+                        background=bg_light,
+                        foreground=fg_main,
+                        bordercolor=border,
+                        lightcolor=bg_light,
+                        darkcolor=bg_light)
+        style.map("Treeview",
+                  background=[("selected", accent)],
+                  foreground=[("selected", "#ffffff")])
+        style.map("Treeview.Heading",
+                  background=[("active", "#4a4a4a")])
 
     def _setup_keyboard_shortcuts(self):
         """Set up keyboard shortcuts for the application."""
@@ -1335,13 +1450,13 @@ class KonaScannerApp:
             for key in ["L*", "a*", "b*", "R", "G", "B", "Hex"]:
                 self.info_entries[key].set("-")
             if update_canvas:
-                self.color_canvas.config(bg="#808080")
+                self.color_canvas.config(bg="#404040")
 
     def _clear_color_info(self):
         """Clear color information display."""
         for var in self.info_entries.values():
             var.set("-")
-        self.color_canvas.config(bg="#808080")
+        self.color_canvas.config(bg="#404040")
 
     def _on_connect(self):
         """Handle connect button click."""
