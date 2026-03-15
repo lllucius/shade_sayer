@@ -8247,25 +8247,25 @@
       "panel_index": 1,
       "id": 449,
       "name": "SUNNY",
-      "measured": false,
+      "measured": true,
       "raw": {
-        "x": null,
-        "y": null,
-        "z": null,
-        "ir": null,
-        "clear": null,
-        "gain": null,
-        "integration_ms": null
+        "x": 15762688,
+        "y": 17017344,
+        "z": 1974784,
+        "ir": 441600,
+        "clear": 10134272,
+        "gain": 4,
+        "integration_ms": 100
       },
       "lab": {
-        "l": null,
-        "a": null,
-        "b": null
+        "l": 98.5,
+        "a": 16.8891,
+        "b": 172.3925
       },
       "rgb": {
-        "r": null,
-        "g": null,
-        "b": null
+        "r": 255,
+        "g": 234,
+        "b": 0
       },
       "notes": ""
     },
@@ -8274,25 +8274,25 @@
       "panel_index": 2,
       "id": 149,
       "name": "PAPAYA",
-      "measured": false,
+      "measured": true,
       "raw": {
-        "x": null,
-        "y": null,
-        "z": null,
-        "ir": null,
-        "clear": null,
-        "gain": null,
-        "integration_ms": null
+        "x": 14855169,
+        "y": 15561728,
+        "z": 1538560,
+        "ir": 432128,
+        "clear": 9383936,
+        "gain": 4,
+        "integration_ms": 100
       },
       "lab": {
-        "l": null,
-        "a": null,
-        "b": null
+        "l": 98.5,
+        "a": 24.3703,
+        "b": 172.3903
       },
       "rgb": {
-        "r": null,
-        "g": null,
-        "b": null
+        "r": 255,
+        "g": 229,
+        "b": 0
       },
       "notes": ""
     },
@@ -8301,25 +8301,25 @@
       "panel_index": 3,
       "id": 1849,
       "name": "NACHO CHEESE",
-      "measured": false,
+      "measured": true,
       "raw": {
-        "x": null,
-        "y": null,
-        "z": null,
-        "ir": null,
-        "clear": null,
-        "gain": null,
-        "integration_ms": null
+        "x": 13700608,
+        "y": 13778176,
+        "z": 2368768,
+        "ir": 420352,
+        "clear": 8864768,
+        "gain": 4,
+        "integration_ms": 100
       },
       "lab": {
-        "l": null,
-        "a": null,
-        "b": null
+        "l": 98.5,
+        "a": 30.0766,
+        "b": 172.3873
       },
       "rgb": {
-        "r": null,
-        "g": null,
-        "b": null
+        "r": 255,
+        "g": 224,
+        "b": 0
       },
       "notes": ""
     },
@@ -8328,25 +8328,25 @@
       "panel_index": 4,
       "id": 1482,
       "name": "SCHOOL BUS",
-      "measured": false,
+      "measured": true,
       "raw": {
-        "x": null,
-        "y": null,
-        "z": null,
-        "ir": null,
-        "clear": null,
-        "gain": null,
-        "integration_ms": null
+        "x": 13342721,
+        "y": 12855552,
+        "z": 2003968,
+        "ir": 405248,
+        "clear": 8170240,
+        "gain": 4,
+        "integration_ms": 100
       },
       "lab": {
-        "l": null,
-        "a": null,
-        "b": null
+        "l": 98.5,
+        "a": 40.7042,
+        "b": 172.3851
       },
       "rgb": {
-        "r": null,
-        "g": null,
-        "b": null
+        "r": 255,
+        "g": 215,
+        "b": 0
       },
       "notes": ""
     },
@@ -8355,25 +8355,25 @@
       "panel_index": 5,
       "id": 1320,
       "name": "SAFFRON",
-      "measured": false,
+      "measured": true,
       "raw": {
-        "x": null,
-        "y": null,
-        "z": null,
-        "ir": null,
-        "clear": null,
-        "gain": null,
-        "integration_ms": null
+        "x": 11161345,
+        "y": 10712064,
+        "z": 1794816,
+        "ir": 400640,
+        "clear": 7307776,
+        "gain": 4,
+        "integration_ms": 100
       },
       "lab": {
-        "l": null,
-        "a": null,
-        "b": null
+        "l": 98.5,
+        "a": 41.0492,
+        "b": 172.3793
       },
       "rgb": {
-        "r": null,
-        "g": null,
-        "b": null
+        "r": 255,
+        "g": 215,
+        "b": 0
       },
       "notes": ""
     },

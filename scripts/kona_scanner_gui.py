@@ -552,7 +552,7 @@ class KonaScannerApp:
         console_frame = ttk.LabelFrame(left_pane, text="Console")
         # Use wrap=NONE with horizontal scrollbar so lines don't wrap
         self.console_text = tk.Text(console_frame, height=8, wrap=tk.NONE, state=tk.DISABLED,
-                                    font=("Courier", 11), bg="#1e1e1e", fg="#d4d4d4",
+                                    font=("Courier", 14), bg="#1e1e1e", fg="#d4d4d4",
                                     insertbackground="#d4d4d4")
         console_vsb = ttk.Scrollbar(console_frame, orient=tk.VERTICAL,
                                     command=self.console_text.yview)
@@ -640,25 +640,26 @@ class KonaScannerApp:
         # Row 3: Hex (spanning)
         lab_rgb_pairs = [("L*", "R"), ("a*", "G"), ("b*", "B")]
         for row_idx, (lab_label, rgb_label) in enumerate(lab_rgb_pairs):
-            # LAB label - left justified
-            ttk.Label(info_frame, text=f"{lab_label}:", font=label_font, anchor=tk.W).grid(
-                row=row_idx, column=0, sticky=tk.W, padx=(5, 2), pady=1)
-            # LAB value - readonly entry with monospace font
-            lab_var = tk.StringVar(value="-")
-            lab_entry = ttk.Entry(info_frame, textvariable=lab_var, width=10, state="readonly",
-                                  font=mono_font, justify=tk.RIGHT)
-            lab_entry.grid(row=row_idx, column=1, sticky=tk.W, padx=(0, 10), pady=1)
-            self.info_entries[lab_label] = lab_var
-
             # RGB label - left justified
             ttk.Label(info_frame, text=f"{rgb_label}:", font=label_font, anchor=tk.W).grid(
-                row=row_idx, column=2, sticky=tk.W, padx=(5, 2), pady=1)
+                row=row_idx, column=0, sticky=tk.W, padx=(5, 2), pady=1)
             # RGB value - readonly entry with monospace font
             rgb_var = tk.StringVar(value="-")
             rgb_entry = ttk.Entry(info_frame, textvariable=rgb_var, width=5, state="readonly",
                                   font=mono_font, justify=tk.RIGHT)
-            rgb_entry.grid(row=row_idx, column=3, sticky=tk.W, pady=1)
+            rgb_entry.grid(row=row_idx, column=1, sticky=tk.W, pady=1)
             self.info_entries[rgb_label] = rgb_var
+
+            # LAB label - left justified
+            ttk.Label(info_frame, text=f"{lab_label}:", font=label_font, anchor=tk.W).grid(
+                row=row_idx, column=2, sticky=tk.W, padx=(5, 2), pady=1)
+            # LAB value - readonly entry with monospace font
+            lab_var = tk.StringVar(value="-")
+            lab_entry = ttk.Entry(info_frame, textvariable=lab_var, width=10, state="readonly",
+                                  font=mono_font, justify=tk.RIGHT)
+            lab_entry.grid(row=row_idx, column=3, sticky=tk.W, padx=(0, 10), pady=1)
+            self.info_entries[lab_label] = lab_var
+
 
         # Hex row at bottom - spans columns
         ttk.Label(info_frame, text="Hex:", font=label_font, anchor=tk.W).grid(
