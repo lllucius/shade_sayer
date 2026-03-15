@@ -73,8 +73,6 @@
 #include "i2c_bus_manager.h"
 #include "hardware_pins.h"
 #include "console_logger.h"
-#include "kona_metadata.h"
-#include "konaref.h"
 
 static const char* TAG = "main";
 
@@ -102,17 +100,6 @@ static const char* TAG = "main";
 // Serial scan mode button debounce (ms)
 #define SERIAL_MODE_BUTTON_DEBOUNCE_MS  50
 
-// Kona swatch scanning
-#define KONA_SWATCH_TOTAL            365
-#define KONA_SWATCH_ID_BUFFER_SIZE   24
-#define KONA_SWATCH_NAME_BUFFER_SIZE 48
-
-#if CONFIG_KONA_SCAN_STRIDE < 1
-#define KONA_SCAN_STRIDE 1
-#else
-#define KONA_SCAN_STRIDE CONFIG_KONA_SCAN_STRIDE
-#endif
-
 // Global handles
 static TCS3530* s_sensor = nullptr;
 
@@ -131,29 +118,6 @@ static bool s_has_last_result = false;
 // Persists across multiple RAWDATA queries until the next SCAN.
 static color_capture_stats_t s_last_scan_stats = {};
 static bool s_has_last_scan_stats = false;
-
-// Next swatch index for Kona scan workflow
-static uint16_t s_kona_scan_index = 0;
-static bool s_kona_scan_active = false;
-
-static void speak_kona_swatch_prompt(uint16_t index)
-{
-    if (index >= KONA_SWATCH_METADATA_COUNT)
-    {
-        ESP_LOGW(TAG, "Kona metadata index out of range: %u", index);
-        return;
-    }
-
-    const kona_swatch_info_t& info = KONA_SWATCH_METADATA[index];
-    tts_speak("Capture swatch %d of %d. Panel %s, index %d, ID %d, name %s. Sampling every %d. Press button to capture, or double click to cancel.",
-              index + 1,
-              KONA_SWATCH_TOTAL,
-              info.panel,
-              info.panel_index,
-              info.id,
-              info.name,
-              KONA_SCAN_STRIDE);
-}
 
 /**
  * @brief Announce battery level and estimated time to full
@@ -514,81 +478,6 @@ static void perform_measurement(void)
     }
 
     ESP_LOGI(TAG, "Measurement complete");
-}
-
-/**
- * @brief Capture one Kona swatch record and emit KONA_SCAN_CSV log row.
- */
-static void capture_kona_swatch(void)
-{
-    if (!s_sensor)
-    {
-        ESP_LOGE(TAG, "Sensor not initialized for Kona scan");
-        tts_speak("Sensor not ready");
-        return;
-    }
-
-    if (s_kona_scan_index >= KONA_SWATCH_TOTAL || s_kona_scan_index >= KONA_SWATCH_METADATA_COUNT)
-    {
-        ESP_LOGI(TAG, "Kona scan sequence complete (%u swatches)", KONA_SWATCH_TOTAL);
-        tts_speak("Kona scan is complete");
-        s_kona_scan_active = false;
-        return;
-    }
-
-    const uint16_t swatch_number = static_cast<uint16_t>(s_kona_scan_index + 1);
-    const kona_swatch_info_t& info = KONA_SWATCH_METADATA[s_kona_scan_index];
-
-    char swatch_id[KONA_SWATCH_ID_BUFFER_SIZE] = {0};
-    char swatch_name[KONA_SWATCH_NAME_BUFFER_SIZE] = {0};
-    snprintf(swatch_id, sizeof(swatch_id), "idx_%03u", swatch_number);
-    snprintf(swatch_name, sizeof(swatch_name), "%s", info.name);
-
-    ESP_LOGI(TAG, "Kona scan capture %u/%u (%s, panel=%s panel_index=%u id=%u name=%s)",
-             swatch_number, KONA_SWATCH_TOTAL, swatch_id, info.panel, info.panel_index, info.id, info.name);
-
-    // Turn on LED for measurement (required for accurate color capture)
-    s_sensor->setLed(true);
-
-    color_result_t scan_result = {};
-    esp_err_t ret = color_pipeline_capture_csv(s_sensor,
-                                               true,
-                                               swatch_id,
-                                               swatch_name,
-                                               &scan_result);
-
-    // Turn off LED after measurement
-    s_sensor->setLed(false);
-
-    if (ret != ESP_OK)
-    {
-        ESP_LOGE(TAG, "Kona scan capture failed: %s", esp_err_to_name(ret));
-        if (ret == ESP_ERR_INVALID_STATE)
-        {
-            tts_speak("Scan failed, retry");
-        }
-        else
-        {
-            tts_speak("Scan failed");
-        }
-        return;
-    }
-
-    s_last_result = scan_result;
-    s_has_last_result = true;
-
-    s_kona_scan_index = static_cast<uint16_t>(s_kona_scan_index + KONA_SCAN_STRIDE);
-    tts_speak("Captured %s, ID %d", info.name, info.id);
-
-    if (s_kona_scan_index < KONA_SWATCH_TOTAL && s_kona_scan_index < KONA_SWATCH_METADATA_COUNT)
-    {
-        speak_kona_swatch_prompt(s_kona_scan_index);
-    }
-    else
-    {
-        tts_speak("All swatches captured");
-        s_kona_scan_active = false;
-    }
 }
 
 /**
@@ -1078,16 +967,8 @@ extern "C" void app_main(void)
             switch (event)
             {
             case UI_EVENT_BUTTON_PRESS:
-                if (s_kona_scan_active)
-                {
-                    ESP_LOGI(TAG, "Button press while Kona scan active - capture swatch");
-                    capture_kona_swatch();
-                }
-                else
-                {
-                    ESP_LOGI(TAG, "Button pressed - taking measurement");
-                    perform_measurement();
-                }
+                ESP_LOGI(TAG, "Button pressed - taking measurement");
+                perform_measurement();
                 break;
 
             case UI_EVENT_BUTTON_LONG_PRESS:
@@ -1096,17 +977,8 @@ extern "C" void app_main(void)
                 break;
 
             case UI_EVENT_BUTTON_DOUBLE:
-                if (s_kona_scan_active)
-                {
-                    ESP_LOGI(TAG, "Double press - canceling Kona scan");
-                    s_kona_scan_active = false;
-                    tts_speak("Kona scan canceled");
-                }
-                else
-                {
-                    ESP_LOGI(TAG, "Double press - speaking color description");
-                    speak_color_description();
-                }
+                ESP_LOGI(TAG, "Double press - speaking color description");
+                speak_color_description();
                 break;
 
             case UI_EVENT_BUTTON_TRIPLE:
@@ -1118,34 +990,11 @@ extern "C" void app_main(void)
                 if (!power_is_usb_connected())
                 {
                     ESP_LOGI(TAG, "Quad press ignored (not on USB power)");
-                    tts_speak("Kona scan requires USB power");
-                    break;
-                }
-
-                if (!s_kona_scan_active)
-                {
-                    ESP_LOGI(TAG, "Quad press on USB power - start Kona scan session");
-                    s_kona_scan_active = true;
-                    s_kona_scan_index = 0;
-                    tts_speak("Starting Kona swatch scan, every %d", KONA_SCAN_STRIDE);
-                    speak_kona_swatch_prompt(s_kona_scan_index);
-                }
-                else
-                {
-                    ESP_LOGI(TAG, "Quad press ignored, Kona scan already active");
-                    tts_speak("Kona scan already active");
-                }
-                break;
-
-            case UI_EVENT_BUTTON_QUINT:
-                if (!power_is_usb_connected())
-                {
-                    ESP_LOGI(TAG, "Quint press ignored (not on USB power)");
                     tts_speak("Serial mode requires USB power");
                     break;
                 }
 
-                ESP_LOGI(TAG, "Quint press on USB power - enter serial scan mode");
+                ESP_LOGI(TAG, "Quad press on USB power - enter serial scan mode");
                 enter_serial_scan_mode();
                 break;
 
