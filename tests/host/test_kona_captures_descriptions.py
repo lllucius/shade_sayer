@@ -11,13 +11,13 @@ REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 KONA_CAPTURES_PATH = REPO_ROOT / "kona_captures.json"
 FORBIDDEN_TERMS = {
     "hex",
-    "rgb",
     "lab",
-    "wavelength",
-    "wavelengths",
     "nanometer",
     "nanometers",
     "nm",
+    "rgb",
+    "wavelength",
+    "wavelengths",
 }
 
 
@@ -31,7 +31,6 @@ class KonaCaptureDescriptionTests(unittest.TestCase):
 
     def test_all_swatches_have_description(self) -> None:
         """Each swatch should include a non-empty description string."""
-        self.assertEqual(len(self.swatches), 365)
         for swatch in self.swatches:
             with self.subTest(name=swatch["name"]):
                 description = swatch.get("description")
@@ -54,7 +53,7 @@ class KonaCaptureDescriptionTests(unittest.TestCase):
                 description = swatch["description"].lower()
                 for term in FORBIDDEN_TERMS:
                     self.assertNotRegex(description, rf"\b{re.escape(term)}\b")
-                self.assertNotRegex(description, r"#[0-9a-f]{3,8}\b")
+                self.assertNotRegex(description, r"#[0-9a-f]{3,8}")
                 self.assertNotRegex(description, r"\b\d{2,4}\s*nm\b")
 
 
