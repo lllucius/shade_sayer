@@ -1452,6 +1452,7 @@ class KonaScannerApp:
                 result = self.serial.scan()
                 if not result:
                     self._log_console(f"Scan failed for {swatch.name} (attempt {attempt})")
+                    time.sleep(0.5)  # Brief delay before retry
                     continue
 
                 L, a, b, R, G, B, raw_x, raw_y, raw_z, raw_ir, raw_clear, raw_gain, raw_int_ms = result
@@ -1484,6 +1485,7 @@ class KonaScannerApp:
                 verify_result = self.serial.scan()
                 if not verify_result:
                     self._log_console(f"Verification scan failed for {swatch.name} (attempt {attempt})")
+                    time.sleep(0.5)  # Brief delay before retry
                     continue
 
                 v_L, v_a, v_b, *_ = verify_result
@@ -1503,6 +1505,8 @@ class KonaScannerApp:
                         f"  ΔE={delta_e:.4f} ≥ 1.0 — not excellent, retrying..."
                         if attempt < MAX_VERIFY_ATTEMPTS
                         else f"  ΔE={delta_e:.4f} ≥ 1.0 — not excellent after {MAX_VERIFY_ATTEMPTS} attempts")
+                    if attempt < MAX_VERIFY_ATTEMPTS:
+                        time.sleep(0.5)  # Brief delay before retry
 
             if not verified:
                 msg = (f"Could not obtain an excellent match for {swatch.name} "
