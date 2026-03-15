@@ -814,7 +814,6 @@ esp_err_t color_pipeline_identify_from_reading(const sensor_reading_t* reading,
         return ESP_ERR_INVALID_ARG;
     }
 
-    uint64_t start_time = tcs_time_us();
     memset(result, 0, sizeof(color_result_t));
 
     xyz_t corrected_xyz;
@@ -926,7 +925,6 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
         return ESP_ERR_INVALID_ARG;
     }
 
-    uint64_t start_time = tcs_time_us();
     memset(result, 0, sizeof(color_result_t));
 
     bool led_enabled = false;
