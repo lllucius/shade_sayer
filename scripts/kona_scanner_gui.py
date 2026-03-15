@@ -440,7 +440,7 @@ class KonaScannerApp:
                 screen_height = self.root.winfo_screenheight()
                 self.root.geometry(f"{screen_width}x{screen_height}+0+0")
         # Make mouse pointer black (standard arrow cursor)
-        self.root.config(cursor="left_ptr black")
+        self.root.config(cursor="left_ptr red")
 
         # Dark mode theme configuration
         self._setup_dark_theme()
