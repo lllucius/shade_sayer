@@ -14,10 +14,7 @@ This directory contains Python scripts for generating and managing the xkcd colo
 python3 kona_scanner_gui.py
 
 # Specify serial port and data file
-python3 kona_scanner_gui.py --port /dev/ttyACM0 --csv ../kona_captures.json
-
-# Legacy CSV format still supported
-python3 kona_scanner_gui.py --port /dev/ttyACM0 --csv ../kona_cotton_solids_k001.csv
+python3 kona_scanner_gui.py --port /dev/ttyACM0 --data ../kona_captures.json
 ```
 
 **Features:**
@@ -27,7 +24,7 @@ python3 kona_scanner_gui.py --port /dev/ttyACM0 --csv ../kona_cotton_solids_k001
 - Bidirectional serial communication with device
 - Export to C++ header file for firmware use
 - Filter by panel, name, ID, or scan status
-- Save scan results in JSON (preferred) or CSV format
+- Save scan results to kona_captures.json
 
 **Device Setup:**
 1. Connect device via USB cable
@@ -43,25 +40,19 @@ python3 kona_scanner_gui.py --port /dev/ttyACM0 --csv ../kona_cotton_solids_k001
 ### generate_kona_table.py
 
 Generates a Kona table source file (default: `main/konaref_generated.cpp`) from
-`kona_captures.json` (preferred) or `kona_cotton_solids_k001.csv` (legacy).
+`kona_captures.json`.
 
 Also provides the shared `render_cpp`, `KonaEntry`, and `crc32_entries` helpers
 used by `kona_scanner_gui.py` to export C++ from the GUI.
 
 **Usage:**
 ```bash
-# JSON (preferred)
 python3 generate_kona_table.py --input ../kona_captures.json --output ../main/konaref_generated.cpp
-
-# Legacy CSV
-python3 generate_kona_table.py --input ../kona_cotton_solids_k001.csv --output ../main/konaref_generated.cpp
 ```
 
 **Features:**
-- Auto-detects format based on file extension (.json vs .csv)
-- For JSON: reads cached `lab` values from the `swatches` array
-- For CSV: reads `L`, `a`, `b` columns from the CSV
-- Only includes rows/entries where `measured=true` and all Lab values are present
+- Reads cached `lab` values from the `swatches` array in kona_captures.json
+- Only includes entries where `measured=true` and all Lab values are present
 - Deduplicates by `id` (last entry wins), sorted by numeric swatch id
 - Emits `kona_table_t kona_reference` with schema version, entry count, and CRC32
 - Caps table size to 365 entries for firmware flash layout compatibility

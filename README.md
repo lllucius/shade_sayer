@@ -165,17 +165,17 @@ tcs/
 │   ├── import_xkcd_colors.py      # Import xkcd color CSV
 │   ├── generate_color_database.py # Generate color_database.cpp
 │   ├── generate_vptree.py         # Generate vptree_data.h
-│   └── generate_kona_table.py     # Generate Kona table source from kona_cotton_solids_k001.csv
+│   └── generate_kona_table.py     # Generate Kona table source from kona_captures.json
 └── TCS3530_DS.txt          # Sensor datasheet extract
 ```
 
 ### Kona scan reference table flow
 
 ```bash
-# Option 1: Generate directly from kona_cotton_solids_k001.csv (requires measured=true rows)
-python3 scripts/generate_kona_table.py --input kona_cotton_solids_k001.csv --output main/konaref_generated.cpp
+# Generate from kona_captures.json (requires measured=true entries with Lab values)
+python3 scripts/generate_kona_table.py --input kona_captures.json --output main/konaref_generated.cpp
 
-# Option 2: Use the GUI to scan swatches and export
+# Or use the GUI to scan swatches and save/export
 python3 scripts/kona_scanner_gui.py
 ```
 

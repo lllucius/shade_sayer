@@ -9,15 +9,14 @@ Features:
 - Display all 365 Kona swatches in a sortable list
 - Show color sample and Lab/RGB info for selected swatches
 - Support single or multi-swatch scanning via EXTENDED selection
-- Maintain scanned values in JSON (preferred) or CSV file
+- Maintain scanned values in kona_captures.json
 - Export to C++ header file for firmware use
 
 Usage:
-    python3 kona_scanner_gui.py [--port /dev/ttyACM0] [--csv kona_captures.json] [--debug]
+    python3 kona_scanner_gui.py [--port /dev/ttyACM0] [--data kona_captures.json] [--debug]
 """
 
 import argparse
-import csv
 import colorsys
 import dataclasses
 import datetime as dt
@@ -26,15 +25,12 @@ import math
 import os
 import pathlib
 import platform
-import struct
 import sys
 import threading
 import time
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 from typing import Dict, List, Optional, Tuple
-import zlib
-
 try:
     import serial
     HAS_SERIAL = True
@@ -46,13 +42,6 @@ except ImportError:
 _SCRIPTS_DIR = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(_SCRIPTS_DIR))
 from generate_kona_table import KonaEntry, MAX_ENTRIES, render_cpp  # noqa: E402
-
-# Schema version must match firmware konaref.h
-SCHEMA_VERSION = 1
-
-# Expected size of kona_ref_t struct in bytes (must match firmware)
-# Layout: uint16_t kona_id (2) + padding (2) + 3 floats (12) = 16 bytes
-KONA_REF_T_SIZE = 16
 
 # Serial communication constants
 DEVICE_READY_DELAY_S = 0.5  # Time to wait for device initialization after connecting
@@ -244,12 +233,21 @@ def ciede2000(lab1: Tuple[float, float, float], lab2: Tuple[float, float, float]
 class SerialConnection:
     """Manages serial communication with the shade_sayer device."""
 
-    def __init__(self, port: str = "/dev/ttyACM0", baudrate: int = 115200, debug: bool = False):
+    def __init__(self, port: str = "/dev/ttyACM0", baudrate: int = 115200, debug: bool = False,
+                 log_callback=None):
         self.port = port
         self.baudrate = baudrate
         self.debug = debug
         self.serial: Optional[serial.Serial] = None
         self._lock = threading.Lock()
+        self._log_callback = log_callback
+
+    def _log(self, msg: str):
+        """Log a message via the callback (GUI console) or stdout."""
+        if self._log_callback:
+            self._log_callback(msg)
+        else:
+            print(msg)
 
     def connect(self) -> bool:
         """Establish serial connection."""
@@ -270,7 +268,7 @@ class SerialConnection:
                 self.serial.reset_output_buffer()
             return True
         except serial.SerialException as e:
-            print(f"Serial connection error: {e}", file=sys.stderr)
+            self._log(f"Serial connection error: {e}")
             return False
 
     def disconnect(self):
@@ -292,7 +290,7 @@ class SerialConnection:
         """Send a command and wait for response.
         
         Returns the response line or None on error/timeout.
-        When debug mode is enabled, prints all TX/RX communication.
+        All TX/RX communication is logged to the console output area.
         """
         if not self.is_connected():
             return None
@@ -303,8 +301,7 @@ class SerialConnection:
                 self.serial.reset_input_buffer()
                 
                 # Send command with newline
-                if self.debug:
-                    print(f"TX: {cmd}")
+                self._log(f"TX: {cmd}")
                 self.serial.write((cmd + "\n").encode("utf-8"))
                 self.serial.flush()
 
@@ -313,18 +310,16 @@ class SerialConnection:
                 while time.time() - start_time < timeout:
                     if self.serial.in_waiting > 0:
                         line = self.serial.readline().decode("utf-8", errors="replace").strip()
-                        if self.debug:
-                            print(f"RX: {line}")
+                        self._log(f"RX: {line}")
                         if line.startswith("OK:") or line.startswith("ERR:"):
                             return line
                         # Continue reading - device may send log lines before response
                     time.sleep(0.05)
 
-                if self.debug:
-                    print(f"RX: (timeout after {timeout}s)")
+                self._log(f"RX: (timeout after {timeout}s)")
                 return None  # Timeout
             except serial.SerialException as e:
-                print(f"Serial error: {e}", file=sys.stderr)
+                self._log(f"Serial error: {e}")
                 return None
 
     def ping(self) -> bool:
@@ -332,10 +327,15 @@ class SerialConnection:
         response = self.send_command("PING", timeout=2.0)
         return response == "OK:PONG"
 
-    def scan(self) -> Optional[Tuple[float, float, float, int, int, int]]:
-        """Request a scan and return Lab and RGB values.
-        
-        Returns tuple (L, a, b, R, G, B) or None on error.
+    def scan(self) -> Optional[Tuple]:
+        """Request a scan and return Lab, RGB, and raw sensor values.
+
+        Sends SCAN to get Lab+RGB, then RAWDATA to retrieve the raw ADC counts
+        from the same measurement for pipeline replay.
+
+        Returns tuple (L, a, b, R, G, B, raw_x, raw_y, raw_z, raw_ir, raw_clear,
+        raw_gain, raw_integration_ms) or None on error.
+        raw_* values are None when RAWDATA is unavailable or returns an error.
         """
         response = self.send_command("SCAN", timeout=20.0)
         if response is None:
@@ -353,14 +353,36 @@ class SerialConnection:
                 R = int(rgb_parts[0])
                 G = int(rgb_parts[1])
                 B = int(rgb_parts[2])
-                if self.debug:
-                    print(f"Parsed scan result: L={L:.4f} a={a:.4f} b={b:.4f} RGB=({R},{G},{B})")
-                return (L, a, b, R, G, B)
             except (IndexError, ValueError) as e:
-                print(f"Parse error: {e}, response: {response}", file=sys.stderr)
+                self._log(f"Parse error: {e}, response: {response}")
                 return None
 
-        print(f"Scan error: {response}", file=sys.stderr)
+            # Retrieve raw ADC values from the just-completed scan via RAWDATA command.
+            # These values are used by regenerate_kona_lab.py to replay the measurement
+            # through the color pipeline after pipeline parameter changes.
+            raw_x = raw_y = raw_z = raw_ir = raw_clear = raw_gain = raw_int_ms = None
+            raw_resp = self.send_command("RAWDATA", timeout=2.0)
+            if raw_resp and raw_resp.startswith("OK:RAWDATA:"):
+                try:
+                    raw_parts = raw_resp[len("OK:RAWDATA:"):].split(",")
+                    raw_x     = int(raw_parts[0])
+                    raw_y     = int(raw_parts[1])
+                    raw_z     = int(raw_parts[2])
+                    raw_ir    = int(raw_parts[3])
+                    raw_clear = int(raw_parts[4])
+                    raw_gain  = int(raw_parts[5])
+                    raw_int_ms = int(raw_parts[6])
+                except (IndexError, ValueError) as e:
+                    self._log(f"RAWDATA parse error: {e}, response: {raw_resp}")
+
+            if self.debug:
+                self._log(f"Parsed scan: L={L:.4f} a={a:.4f} b={b:.4f} RGB=({R},{G},{B})"
+                          f" RAW=({raw_x},{raw_y},{raw_z},{raw_ir},{raw_clear},"
+                          f"gain={raw_gain},int={raw_int_ms}ms)")
+            return (L, a, b, R, G, B, raw_x, raw_y, raw_z, raw_ir, raw_clear,
+                    raw_gain, raw_int_ms)
+
+        self._log(f"Scan error: {response}")
         return None
 
     def exit_mode(self) -> bool:
@@ -368,115 +390,15 @@ class SerialConnection:
         response = self.send_command("EXIT", timeout=2.0)
         return response is not None and response.startswith("OK:")
 
-    def kona_status(self) -> Optional[dict]:
-        """Query Kona table status from device.
-        
-        Returns dict with keys: temp (bool), entries (int), builtin (bool)
-        or None on error.
-        """
-        response = self.send_command("KONA_STATUS", timeout=2.0)
-        if response and response.startswith("OK:KONA_STATUS:"):
-            try:
-                # Parse: OK:KONA_STATUS:temp=0,entries=5,builtin=1
-                parts = response.split(":")[2].split(",")
-                status = {}
-                for part in parts:
-                    key, value = part.split("=")
-                    if key == "entries":
-                        status[key] = int(value)
-                    else:
-                        status[key] = value == "1"
-                return status
-            except (IndexError, ValueError) as e:
-                print(f"Parse error for KONA_STATUS: {e}", file=sys.stderr)
-        return None
-
-    def kona_clear(self) -> bool:
-        """Clear temporary Kona table on device."""
-        response = self.send_command("KONA_CLEAR", timeout=2.0)
-        return response is not None and response.startswith("OK:KONA_CLEARED")
-
-    def kona_load(self, table_data: bytes) -> Tuple[bool, str]:
-        """Upload a temporary Kona table to the device.
-        
-        Args:
-            table_data: Binary kona_table_t struct data
-            
-        Returns:
-            Tuple of (success, message)
-        """
-        if not self.is_connected():
-            return (False, "Not connected")
-
-        with self._lock:
-            try:
-                # Clear input buffer
-                self.serial.reset_input_buffer()
-                
-                # Send load command with size
-                cmd = f"KONA_LOAD:{len(table_data)}\n"
-                if self.debug:
-                    print(f"TX: KONA_LOAD:{len(table_data)}")
-                self.serial.write(cmd.encode("utf-8"))
-                self.serial.flush()
-                
-                # Wait for READY response
-                start_time = time.time()
-                ready_received = False
-                while time.time() - start_time < 5.0:
-                    if self.serial.in_waiting > 0:
-                        line = self.serial.readline().decode("utf-8", errors="replace").strip()
-                        if self.debug:
-                            print(f"RX: {line}")
-                        if line.startswith("OK:KONA_LOAD:READY:"):
-                            ready_received = True
-                            break
-                        if line.startswith("ERR:"):
-                            return (False, line)
-                    time.sleep(0.05)
-                
-                if not ready_received:
-                    return (False, "Timeout waiting for READY")
-                
-                # Send binary data
-                if self.debug:
-                    print(f"TX: <binary data {len(table_data)} bytes>")
-                self.serial.write(table_data)
-                self.serial.flush()
-                
-                # Wait for result
-                start_time = time.time()
-                while time.time() - start_time < 10.0:
-                    if self.serial.in_waiting > 0:
-                        line = self.serial.readline().decode("utf-8", errors="replace").strip()
-                        if self.debug:
-                            print(f"RX: {line}")
-                        if line.startswith("OK:KONA_LOADED:"):
-                            # Parse entry count
-                            try:
-                                entries = int(line.split("=")[1])
-                                return (True, f"Loaded {entries} entries")
-                            except (IndexError, ValueError):
-                                return (True, "Loaded successfully")
-                        if line.startswith("ERR:"):
-                            return (False, line)
-                    time.sleep(0.05)
-                
-                return (False, "Timeout waiting for result")
-                
-            except serial.SerialException as e:
-                return (False, f"Serial error: {e}")
-
 
 class KonaScannerApp:
     """Main application class for Kona Swatch Scanner GUI."""
 
-    def __init__(self, root: tk.Tk, csv_path: str, serial_port: str, debug: bool = False):
+    def __init__(self, root: tk.Tk, data_path: str, serial_port: str, debug: bool = False):
         self.root = root
-        self.csv_path = pathlib.Path(csv_path)
+        self.data_path = pathlib.Path(data_path)
         self.serial_port = serial_port
         self.debug = debug
-        self.serial = SerialConnection(serial_port, debug=debug)
         self.swatches: Dict[int, SwatchData] = {}
         self.scan_queue: List[int] = []
         self.scanning = False
@@ -486,6 +408,9 @@ class KonaScannerApp:
         self._last_captured_color: Optional[str] = None  # Hex color of last captured swatch
 
         self._setup_ui()
+        # Create serial connection after UI setup so log callback can use console widget
+        self.serial = SerialConnection(serial_port, debug=debug,
+                                       log_callback=self._log_console)
         self._load_data()
         self._populate_treeview()
 
@@ -515,7 +440,7 @@ class KonaScannerApp:
                 screen_height = self.root.winfo_screenheight()
                 self.root.geometry(f"{screen_width}x{screen_height}+0+0")
         # Make mouse pointer black (standard arrow cursor)
-        self.root.config(cursor="arrow")
+        self.root.config(cursor="left_ptr black")
 
         # Main frame with paned window
         main_pane = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
@@ -546,8 +471,8 @@ class KonaScannerApp:
 
         ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=3)
 
-        self.save_csv_btn = ttk.Button(toolbar, text="Save", command=self._on_save_csv)
-        self.save_csv_btn.pack(side=tk.LEFT, padx=1)
+        self.save_btn = ttk.Button(toolbar, text="Save", command=self._on_save)
+        self.save_btn.pack(side=tk.LEFT, padx=1)
         self.export_cpp_btn = ttk.Button(toolbar, text="Export", command=self._on_export_cpp)
         self.export_cpp_btn.pack(side=tk.LEFT, padx=1)
 
@@ -558,9 +483,6 @@ class KonaScannerApp:
 
         ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=3)
 
-        # Kona table management buttons
-        self.upload_kona_btn = ttk.Button(toolbar, text="Upload", command=self._on_upload_kona)
-        self.upload_kona_btn.pack(side=tk.LEFT, padx=1)
         self.measure_btn = ttk.Button(toolbar, text="Measure", command=self._on_measure)
         self.measure_btn.pack(side=tk.LEFT, padx=1)
         
@@ -583,9 +505,12 @@ class KonaScannerApp:
         ttk.Radiobutton(filter_frame, text="Not Scanned", variable=self.show_var, value="not_scanned",
                        command=self._on_filter_change).pack(side=tk.LEFT)
 
+        # Vertical PanedWindow so the treeview and console are resizable
+        left_pane = ttk.PanedWindow(left_frame, orient=tk.VERTICAL)
+        left_pane.pack(fill=tk.BOTH, expand=True)
+
         # Treeview with scrollbars
-        tree_frame = ttk.Frame(left_frame)
-        tree_frame.pack(fill=tk.BOTH, expand=True)
+        tree_frame = ttk.Frame(left_pane)
 
         columns = ("panel", "index", "id", "name", "measured", "L", "a", "b")
         self.tree = ttk.Treeview(tree_frame, columns=columns, show="headings", selectmode="extended")
@@ -620,6 +545,50 @@ class KonaScannerApp:
         tree_frame.grid_columnconfigure(0, weight=1)
 
         self.tree.bind("<<TreeviewSelect>>", self._on_selection_change)
+
+        left_pane.add(tree_frame, weight=3)
+
+        # Console output area — shows serial TX/RX and measurement details
+        console_frame = ttk.LabelFrame(left_pane, text="Console")
+        # Use wrap=NONE with horizontal scrollbar so lines don't wrap
+        self.console_text = tk.Text(console_frame, height=8, wrap=tk.NONE, state=tk.DISABLED,
+                                    font=("Courier", 14), bg="#1e1e1e", fg="#d4d4d4",
+                                    insertbackground="#d4d4d4")
+        console_vsb = ttk.Scrollbar(console_frame, orient=tk.VERTICAL,
+                                    command=self.console_text.yview)
+        console_hsb = ttk.Scrollbar(console_frame, orient=tk.HORIZONTAL,
+                                    command=self.console_text.xview)
+        self.console_text.configure(yscrollcommand=console_vsb.set,
+                                    xscrollcommand=console_hsb.set)
+        self.console_text.grid(row=0, column=0, sticky="nsew")
+        console_vsb.grid(row=0, column=1, sticky="ns")
+        console_hsb.grid(row=1, column=0, sticky="ew")
+        console_frame.grid_rowconfigure(0, weight=1)
+        console_frame.grid_columnconfigure(0, weight=1)
+
+        # Allow mouse text selection even though the widget is DISABLED.
+        # Temporarily switch to NORMAL during mouse drag operations.
+        self.console_text.bind("<ButtonPress-1>", self._console_enable_select)
+        self.console_text.bind("<ButtonRelease-1>", self._console_disable_select)
+        self.console_text.bind("<B1-Motion>", self._console_enable_select)
+
+        # Prevent keyboard edits while still allowing Ctrl+A / Ctrl+C
+        self.console_text.bind("<Key>", lambda e: "break"
+                               if e.keysym not in ("c", "a")
+                               or not (e.state & 0x4)  # 0x4 = Control modifier
+                               else None)
+
+        # Right-click context menu for console (Select All + Copy)
+        self._console_menu = tk.Menu(self.console_text, tearoff=0)
+        self._console_menu.add_command(label="Select All    Ctrl+A",
+                                       command=self._console_select_all)
+        self._console_menu.add_command(label="Copy            Ctrl+C",
+                                       command=self._console_copy)
+        self.console_text.bind("<Button-3>", self._console_context_menu)
+        self.console_text.bind("<Control-a>", lambda e: self._console_select_all())
+        self.console_text.bind("<Control-c>", lambda e: self._console_copy())
+
+        left_pane.add(console_frame, weight=1)
 
         # Status bar
         self.progress_var = tk.StringVar(value="Ready")
@@ -658,72 +627,108 @@ class KonaScannerApp:
         mono_font = ("Courier", 11)
         label_font = ("TkDefaultFont", 10)
 
-        # Color info with LAB on left, RGB on right (read-only text boxes for copying)
+        # Color info display (read-only text boxes for copying)
         info_frame = ttk.LabelFrame(right_content, text="Selected Info")
         info_frame.pack(fill=tk.X, padx=3, pady=3)
 
         self.info_entries = {}
 
         # Use grid layout for aligned labels and values
-        # Row 0: L* and R
-        # Row 1: a* and G
-        # Row 2: b* and B
-        # Row 3: Hex (spanning)
-        lab_rgb_pairs = [("L*", "R"), ("a*", "G"), ("b*", "B")]
-        for row_idx, (lab_label, rgb_label) in enumerate(lab_rgb_pairs):
-            # LAB label - left justified
+        # Row 0: L*, a*, and b*
+        # Row 1: R, G, and B
+        # Row 2: Hex (spanning)
+        for col_idx, lab_label in enumerate(["L*", "a*", "b*"]):
             ttk.Label(info_frame, text=f"{lab_label}:", font=label_font, anchor=tk.W).grid(
-                row=row_idx, column=0, sticky=tk.W, padx=(5, 2), pady=1)
-            # LAB value - readonly entry with monospace font
+                row=0, column=col_idx * 2, sticky=tk.W, padx=(5, 2), pady=1)
             lab_var = tk.StringVar(value="-")
-            lab_entry = ttk.Entry(info_frame, textvariable=lab_var, width=10, state="readonly",
+            lab_entry = ttk.Entry(info_frame, textvariable=lab_var, width=8, state="readonly",
                                   font=mono_font, justify=tk.RIGHT)
-            lab_entry.grid(row=row_idx, column=1, sticky=tk.W, padx=(0, 10), pady=1)
+            lab_entry.grid(row=0, column=col_idx * 2 + 1, sticky=tk.W, padx=(0, 5), pady=1)
             self.info_entries[lab_label] = lab_var
 
-            # RGB label - left justified
+        for col_idx, rgb_label in enumerate(["R", "G", "B"]):
             ttk.Label(info_frame, text=f"{rgb_label}:", font=label_font, anchor=tk.W).grid(
-                row=row_idx, column=2, sticky=tk.W, padx=(5, 2), pady=1)
-            # RGB value - readonly entry with monospace font
+                row=1, column=col_idx * 2, sticky=tk.W, padx=(5, 2), pady=1)
             rgb_var = tk.StringVar(value="-")
             rgb_entry = ttk.Entry(info_frame, textvariable=rgb_var, width=5, state="readonly",
                                   font=mono_font, justify=tk.RIGHT)
-            rgb_entry.grid(row=row_idx, column=3, sticky=tk.W, pady=1)
+            rgb_entry.grid(row=1, column=col_idx * 2 + 1, sticky=tk.W, padx=(0, 5), pady=1)
             self.info_entries[rgb_label] = rgb_var
 
         # Hex row at bottom - spans columns
         ttk.Label(info_frame, text="Hex:", font=label_font, anchor=tk.W).grid(
-            row=3, column=0, sticky=tk.W, padx=(5, 2), pady=1)
+            row=2, column=0, sticky=tk.W, padx=(5, 2), pady=1)
         hex_var = tk.StringVar(value="-")
         hex_entry = ttk.Entry(info_frame, textvariable=hex_var, width=10, state="readonly",
                               font=mono_font, justify=tk.LEFT)
-        hex_entry.grid(row=3, column=1, sticky=tk.W, pady=1)
+        hex_entry.grid(row=2, column=1, columnspan=5, sticky=tk.W, pady=1)
         self.info_entries["Hex"] = hex_var
 
         # Configure column weights for proper resizing
-        info_frame.columnconfigure(1, weight=1)
-        info_frame.columnconfigure(3, weight=1)
+        for c in (1, 3, 5):
+            info_frame.columnconfigure(c, weight=1)
 
         # Last captured display - shows the most recently scanned swatch info
         last_captured_frame = ttk.LabelFrame(right_content, text="Last Captured")
         last_captured_frame.pack(fill=tk.X, padx=3, pady=3)
-        
-        self.last_captured_label = ttk.Label(last_captured_frame, text="No captures yet", 
-                                             wraplength=180, justify=tk.LEFT, anchor=tk.W,
-                                             font=mono_font)
-        self.last_captured_label.pack(fill=tk.X, padx=5, pady=3)
+
+        self.lc_vars = {}
+        # Row 0: Name (spanning)
+        # Row 1: L* value, RGB value
+        # Row 2: a* value, ΔE00 value
+        # Row 3: b* value
+        for field in ["Name", "L*", "a*", "b*", "RGB", "ΔE00"]:
+            self.lc_vars[field] = tk.StringVar(value="-")
+
+        # Row 0: Name
+        ttk.Label(last_captured_frame, text="Name:", font=label_font, anchor=tk.W).grid(
+            row=0, column=0, sticky=tk.W, padx=(5, 2), pady=1)
+        ttk.Label(last_captured_frame, textvariable=self.lc_vars["Name"], font=mono_font, anchor=tk.W).grid(
+            row=0, column=1, columnspan=3, sticky=tk.W, padx=(2, 5), pady=1)
+        # Row 1: L* and RGB
+        ttk.Label(last_captured_frame, text="L*:", font=label_font, anchor=tk.W).grid(
+            row=1, column=0, sticky=tk.W, padx=(5, 2), pady=1)
+        ttk.Label(last_captured_frame, textvariable=self.lc_vars["L*"], font=mono_font, anchor=tk.W).grid(
+            row=1, column=1, sticky=tk.W, padx=(2, 5), pady=1)
+        ttk.Label(last_captured_frame, text="RGB:", font=label_font, anchor=tk.W).grid(
+            row=1, column=2, sticky=tk.W, padx=(5, 2), pady=1)
+        ttk.Label(last_captured_frame, textvariable=self.lc_vars["RGB"], font=mono_font, anchor=tk.W).grid(
+            row=1, column=3, sticky=tk.W, padx=(2, 5), pady=1)
+        # Row 2: a* and ΔE00
+        ttk.Label(last_captured_frame, text="a*:", font=label_font, anchor=tk.W).grid(
+            row=2, column=0, sticky=tk.W, padx=(5, 2), pady=1)
+        ttk.Label(last_captured_frame, textvariable=self.lc_vars["a*"], font=mono_font, anchor=tk.W).grid(
+            row=2, column=1, sticky=tk.W, padx=(2, 5), pady=1)
+        ttk.Label(last_captured_frame, text="ΔE00:", font=label_font, anchor=tk.W).grid(
+            row=2, column=2, sticky=tk.W, padx=(5, 2), pady=1)
+        ttk.Label(last_captured_frame, textvariable=self.lc_vars["ΔE00"], font=mono_font, anchor=tk.W).grid(
+            row=2, column=3, sticky=tk.W, padx=(2, 5), pady=1)
+        # Row 3: b*
+        ttk.Label(last_captured_frame, text="b*:", font=label_font, anchor=tk.W).grid(
+            row=3, column=0, sticky=tk.W, padx=(5, 2), pady=1)
+        ttk.Label(last_captured_frame, textvariable=self.lc_vars["b*"], font=mono_font, anchor=tk.W).grid(
+            row=3, column=1, sticky=tk.W, padx=(2, 5), pady=1)
+        last_captured_frame.columnconfigure(1, weight=1)
+        last_captured_frame.columnconfigure(3, weight=1)
 
         # Scan guidance frame
         scan_frame = ttk.LabelFrame(right_content, text="Scanning")
         scan_frame.pack(fill=tk.X, padx=3, pady=3)
 
-        self.scan_status_label = ttk.Label(scan_frame, text="Not scanning", wraplength=180,
-                                            justify=tk.LEFT, anchor=tk.W)
-        self.scan_status_label.pack(fill=tk.X, padx=5, pady=3)
+        self.scan_vars = {}
+        scan_fields = ["Status", "Swatch", "Panel", "Remaining"]
+        for row_idx, field in enumerate(scan_fields):
+            ttk.Label(scan_frame, text=f"{field}:", font=label_font, anchor=tk.W).grid(
+                row=row_idx, column=0, sticky=tk.W, padx=(5, 2), pady=1)
+            var = tk.StringVar(value="-" if field != "Status" else "Not scanning")
+            ttk.Label(scan_frame, textvariable=var, font=mono_font, anchor=tk.W).grid(
+                row=row_idx, column=1, sticky=tk.W, padx=(2, 5), pady=1)
+            self.scan_vars[field] = var
 
-        # Button row - Capture bottom-left, Skip bottom-right
+        # Button row - Capture left, Skip right
         btn_row = ttk.Frame(scan_frame)
-        btn_row.pack(fill=tk.X, padx=3, pady=2)
+        btn_row.grid(row=len(scan_fields), column=0, columnspan=2, sticky=tk.EW, padx=3, pady=2)
+        scan_frame.columnconfigure(1, weight=1)
 
         self.scan_button = ttk.Button(btn_row, text="Capture", command=self._on_capture_current,
                                        state=tk.DISABLED)
@@ -732,22 +737,22 @@ class KonaScannerApp:
         self.skip_button = ttk.Button(btn_row, text="Skip", command=self._on_skip_current,
                                        state=tk.DISABLED)
         self.skip_button.pack(side=tk.RIGHT)
-        
-        # Kona table status frame
-        kona_frame = ttk.LabelFrame(right_content, text="Kona Status")
-        kona_frame.pack(fill=tk.X, padx=3, pady=3)
-        
-        self.kona_status_label = ttk.Label(kona_frame, text="Not connected", justify=tk.LEFT, 
-                                           anchor=tk.W, font=mono_font)
-        self.kona_status_label.pack(fill=tk.X, padx=5, pady=3)
-        
+
         # Statistics frame
         stats_frame = ttk.LabelFrame(right_content, text="Stats")
         stats_frame.pack(fill=tk.X, padx=3, pady=3)
-        
-        self.stats_label = ttk.Label(stats_frame, text="", justify=tk.LEFT, anchor=tk.W,
-                                     font=mono_font)
-        self.stats_label.pack(fill=tk.X, padx=5, pady=3)
+
+        self.stats_vars = {}
+        stats_fields = ["Total", "Scanned", "Remaining"]
+        for col_idx, field in enumerate(stats_fields):
+            ttk.Label(stats_frame, text=f"{field}:", font=label_font, anchor=tk.W).grid(
+                row=0, column=col_idx * 2, sticky=tk.W, padx=(5, 2), pady=1)
+            var = tk.StringVar(value="0")
+            ttk.Label(stats_frame, textvariable=var, font=mono_font, anchor=tk.W).grid(
+                row=0, column=col_idx * 2 + 1, sticky=tk.W, padx=(2, 5), pady=1)
+            self.stats_vars[field] = var
+        for c in (1, 3, 5):
+            stats_frame.columnconfigure(c, weight=1)
         self._update_stats()
 
         # Bind keyboard shortcuts
@@ -765,11 +770,10 @@ class KonaScannerApp:
         self.root.bind("<Alt-e>", lambda e: self._on_export_cpp())
         self.root.bind("<Alt-l>", lambda e: self._on_clear_scanned())
         self.root.bind("<Alt-k>", lambda e: self._on_skip_current())
-        self.root.bind("<Alt-u>", lambda e: self._on_upload_kona())
         self.root.bind("<Alt-m>", lambda e: self._on_measure())
         
-        # Ctrl+S for Save CSV
-        self.root.bind("<Control-s>", lambda e: self._on_save_csv())
+        # Ctrl+S for Save
+        self.root.bind("<Control-s>", lambda e: self._on_save())
         
         # Ctrl+A for Select All in treeview
         self.root.bind("<Control-a>", self._on_select_all)
@@ -814,6 +818,59 @@ class KonaScannerApp:
         # Shift+Home/End: Extend selection to first/last item
         self.tree.bind("<Shift-Home>", self._on_shift_home)
         self.tree.bind("<Shift-End>", self._on_shift_end)
+
+    def _log_console(self, msg: str):
+        """Append a message to the console output text area.
+
+        Thread-safe: schedules the update on the Tk main thread when called
+        from a background thread (e.g. serial I/O).  Automatically scrolls
+        to the latest line and caps the buffer at 2000 lines.
+        """
+        def _append():
+            self.console_text.configure(state=tk.NORMAL)
+            self.console_text.insert(tk.END, msg + "\n")
+            # Cap buffer at 2000 lines to avoid unbounded memory growth
+            line_count = int(self.console_text.index("end-1c").split(".")[0])
+            if line_count > 2000:
+                self.console_text.delete("1.0", f"{line_count - 2000}.0")
+            self.console_text.see(tk.END)
+            self.console_text.configure(state=tk.DISABLED)
+
+        # Schedule on the main thread if called from a background thread
+        try:
+            self.root.after_idle(_append)
+        except RuntimeError:
+            # Fallback if Tk mainloop has already exited
+            pass
+
+    def _console_select_all(self):
+        """Select all text in the console output area."""
+        self.console_text.configure(state=tk.NORMAL)
+        self.console_text.tag_add(tk.SEL, "1.0", tk.END)
+        self.console_text.configure(state=tk.DISABLED)
+        return "break"
+
+    def _console_copy(self):
+        """Copy selected text from the console to the clipboard."""
+        try:
+            sel = self.console_text.get(tk.SEL_FIRST, tk.SEL_LAST)
+            self.root.clipboard_clear()
+            self.root.clipboard_append(sel)
+        except tk.TclError:
+            pass  # No selection
+        return "break"
+
+    def _console_context_menu(self, event):
+        """Show right-click context menu on the console output area."""
+        self._console_menu.tk_popup(event.x_root, event.y_root)
+
+    def _console_enable_select(self, event=None):
+        """Temporarily enable the console text widget for mouse selection."""
+        self.console_text.configure(state=tk.NORMAL)
+
+    def _console_disable_select(self, event=None):
+        """Re-disable the console text widget after mouse selection."""
+        self.console_text.configure(state=tk.DISABLED)
 
     def _on_focus_filter(self, event=None):
         """Focus the filter entry field and select all text.
@@ -1007,74 +1064,23 @@ class KonaScannerApp:
         self._on_filter_change()
 
     def _load_data(self):
-        """Load swatch data from file, auto-detecting CSV or JSON format."""
-        if self.csv_path.suffix.lower() == ".json":
-            self._load_json()
-        else:
-            self._load_csv()
+        """Load swatch data from kona_captures.json."""
+        self._load_json()
 
     def _save_data(self) -> bool:
-        """Save swatch data to file, dispatching to JSON or CSV based on extension."""
-        if self.csv_path.suffix.lower() == ".json":
-            return self._save_json()
-        return self._save_csv()
-
-    def _load_csv(self):
-        """Load swatch data from CSV file."""
-        self.swatches.clear()
-
-        if not self.csv_path.exists():
-            print(f"CSV file not found: {self.csv_path}", file=sys.stderr)
-            return
-
-        try:
-            with self.csv_path.open(newline="", encoding="utf-8") as f:
-                reader = csv.DictReader(f)
-                for row in reader:
-                    try:
-                        swatch_id = int(row.get("id", 0))
-                        if swatch_id == 0:
-                            continue
-
-                        L = float(row["L"]) if row.get("L") else None
-                        a = float(row["a"]) if row.get("a") else None
-                        b = float(row["b"]) if row.get("b") else None
-                        R = int(row["R"]) if row.get("R") else None
-                        G = int(row["G"]) if row.get("G") else None
-                        B = int(row["B"]) if row.get("B") else None
-                        measured = row.get("measured", "").lower() == "true"
-
-                        self.swatches[swatch_id] = SwatchData(
-                            panel=row.get("panel", ""),
-                            panel_index=int(row.get("panel_index", 0)),
-                            id=swatch_id,
-                            name=row.get("name", ""),
-                            L=L,
-                            a=a,
-                            b=b,
-                            R=R,
-                            G=G,
-                            B=B,
-                            measured=measured,
-                            notes=row.get("notes", "")
-                        )
-                    except (ValueError, KeyError) as e:
-                        print(f"Skipping invalid row: {row} ({e})", file=sys.stderr)
-
-            print(f"Loaded {len(self.swatches)} swatches from {self.csv_path}")
-        except Exception as e:
-            print(f"Error loading CSV: {e}", file=sys.stderr)
+        """Save swatch data to kona_captures.json."""
+        return self._save_json()
 
     def _load_json(self):
         """Load swatch data from a kona_captures.json file."""
         self.swatches.clear()
 
-        if not self.csv_path.exists():
-            print(f"JSON file not found: {self.csv_path}", file=sys.stderr)
+        if not self.data_path.exists():
+            self._log_console(f"Data file not found: {self.data_path}")
             return
 
         try:
-            with self.csv_path.open(encoding="utf-8") as f:
+            with self.data_path.open(encoding="utf-8") as f:
                 data = json.load(f)
 
             for entry in data.get("swatches", []):
@@ -1125,59 +1131,12 @@ class KonaScannerApp:
                         raw_gain=raw_gain,
                         raw_integration_ms=raw_integration_ms,
                     )
-                except (ValueError, KeyError, TypeError) as e:
-                    print(f"Skipping invalid JSON swatch entry: {entry} ({e})", file=sys.stderr)
+                except (ValueError, KeyError, TypeError, AttributeError) as e:
+                    self._log_console(f"Skipping invalid JSON swatch entry: {entry} ({e})")
 
-            print(f"Loaded {len(self.swatches)} swatches from {self.csv_path}")
+            self._log_console(f"Loaded {len(self.swatches)} swatches from {self.data_path}")
         except Exception as e:
-            print(f"Error loading JSON: {e}", file=sys.stderr)
-
-    def _save_csv(self):
-        """Save swatch data to CSV file."""
-        try:
-            # Count measured swatches for verification
-            measured_count = sum(1 for s in self.swatches.values() if s.measured)
-            if self.debug:
-                print(f"Saving CSV: {len(self.swatches)} total swatches, {measured_count} measured")
-            
-            with self.csv_path.open("w", newline="", encoding="utf-8") as f:
-                writer = csv.writer(f)
-                writer.writerow(["panel", "panel_index", "id", "name", "L", "a", "b",
-                                "R", "G", "B", "measured", "notes"])
-
-                # Sort by panel, then panel_index
-                sorted_swatches = sorted(self.swatches.values(),
-                                        key=lambda s: (s.panel, s.panel_index))
-
-                for s in sorted_swatches:
-                    if self.debug and s.measured:
-                        L_str = f"{s.L:.4f}" if s.L is not None else "None"
-                        a_str = f"{s.a:.4f}" if s.a is not None else "None"
-                        b_str = f"{s.b:.4f}" if s.b is not None else "None"
-                        print(f"  Writing swatch[{s.id}] ({s.name}): "
-                              f"L={L_str} a={a_str} b={b_str}")
-                    writer.writerow([
-                        s.panel,
-                        s.panel_index,
-                        s.id,
-                        s.name,
-                        f"{s.L:.4f}" if s.L is not None else "",
-                        f"{s.a:.4f}" if s.a is not None else "",
-                        f"{s.b:.4f}" if s.b is not None else "",
-                        s.R if s.R is not None else "",
-                        s.G if s.G is not None else "",
-                        s.B if s.B is not None else "",
-                        "true" if s.measured else "false",
-                        s.notes
-                    ])
-
-            print(f"Saved {len(self.swatches)} swatches to {self.csv_path}")
-            self._unsaved_changes = False  # Clear unsaved changes flag
-            return True
-        except Exception as e:
-            print(f"Error saving CSV: {e}", file=sys.stderr)
-            messagebox.showerror("Error", f"Failed to save CSV: {e}")
-            return False
+            self._log_console(f"Error loading JSON: {e}")
 
     def _save_json(self) -> bool:
         """Save swatch data to a kona_captures.json file.
@@ -1190,18 +1149,18 @@ class KonaScannerApp:
         try:
             # Preserve existing top-level metadata if the file exists
             existing: dict = {}
-            if self.csv_path.exists():
+            if self.data_path.exists():
                 try:
-                    with self.csv_path.open(encoding="utf-8") as f:
+                    with self.data_path.open(encoding="utf-8") as f:
                         existing = json.load(f)
                 except Exception:
                     pass
 
             measured_count = sum(1 for s in self.swatches.values() if s.measured)
             if self.debug:
-                print(f"Saving JSON: {len(self.swatches)} total swatches, {measured_count} measured")
+                self._log_console(f"Saving JSON: {len(self.swatches)} total swatches, {measured_count} measured")
 
-            # Build swatch list sorted by panel / panel_index (same order as CSV)
+            # Build swatch list sorted by panel / panel_index
             sorted_swatches = sorted(self.swatches.values(),
                                      key=lambda s: (s.panel, s.panel_index))
 
@@ -1211,8 +1170,8 @@ class KonaScannerApp:
                     L_str = f"{s.L:.4f}" if s.L is not None else "None"
                     a_str = f"{s.a:.4f}" if s.a is not None else "None"
                     b_str = f"{s.b:.4f}" if s.b is not None else "None"
-                    print(f"  Writing swatch[{s.id}] ({s.name}): "
-                          f"L={L_str} a={a_str} b={b_str}")
+                    self._log_console(f"  Writing swatch[{s.id}] ({s.name}): "
+                                      f"L={L_str} a={a_str} b={b_str}")
 
                 entry: dict = {
                     "panel": s.panel,
@@ -1251,15 +1210,15 @@ class KonaScannerApp:
                 "swatches": swatch_entries,
             }
 
-            with self.csv_path.open("w", encoding="utf-8") as f:
+            with self.data_path.open("w", encoding="utf-8") as f:
                 json.dump(output, f, indent=2)
                 f.write("\n")  # Trailing newline for POSIX compliance
 
-            print(f"Saved {len(self.swatches)} swatches to {self.csv_path}")
+            self._log_console(f"Saved {len(self.swatches)} swatches to {self.data_path}")
             self._unsaved_changes = False
             return True
         except Exception as e:
-            print(f"Error saving JSON: {e}", file=sys.stderr)
+            self._log_console(f"Error saving JSON: {e}")
             messagebox.showerror("Error", f"Failed to save JSON: {e}")
             return False
 
@@ -1305,28 +1264,9 @@ class KonaScannerApp:
         """Update statistics display."""
         total = len(self.swatches)
         scanned = sum(1 for s in self.swatches.values() if s.measured)
-        self.stats_label.config(text=f"Total: {total}\nScanned: {scanned}\nRemaining: {total - scanned}")
-
-    def _update_kona_status(self):
-        """Update Kona table status display from device."""
-        if not self.serial.is_connected():
-            self.kona_status_label.config(text="Not connected")
-            return
-        
-        status = self.serial.kona_status()
-        if status:
-            if status.get("temp", False):
-                text = f"Temporary table active\nEntries: {status.get('entries', 0)}"
-            else:
-                builtin = status.get("builtin", False)
-                entries = status.get("entries", 0)
-                if builtin:
-                    text = f"Built-in table\nEntries: {entries}"
-                else:
-                    text = "No valid table loaded"
-            self.kona_status_label.config(text=text)
-        else:
-            self.kona_status_label.config(text="Status query failed")
+        self.stats_vars["Total"].set(str(total))
+        self.stats_vars["Scanned"].set(str(scanned))
+        self.stats_vars["Remaining"].set(str(total - scanned))
 
     def _sort_column(self, col: str):
         """Sort treeview by column."""
@@ -1423,8 +1363,6 @@ class KonaScannerApp:
                 self.connect_btn.config(state=tk.DISABLED)
                 self.disconnect_btn.config(state=tk.NORMAL)
                 self.progress_var.set("Connected to device")
-                # Update Kona table status
-                self._update_kona_status()
             else:
                 self.serial.disconnect()
                 self.progress_var.set("Device connected but not in serial mode")
@@ -1449,7 +1387,6 @@ class KonaScannerApp:
         # Update button states to reflect disconnection
         self.connect_btn.config(state=tk.NORMAL)
         self.disconnect_btn.config(state=tk.DISABLED)
-        self.kona_status_label.config(text="Not connected")
         self.progress_var.set("Disconnected")
 
     def _on_scan_selected(self):
@@ -1481,10 +1418,10 @@ class KonaScannerApp:
             swatch = self.swatches.get(current_id)
             if swatch:
                 remaining = len(self.scan_queue)
-                self.scan_status_label.config(
-                    text=f"Ready to scan:\n{swatch.name}\nPanel: {swatch.panel}, Index: {swatch.panel_index}\n\n"
-                         f"{remaining} swatch(es) remaining"
-                )
+                self.scan_vars["Status"].set("Ready to scan")
+                self.scan_vars["Swatch"].set(swatch.name)
+                self.scan_vars["Panel"].set(f"{swatch.panel}, Idx {swatch.panel_index}")
+                self.scan_vars["Remaining"].set(str(remaining))
                 self.scan_button.config(state=tk.NORMAL)
                 self.skip_button.config(state=tk.NORMAL)
                 
@@ -1501,7 +1438,10 @@ class KonaScannerApp:
             else:
                 self._advance_scan()
         else:
-            self.scan_status_label.config(text="Not scanning")
+            self.scan_vars["Status"].set("Not scanning")
+            self.scan_vars["Swatch"].set("-")
+            self.scan_vars["Panel"].set("-")
+            self.scan_vars["Remaining"].set("-")
             self.scan_button.config(state=tk.DISABLED)
             self.skip_button.config(state=tk.DISABLED)
             self.scanning = False
@@ -1518,7 +1458,13 @@ class KonaScannerApp:
 
 
     def _on_capture_current(self):
-        """Capture current swatch in queue."""
+        """Capture current swatch in queue.
+
+        Performs a scan, then a verification measurement.  If the verification
+        CIEDE2000 ΔE is not < 1.0 ("excellent match"), the scan+verify cycle
+        is retried up to 3 total attempts.  If all attempts fail, the scan
+        session is terminated with an error message.
+        """
         if not self.scanning or not self.scan_queue:
             return
 
@@ -1540,16 +1486,28 @@ class KonaScannerApp:
                 self._advance_scan()
                 return
 
-            self.scan_status_label.config(text=f"Scanning {swatch.name}...")
-            self.scan_button.config(state=tk.DISABLED)
-            self.skip_button.config(state=tk.DISABLED)
-            self.root.update()
+            MAX_VERIFY_ATTEMPTS = 3
+            verified = False
 
-            # Perform scan
-            result = self.serial.scan()
-            if result:
-                L, a, b, R, G, B = result
-                
+            for attempt in range(1, MAX_VERIFY_ATTEMPTS + 1):
+                if attempt == 1:
+                    self.scan_vars["Status"].set(f"Scanning...")
+                else:
+                    self.scan_vars["Status"].set(f"Attempt {attempt}/{MAX_VERIFY_ATTEMPTS}")
+                self.scan_vars["Swatch"].set(swatch.name)
+                self.scan_button.config(state=tk.DISABLED)
+                self.skip_button.config(state=tk.DISABLED)
+                self.root.update()
+
+                # --- Capture scan ---
+                result = self.serial.scan()
+                if not result:
+                    self._log_console(f"Scan failed for {swatch.name} (attempt {attempt})")
+                    time.sleep(0.5)  # Brief delay before retry
+                    continue
+
+                L, a, b, R, G, B, raw_x, raw_y, raw_z, raw_ir, raw_clear, raw_gain, raw_int_ms = result
+
                 # Store scan results in the swatch object (canonical data store)
                 swatch.L = L
                 swatch.a = a
@@ -1557,60 +1515,105 @@ class KonaScannerApp:
                 swatch.R = R
                 swatch.G = G
                 swatch.B = B
+                swatch.raw_x = raw_x
+                swatch.raw_y = raw_y
+                swatch.raw_z = raw_z
+                swatch.raw_ir = raw_ir
+                swatch.raw_clear = raw_clear
+                swatch.raw_gain = raw_gain
+                swatch.raw_integration_ms = raw_int_ms
                 swatch.measured = True
-                
+
                 if self.debug:
-                    print(f"Stored in swatch[{current_id}] ({swatch.name}): "
-                          f"L={swatch.L:.4f} a={swatch.a:.4f} b={swatch.b:.4f} "
-                          f"RGB=({swatch.R},{swatch.G},{swatch.B})")
+                    self._log_console(f"Stored in swatch[{current_id}] ({swatch.name}): "
+                                      f"L={swatch.L:.4f} a={swatch.a:.4f} b={swatch.b:.4f} "
+                                      f"RGB=({swatch.R},{swatch.G},{swatch.B})")
 
-                # Update treeview if the item exists (may be filtered out)
-                tree_item_id = str(current_id)
-                if self.tree.exists(tree_item_id):
-                    measured_str = "✓"
-                    self.tree.set(tree_item_id, "measured", measured_str)
-                    self.tree.set(tree_item_id, "L", f"{L:.1f}")
-                    self.tree.set(tree_item_id, "a", f"{a:.1f}")
-                    self.tree.set(tree_item_id, "b", f"{b:.1f}")
-                    if self.debug:
-                        # Verify the treeview was actually updated
-                        tree_values = self.tree.item(tree_item_id, 'values')
-                        print(f"Treeview item {tree_item_id} values: {tree_values}")
-                elif self.debug:
-                    print(f"Warning: Treeview item {tree_item_id} does not exist (filtered?)")
+                # --- Verification measurement ---
+                self.scan_vars["Status"].set(f"Verifying...")
+                self.root.update()
 
-                # Update display panel - read back from swatch to ensure consistency
-                self._show_color_info(swatch)
-                self._update_stats()
-                
-                # Store the last captured color for the canvas display during scanning.
-                # This allows visual verification that the captured color matches the swatch.
-                r, g, b = lab_to_rgb(swatch.L, swatch.a, swatch.b)
-                self._last_captured_color = rgb_to_hex(r, g, b)
-                self.color_canvas.config(bg=self._last_captured_color)
-                
-                # Update "Last Captured" display to show what was just scanned
-                # This persists even when selection changes to next item
-                self.last_captured_label.config(
-                    text=f"{swatch.name}\n"
-                         f"L*={L:.2f}  a*={a:.2f}  b*={b:.2f}\n"
-                         f"RGB=({r}, {g}, {b})")
+                verify_result = self.serial.scan()
+                if not verify_result:
+                    self._log_console(f"Verification scan failed for {swatch.name} (attempt {attempt})")
+                    time.sleep(0.5)  # Brief delay before retry
+                    continue
 
-                self.progress_var.set(f"Captured {swatch.name}: L={L:.1f} a={a:.1f} b={b:.1f}")
-                
-                # Force immediate UI refresh so the canvas and labels are visually updated
-                # before advancing to the next item. Without this, the updates may not be
-                # visible until the user moves the mouse or triggers another event.
-                self.root.update_idletasks()
-                
-                # Mark that we have unsaved changes
-                self._unsaved_changes = True
-                
-                # Play system bell to indicate successful scan
-                self.root.bell()
-            else:
-                messagebox.showerror("Error", f"Failed to scan {swatch.name}")
-                self.progress_var.set(f"Scan failed for {swatch.name}")
+                v_L, v_a, v_b, *_ = verify_result
+                delta_e = ciede2000((L, a, b), (v_L, v_a, v_b))
+
+                self._log_console(
+                    f"Verify {swatch.name} attempt {attempt}: "
+                    f"ref L={L:.2f} a={a:.2f} b={b:.2f}  "
+                    f"meas L={v_L:.2f} a={v_a:.2f} b={v_b:.2f}  "
+                    f"ΔE={delta_e:.4f}")
+
+                if delta_e < 1.0:
+                    verified = True
+                    break
+                else:
+                    self._log_console(
+                        f"  ΔE={delta_e:.4f} ≥ 1.0 — not excellent, retrying..."
+                        if attempt < MAX_VERIFY_ATTEMPTS
+                        else f"  ΔE={delta_e:.4f} ≥ 1.0 — not excellent after {MAX_VERIFY_ATTEMPTS} attempts")
+                    if attempt < MAX_VERIFY_ATTEMPTS:
+                        time.sleep(0.5)  # Brief delay before retry
+
+            if not verified:
+                msg = (f"Could not obtain an excellent match for {swatch.name} "
+                       f"after {MAX_VERIFY_ATTEMPTS} attempts.\n\n"
+                       f"Scan session terminated.")
+                self._log_console(f"SCAN ABORTED: {msg}")
+                messagebox.showerror("Verification Failed", msg)
+                self.scanning = False
+                self._update_scan_ui()
+                return
+
+            # --- Update UI with the verified capture ---
+            tree_item_id = str(current_id)
+            if self.tree.exists(tree_item_id):
+                measured_str = "✓"
+                self.tree.set(tree_item_id, "measured", measured_str)
+                self.tree.set(tree_item_id, "L", f"{swatch.L:.1f}")
+                self.tree.set(tree_item_id, "a", f"{swatch.a:.1f}")
+                self.tree.set(tree_item_id, "b", f"{swatch.b:.1f}")
+                if self.debug:
+                    tree_values = self.tree.item(tree_item_id, 'values')
+                    self._log_console(f"Treeview item {tree_item_id} values: {tree_values}")
+            elif self.debug:
+                self._log_console(f"Warning: Treeview item {tree_item_id} does not exist (filtered?)")
+
+            # Update display panel - read back from swatch to ensure consistency
+            self._show_color_info(swatch)
+            self._update_stats()
+
+            # Store the last captured color for the canvas display during scanning.
+            # This allows visual verification that the captured color matches the swatch.
+            r, g, b = lab_to_rgb(swatch.L, swatch.a, swatch.b)
+            self._last_captured_color = rgb_to_hex(r, g, b)
+            self.color_canvas.config(bg=self._last_captured_color)
+
+            # Update "Last Captured" display to show what was just scanned
+            # This persists even when selection changes to next item
+            self.lc_vars["Name"].set(swatch.name)
+            self.lc_vars["L*"].set(f"{swatch.L:.2f}")
+            self.lc_vars["a*"].set(f"{swatch.a:.2f}")
+            self.lc_vars["b*"].set(f"{swatch.b:.2f}")
+            self.lc_vars["RGB"].set(f"({r}, {g}, {b})")
+            self.lc_vars["ΔE00"].set("-")
+
+            self.progress_var.set(f"Captured {swatch.name}: L={swatch.L:.1f} a={swatch.a:.1f} b={swatch.b:.1f}")
+
+            # Force immediate UI refresh so the canvas and labels are visually updated
+            # before advancing to the next item. Without this, the updates may not be
+            # visible until the user moves the mouse or triggers another event.
+            self.root.update_idletasks()
+
+            # Mark that we have unsaved changes
+            self._unsaved_changes = True
+
+            # Play system bell to indicate successful scan
+            self.root.bell()
 
             self._advance_scan()
         finally:
@@ -1661,10 +1664,10 @@ class KonaScannerApp:
         self._update_scan_ui()
         self.progress_var.set("Scan stopped")
 
-    def _on_save_csv(self):
-        """Save data file (CSV or JSON based on file extension)."""
+    def _on_save(self):
+        """Save data to kona_captures.json."""
         if self._save_data():
-            messagebox.showinfo("Info", f"Saved to {self.csv_path}")
+            messagebox.showinfo("Info", f"Saved to {self.data_path}")
 
     def _on_export_cpp(self):
         """Export to C++ header file."""
@@ -1703,7 +1706,7 @@ class KonaScannerApp:
             KonaEntry(kona_id=s.id, l=s.L, a=s.a, b=s.b, name=s.name)
             for s in swatches
         ]
-        return render_cpp(entries, self.csv_path, source_script="kona_scanner_gui.py")
+        return render_cpp(entries, self.data_path, source_script="kona_scanner_gui.py")
 
     def _on_clear_scanned(self):
         """Clear all scanned values."""
@@ -1722,53 +1725,9 @@ class KonaScannerApp:
         
         self._populate_treeview()
         self._clear_color_info()
-        # Mark as unsaved since clearing Lab values is a change from the loaded CSV state
-        # User should save to persist the cleared state to the CSV file
+        # Mark as unsaved since clearing Lab values is a change from the loaded state
         self._unsaved_changes = True
         self.progress_var.set("Cleared all scanned values")
-
-    def _on_upload_kona(self):
-        """Upload the currently loaded Kona reference table to the device."""
-        if not self.serial.is_connected():
-            messagebox.showerror("Error", "Not connected to device.\nConnect first, then upload.")
-            return
-
-        # Collect measured swatches from currently loaded table
-        measured = [s for s in self.swatches.values() 
-                   if s.measured and s.L is not None and s.a is not None and s.b is not None]
-        
-        if not measured:
-            messagebox.showwarning("Warning", "No scanned swatches to upload.\nScan some swatches first.")
-            return
-        
-        # Convert to (id, L, a, b) tuples sorted by ID
-        entries = [(s.id, s.L, s.a, s.b) for s in sorted(measured, key=lambda s: s.id)]
-        
-        if len(entries) > MAX_ENTRIES:
-            messagebox.showerror("Error", f"Too many entries ({len(entries)}), max is {MAX_ENTRIES}")
-            return
-        
-        try:
-            # Generate binary table data
-            table_data = self._generate_kona_binary(entries)
-            
-            self.progress_var.set(f"Uploading {len(entries)} entries to device...")
-            self.root.update()
-            
-            # Upload to device
-            success, message = self.serial.kona_load(table_data)
-            
-            if success:
-                messagebox.showinfo("Success", f"Kona table uploaded successfully.\n{message}")
-                self.progress_var.set(f"Kona table uploaded: {message}")
-                self._update_kona_status()
-            else:
-                messagebox.showerror("Error", f"Upload failed:\n{message}")
-                self.progress_var.set(f"Upload failed: {message}")
-                
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to upload table:\n{e}")
-            self.progress_var.set(f"Upload error: {e}")
 
     def _on_measure(self):
         """Take a measurement and compare to the selected swatch.
@@ -1812,23 +1771,23 @@ class KonaScannerApp:
             self.progress_var.set("Measurement failed")
             return
         
-        scan_L, scan_a, scan_b, scan_R, scan_G, scan_B = result
+        scan_L, scan_a, scan_b, scan_R, scan_G, scan_B, *_ = result
         
         # Calculate delta E using CIEDE2000
         scan_lab = (scan_L, scan_a, scan_b)
         ref_lab = (swatch.L, swatch.a, swatch.b)
         delta_e = ciede2000(scan_lab, ref_lab)
         
-        # Log detailed comparison (to console)
-        print("\n" + "=" * 70)
-        print(f"MEASUREMENT COMPARISON: {swatch.name} (ID: {swatch.id})")
-        print("=" * 70)
-        print(f"Reference (stored):  L*={swatch.L:8.3f}  a*={swatch.a:8.3f}  b*={swatch.b:8.3f}")
-        print(f"Scanned (measured):  L*={scan_L:8.3f}  a*={scan_a:8.3f}  b*={scan_b:8.3f}")
-        print("-" * 70)
-        print(f"Difference:          ΔL*={scan_L - swatch.L:+8.3f}  Δa*={scan_a - swatch.a:+8.3f}  Δb*={scan_b - swatch.b:+8.3f}")
-        print(f"CIEDE2000 ΔE:        {delta_e:.4f}")
-        print("-" * 70)
+        # Log detailed comparison to console output area
+        self._log_console("=" * 70)
+        self._log_console(f"MEASUREMENT COMPARISON: {swatch.name} (ID: {swatch.id})")
+        self._log_console("=" * 70)
+        self._log_console(f"Reference (stored):  L*={swatch.L:8.3f}  a*={swatch.a:8.3f}  b*={swatch.b:8.3f}")
+        self._log_console(f"Scanned (measured):  L*={scan_L:8.3f}  a*={scan_a:8.3f}  b*={scan_b:8.3f}")
+        self._log_console("-" * 70)
+        self._log_console(f"Difference:          ΔL*={scan_L - swatch.L:+8.3f}  Δa*={scan_a - swatch.a:+8.3f}  Δb*={scan_b - swatch.b:+8.3f}")
+        self._log_console(f"CIEDE2000 ΔE:        {delta_e:.4f}")
+        self._log_console("-" * 70)
         
         # Interpret the result - separate quality level and description
         if delta_e < 1.0:
@@ -1847,55 +1806,27 @@ class KonaScannerApp:
             quality_level = "No match"
             quality_desc = "clearly different"
         
-        print(f"Match Quality:       {quality_level} ({quality_desc})")
-        print(f"Scanned RGB:         ({scan_R}, {scan_G}, {scan_B})")
-        print("=" * 70 + "\n")
+        self._log_console(f"Match Quality:       {quality_level} ({quality_desc})")
+        self._log_console(f"Scanned RGB:         ({scan_R}, {scan_G}, {scan_B})")
+        self._log_console("=" * 70)
         
         # Update the "Last Captured" display
         r, g, b = lab_to_rgb(scan_L, scan_a, scan_b)
         self._last_captured_color = rgb_to_hex(r, g, b)
         self.color_canvas.config(bg=self._last_captured_color)
         
-        self.last_captured_label.config(
-            text=f"Measured: {swatch.name}\n"
-                 f"L*={scan_L:.2f}  a*={scan_a:.2f}  b*={scan_b:.2f}\n"
-                 f"ΔE00={delta_e:.2f} ({quality_level})")
+        self.lc_vars["Name"].set(swatch.name)
+        self.lc_vars["L*"].set(f"{scan_L:.2f}")
+        self.lc_vars["a*"].set(f"{scan_a:.2f}")
+        self.lc_vars["b*"].set(f"{scan_b:.2f}")
+        self.lc_vars["RGB"].set(f"({r}, {g}, {b})")
+        self.lc_vars["ΔE00"].set(f"{delta_e:.2f} ({quality_level})")
         
         # Update status bar
         self.progress_var.set(f"{swatch.name}: ΔE={delta_e:.2f} - {quality_level}")
         
         self.root.update_idletasks()
         self.root.bell()
-
-    def _generate_kona_binary(self, entries: List[Tuple[int, float, float, float]]) -> bytes:
-        """Generate binary kona_table_t data from list of (id, L, a, b) tuples.
-        
-        Returns bytes that can be sent directly to the device.
-        """
-        # Pack entries into binary format matching firmware kona_ref_t struct
-        def pack_entry(kona_id: int, L: float, a: float, b: float) -> bytes:
-            # Pack as: uint16_t + 2 padding bytes + 3 floats (little-endian)
-            # This must match sizeof(kona_ref_t) = 16 bytes
-            return struct.pack("<H2x3f", kona_id, L, a, b)
-        
-        # Build entry payload - used for both CRC and final output
-        entry_data = bytearray()
-        for kona_id, L, a, b in entries:
-            entry_data.extend(pack_entry(kona_id, L, a, b))
-        
-        # Calculate CRC32 over actual entries only (not padding)
-        crc = zlib.crc32(entry_data) & 0xFFFFFFFF
-        
-        # Pad to full 365 entries (all zeros)
-        remaining = MAX_ENTRIES - len(entries)
-        if remaining > 0:
-            entry_data.extend(b'\x00' * (remaining * KONA_REF_T_SIZE))
-        
-        # Build complete table: header + entries
-        # Header: uint16_t version + uint16_t entry_count + uint32_t crc32
-        header = struct.pack("<HHI", SCHEMA_VERSION, len(entries), crc)
-        
-        return header + bytes(entry_data)
 
     def _on_window_close(self):
         """Handle window close event with unsaved changes check."""
@@ -1923,10 +1854,10 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", default="/dev/ttyACM0",
                        help="Serial port for device communication")
-    parser.add_argument("--csv", default="kona_captures.json",
-                       help="Data file for swatch data (.json preferred, .csv legacy)")
+    parser.add_argument("--data", default="kona_captures.json",
+                       help="kona_captures.json data file path")
     parser.add_argument("--debug", action="store_true",
-                       help="Print all serial TX/RX communications for debugging")
+                       help="Enable extra verbose debug logging in the console")
     return parser.parse_args()
 
 
@@ -1935,17 +1866,14 @@ def main() -> int:
     args = parse_args()
 
     # Make data path relative to repository root (one level up from scripts directory)
-    csv_path = args.csv
-    if not os.path.isabs(csv_path):
+    data_path = args.data
+    if not os.path.isabs(data_path):
         script_dir = pathlib.Path(__file__).parent  # scripts directory
         repo_root = script_dir.parent               # repository root
-        csv_path = repo_root / csv_path
-
-    if args.debug:
-        print("Debug mode enabled - all serial TX/RX will be printed")
+        data_path = repo_root / data_path
 
     root = tk.Tk()
-    app = KonaScannerApp(root, str(csv_path), args.port, debug=args.debug)
+    app = KonaScannerApp(root, str(data_path), args.port, debug=args.debug)
     root.mainloop()
 
     return 0
