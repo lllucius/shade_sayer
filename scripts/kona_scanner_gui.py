@@ -677,23 +677,36 @@ class KonaScannerApp:
         # Last captured display - shows the most recently scanned swatch info
         last_captured_frame = ttk.LabelFrame(right_content, text="Last Captured")
         last_captured_frame.pack(fill=tk.X, padx=3, pady=3)
-        
-        self.last_captured_label = ttk.Label(last_captured_frame, text="No captures yet", 
-                                             wraplength=180, justify=tk.LEFT, anchor=tk.W,
-                                             font=mono_font)
-        self.last_captured_label.pack(fill=tk.X, padx=5, pady=3)
+
+        self.lc_vars = {}
+        lc_fields = ["Name", "L*", "a*", "b*", "RGB", "ΔE00"]
+        for row_idx, field in enumerate(lc_fields):
+            ttk.Label(last_captured_frame, text=f"{field}:", font=label_font, anchor=tk.W).grid(
+                row=row_idx, column=0, sticky=tk.W, padx=(5, 2), pady=1)
+            var = tk.StringVar(value="-")
+            ttk.Label(last_captured_frame, textvariable=var, font=mono_font, anchor=tk.W).grid(
+                row=row_idx, column=1, sticky=tk.W, padx=(2, 5), pady=1)
+            self.lc_vars[field] = var
+        last_captured_frame.columnconfigure(1, weight=1)
 
         # Scan guidance frame
         scan_frame = ttk.LabelFrame(right_content, text="Scanning")
         scan_frame.pack(fill=tk.X, padx=3, pady=3)
 
-        self.scan_status_label = ttk.Label(scan_frame, text="Not scanning", wraplength=180,
-                                            justify=tk.LEFT, anchor=tk.W)
-        self.scan_status_label.pack(fill=tk.X, padx=5, pady=3)
+        self.scan_vars = {}
+        scan_fields = ["Status", "Swatch", "Panel", "Remaining"]
+        for row_idx, field in enumerate(scan_fields):
+            ttk.Label(scan_frame, text=f"{field}:", font=label_font, anchor=tk.W).grid(
+                row=row_idx, column=0, sticky=tk.W, padx=(5, 2), pady=1)
+            var = tk.StringVar(value="-" if field != "Status" else "Not scanning")
+            ttk.Label(scan_frame, textvariable=var, font=mono_font, anchor=tk.W).grid(
+                row=row_idx, column=1, sticky=tk.W, padx=(2, 5), pady=1)
+            self.scan_vars[field] = var
 
-        # Button row - Capture bottom-left, Skip bottom-right
+        # Button row - Capture left, Skip right
         btn_row = ttk.Frame(scan_frame)
-        btn_row.pack(fill=tk.X, padx=3, pady=2)
+        btn_row.grid(row=len(scan_fields), column=0, columnspan=2, sticky=tk.EW, padx=3, pady=2)
+        scan_frame.columnconfigure(1, weight=1)
 
         self.scan_button = ttk.Button(btn_row, text="Capture", command=self._on_capture_current,
                                        state=tk.DISABLED)
@@ -702,14 +715,21 @@ class KonaScannerApp:
         self.skip_button = ttk.Button(btn_row, text="Skip", command=self._on_skip_current,
                                        state=tk.DISABLED)
         self.skip_button.pack(side=tk.RIGHT)
-        
+
         # Statistics frame
         stats_frame = ttk.LabelFrame(right_content, text="Stats")
         stats_frame.pack(fill=tk.X, padx=3, pady=3)
-        
-        self.stats_label = ttk.Label(stats_frame, text="", justify=tk.LEFT, anchor=tk.W,
-                                     font=mono_font)
-        self.stats_label.pack(fill=tk.X, padx=5, pady=3)
+
+        self.stats_vars = {}
+        stats_fields = ["Total", "Scanned", "Remaining"]
+        for row_idx, field in enumerate(stats_fields):
+            ttk.Label(stats_frame, text=f"{field}:", font=label_font, anchor=tk.W).grid(
+                row=row_idx, column=0, sticky=tk.W, padx=(5, 2), pady=1)
+            var = tk.StringVar(value="0")
+            ttk.Label(stats_frame, textvariable=var, font=mono_font, anchor=tk.W).grid(
+                row=row_idx, column=1, sticky=tk.W, padx=(2, 5), pady=1)
+            self.stats_vars[field] = var
+        stats_frame.columnconfigure(1, weight=1)
         self._update_stats()
 
         # Bind keyboard shortcuts
@@ -1221,7 +1241,9 @@ class KonaScannerApp:
         """Update statistics display."""
         total = len(self.swatches)
         scanned = sum(1 for s in self.swatches.values() if s.measured)
-        self.stats_label.config(text=f"Total: {total}\nScanned: {scanned}\nRemaining: {total - scanned}")
+        self.stats_vars["Total"].set(str(total))
+        self.stats_vars["Scanned"].set(str(scanned))
+        self.stats_vars["Remaining"].set(str(total - scanned))
 
     def _sort_column(self, col: str):
         """Sort treeview by column."""
@@ -1373,10 +1395,10 @@ class KonaScannerApp:
             swatch = self.swatches.get(current_id)
             if swatch:
                 remaining = len(self.scan_queue)
-                self.scan_status_label.config(
-                    text=f"Ready to scan:\n{swatch.name}\nPanel: {swatch.panel}, Index: {swatch.panel_index}\n\n"
-                         f"{remaining} swatch(es) remaining"
-                )
+                self.scan_vars["Status"].set("Ready to scan")
+                self.scan_vars["Swatch"].set(swatch.name)
+                self.scan_vars["Panel"].set(f"{swatch.panel}, Idx {swatch.panel_index}")
+                self.scan_vars["Remaining"].set(str(remaining))
                 self.scan_button.config(state=tk.NORMAL)
                 self.skip_button.config(state=tk.NORMAL)
                 
@@ -1393,7 +1415,10 @@ class KonaScannerApp:
             else:
                 self._advance_scan()
         else:
-            self.scan_status_label.config(text="Not scanning")
+            self.scan_vars["Status"].set("Not scanning")
+            self.scan_vars["Swatch"].set("-")
+            self.scan_vars["Panel"].set("-")
+            self.scan_vars["Remaining"].set("-")
             self.scan_button.config(state=tk.DISABLED)
             self.skip_button.config(state=tk.DISABLED)
             self.scanning = False
@@ -1442,9 +1467,11 @@ class KonaScannerApp:
             verified = False
 
             for attempt in range(1, MAX_VERIFY_ATTEMPTS + 1):
-                self.scan_status_label.config(
-                    text=f"Scanning {swatch.name}..." if attempt == 1
-                    else f"Scanning {swatch.name} (attempt {attempt}/{MAX_VERIFY_ATTEMPTS})...")
+                if attempt == 1:
+                    self.scan_vars["Status"].set(f"Scanning...")
+                else:
+                    self.scan_vars["Status"].set(f"Attempt {attempt}/{MAX_VERIFY_ATTEMPTS}")
+                self.scan_vars["Swatch"].set(swatch.name)
                 self.scan_button.config(state=tk.DISABLED)
                 self.skip_button.config(state=tk.DISABLED)
                 self.root.update()
@@ -1480,7 +1507,7 @@ class KonaScannerApp:
                                       f"RGB=({swatch.R},{swatch.G},{swatch.B})")
 
                 # --- Verification measurement ---
-                self.scan_status_label.config(text=f"Verifying {swatch.name}...")
+                self.scan_vars["Status"].set(f"Verifying...")
                 self.root.update()
 
                 verify_result = self.serial.scan()
@@ -1545,10 +1572,12 @@ class KonaScannerApp:
 
             # Update "Last Captured" display to show what was just scanned
             # This persists even when selection changes to next item
-            self.last_captured_label.config(
-                text=f"{swatch.name}\n"
-                     f"L*={swatch.L:.2f}  a*={swatch.a:.2f}  b*={swatch.b:.2f}\n"
-                     f"RGB=({r}, {g}, {b})")
+            self.lc_vars["Name"].set(swatch.name)
+            self.lc_vars["L*"].set(f"{swatch.L:.2f}")
+            self.lc_vars["a*"].set(f"{swatch.a:.2f}")
+            self.lc_vars["b*"].set(f"{swatch.b:.2f}")
+            self.lc_vars["RGB"].set(f"({r}, {g}, {b})")
+            self.lc_vars["ΔE00"].set("-")
 
             self.progress_var.set(f"Captured {swatch.name}: L={swatch.L:.1f} a={swatch.a:.1f} b={swatch.b:.1f}")
 
@@ -1763,10 +1792,12 @@ class KonaScannerApp:
         self._last_captured_color = rgb_to_hex(r, g, b)
         self.color_canvas.config(bg=self._last_captured_color)
         
-        self.last_captured_label.config(
-            text=f"Measured: {swatch.name}\n"
-                 f"L*={scan_L:.2f}  a*={scan_a:.2f}  b*={scan_b:.2f}\n"
-                 f"ΔE00={delta_e:.2f} ({quality_level})")
+        self.lc_vars["Name"].set(swatch.name)
+        self.lc_vars["L*"].set(f"{scan_L:.2f}")
+        self.lc_vars["a*"].set(f"{scan_a:.2f}")
+        self.lc_vars["b*"].set(f"{scan_b:.2f}")
+        self.lc_vars["RGB"].set(f"({r}, {g}, {b})")
+        self.lc_vars["ΔE00"].set(f"{delta_e:.2f} ({quality_level})")
         
         # Update status bar
         self.progress_var.set(f"{swatch.name}: ΔE={delta_e:.2f} - {quality_level}")
