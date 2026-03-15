@@ -627,67 +627,89 @@ class KonaScannerApp:
         mono_font = ("Courier", 11)
         label_font = ("TkDefaultFont", 10)
 
-        # Color info with LAB on left, RGB on right (read-only text boxes for copying)
+        # Color info display (read-only text boxes for copying)
         info_frame = ttk.LabelFrame(right_content, text="Selected Info")
         info_frame.pack(fill=tk.X, padx=3, pady=3)
 
         self.info_entries = {}
 
         # Use grid layout for aligned labels and values
-        # Row 0: L* and R
-        # Row 1: a* and G
-        # Row 2: b* and B
-        # Row 3: Hex (spanning)
-        lab_rgb_pairs = [("L*", "R"), ("a*", "G"), ("b*", "B")]
-        for row_idx, (lab_label, rgb_label) in enumerate(lab_rgb_pairs):
-            # RGB label - left justified
+        # Row 0: L*, a*, and b*
+        # Row 1: R, G, and B
+        # Row 2: Hex (spanning)
+        for col_idx, lab_label in enumerate(["L*", "a*", "b*"]):
+            ttk.Label(info_frame, text=f"{lab_label}:", font=label_font, anchor=tk.W).grid(
+                row=0, column=col_idx * 2, sticky=tk.W, padx=(5, 2), pady=1)
+            lab_var = tk.StringVar(value="-")
+            lab_entry = ttk.Entry(info_frame, textvariable=lab_var, width=8, state="readonly",
+                                  font=mono_font, justify=tk.RIGHT)
+            lab_entry.grid(row=0, column=col_idx * 2 + 1, sticky=tk.W, padx=(0, 5), pady=1)
+            self.info_entries[lab_label] = lab_var
+
+        for col_idx, rgb_label in enumerate(["R", "G", "B"]):
             ttk.Label(info_frame, text=f"{rgb_label}:", font=label_font, anchor=tk.W).grid(
-                row=row_idx, column=0, sticky=tk.W, padx=(5, 2), pady=1)
-            # RGB value - readonly entry with monospace font
+                row=1, column=col_idx * 2, sticky=tk.W, padx=(5, 2), pady=1)
             rgb_var = tk.StringVar(value="-")
             rgb_entry = ttk.Entry(info_frame, textvariable=rgb_var, width=5, state="readonly",
                                   font=mono_font, justify=tk.RIGHT)
-            rgb_entry.grid(row=row_idx, column=1, sticky=tk.W, pady=1)
+            rgb_entry.grid(row=1, column=col_idx * 2 + 1, sticky=tk.W, padx=(0, 5), pady=1)
             self.info_entries[rgb_label] = rgb_var
-
-            # LAB label - left justified
-            ttk.Label(info_frame, text=f"{lab_label}:", font=label_font, anchor=tk.W).grid(
-                row=row_idx, column=2, sticky=tk.W, padx=(5, 2), pady=1)
-            # LAB value - readonly entry with monospace font
-            lab_var = tk.StringVar(value="-")
-            lab_entry = ttk.Entry(info_frame, textvariable=lab_var, width=10, state="readonly",
-                                  font=mono_font, justify=tk.RIGHT)
-            lab_entry.grid(row=row_idx, column=3, sticky=tk.W, padx=(0, 10), pady=1)
-            self.info_entries[lab_label] = lab_var
-
 
         # Hex row at bottom - spans columns
         ttk.Label(info_frame, text="Hex:", font=label_font, anchor=tk.W).grid(
-            row=3, column=0, sticky=tk.W, padx=(5, 2), pady=1)
+            row=2, column=0, sticky=tk.W, padx=(5, 2), pady=1)
         hex_var = tk.StringVar(value="-")
         hex_entry = ttk.Entry(info_frame, textvariable=hex_var, width=10, state="readonly",
                               font=mono_font, justify=tk.LEFT)
-        hex_entry.grid(row=3, column=1, sticky=tk.W, pady=1)
+        hex_entry.grid(row=2, column=1, columnspan=5, sticky=tk.W, pady=1)
         self.info_entries["Hex"] = hex_var
 
         # Configure column weights for proper resizing
-        info_frame.columnconfigure(1, weight=1)
-        info_frame.columnconfigure(3, weight=1)
+        for c in (1, 3, 5):
+            info_frame.columnconfigure(c, weight=1)
 
         # Last captured display - shows the most recently scanned swatch info
         last_captured_frame = ttk.LabelFrame(right_content, text="Last Captured")
         last_captured_frame.pack(fill=tk.X, padx=3, pady=3)
 
         self.lc_vars = {}
-        lc_fields = ["Name", "L*", "a*", "b*", "RGB", "ΔE00"]
-        for row_idx, field in enumerate(lc_fields):
-            ttk.Label(last_captured_frame, text=f"{field}:", font=label_font, anchor=tk.W).grid(
-                row=row_idx, column=0, sticky=tk.W, padx=(5, 2), pady=1)
-            var = tk.StringVar(value="-")
-            ttk.Label(last_captured_frame, textvariable=var, font=mono_font, anchor=tk.W).grid(
-                row=row_idx, column=1, sticky=tk.W, padx=(2, 5), pady=1)
-            self.lc_vars[field] = var
+        # Row 0: Name (spanning)
+        # Row 1: L* value, RGB value
+        # Row 2: a* value, ΔE00 value
+        # Row 3: b* value
+        for field in ["Name", "L*", "a*", "b*", "RGB", "ΔE00"]:
+            self.lc_vars[field] = tk.StringVar(value="-")
+
+        # Row 0: Name
+        ttk.Label(last_captured_frame, text="Name:", font=label_font, anchor=tk.W).grid(
+            row=0, column=0, sticky=tk.W, padx=(5, 2), pady=1)
+        ttk.Label(last_captured_frame, textvariable=self.lc_vars["Name"], font=mono_font, anchor=tk.W).grid(
+            row=0, column=1, columnspan=3, sticky=tk.W, padx=(2, 5), pady=1)
+        # Row 1: L* and RGB
+        ttk.Label(last_captured_frame, text="L*:", font=label_font, anchor=tk.W).grid(
+            row=1, column=0, sticky=tk.W, padx=(5, 2), pady=1)
+        ttk.Label(last_captured_frame, textvariable=self.lc_vars["L*"], font=mono_font, anchor=tk.W).grid(
+            row=1, column=1, sticky=tk.W, padx=(2, 5), pady=1)
+        ttk.Label(last_captured_frame, text="RGB:", font=label_font, anchor=tk.W).grid(
+            row=1, column=2, sticky=tk.W, padx=(5, 2), pady=1)
+        ttk.Label(last_captured_frame, textvariable=self.lc_vars["RGB"], font=mono_font, anchor=tk.W).grid(
+            row=1, column=3, sticky=tk.W, padx=(2, 5), pady=1)
+        # Row 2: a* and ΔE00
+        ttk.Label(last_captured_frame, text="a*:", font=label_font, anchor=tk.W).grid(
+            row=2, column=0, sticky=tk.W, padx=(5, 2), pady=1)
+        ttk.Label(last_captured_frame, textvariable=self.lc_vars["a*"], font=mono_font, anchor=tk.W).grid(
+            row=2, column=1, sticky=tk.W, padx=(2, 5), pady=1)
+        ttk.Label(last_captured_frame, text="ΔE00:", font=label_font, anchor=tk.W).grid(
+            row=2, column=2, sticky=tk.W, padx=(5, 2), pady=1)
+        ttk.Label(last_captured_frame, textvariable=self.lc_vars["ΔE00"], font=mono_font, anchor=tk.W).grid(
+            row=2, column=3, sticky=tk.W, padx=(2, 5), pady=1)
+        # Row 3: b*
+        ttk.Label(last_captured_frame, text="b*:", font=label_font, anchor=tk.W).grid(
+            row=3, column=0, sticky=tk.W, padx=(5, 2), pady=1)
+        ttk.Label(last_captured_frame, textvariable=self.lc_vars["b*"], font=mono_font, anchor=tk.W).grid(
+            row=3, column=1, sticky=tk.W, padx=(2, 5), pady=1)
         last_captured_frame.columnconfigure(1, weight=1)
+        last_captured_frame.columnconfigure(3, weight=1)
 
         # Scan guidance frame
         scan_frame = ttk.LabelFrame(right_content, text="Scanning")
@@ -722,14 +744,15 @@ class KonaScannerApp:
 
         self.stats_vars = {}
         stats_fields = ["Total", "Scanned", "Remaining"]
-        for row_idx, field in enumerate(stats_fields):
+        for col_idx, field in enumerate(stats_fields):
             ttk.Label(stats_frame, text=f"{field}:", font=label_font, anchor=tk.W).grid(
-                row=row_idx, column=0, sticky=tk.W, padx=(5, 2), pady=1)
+                row=0, column=col_idx * 2, sticky=tk.W, padx=(5, 2), pady=1)
             var = tk.StringVar(value="0")
             ttk.Label(stats_frame, textvariable=var, font=mono_font, anchor=tk.W).grid(
-                row=row_idx, column=1, sticky=tk.W, padx=(2, 5), pady=1)
+                row=0, column=col_idx * 2 + 1, sticky=tk.W, padx=(2, 5), pady=1)
             self.stats_vars[field] = var
-        stats_frame.columnconfigure(1, weight=1)
+        for c in (1, 3, 5):
+            stats_frame.columnconfigure(c, weight=1)
         self._update_stats()
 
         # Bind keyboard shortcuts
