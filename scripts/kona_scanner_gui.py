@@ -25,15 +25,12 @@ import math
 import os
 import pathlib
 import platform
-import struct
 import sys
 import threading
 import time
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 from typing import Dict, List, Optional, Tuple
-import zlib
-
 try:
     import serial
     HAS_SERIAL = True
@@ -45,13 +42,6 @@ except ImportError:
 _SCRIPTS_DIR = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(_SCRIPTS_DIR))
 from generate_kona_table import KonaEntry, MAX_ENTRIES, render_cpp  # noqa: E402
-
-# Schema version must match firmware konaref.h
-SCHEMA_VERSION = 1
-
-# Expected size of kona_ref_t struct in bytes (must match firmware)
-# Layout: uint16_t kona_id (2) + padding (2) + 3 floats (12) = 16 bytes
-KONA_REF_T_SIZE = 16
 
 # Serial communication constants
 DEVICE_READY_DELAY_S = 0.5  # Time to wait for device initialization after connecting
@@ -400,101 +390,6 @@ class SerialConnection:
         response = self.send_command("EXIT", timeout=2.0)
         return response is not None and response.startswith("OK:")
 
-    def kona_status(self) -> Optional[dict]:
-        """Query Kona table status from device.
-        
-        Returns dict with keys: temp (bool), entries (int), builtin (bool)
-        or None on error.
-        """
-        response = self.send_command("KONA_STATUS", timeout=2.0)
-        if response and response.startswith("OK:KONA_STATUS:"):
-            try:
-                # Parse: OK:KONA_STATUS:temp=0,entries=5,builtin=1
-                parts = response.split(":")[2].split(",")
-                status = {}
-                for part in parts:
-                    key, value = part.split("=")
-                    if key == "entries":
-                        status[key] = int(value)
-                    else:
-                        status[key] = value == "1"
-                return status
-            except (IndexError, ValueError) as e:
-                self._log(f"Parse error for KONA_STATUS: {e}")
-        return None
-
-    def kona_clear(self) -> bool:
-        """Clear temporary Kona table on device."""
-        response = self.send_command("KONA_CLEAR", timeout=2.0)
-        return response is not None and response.startswith("OK:KONA_CLEARED")
-
-    def kona_load(self, table_data: bytes) -> Tuple[bool, str]:
-        """Upload a temporary Kona table to the device.
-        
-        Args:
-            table_data: Binary kona_table_t struct data
-            
-        Returns:
-            Tuple of (success, message)
-        """
-        if not self.is_connected():
-            return (False, "Not connected")
-
-        with self._lock:
-            try:
-                # Clear input buffer
-                self.serial.reset_input_buffer()
-                
-                # Send load command with size
-                cmd = f"KONA_LOAD:{len(table_data)}\n"
-                self._log(f"TX: KONA_LOAD:{len(table_data)}")
-                self.serial.write(cmd.encode("utf-8"))
-                self.serial.flush()
-                
-                # Wait for READY response
-                start_time = time.time()
-                ready_received = False
-                while time.time() - start_time < 5.0:
-                    if self.serial.in_waiting > 0:
-                        line = self.serial.readline().decode("utf-8", errors="replace").strip()
-                        self._log(f"RX: {line}")
-                        if line.startswith("OK:KONA_LOAD:READY:"):
-                            ready_received = True
-                            break
-                        if line.startswith("ERR:"):
-                            return (False, line)
-                    time.sleep(0.05)
-                
-                if not ready_received:
-                    return (False, "Timeout waiting for READY")
-                
-                # Send binary data
-                self._log(f"TX: <binary data {len(table_data)} bytes>")
-                self.serial.write(table_data)
-                self.serial.flush()
-                
-                # Wait for result
-                start_time = time.time()
-                while time.time() - start_time < 10.0:
-                    if self.serial.in_waiting > 0:
-                        line = self.serial.readline().decode("utf-8", errors="replace").strip()
-                        self._log(f"RX: {line}")
-                        if line.startswith("OK:KONA_LOADED:"):
-                            # Parse entry count
-                            try:
-                                entries = int(line.split("=")[1])
-                                return (True, f"Loaded {entries} entries")
-                            except (IndexError, ValueError):
-                                return (True, "Loaded successfully")
-                        if line.startswith("ERR:"):
-                            return (False, line)
-                    time.sleep(0.05)
-                
-                return (False, "Timeout waiting for result")
-                
-            except serial.SerialException as e:
-                return (False, f"Serial error: {e}")
-
 
 class KonaScannerApp:
     """Main application class for Kona Swatch Scanner GUI."""
@@ -588,9 +483,6 @@ class KonaScannerApp:
 
         ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=3)
 
-        # Kona table management buttons
-        self.upload_kona_btn = ttk.Button(toolbar, text="Upload", command=self._on_upload_kona)
-        self.upload_kona_btn.pack(side=tk.LEFT, padx=1)
         self.measure_btn = ttk.Button(toolbar, text="Measure", command=self._on_measure)
         self.measure_btn.pack(side=tk.LEFT, padx=1)
         
@@ -810,14 +702,6 @@ class KonaScannerApp:
                                        state=tk.DISABLED)
         self.skip_button.pack(side=tk.RIGHT)
         
-        # Kona table status frame
-        kona_frame = ttk.LabelFrame(right_content, text="Kona Status")
-        kona_frame.pack(fill=tk.X, padx=3, pady=3)
-        
-        self.kona_status_label = ttk.Label(kona_frame, text="Not connected", justify=tk.LEFT, 
-                                           anchor=tk.W, font=mono_font)
-        self.kona_status_label.pack(fill=tk.X, padx=5, pady=3)
-        
         # Statistics frame
         stats_frame = ttk.LabelFrame(right_content, text="Stats")
         stats_frame.pack(fill=tk.X, padx=3, pady=3)
@@ -842,7 +726,6 @@ class KonaScannerApp:
         self.root.bind("<Alt-e>", lambda e: self._on_export_cpp())
         self.root.bind("<Alt-l>", lambda e: self._on_clear_scanned())
         self.root.bind("<Alt-k>", lambda e: self._on_skip_current())
-        self.root.bind("<Alt-u>", lambda e: self._on_upload_kona())
         self.root.bind("<Alt-m>", lambda e: self._on_measure())
         
         # Ctrl+S for Save
@@ -1339,27 +1222,6 @@ class KonaScannerApp:
         scanned = sum(1 for s in self.swatches.values() if s.measured)
         self.stats_label.config(text=f"Total: {total}\nScanned: {scanned}\nRemaining: {total - scanned}")
 
-    def _update_kona_status(self):
-        """Update Kona table status display from device."""
-        if not self.serial.is_connected():
-            self.kona_status_label.config(text="Not connected")
-            return
-        
-        status = self.serial.kona_status()
-        if status:
-            if status.get("temp", False):
-                text = f"Temporary table active\nEntries: {status.get('entries', 0)}"
-            else:
-                builtin = status.get("builtin", False)
-                entries = status.get("entries", 0)
-                if builtin:
-                    text = f"Built-in table\nEntries: {entries}"
-                else:
-                    text = "No valid table loaded"
-            self.kona_status_label.config(text=text)
-        else:
-            self.kona_status_label.config(text="Status query failed")
-
     def _sort_column(self, col: str):
         """Sort treeview by column."""
         items = [(self.tree.set(k, col), k) for k in self.tree.get_children("")]
@@ -1455,8 +1317,6 @@ class KonaScannerApp:
                 self.connect_btn.config(state=tk.DISABLED)
                 self.disconnect_btn.config(state=tk.NORMAL)
                 self.progress_var.set("Connected to device")
-                # Update Kona table status
-                self._update_kona_status()
             else:
                 self.serial.disconnect()
                 self.progress_var.set("Device connected but not in serial mode")
@@ -1481,7 +1341,6 @@ class KonaScannerApp:
         # Update button states to reflect disconnection
         self.connect_btn.config(state=tk.NORMAL)
         self.disconnect_btn.config(state=tk.DISABLED)
-        self.kona_status_label.config(text="Not connected")
         self.progress_var.set("Disconnected")
 
     def _on_scan_selected(self):
@@ -1550,7 +1409,13 @@ class KonaScannerApp:
 
 
     def _on_capture_current(self):
-        """Capture current swatch in queue."""
+        """Capture current swatch in queue.
+
+        Performs a scan, then a verification measurement.  If the verification
+        CIEDE2000 ΔE is not < 1.0 ("excellent match"), the scan+verify cycle
+        is retried up to 3 total attempts.  If all attempts fail, the scan
+        session is terminated with an error message.
+        """
         if not self.scanning or not self.scan_queue:
             return
 
@@ -1572,16 +1437,25 @@ class KonaScannerApp:
                 self._advance_scan()
                 return
 
-            self.scan_status_label.config(text=f"Scanning {swatch.name}...")
-            self.scan_button.config(state=tk.DISABLED)
-            self.skip_button.config(state=tk.DISABLED)
-            self.root.update()
+            MAX_VERIFY_ATTEMPTS = 3
+            verified = False
 
-            # Perform scan
-            result = self.serial.scan()
-            if result:
+            for attempt in range(1, MAX_VERIFY_ATTEMPTS + 1):
+                self.scan_status_label.config(
+                    text=f"Scanning {swatch.name}..." if attempt == 1
+                    else f"Scanning {swatch.name} (attempt {attempt}/{MAX_VERIFY_ATTEMPTS})...")
+                self.scan_button.config(state=tk.DISABLED)
+                self.skip_button.config(state=tk.DISABLED)
+                self.root.update()
+
+                # --- Capture scan ---
+                result = self.serial.scan()
+                if not result:
+                    self._log_console(f"Scan failed for {swatch.name} (attempt {attempt})")
+                    continue
+
                 L, a, b, R, G, B, raw_x, raw_y, raw_z, raw_ir, raw_clear, raw_gain, raw_int_ms = result
-                
+
                 # Store scan results in the swatch object (canonical data store)
                 swatch.L = L
                 swatch.a = a
@@ -1597,59 +1471,92 @@ class KonaScannerApp:
                 swatch.raw_gain = raw_gain
                 swatch.raw_integration_ms = raw_int_ms
                 swatch.measured = True
-                
+
                 if self.debug:
                     self._log_console(f"Stored in swatch[{current_id}] ({swatch.name}): "
                                       f"L={swatch.L:.4f} a={swatch.a:.4f} b={swatch.b:.4f} "
                                       f"RGB=({swatch.R},{swatch.G},{swatch.B})")
 
-                # Update treeview if the item exists (may be filtered out)
-                tree_item_id = str(current_id)
-                if self.tree.exists(tree_item_id):
-                    measured_str = "✓"
-                    self.tree.set(tree_item_id, "measured", measured_str)
-                    self.tree.set(tree_item_id, "L", f"{L:.1f}")
-                    self.tree.set(tree_item_id, "a", f"{a:.1f}")
-                    self.tree.set(tree_item_id, "b", f"{b:.1f}")
-                    if self.debug:
-                        # Verify the treeview was actually updated
-                        tree_values = self.tree.item(tree_item_id, 'values')
-                        self._log_console(f"Treeview item {tree_item_id} values: {tree_values}")
-                elif self.debug:
-                    self._log_console(f"Warning: Treeview item {tree_item_id} does not exist (filtered?)")
+                # --- Verification measurement ---
+                self.scan_status_label.config(text=f"Verifying {swatch.name}...")
+                self.root.update()
 
-                # Update display panel - read back from swatch to ensure consistency
-                self._show_color_info(swatch)
-                self._update_stats()
-                
-                # Store the last captured color for the canvas display during scanning.
-                # This allows visual verification that the captured color matches the swatch.
-                r, g, b = lab_to_rgb(swatch.L, swatch.a, swatch.b)
-                self._last_captured_color = rgb_to_hex(r, g, b)
-                self.color_canvas.config(bg=self._last_captured_color)
-                
-                # Update "Last Captured" display to show what was just scanned
-                # This persists even when selection changes to next item
-                self.last_captured_label.config(
-                    text=f"{swatch.name}\n"
-                         f"L*={L:.2f}  a*={a:.2f}  b*={b:.2f}\n"
-                         f"RGB=({r}, {g}, {b})")
+                verify_result = self.serial.scan()
+                if not verify_result:
+                    self._log_console(f"Verification scan failed for {swatch.name} (attempt {attempt})")
+                    continue
 
-                self.progress_var.set(f"Captured {swatch.name}: L={L:.1f} a={a:.1f} b={b:.1f}")
-                
-                # Force immediate UI refresh so the canvas and labels are visually updated
-                # before advancing to the next item. Without this, the updates may not be
-                # visible until the user moves the mouse or triggers another event.
-                self.root.update_idletasks()
-                
-                # Mark that we have unsaved changes
-                self._unsaved_changes = True
-                
-                # Play system bell to indicate successful scan
-                self.root.bell()
-            else:
-                messagebox.showerror("Error", f"Failed to scan {swatch.name}")
-                self.progress_var.set(f"Scan failed for {swatch.name}")
+                v_L, v_a, v_b, *_ = verify_result
+                delta_e = ciede2000((L, a, b), (v_L, v_a, v_b))
+
+                self._log_console(
+                    f"Verify {swatch.name} attempt {attempt}: "
+                    f"ref L={L:.2f} a={a:.2f} b={b:.2f}  "
+                    f"meas L={v_L:.2f} a={v_a:.2f} b={v_b:.2f}  "
+                    f"ΔE={delta_e:.4f}")
+
+                if delta_e < 1.0:
+                    verified = True
+                    break
+                else:
+                    self._log_console(
+                        f"  ΔE={delta_e:.4f} ≥ 1.0 — not excellent, retrying..."
+                        if attempt < MAX_VERIFY_ATTEMPTS
+                        else f"  ΔE={delta_e:.4f} ≥ 1.0 — not excellent after {MAX_VERIFY_ATTEMPTS} attempts")
+
+            if not verified:
+                msg = (f"Could not obtain an excellent match for {swatch.name} "
+                       f"after {MAX_VERIFY_ATTEMPTS} attempts.\n\n"
+                       f"Scan session terminated.")
+                self._log_console(f"SCAN ABORTED: {msg}")
+                messagebox.showerror("Verification Failed", msg)
+                self.scanning = False
+                self._update_scan_ui()
+                return
+
+            # --- Update UI with the verified capture ---
+            tree_item_id = str(current_id)
+            if self.tree.exists(tree_item_id):
+                measured_str = "✓"
+                self.tree.set(tree_item_id, "measured", measured_str)
+                self.tree.set(tree_item_id, "L", f"{swatch.L:.1f}")
+                self.tree.set(tree_item_id, "a", f"{swatch.a:.1f}")
+                self.tree.set(tree_item_id, "b", f"{swatch.b:.1f}")
+                if self.debug:
+                    tree_values = self.tree.item(tree_item_id, 'values')
+                    self._log_console(f"Treeview item {tree_item_id} values: {tree_values}")
+            elif self.debug:
+                self._log_console(f"Warning: Treeview item {tree_item_id} does not exist (filtered?)")
+
+            # Update display panel - read back from swatch to ensure consistency
+            self._show_color_info(swatch)
+            self._update_stats()
+
+            # Store the last captured color for the canvas display during scanning.
+            # This allows visual verification that the captured color matches the swatch.
+            r, g, b = lab_to_rgb(swatch.L, swatch.a, swatch.b)
+            self._last_captured_color = rgb_to_hex(r, g, b)
+            self.color_canvas.config(bg=self._last_captured_color)
+
+            # Update "Last Captured" display to show what was just scanned
+            # This persists even when selection changes to next item
+            self.last_captured_label.config(
+                text=f"{swatch.name}\n"
+                     f"L*={swatch.L:.2f}  a*={swatch.a:.2f}  b*={swatch.b:.2f}\n"
+                     f"RGB=({r}, {g}, {b})")
+
+            self.progress_var.set(f"Captured {swatch.name}: L={swatch.L:.1f} a={swatch.a:.1f} b={swatch.b:.1f}")
+
+            # Force immediate UI refresh so the canvas and labels are visually updated
+            # before advancing to the next item. Without this, the updates may not be
+            # visible until the user moves the mouse or triggers another event.
+            self.root.update_idletasks()
+
+            # Mark that we have unsaved changes
+            self._unsaved_changes = True
+
+            # Play system bell to indicate successful scan
+            self.root.bell()
 
             self._advance_scan()
         finally:
@@ -1765,49 +1672,6 @@ class KonaScannerApp:
         self._unsaved_changes = True
         self.progress_var.set("Cleared all scanned values")
 
-    def _on_upload_kona(self):
-        """Upload the currently loaded Kona reference table to the device."""
-        if not self.serial.is_connected():
-            messagebox.showerror("Error", "Not connected to device.\nConnect first, then upload.")
-            return
-
-        # Collect measured swatches from currently loaded table
-        measured = [s for s in self.swatches.values() 
-                   if s.measured and s.L is not None and s.a is not None and s.b is not None]
-        
-        if not measured:
-            messagebox.showwarning("Warning", "No scanned swatches to upload.\nScan some swatches first.")
-            return
-        
-        # Convert to (id, L, a, b) tuples sorted by ID
-        entries = [(s.id, s.L, s.a, s.b) for s in sorted(measured, key=lambda s: s.id)]
-        
-        if len(entries) > MAX_ENTRIES:
-            messagebox.showerror("Error", f"Too many entries ({len(entries)}), max is {MAX_ENTRIES}")
-            return
-        
-        try:
-            # Generate binary table data
-            table_data = self._generate_kona_binary(entries)
-            
-            self.progress_var.set(f"Uploading {len(entries)} entries to device...")
-            self.root.update()
-            
-            # Upload to device
-            success, message = self.serial.kona_load(table_data)
-            
-            if success:
-                messagebox.showinfo("Success", f"Kona table uploaded successfully.\n{message}")
-                self.progress_var.set(f"Kona table uploaded: {message}")
-                self._update_kona_status()
-            else:
-                messagebox.showerror("Error", f"Upload failed:\n{message}")
-                self.progress_var.set(f"Upload failed: {message}")
-                
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to upload table:\n{e}")
-            self.progress_var.set(f"Upload error: {e}")
-
     def _on_measure(self):
         """Take a measurement and compare to the selected swatch.
         
@@ -1904,36 +1768,6 @@ class KonaScannerApp:
         
         self.root.update_idletasks()
         self.root.bell()
-
-    def _generate_kona_binary(self, entries: List[Tuple[int, float, float, float]]) -> bytes:
-        """Generate binary kona_table_t data from list of (id, L, a, b) tuples.
-        
-        Returns bytes that can be sent directly to the device.
-        """
-        # Pack entries into binary format matching firmware kona_ref_t struct
-        def pack_entry(kona_id: int, L: float, a: float, b: float) -> bytes:
-            # Pack as: uint16_t + 2 padding bytes + 3 floats (little-endian)
-            # This must match sizeof(kona_ref_t) = 16 bytes
-            return struct.pack("<H2x3f", kona_id, L, a, b)
-        
-        # Build entry payload - used for both CRC and final output
-        entry_data = bytearray()
-        for kona_id, L, a, b in entries:
-            entry_data.extend(pack_entry(kona_id, L, a, b))
-        
-        # Calculate CRC32 over actual entries only (not padding)
-        crc = zlib.crc32(entry_data) & 0xFFFFFFFF
-        
-        # Pad to full 365 entries (all zeros)
-        remaining = MAX_ENTRIES - len(entries)
-        if remaining > 0:
-            entry_data.extend(b'\x00' * (remaining * KONA_REF_T_SIZE))
-        
-        # Build complete table: header + entries
-        # Header: uint16_t version + uint16_t entry_count + uint32_t crc32
-        header = struct.pack("<HHI", SCHEMA_VERSION, len(entries), crc)
-        
-        return header + bytes(entry_data)
 
     def _on_window_close(self):
         """Handle window close event with unsaved changes check."""

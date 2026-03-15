@@ -174,11 +174,7 @@ static esp_err_t apply_sensor_correction(const sensor_reading_t* reading, xyz_t*
  */
 static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
 {
-    // Check for temporary table first, then fall back to built-in
-    const bool have_temp = kona_ref_is_temp_active();
-    const bool have_builtin = s_kona_reference_ready;
-    
-    if (!have_temp && !have_builtin)
+    if (!s_kona_reference_ready)
     {
         return false;
     }
@@ -189,7 +185,7 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
     }
 
     const kona_ref_t* entries = kona_ref_entries();
-    const size_t count = kona_ref_active_entry_count();
+    const size_t count = kona_ref_entry_count();
 
     // Diagnostic: log input Lab values for debugging CIEDE2000 discrepancy
     ESP_LOGI(TAG, "Kona input: measured Lab L=%.4f a=%.4f b=%.4f (count=%zu)",
@@ -220,8 +216,8 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
                  best_delta_e);
     }
 
-    ESP_LOGI(TAG, "Kona result: best_entry %p best_delta %f max delta %f (temp=%d)",
-             best_entry, best_delta_e, s_config.kona_max_delta_e, have_temp);
+    ESP_LOGI(TAG, "Kona result: best_entry %p best_delta %f max delta %f",
+             best_entry, best_delta_e, s_config.kona_max_delta_e);
     // Reject if no match or distance exceeds threshold
     if (!best_entry || best_delta_e >= s_config.kona_max_delta_e)
     {
