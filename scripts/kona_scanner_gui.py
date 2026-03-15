@@ -1832,16 +1832,16 @@ class KonaScannerApp:
         
         # Interpret the result - separate quality level and description
         if delta_e < 1.0:
-            quality_level = "Excellent match"
+            quality_level = "Excellent"
             quality_desc = "imperceptible difference"
         elif delta_e < 2.0:
-            quality_level = "Good match"
+            quality_level = "Good"
             quality_desc = "within Kona threshold"
         elif delta_e < 3.0:
-            quality_level = "Fair match"
+            quality_level = "Fair"
             quality_desc = "perceptible difference"
         elif delta_e < 5.0:
-            quality_level = "Poor match"
+            quality_level = "Poor"
             quality_desc = "noticeable difference"
         else:
             quality_level = "No match"
