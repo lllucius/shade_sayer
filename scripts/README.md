@@ -138,7 +138,8 @@ and cached Lab values (for fast builds).
     "g": 228,
     "b": 0
   },
-  "notes": ""
+  "notes": "",
+  "description": "A clear yellow like sunflower petals or lemon peel, with a bright and sunny look."
 }
 ```
 
@@ -155,6 +156,7 @@ and cached Lab values (for fast builds).
 | `raw.integration_ms` | Integration time in milliseconds |
 | `lab.l/a/b` | Cached Lab values from the current pipeline (used by normal builds) |
 | `rgb.r/g/b` | Display RGB values (informational) |
+| `description` | Single-sentence real-world description of the swatch color |
 
 ### Normal vs. Regeneration Build Paths
 
