@@ -3,8 +3,7 @@
  * @brief Kona Reference Table Validation and Access Implementation
  *
  * Provides runtime validation of the Kona reference table (CRC32 checksum)
- * and accessor functions for table data. Supports loading temporary tables
- * from the GUI application for testing purposes.
+ * and accessor functions for table data.
  */
 
 #include "konaref.h"
@@ -12,25 +11,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-
-/**
- * @brief Storage for temporarily loaded Kona table.
- *
- * When a temporary table is loaded via kona_ref_load_temp(), it is copied
- * here and takes precedence over the built-in table. The temporary table
- * is cleared on device reset or by calling kona_ref_clear_temp().
- */
-static kona_table_t s_temp_table = {};
-
-/**
- * @brief Flag indicating whether a temporary table is active.
- */
-static bool s_temp_table_active = false;
-
-/**
- * @brief Flag indicating whether the temporary table has been validated.
- */
-static bool s_temp_table_valid = false;
 
 /**
  * @brief Compute CRC32 checksum using IEEE 802.3 polynomial.
@@ -100,60 +80,5 @@ size_t kona_ref_entry_count(void)
 
 const kona_ref_t* kona_ref_entries(void)
 {
-    // Prefer temporary table if active and valid
-    if (s_temp_table_active && s_temp_table_valid)
-    {
-        return s_temp_table.entries;
-    }
     return kona_reference.entries;
-}
-
-bool kona_ref_load_temp(const kona_table_t* table)
-{
-    if (!table)
-    {
-        return false;
-    }
-
-    // Validate before loading
-    if (!validate_table(table))
-    {
-        return false;
-    }
-
-    // Copy table to internal storage
-    memcpy(&s_temp_table, table, sizeof(kona_table_t));
-    s_temp_table_valid = true;
-    s_temp_table_active = true;
-
-    return true;
-}
-
-void kona_ref_clear_temp(void)
-{
-    s_temp_table_active = false;
-    s_temp_table_valid = false;
-    memset(&s_temp_table, 0, sizeof(kona_table_t));
-}
-
-bool kona_ref_is_temp_active(void)
-{
-    return s_temp_table_active && s_temp_table_valid;
-}
-
-size_t kona_ref_active_entry_count(void)
-{
-    // Prefer temporary table if active and valid
-    if (s_temp_table_active && s_temp_table_valid)
-    {
-        return static_cast<size_t>(s_temp_table.entry_count);
-    }
-
-    // Fall back to built-in table if valid
-    if (validate_table(&kona_reference))
-    {
-        return static_cast<size_t>(kona_reference.entry_count);
-    }
-
-    return 0;
 }

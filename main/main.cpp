@@ -126,6 +126,12 @@ static char s_description_buffer[TTS_DESCRIPTION_BUFFER_SIZE];
 static color_result_t s_last_result;
 static bool s_has_last_result = false;
 
+// Raw capture statistics from the most recent SCAN command, for pipeline replay.
+// Updated only by the SCAN command handler and queried by the RAWDATA command.
+// Persists across multiple RAWDATA queries until the next SCAN.
+static color_capture_stats_t s_last_scan_stats = {};
+static bool s_has_last_scan_stats = false;
+
 // Next swatch index for Kona scan workflow
 static uint16_t s_kona_scan_index = 0;
 static bool s_kona_scan_active = false;
@@ -720,12 +726,20 @@ static void enter_serial_scan_mode(void)
                         }
                         else
                         {
+                            // Suppress ESP logging during the scan to prevent
+                            // ESP_LOGx output (which goes to stdout) from
+                            // interfering with the SCAN response.  Mixing
+                            // ESP_LOG and stdio on the same stdout causes
+                            // intermittent hangs on subsequent scans.
+                            esp_log_level_set("*", ESP_LOG_NONE);
+
                             // Turn on LED for measurement
                             s_sensor->setLed(true);
                             vTaskDelay(pdMS_TO_TICKS(50));
                             
                             color_result_t result = {};
-                            esp_err_t ret = color_pipeline_identify(s_sensor, &result);
+                            color_capture_stats_t scan_stats = {};
+                            esp_err_t ret = color_pipeline_identify(s_sensor, &result, &scan_stats);
                             
                             s_sensor->setLed(false);
                             
@@ -736,128 +750,56 @@ static void enter_serial_scan_mode(void)
                             }
                             else
                             {
-                                // Output Lab values and RGB
-                                printf("OK:LAB:%.4f,%.4f,%.4f:RGB:%d,%d,%d\n",
-                                       result.lab.l, result.lab.a, result.lab.b,
-                                       result.rgb[0], result.rgb[1], result.rgb[2]);
+                                // Return pre-saturation-boost Lab (scan_lab) and the corresponding
+                                // sRGB values for storage in kona_captures.json.
+                                // Pre-boost Lab keeps distinct swatches distinguishable — saturation
+                                // boost + ±110 clamping would otherwise collapse highly saturated
+                                // colors (e.g., different oranges) to identical a*/b* values.
+                                uint8_t scan_r, scan_g, scan_b;
+                                color_math_lab_to_rgb(result.scan_lab,
+                                                      &scan_r, &scan_g, &scan_b);
+                                char scan_resp[96];
+                                snprintf(scan_resp, sizeof(scan_resp),
+                                         "OK:LAB:%.4f,%.4f,%.4f:RGB:%d,%d,%d",
+                                         (double)result.scan_lab.l,
+                                         (double)result.scan_lab.a,
+                                         (double)result.scan_lab.b,
+                                         (int)scan_r, (int)scan_g, (int)scan_b);
+                                puts(scan_resp);
                                 fflush(stdout);
                                 
                                 s_last_result = result;
                                 s_has_last_result = true;
+
+                                // Store raw capture stats for retrieval via the RAWDATA command
+                                s_last_scan_stats = scan_stats;
+                                s_has_last_scan_stats = true;
                             }
+
+                            // Restore logging
+                            esp_log_level_set("*", ESP_LOG_INFO);
                         }
                     }
-                    else if (strcmp(cmd_buffer, "KONA_STATUS") == 0)
+                    else if (strcmp(cmd_buffer, "RAWDATA") == 0)
                     {
-                        // Report Kona table status
-                        const bool temp_active = kona_ref_is_temp_active();
-                        const size_t entry_count = kona_ref_active_entry_count();
-                        const bool builtin_valid = kona_ref_validate();
-                        printf("OK:KONA_STATUS:temp=%d,entries=%zu,builtin=%d\n",
-                               temp_active, entry_count, builtin_valid);
-                        fflush(stdout);
-                    }
-                    else if (strcmp(cmd_buffer, "KONA_CLEAR") == 0)
-                    {
-                        // Clear temporary Kona table
-                        kona_ref_clear_temp();
-                        printf("OK:KONA_CLEARED\n");
-                        fflush(stdout);
-                        ESP_LOGI(TAG, "Temporary Kona table cleared");
-                    }
-                    else if (strncmp(cmd_buffer, "KONA_LOAD:", 10) == 0)
-                    {
-                        // Parse expected byte count
-                        const char* size_str = cmd_buffer + 10;
-                        const size_t expected_bytes = static_cast<size_t>(atoi(size_str));
-                        
-                        // Validate size
-                        if (expected_bytes != sizeof(kona_table_t))
+                        // Return raw ADC sensor values from the most recent SCAN for pipeline replay.
+                        // Format: OK:RAWDATA:x,y,z,ir,clear,gain,integration_ms
+                        if (!s_has_last_scan_stats)
                         {
-                            printf("ERR:KONA_LOAD:SIZE_MISMATCH:expected=%zu,got=%zu\n",
-                                   sizeof(kona_table_t), expected_bytes);
+                            printf("ERR:NO_RAWDATA\n");
                             fflush(stdout);
                         }
                         else
                         {
-                            // Signal ready to receive
-                            printf("OK:KONA_LOAD:READY:%zu\n", sizeof(kona_table_t));
+                            printf("OK:RAWDATA:%u,%u,%u,%u,%u,%u,%u\n",
+                                   (unsigned)s_last_scan_stats.raw_x,
+                                   (unsigned)s_last_scan_stats.raw_y,
+                                   (unsigned)s_last_scan_stats.raw_z,
+                                   (unsigned)s_last_scan_stats.raw_ir,
+                                   (unsigned)s_last_scan_stats.raw_clear,
+                                   (unsigned)s_last_scan_stats.gain_code,
+                                   (unsigned)s_last_scan_stats.integration_ms);
                             fflush(stdout);
-                            
-                            // Allocate buffer for receiving binary data
-                            uint8_t* recv_buffer = static_cast<uint8_t*>(malloc(sizeof(kona_table_t)));
-                            if (!recv_buffer)
-                            {
-                                printf("ERR:KONA_LOAD:OUT_OF_MEMORY\n");
-                                fflush(stdout);
-                            }
-                            else
-                            {
-                                // Read binary data with timeout
-                                size_t bytes_received = 0;
-                                const uint32_t timeout_ms = 10000; // 10 second timeout
-                                const TickType_t start_tick = xTaskGetTickCount();
-                                
-                                // Temporarily set stdin to blocking with timeout for bulk read
-                                while (bytes_received < sizeof(kona_table_t))
-                                {
-                                    // Check timeout using tick count subtraction.
-                                    // This handles wrap-around correctly due to unsigned arithmetic,
-                                    // as long as timeout is less than half the tick range.
-                                    const TickType_t elapsed_ticks = xTaskGetTickCount() - start_tick;
-                                    if ((elapsed_ticks * portTICK_PERIOD_MS) > timeout_ms)
-                                    {
-                                        break;
-                                    }
-                                    
-                                    // Try to read available bytes
-                                    int ch;
-                                    while (bytes_received < sizeof(kona_table_t) && (ch = getchar()) != EOF)
-                                    {
-                                        recv_buffer[bytes_received++] = static_cast<uint8_t>(ch);
-                                    }
-                                    
-                                    // Clear EAGAIN from non-blocking read
-                                    if (errno == EAGAIN)
-                                    {
-                                        errno = 0;
-                                    }
-                                    
-                                    // Small delay if no data available
-                                    if (bytes_received < sizeof(kona_table_t))
-                                    {
-                                        vTaskDelay(pdMS_TO_TICKS(10));
-                                    }
-                                }
-                                
-                                if (bytes_received != sizeof(kona_table_t))
-                                {
-                                    printf("ERR:KONA_LOAD:INCOMPLETE:%zu/%zu\n",
-                                           bytes_received, sizeof(kona_table_t));
-                                    fflush(stdout);
-                                }
-                                else
-                                {
-                                    // Try to load the table
-                                    const kona_table_t* table = reinterpret_cast<const kona_table_t*>(recv_buffer);
-                                    if (kona_ref_load_temp(table))
-                                    {
-                                        printf("OK:KONA_LOADED:entries=%u\n",
-                                               static_cast<unsigned int>(table->entry_count));
-                                        fflush(stdout);
-                                        ESP_LOGI(TAG, "Temporary Kona table loaded: %u entries",
-                                                 static_cast<unsigned int>(table->entry_count));
-                                    }
-                                    else
-                                    {
-                                        printf("ERR:KONA_LOAD:VALIDATION_FAILED\n");
-                                        fflush(stdout);
-                                        ESP_LOGW(TAG, "Kona table validation failed");
-                                    }
-                                }
-                                
-                                free(recv_buffer);
-                            }
                         }
                     }
                     else

@@ -1,9 +1,8 @@
 set(KONA_REF_TABLE_SRC "konaref_default.cpp")
 
-# Prefer kona_captures.json only if it contains measured swatches with Lab values.
-# An empty or template JSON falls through to the legacy CSV for backward compatibility.
+# Generate Kona reference table from kona_captures.json.
+# Only swatches with measured=true and valid Lab values are included.
 set(KONA_CAPTURE_JSON "${CMAKE_SOURCE_DIR}/kona_captures.json")
-set(KONA_CAPTURE_CSV "${CMAKE_SOURCE_DIR}/kona_cotton_solids_k001.csv")
 set(KONA_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/generate_kona_table.py")
 
 if(EXISTS "${KONA_CAPTURE_JSON}" AND EXISTS "${KONA_GENERATOR}")
@@ -16,10 +15,6 @@ if(EXISTS "${KONA_CAPTURE_JSON}" AND EXISTS "${KONA_GENERATOR}")
     if(_JSON_HAS_DATA EQUAL 0)
         set(KONA_ACTIVE_INPUT "${KONA_CAPTURE_JSON}")
     endif()
-endif()
-
-if(NOT DEFINED KONA_ACTIVE_INPUT AND EXISTS "${KONA_CAPTURE_CSV}" AND EXISTS "${KONA_GENERATOR}")
-    set(KONA_ACTIVE_INPUT "${KONA_CAPTURE_CSV}")
 endif()
 
 if(DEFINED KONA_ACTIVE_INPUT AND EXISTS "${KONA_GENERATOR}")

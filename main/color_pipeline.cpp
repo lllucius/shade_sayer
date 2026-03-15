@@ -174,11 +174,7 @@ static esp_err_t apply_sensor_correction(const sensor_reading_t* reading, xyz_t*
  */
 static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
 {
-    // Check for temporary table first, then fall back to built-in
-    const bool have_temp = kona_ref_is_temp_active();
-    const bool have_builtin = s_kona_reference_ready;
-    
-    if (!have_temp && !have_builtin)
+    if (!s_kona_reference_ready)
     {
         return false;
     }
@@ -189,7 +185,7 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
     }
 
     const kona_ref_t* entries = kona_ref_entries();
-    const size_t count = kona_ref_active_entry_count();
+    const size_t count = kona_ref_entry_count();
 
     // Diagnostic: log input Lab values for debugging CIEDE2000 discrepancy
     ESP_LOGI(TAG, "Kona input: measured Lab L=%.4f a=%.4f b=%.4f (count=%zu)",
@@ -220,8 +216,8 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
                  best_delta_e);
     }
 
-    ESP_LOGI(TAG, "Kona result: best_entry %p best_delta %f max delta %f (temp=%d)",
-             best_entry, best_delta_e, s_config.kona_max_delta_e, have_temp);
+    ESP_LOGI(TAG, "Kona result: best_entry %p best_delta %f max delta %f",
+             best_entry, best_delta_e, s_config.kona_max_delta_e);
     // Reject if no match or distance exceeds threshold
     if (!best_entry || best_delta_e >= s_config.kona_max_delta_e)
     {
@@ -377,6 +373,14 @@ static esp_err_t capture_averaged_xyz(TCS3530* sensor,
             stats->integration_ms = reading.integration_ms;
             stats->status2 = reading.status2;
             stats->status6 = reading.status6;
+            // Capture the raw ADC counts from the first accepted reading. These values
+            // are stored once (accepted_samples == 1) and are used for kona pipeline
+            // replay via regenerate_kona_lab.py after pipeline parameter changes.
+            stats->raw_x = reading.x;
+            stats->raw_y = reading.y;
+            stats->raw_z = reading.z;
+            stats->raw_ir = reading.ir;
+            stats->raw_clear = reading.clear;
         }
 
 sample_delay:
@@ -394,6 +398,13 @@ sample_delay:
             stats->integration_ms = last_reading.integration_ms;
             stats->status2 = last_reading.status2;
             stats->status6 = last_reading.status6;
+            // All samples were rejected (saturated or below signal floor); fall back to
+            // the last reading's raw ADC counts so pipeline replay can still be attempted.
+            stats->raw_x = last_reading.x;
+            stats->raw_y = last_reading.y;
+            stats->raw_z = last_reading.z;
+            stats->raw_ir = last_reading.ir;
+            stats->raw_clear = last_reading.clear;
         }
 
         // If all samples were below the luminance acceptance floor, keep the
@@ -907,7 +918,8 @@ esp_err_t color_pipeline_capture_csv(TCS3530* sensor,
     return ESP_OK;
 }
 
-esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
+esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
+                                  color_capture_stats_t* stats_out)
 {
     if (!sensor || !result)
     {
@@ -926,6 +938,9 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
     {
         return ret;
     }
+
+    // Track which capture produced the accepted result so raw values can be reported.
+    color_capture_stats_t winning_stats = capture_stats;
 
     result->saturated = capture_stats.any_saturated;
     result->flicker_detected = capture_stats.flicker_detected;
@@ -997,6 +1012,7 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
                     if (set_ret == ESP_OK && (!retry_result.low_light || retry_result.luminance > result->luminance))
                     {
                         *result = retry_result;
+                        winning_stats = retry_stats;
                     }
                 }
             }
@@ -1051,6 +1067,7 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
                     if (set_ret == ESP_OK && (!retry_result.saturated || retry_result.luminance < result->luminance))
                     {
                         *result = retry_result;
+                        winning_stats = retry_stats;
                     }
                 }
 
@@ -1106,6 +1123,7 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
                     if (set_ret == ESP_OK && !retry_result.saturated)
                     {
                         *result = retry_result;
+                        winning_stats = retry_stats;
                     }
                 }
 
@@ -1116,6 +1134,11 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result)
                 }
             }
         }
+    }
+
+    if (stats_out)
+    {
+        *stats_out = winning_stats;
     }
 
     return ret;
@@ -1179,15 +1202,17 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
 
     result->xyz = corrected;
 
-    // For display Lab values and Kona matching, normalize XYZ to prevent extreme
-    // b* values. The Kona reference table was generated using normalized Lab values,
-    // so we must use the same normalization for accurate deltaE matching.
+    // For display Lab values, normalize XYZ to prevent extreme b* values for display.
+    // The Z floor is applied for display only — it is NOT applied when computing scan_lab
+    // (the Lab values captured by SCAN and stored in kona_captures.json) to preserve the
+    // natural b* variation between similarly-saturated swatches.
     xyz_t lab_xyz = corrected;
 
     // Normalize XYZ values when luminance exceeds D65 white reference.
     // This prevents Lab values from going out of gamut (b* > 200) when the sensor
     // reports colors brighter than reference white (e.g., saturated yellows).
     // We scale all channels proportionally to preserve chromaticity (hue).
+    // Applied to BOTH display and scan paths.
     if (lab_xyz.y > D65_Y)
     {
         float scale = D65_Y / lab_xyz.y;
@@ -1197,12 +1222,46 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         TCS_LOGD(TAG, "XYZ normalized: Y=%.1f -> %.1f (scale=%.4f)", corrected.y, lab_xyz.y, scale);
     }
 
-    // Apply minimum Z floor relative to luminance to prevent extreme b* values.
+    // === SCAN LAB PATH (no Z floor, no saturation boost) ===
+    // Compute scan_lab from the Y-normalized XYZ WITHOUT applying the Z floor or
+    // saturation boost. This produces the raw perceptual Lab value for each swatch
+    // that is stored in kona_captures.json and used to build the Kona reference table.
+    //
+    // Why no saturation boost: the 1.5× boost + ±110 clamp collapses deeply-saturated
+    // swatches (e.g., CARROT, TORCH, ORANGEADE) to identical a*=110 b*=110, making
+    // them impossible to distinguish.  Pre-boost Lab values naturally differ in both
+    // a* and b* (driven by the PCCM-corrected XYZ) and remain distinct.
+    //
+    // Why no Z floor: the Z floor forces a minimum Z of 20% of Y, which gives all
+    // saturated yellows/oranges the same b*≈85 before boost. Without the Z floor the
+    // natural b* variation (CANTALOUPE b*≈60 vs SUNNY b*≈73) is preserved.
+    {
+        // CRITICAL: Use scale=1.0 to prevent double-scaling (same as display path below).
+        // s_params.lightness_scale is already applied in apply_sensor_correction() in XYZ
+        // space (it scales the whole XYZ triplet). Re-applying it here in Lab space would
+        // scale L a second time. Only apply gamma and offset in Lab space.
+        color_calib_params_t scan_lightness_params = s_params;
+        scan_lightness_params.lightness_scale = 1.0f;
+
+        lab_t scan_lab = color_math_xyz_to_lab(lab_xyz);
+        scan_lab.l = color_math_correct_lightness(scan_lab.l, &scan_lightness_params);
+
+        // No saturation boost and no clamp — preserve natural Lab values so that
+        // highly-saturated swatches remain distinguishable in kona_captures.json.
+        result->scan_lab = scan_lab;
+    }
+
+    // === DISPLAY LAB PATH (with Z floor) ===
+    // Apply minimum Z floor relative to luminance to prevent extreme b* values on display.
     // When the PCCM collapses Z to near-zero (e.g., for saturated yellows), the Lab
     // b* calculation explodes because b* = 200*(fy - fz) and fz becomes very small.
-    // A minimum Z of 20% of Y keeps pre-boost b* around 86, allowing distinct a*
-    // values to be preserved even when b* is clamped after saturation boost.
-    const float MIN_Z_TO_Y_RATIO = 0.20f;  // Minimum Z as fraction of Y
+    // A minimum Z of 20% of Y caps b* at roughly 86 pre-boost (at Y=100, Z_floor=20
+    // gives f(20/108.883)=0.573, so b=200*(1.0-0.573)=85.4). This prevents runaway
+    // display values while still allowing saturation boost to bring b* up to 110 for
+    // fully saturated colors.
+    // The Z floor only affects the display path (result->lab); scan_lab uses the
+    // natural Z (above) to maintain distinct b* values across different swatches.
+    const float MIN_Z_TO_Y_RATIO = 0.20f;  // 20% of Y → pre-boost b* cap ≈ 86
     float min_z = lab_xyz.y * MIN_Z_TO_Y_RATIO;
     if (lab_xyz.z < min_z)
     {
@@ -1258,10 +1317,14 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
     }
     else
     {
-        // Use fully processed Lab (after saturation boost and clamping) for Kona matching.
-        // The Kona reference table stores Lab values from device SCAN responses, which
-        // include all processing. Using result->lab ensures consistent comparison.
-        if (try_match_kona_reference(&result->lab, result))
+        // Use scan_lab (Y-normalized, no Z floor, no saturation boost) for Kona matching.
+        // The Kona reference table is built from kona_captures.json values that were
+        // captured using this same scan_lab computation, so matching against scan_lab
+        // ensures accurate deltaE between measured colors and stored references.
+        // Using pre-boost values keeps highly saturated swatches (e.g., CARROT, TORCH)
+        // distinguishable where boost+clamp would otherwise collapse them to identical
+        // a*=110, b*=110 values.
+        if (try_match_kona_reference(&result->scan_lab, result))
         {
             result->description = nullptr;
             TCS_LOGD(TAG, "Kona match: id=%u name=%s dE=%.3f",
