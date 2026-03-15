@@ -767,12 +767,12 @@ class KonaScannerApp:
         """Configure the dark mode theme for the application."""
         # Dark mode color palette
         bg_dark = "#1e1e1e"       # Main background
-        bg_medium = "#2d2d2d"     # Slightly lighter background (for contrast)
-        bg_light = "#3c3c3c"      # Lighter elements (entry fields, etc.)
+        bg_medium = "#2d2d2d"     # Slightly lighter background
+        bg_light = "#3c3c3c"      # Lighter elements
         fg_main = "#d4d4d4"       # Main text color
-        fg_dim = "#808080"        # Dimmed text
+        fg_dim = "#808080"        # Dimmed/disabled text
         accent = "#0078d4"        # Selection/accent color
-        accent_dark = "#005a9e"   # Darker accent for pressed states
+        accent_dark = "#005a9e"   # Pressed state accent
         border = "#555555"        # Border color
 
         # Configure root window background
