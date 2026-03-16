@@ -45,8 +45,8 @@ static color_pipeline_config_t s_config =
     .has_led_calibration = false,
     .has_ambient_calibration = false,
     .has_black_calibration = false,
-    .num_samples = 3,
-    .sample_delay_ms = 50,
+    .num_samples = 5,
+    .sample_delay_ms = 80,
     .gray_threshold = 5.0f,
     .color_threshold = 60.0f,
     .saturation_boost = 1.5f
@@ -283,12 +283,13 @@ static esp_err_t capture_averaged_xyz(TCS3530* sensor,
     memset(stats, 0, sizeof(*stats));
     stats->requested_samples = (s_config.num_samples > 0) ? s_config.num_samples : 1;
 
-    float sum_x = 0.0f;
-    float sum_y = 0.0f;
-    float sum_z = 0.0f;
-    float sum_x2 = 0.0f;
-    float sum_y2 = 0.0f;
-    float sum_z2 = 0.0f;
+    // Collect accepted XYZ samples in a fixed-size array for trimmed mean computation.
+    // Sized at 12 to comfortably hold the default num_samples (5) plus a full texture
+    // retry round (another 5), with headroom for any user override up to this cap.
+    static const int MAX_ACCEPTED_SAMPLES = 12;
+    xyz_t accepted_xyz[MAX_ACCEPTED_SAMPLES];
+    sensor_reading_t first_accepted_reading = {};
+    bool has_first_accepted = false;
 
     sensor_reading_t last_reading = {};
     bool has_last = false;
@@ -359,28 +360,17 @@ static esp_err_t capture_averaged_xyz(TCS3530* sensor,
             goto sample_delay;
         }
 
-        sum_x += corrected_xyz.x;
-        sum_y += corrected_xyz.y;
-        sum_z += corrected_xyz.z;
-        sum_x2 += corrected_xyz.x * corrected_xyz.x;
-        sum_y2 += corrected_xyz.y * corrected_xyz.y;
-        sum_z2 += corrected_xyz.z * corrected_xyz.z;
+        // Store accepted sample in the fixed-size collection array.
+        if (stats->accepted_samples < MAX_ACCEPTED_SAMPLES)
+        {
+            accepted_xyz[stats->accepted_samples] = corrected_xyz;
+        }
         stats->accepted_samples++;
 
-        if (stats->accepted_samples == 1)
+        if (!has_first_accepted)
         {
-            stats->gain_code = reading.gain;
-            stats->integration_ms = reading.integration_ms;
-            stats->status2 = reading.status2;
-            stats->status6 = reading.status6;
-            // Capture the raw ADC counts from the first accepted reading. These values
-            // are stored once (accepted_samples == 1) and are used for kona pipeline
-            // replay via regenerate_kona_lab.py after pipeline parameter changes.
-            stats->raw_x = reading.x;
-            stats->raw_y = reading.y;
-            stats->raw_z = reading.z;
-            stats->raw_ir = reading.ir;
-            stats->raw_clear = reading.clear;
+            has_first_accepted = true;
+            first_accepted_reading = reading;
         }
 
 sample_delay:
@@ -450,18 +440,95 @@ sample_delay:
         return ESP_ERR_INVALID_STATE;
     }
 
-    const float n = static_cast<float>(stats->accepted_samples);
-    stats->mean_xyz.x = sum_x / n;
-    stats->mean_xyz.y = sum_y / n;
-    stats->mean_xyz.z = sum_z / n;
+    // Populate the stats fields from the first accepted reading.
+    stats->gain_code = first_accepted_reading.gain;
+    stats->integration_ms = first_accepted_reading.integration_ms;
+    stats->status2 = first_accepted_reading.status2;
+    stats->status6 = first_accepted_reading.status6;
+    // Capture the raw ADC counts from the first accepted reading. These values
+    // are used for kona pipeline replay via regenerate_kona_lab.py.
+    stats->raw_x = first_accepted_reading.x;
+    stats->raw_y = first_accepted_reading.y;
+    stats->raw_z = first_accepted_reading.z;
+    stats->raw_ir = first_accepted_reading.ir;
+    stats->raw_clear = first_accepted_reading.clear;
 
-    float var_x = (sum_x2 / n) - (stats->mean_xyz.x * stats->mean_xyz.x);
-    float var_y = (sum_y2 / n) - (stats->mean_xyz.y * stats->mean_xyz.y);
-    float var_z = (sum_z2 / n) - (stats->mean_xyz.z * stats->mean_xyz.z);
+    // Clamp the usable count in case accepted_samples exceeded the array bound.
+    int n_usable = (stats->accepted_samples < MAX_ACCEPTED_SAMPLES)
+                   ? stats->accepted_samples : MAX_ACCEPTED_SAMPLES;
+
+    // === TRIMMED MEAN ===
+    // Sort the accepted samples by Y (luminance) using a simple insertion sort.
+    // With at most MAX_ACCEPTED_SAMPLES (12) elements this is negligible overhead.
+    // Sorting by Y lets us discard the extreme high/low luminance outliers that
+    // are caused by micro-shadows and specular highlights on textured fabrics.
+    for (int a = 1; a < n_usable; ++a)
+    {
+        xyz_t key = accepted_xyz[a];
+        int j = a - 1;
+        while (j >= 0 && accepted_xyz[j].y > key.y)
+        {
+            accepted_xyz[j + 1] = accepted_xyz[j];
+            --j;
+        }
+        accepted_xyz[j + 1] = key;
+    }
+
+    // With 4+ samples, discard the lowest and highest Y outliers (1 from each end).
+    int trim_start = 0;
+    int trim_end = n_usable;
+    if (n_usable >= 4)
+    {
+        trim_start = 1;
+        trim_end = n_usable - 1;
+    }
+
+    // Compute mean from the trimmed (core) set.
+    float sum_x = 0.0f;
+    float sum_y = 0.0f;
+    float sum_z = 0.0f;
+    int core_count = trim_end - trim_start;
+    for (int k = trim_start; k < trim_end; ++k)
+    {
+        sum_x += accepted_xyz[k].x;
+        sum_y += accepted_xyz[k].y;
+        sum_z += accepted_xyz[k].z;
+    }
+
+    const float fn = static_cast<float>(core_count);
+    stats->mean_xyz.x = sum_x / fn;
+    stats->mean_xyz.y = sum_y / fn;
+    stats->mean_xyz.z = sum_z / fn;
+
+    // Compute stddev from the FULL (untrimmed) set for diagnostics.
+    float full_sum_x2 = 0.0f, full_sum_y2 = 0.0f, full_sum_z2 = 0.0f;
+    float full_sum_x = 0.0f, full_sum_y = 0.0f, full_sum_z = 0.0f;
+    for (int k = 0; k < n_usable; ++k)
+    {
+        full_sum_x += accepted_xyz[k].x;
+        full_sum_y += accepted_xyz[k].y;
+        full_sum_z += accepted_xyz[k].z;
+        full_sum_x2 += accepted_xyz[k].x * accepted_xyz[k].x;
+        full_sum_y2 += accepted_xyz[k].y * accepted_xyz[k].y;
+        full_sum_z2 += accepted_xyz[k].z * accepted_xyz[k].z;
+    }
+    const float fn_full = static_cast<float>(n_usable);
+    float mean_x_full = full_sum_x / fn_full;
+    float mean_y_full = full_sum_y / fn_full;
+    float mean_z_full = full_sum_z / fn_full;
+    float var_x = (full_sum_x2 / fn_full) - (mean_x_full * mean_x_full);
+    float var_y = (full_sum_y2 / fn_full) - (mean_y_full * mean_y_full);
+    float var_z = (full_sum_z2 / fn_full) - (mean_z_full * mean_z_full);
 
     stats->stddev_xyz.x = sqrtf(fmaxf(0.0f, var_x));
     stats->stddev_xyz.y = sqrtf(fmaxf(0.0f, var_y));
     stats->stddev_xyz.z = sqrtf(fmaxf(0.0f, var_z));
+
+    if (n_usable >= 4)
+    {
+        TCS_LOGD(TAG, "Trimmed mean: %d/%d core samples (dropped Y min=%.2f max=%.2f)",
+                 core_count, n_usable, accepted_xyz[0].y, accepted_xyz[n_usable - 1].y);
+    }
 
     xyz_t lab_xyz = stats->mean_xyz;
     clamp_xyz_floor(&lab_xyz);
@@ -883,6 +950,59 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
 
     ret = color_pipeline_process_xyz(&result->xyz, led_enabled, result);
 
+    // === TEXTURE VARIANCE RETRY ===
+    // If the coefficient of variation (CoV) of luminance across the captured samples
+    // is high, the surface is likely textured (micro-shadows and specular highlights
+    // cause high Y variance). Take a second round of samples and merge the two rounds
+    // via a weighted average to reduce the influence of outlier readings.
+    // A CoV of 15% was chosen as the texture detection threshold based on the
+    // observed variance difference between flat swatches (typically < 5% CoV) and
+    // textured fabrics (typically 20–40% CoV). At 15% the trigger is conservative
+    // enough to avoid spurious retries on flat surfaces while reliably catching
+    // textured materials that would benefit from additional spatial averaging.
+    static const float TEXTURE_CV_THRESHOLD = 0.15f;
+    if (ret == ESP_OK && !result->low_light && !result->saturated &&
+        capture_stats.accepted_samples >= 2 && capture_stats.mean_xyz.y > 0.1f)
+    {
+        float cv_y = capture_stats.stddev_xyz.y / capture_stats.mean_xyz.y;
+        if (cv_y > TEXTURE_CV_THRESHOLD)
+        {
+            ESP_LOGI(TAG,
+                     "High variance detected (CoV=%.2f), taking additional samples for textured surface",
+                     cv_y);
+
+            color_capture_stats_t extra_stats = {};
+            esp_err_t extra_ret = color_pipeline_capture_averaged(sensor, led_enabled, &extra_stats);
+            if (extra_ret == ESP_OK && extra_stats.accepted_samples > 0)
+            {
+                float n1 = static_cast<float>(capture_stats.accepted_samples);
+                float n2 = static_cast<float>(extra_stats.accepted_samples);
+                float total = n1 + n2;
+                xyz_t merged_xyz;
+                merged_xyz.x = (capture_stats.mean_xyz.x * n1 + extra_stats.mean_xyz.x * n2) / total;
+                merged_xyz.y = (capture_stats.mean_xyz.y * n1 + extra_stats.mean_xyz.y * n2) / total;
+                merged_xyz.z = (capture_stats.mean_xyz.z * n1 + extra_stats.mean_xyz.z * n2) / total;
+
+                // Rebuild the result from the merged XYZ.
+                color_result_t merged_result = {};
+                merged_result.xyz = merged_xyz;
+                clamp_xyz_floor(&merged_result.xyz);
+                merged_result.saturated = capture_stats.any_saturated || extra_stats.any_saturated;
+                merged_result.flicker_detected = capture_stats.flicker_detected || extra_stats.flicker_detected;
+                merged_result.timestamp_us = tcs_time_us();
+
+                esp_err_t merge_ret = color_pipeline_process_xyz(&merged_result.xyz, led_enabled, &merged_result);
+                if (merge_ret == ESP_OK)
+                {
+                    *result = merged_result;
+                    // Update capture_stats to reflect the merged total sample count.
+                    capture_stats.accepted_samples += extra_stats.accepted_samples;
+                    // Keep winning_stats pointing at the first capture round for raw ADC replay.
+                }
+            }
+        }
+    }
+
     // Retry with longer integration time and higher gain if the result is too dark.
     // Combining both gives up to 8x more signal (2x integration × 4x gain), which
     // helps extremely low-reflectance surfaces that are barely above the sensor noise floor.
@@ -1227,6 +1347,10 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
     TCS_LOGD(TAG, "Pre-enhance Lab: L=%.1f a=%.1f b=%.1f chroma=%.1f",
              result->lab.l, result->lab.a, result->lab.b, raw_chroma);
 
+    // Save pre-boost a*/b* so we can re-apply a confidence-scaled boost later.
+    float pre_boost_a = result->lab.a;
+    float pre_boost_b = result->lab.b;
+
     float enhanced_chroma = color_math_enhance_saturation(&result->lab,
                             s_config.gray_threshold,
                             s_config.color_threshold,
@@ -1289,6 +1413,30 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
                 result->color_name = COLOR_NAME_UNKNOWN;
                 result->description = COLOR_DESC_NO_MATCH;
             }
+        }
+
+        // === CONFIDENCE-SCALED SATURATION BOOST ===
+        // Reduce the saturation boost for low-confidence matches to prevent over-boosting
+        // uncertain readings (e.g., from textured surfaces) into an incorrect vivid color name.
+        // At confidence=1.0 the full boost is applied; at confidence=0.0 no boost is applied.
+        float confidence_factor = fmaxf(0.0f, fminf(1.0f, result->confidence));
+        float effective_boost = 1.0f + (s_params.saturation_boost - 1.0f) * confidence_factor;
+        if (effective_boost < s_params.saturation_boost - 0.01f)
+        {
+            // Restore pre-boost a*/b* and reapply with the lower effective boost.
+            result->lab.a = pre_boost_a;
+            result->lab.b = pre_boost_b;
+            enhanced_chroma = color_math_enhance_saturation(&result->lab,
+                              s_config.gray_threshold,
+                              s_config.color_threshold,
+                              effective_boost);
+            result->saturation = enhanced_chroma / 100.0f;
+            result->lab.a = fminf(fmaxf(result->lab.a, -110.0f), 110.0f);
+            result->lab.b = fminf(fmaxf(result->lab.b, -110.0f), 110.0f);
+            TCS_LOGD(TAG,
+                     "Confidence-scaled boost: confidence=%.2f factor=%.2f boost=%.2f->%.2f",
+                     result->confidence, confidence_factor,
+                     s_params.saturation_boost, effective_boost);
         }
     }
 
@@ -1392,16 +1540,27 @@ int color_pipeline_describe(const color_result_t* result, char* buffer, size_t b
     }
 
     // Build description based on confidence
-    const char* prefix = (result->confidence > CONFIDENCE_HIGH) ? "This is " :
-                         (result->confidence > CONFIDENCE_MEDIUM) ? "This looks like " :
-                         "This might be ";
-
-    len += snprintf(buffer + len, buffer_size - len, "%s%s. ", prefix, result->color_name);
-
-    // Add description if available
-    if (result->description && len < (int)buffer_size - 1)
+    // For low-confidence matches (below CONFIDENCE_MEDIUM), report the color family/category
+    // instead of a specific name that may be wrong (e.g., due to texture variance).
+    if (result->confidence <= CONFIDENCE_MEDIUM && result->category &&
+        result->category[0] != '\0')
     {
-        len += snprintf(buffer + len, buffer_size - len, "%s ", result->description);
+        len += snprintf(buffer + len, buffer_size - len,
+                        "This appears to be a shade of %s. ", result->category);
+    }
+    else
+    {
+        const char* prefix = (result->confidence > CONFIDENCE_HIGH) ? "This is " :
+                             (result->confidence > CONFIDENCE_MEDIUM) ? "This looks like " :
+                             "This might be ";
+
+        len += snprintf(buffer + len, buffer_size - len, "%s%s. ", prefix, result->color_name);
+
+        // Add description if available
+        if (result->description && len < (int)buffer_size - 1)
+        {
+            len += snprintf(buffer + len, buffer_size - len, "%s ", result->description);
+        }
     }
 
     // Add lightness and saturation qualifiers in one pass
