@@ -48,7 +48,6 @@ idf_component_register(
         "color_types.cpp"
         "auto_calibrate.cpp"
         "i2c_bus_manager.cpp"
-        "console_logger.cpp"
         "kona_metadata.cpp"
         "konaref.cpp"
         ${KONA_REF_TABLE_SRC}

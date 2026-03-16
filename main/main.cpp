@@ -72,8 +72,6 @@
 #include "auto_calibrate.h"
 #include "i2c_bus_manager.h"
 #include "hardware_pins.h"
-#include "console_logger.h"
-
 static const char* TAG = "main";
 
 // Firmware version
@@ -741,14 +739,6 @@ extern "C" void app_main(void)
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
-
-    // Initialize console logger to capture all output
-    // This must be done early to capture initialization logs
-    ret = console_logger_init();
-    if (ret != ESP_OK)
-    {
-        ESP_LOGW(TAG, "Console logger initialization failed: %s", esp_err_to_name(ret));
-    }
 
     // Disable onboard RGB LED on first boot only
     // If waking from deep sleep, the GPIO hold is already active
