@@ -199,29 +199,17 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
         return false;
     }
 
-    const kona_ref_t* entries = kona_ref_entries();
     const size_t count = kona_ref_entry_count();
 
     // Diagnostic: log input Lab values for debugging CIEDE2000 discrepancy
     ESP_LOGI(TAG, "Kona input: measured Lab L=%.4f a=%.4f b=%.4f (count=%zu)",
              lab->l, lab->a, lab->b, count);
 
-    // Linear search for closest match (O(n) for up to 2048 entries)
+    // VP-tree search — O(log n) for up to 2048 entries
     float best_delta_e = FLT_MAX;
-    const kona_ref_t* best_entry = nullptr;
     size_t best_index = 0;
-
-    for (size_t i = 0; i < count; ++i)
-    {
-        const lab_t entry_lab = {entries[i].l, entries[i].a, entries[i].b};
-        const float de = color_math_delta_e_ciede2000(lab, &entry_lab);
-        if (de < best_delta_e)
-        {
-            best_delta_e = de;
-            best_entry = &entries[i];
-            best_index = i;
-        }
-    }
+    const kona_ref_t* best_entry = kona_ref_find_closest(
+        lab->l, lab->a, lab->b, &best_delta_e, &best_index);
 
     // Diagnostic: log the best match entry details for debugging
     if (best_entry)

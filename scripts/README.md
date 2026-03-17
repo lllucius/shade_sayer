@@ -161,8 +161,25 @@ python3 generate_kona_table.py \
 - Optionally merges synthetic entries from `kona_synthetic_tints.json`; real entries always win
 - Deduplicates by `id` (last entry wins), sorted by numeric swatch id
 - Emits `kona_table_t kona_reference` with schema version, entry count, and CRC32
+- **Generates a VP-tree** alongside the reference table for O(log n) matching (vs O(n) linear scan)
 - Supports up to 2048 entries (365 real + up to ~1,460 synthetic)
 - Shared by `kona_scanner_gui.py` for C++ export
+
+**VP-tree details:**
+
+The generator builds a Vantage Point Tree over all entries using CIEDE2000 as the
+distance metric.  The tree is emitted as two additional symbols in the generated
+C++ file:
+
+| Symbol | Description |
+|--------|-------------|
+| `kona_vptree_node_count` | Number of VP-tree nodes (= entry count) |
+| `kona_vptree_nodes[]` | Flat node array; root at index 0 |
+
+Each node stores an `entry_index` into `kona_reference.entries[]`, a
+`median_distance` partitioning threshold, and left/right child indices.
+Search complexity is **O(log n)** (~10–15 CIEDE2000 calculations for 1,141
+entries, vs ~1,141 for a linear scan).
 
 ### regenerate_kona_lab.py *(new)*
 
