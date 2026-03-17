@@ -20,7 +20,6 @@
 #include "tts_manager.h"
 #include "i2c_bus_manager.h"
 #include "hardware_pins.h"
-#include "console_logger.h"
 #include "esp_log.h"
 #include "esp_sleep.h"
 #include "driver/gpio.h"
@@ -1013,29 +1012,6 @@ void power_enter_deep_sleep(void)
     // Step 1: Speak power down message
     ESP_LOGI(TAG, "Step 1: Speaking power down message");
     speak_power_down();
-
-    // Step 1.5: Save console log to NVS if errors occurred (only on battery power)
-    if (!power_is_usb_connected())
-    {
-        ESP_LOGI(TAG, "Step 1.5: Checking for errors to save console log");
-        esp_err_t log_err = console_logger_save_if_errors();
-        if (log_err == ESP_OK)
-        {
-            ESP_LOGI(TAG, "Console log saved to NVS (errors detected)");
-        }
-        else if (log_err == ESP_ERR_INVALID_STATE)
-        {
-            ESP_LOGI(TAG, "No errors in this session, log not saved");
-        }
-        else
-        {
-            ESP_LOGW(TAG, "Failed to save console log: %s", esp_err_to_name(log_err));
-        }
-    }
-    else
-    {
-        ESP_LOGI(TAG, "Step 1.5: Skipped log save (on USB power)");
-    }
 
     // Step 2: Prepare hardware for sleep
     ESP_LOGI(TAG, "Step 2: Preparing hardware for sleep");
