@@ -25,7 +25,7 @@ import zlib
 from typing import Iterable, List, Optional
 
 SCHEMA_VERSION = 1
-MAX_ENTRIES = 365
+MAX_ENTRIES = 2048
 
 
 @dataclasses.dataclass(frozen=True)
@@ -91,6 +91,42 @@ def parse_json_captures(path: pathlib.Path) -> List[KonaEntry]:
 def parse_captures(path: pathlib.Path) -> List[KonaEntry]:
     """Parse Kona capture data from a kona_captures.json file."""
     return parse_json_captures(path)
+
+
+def parse_json_synthetic(path: pathlib.Path) -> List[KonaEntry]:
+    """Parse synthetic tint/shade entries from a kona_synthetic_tints.json file.
+
+    Reads the 'swatches' array and extracts entries with valid Lab values.
+    Synthetic entries are expected to have 'synthetic': true and IDs >= 10000.
+    Duplicate IDs are deduplicated (last entry wins).
+    Output is sorted by id.
+    """
+    with path.open(encoding="utf-8") as f:
+        data = json.load(f)
+
+    entries = {}
+    for swatch in data.get("swatches", []):
+        lab = swatch.get("lab") or {}
+        l = lab.get("l")
+        a = lab.get("a")
+        b = lab.get("b")
+        if l is None or a is None or b is None:
+            continue
+
+        swatch_id_raw = swatch.get("id")
+        if swatch_id_raw is None:
+            continue
+
+        swatch_id = int(swatch_id_raw)
+        entries[swatch_id] = KonaEntry(
+            kona_id=swatch_id,
+            l=float(l),
+            a=float(a),
+            b=float(b),
+            name=str(swatch.get("name", "")).strip(),
+        )
+
+    return sorted(entries.values(), key=lambda e: e.kona_id)
 
 
 def crc32_entries(entries: Iterable[KonaEntry]) -> int:
@@ -159,16 +195,53 @@ def parse_args() -> argparse.Namespace:
                    help="Input kona_captures.json with measured Lab values")
     p.add_argument("--output", default=pathlib.Path("../main/konaref_generated.cpp"), type=pathlib.Path,
                    help="Output C++ source file path")
+    p.add_argument("--synthetic", default=None, type=pathlib.Path,
+                   help="Optional kona_synthetic_tints.json to merge (real entries take priority)")
     return p.parse_args()
 
 
 def main() -> int:
     args = parse_args()
-    entries = parse_captures(args.input)
-    output_text = render_cpp(entries, args.input)
+    real_entries = parse_captures(args.input)
+
+    synthetic_entries: List[KonaEntry] = []
+    if args.synthetic is not None:
+        if not args.synthetic.exists():
+            print(f"Warning: synthetic file not found: {args.synthetic} — skipping")
+        else:
+            synthetic_entries = parse_json_synthetic(args.synthetic)
+
+    # Merge: real entries take priority over synthetic entries with the same ID
+    real_ids = {e.kona_id for e in real_entries}
+    merged = list(real_entries)
+    skipped = 0
+    for e in synthetic_entries:
+        if e.kona_id in real_ids:
+            skipped += 1
+        else:
+            merged.append(e)
+
+    merged.sort(key=lambda e: e.kona_id)
+
+    source_script = "generate_kona_table.py"
+    if synthetic_entries:
+        source_script = "generate_kona_table.py (with synthetic tints)"
+
+    output_text = render_cpp(merged, args.input, source_script)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(output_text)
-    print(f"Wrote {len(entries)} entries to {args.output}")
+
+    if synthetic_entries:
+        used_synthetic = len(merged) - len(real_entries)
+        print(
+            f"Wrote {len(real_entries)} real + {used_synthetic} synthetic"
+            f" = {len(merged)} entries to {args.output}"
+        )
+        if skipped:
+            print(f"  (Skipped {skipped} synthetic entries that collided with real IDs)")
+    else:
+        print(f"Wrote {len(real_entries)} entries to {args.output}")
+
     return 0
 
 

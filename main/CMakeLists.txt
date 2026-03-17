@@ -19,13 +19,24 @@ endif()
 
 if(DEFINED KONA_ACTIVE_INPUT AND EXISTS "${KONA_GENERATOR}")
     set(KONA_REF_GENERATED "${CMAKE_BINARY_DIR}/generated/konaref_generated.cpp")
+    set(KONA_SYNTHETIC_JSON "${CMAKE_SOURCE_DIR}/kona_synthetic_tints.json")
+
+    # Build the generator command arguments; add --synthetic if the file exists
+    set(_KONA_GEN_ARGS
+        --input "${KONA_ACTIVE_INPUT}"
+        --output "${KONA_REF_GENERATED}"
+    )
+    set(_KONA_DEPENDS "${KONA_GENERATOR}" "${KONA_ACTIVE_INPUT}")
+    if(EXISTS "${KONA_SYNTHETIC_JSON}")
+        list(APPEND _KONA_GEN_ARGS --synthetic "${KONA_SYNTHETIC_JSON}")
+        list(APPEND _KONA_DEPENDS "${KONA_SYNTHETIC_JSON}")
+    endif()
+
     add_custom_command(
         OUTPUT "${KONA_REF_GENERATED}"
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/generated"
-        COMMAND python3 "${KONA_GENERATOR}"
-                --input "${KONA_ACTIVE_INPUT}"
-                --output "${KONA_REF_GENERATED}"
-        DEPENDS "${KONA_GENERATOR}" "${KONA_ACTIVE_INPUT}"
+        COMMAND python3 "${KONA_GENERATOR}" ${_KONA_GEN_ARGS}
+        DEPENDS ${_KONA_DEPENDS}
         COMMENT "Generating Kona reference table from ${KONA_ACTIVE_INPUT}"
         VERBATIM)
     set(KONA_REF_TABLE_SRC "${KONA_REF_GENERATED}")
