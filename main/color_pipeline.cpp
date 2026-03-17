@@ -19,11 +19,22 @@ static const char* TAG = "color_pipe";
 static const float CONFIDENCE_HIGH = 0.8f;    //< High confidence - "This is..."
 static const float CONFIDENCE_MEDIUM = 0.5f;  //< Medium confidence - "This looks like..."
 
-// Luminance threshold below which a sample is considered "near-black" and eligible
-// for a gain-boost retry to improve SNR in low-illumination conditions.
-static const float NEAR_BLACK_LUMINANCE_THRESHOLD = 25.0f;
+// Progressive auto-gain for dark surfaces.
+// Luminance (L*) threshold below which progressive auto-gain kicks in.
+// L*=25 captures most "dark" colors without triggering on medium tones.
+static const float DARK_AUTO_GAIN_LUMINANCE_THRESHOLD = 25.0f;
 
-// Number of gain steps to boost during low-light / near-black retries.
+// Target luminance (L*) at which the auto-gain loop considers the signal
+// adequate and stops boosting. L*=15 is well above the noise floor.
+static const float DARK_AUTO_GAIN_TARGET_LUMINANCE = 15.0f;
+
+// Maximum gain code for progressive auto-gain (256× = code 9).
+// Higher values (512×, 1024×, etc.) risk saturating even dark surfaces
+// when the LED is on. 256× gives a 32× boost over the 8× default,
+// which testing showed provides good dark-color discrimination.
+static const uint8_t AUTO_GAIN_MAX_CODE = 9u;  // 256×
+
+// Number of gain steps to boost during low-light retries.
 // Each step doubles the gain, so 2 steps = 4x more signal.
 static const uint8_t DARK_RETRY_GAIN_BOOST_STEPS = 2u;
 
@@ -1130,59 +1141,98 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
         }
     }
 
-    // Retry with higher gain for near-black samples that are above the low_light threshold.
-    // When LED illumination is insufficient, dark-but-colored fabrics may appear featureless
-    // black because the color signal is buried in noise. Boosting gain amplifies the signal
-    // above the sensor noise floor, improving color discrimination for dark surfaces.
+    // Progressive auto-gain for dark surfaces that are above the low_light threshold.
+    // When the initial measurement at default gain produces a low luminance result,
+    // iteratively step gain upward until the signal is well above the noise floor,
+    // the measurement saturates, or the gain ceiling is reached. This significantly
+    // improves hue discrimination for dark fabrics (corduroy, dark knits, dark solids).
     if (ret == ESP_OK && !result->low_light && !result->saturated &&
-        result->luminance < NEAR_BLACK_LUMINANCE_THRESHOLD)
+        result->luminance < DARK_AUTO_GAIN_LUMINANCE_THRESHOLD)
     {
         TCS3530Gain original_gain = sensor->gain();
         uint8_t gain_code = static_cast<uint8_t>(original_gain);
-        uint8_t retry_gain_code = gain_code + DARK_RETRY_GAIN_BOOST_STEPS;
-        if (retry_gain_code > TCS3530_MAX_GAIN_CODE)
+
+        // Track the best non-saturated result found so far.
+        color_result_t best_result = *result;
+        color_capture_stats_t best_stats = winning_stats;
+        uint8_t best_gain_code = gain_code;
+        int steps_taken = 0;
+
+        while (gain_code < AUTO_GAIN_MAX_CODE)
         {
-            retry_gain_code = TCS3530_MAX_GAIN_CODE;
+            uint8_t next_gain_code = gain_code + 1u;
+            steps_taken++;
+
+            TCS3530Gain step_gain = static_cast<TCS3530Gain>(next_gain_code);
+            esp_err_t set_ret = sensor->setGain(step_gain);
+            if (set_ret != ESP_OK)
+            {
+                ESP_LOGW(TAG, "Auto-gain step %d: failed to set gain code %u: %s",
+                         steps_taken, next_gain_code, esp_err_to_name(set_ret));
+                break;
+            }
+
+            color_capture_stats_t step_stats = {};
+            set_ret = color_pipeline_capture_averaged(sensor, led_enabled, &step_stats);
+            if (set_ret != ESP_OK)
+            {
+                ESP_LOGW(TAG, "Auto-gain step %d: capture failed: %s",
+                         steps_taken, esp_err_to_name(set_ret));
+                break;
+            }
+
+            color_result_t step_result = {};
+            step_result.xyz = step_stats.mean_xyz;
+            clamp_xyz_floor(&step_result.xyz);
+            step_result.saturated = step_stats.any_saturated;
+            step_result.flicker_detected = step_stats.flicker_detected;
+            step_result.timestamp_us = tcs_time_us();
+
+            set_ret = color_pipeline_process_xyz(&step_result.xyz, led_enabled, &step_result);
+            if (set_ret != ESP_OK)
+            {
+                ESP_LOGW(TAG, "Auto-gain step %d: process_xyz failed: %s",
+                         steps_taken, esp_err_to_name(set_ret));
+                break;
+            }
+
+            ESP_LOGI(TAG, "Auto-gain step %d: gain=%.0fx, luminance=%.1f, saturated=%d",
+                     steps_taken,
+                     tcs3530_gain_code_to_multiplier(next_gain_code),
+                     step_result.luminance,
+                     static_cast<int>(step_result.saturated));
+
+            if (step_result.saturated)
+            {
+                // Saturated — discard this step; the previous best is the highest usable gain.
+                break;
+            }
+
+            // This step is non-saturated — it has better SNR than the previous, adopt it.
+            gain_code = next_gain_code;
+            best_result = step_result;
+            best_stats = step_stats;
+            best_gain_code = gain_code;
+
+            if (step_result.luminance >= DARK_AUTO_GAIN_TARGET_LUMINANCE)
+            {
+                // Signal is adequate — stop boosting.
+                break;
+            }
         }
 
-        if (retry_gain_code > gain_code)
+        ESP_LOGI(TAG, "Auto-gain complete: %d steps, final gain=%.0fx, luminance=%.1f",
+                 steps_taken,
+                 tcs3530_gain_code_to_multiplier(best_gain_code),
+                 best_result.luminance);
+
+        *result = best_result;
+        winning_stats = best_stats;
+
+        esp_err_t restore_ret = sensor->setGain(original_gain);
+        if (restore_ret != ESP_OK)
         {
-            TCS3530Gain retry_gain = static_cast<TCS3530Gain>(retry_gain_code);
-            ESP_LOGI(TAG, "Near-black retry: luminance=%.1f < %.1f, boosting gain from %.0fx to %.0fx",
-                     result->luminance, NEAR_BLACK_LUMINANCE_THRESHOLD,
-                     tcs3530_gain_code_to_multiplier(gain_code),
-                     tcs3530_gain_code_to_multiplier(retry_gain_code));
-
-            esp_err_t set_ret = sensor->setGain(retry_gain);
-            if (set_ret == ESP_OK)
-            {
-                color_capture_stats_t retry_stats = {};
-                set_ret = color_pipeline_capture_averaged(sensor, led_enabled, &retry_stats);
-                if (set_ret == ESP_OK)
-                {
-                    color_result_t retry_result = {};
-                    retry_result.xyz = retry_stats.mean_xyz;
-                    clamp_xyz_floor(&retry_result.xyz);
-                    retry_result.saturated = retry_stats.any_saturated;
-                    retry_result.flicker_detected = retry_stats.flicker_detected;
-                    retry_result.timestamp_us = tcs_time_us();
-
-                    set_ret = color_pipeline_process_xyz(&retry_result.xyz, led_enabled, &retry_result);
-                    // Accept the gain-boosted result if it is not saturated. Even if still near-black,
-                    // the boosted measurement has better SNR and will give more accurate color hue.
-                    if (set_ret == ESP_OK && !retry_result.saturated)
-                    {
-                        *result = retry_result;
-                        winning_stats = retry_stats;
-                    }
-                }
-
-                esp_err_t restore_ret = sensor->setGain(original_gain);
-                if (restore_ret != ESP_OK)
-                {
-                    ESP_LOGW(TAG, "Failed to restore gain: %s", esp_err_to_name(restore_ret));
-                }
-            }
+            ESP_LOGW(TAG, "Auto-gain: failed to restore gain: %s", esp_err_to_name(restore_ret));
         }
     }
 
