@@ -711,7 +711,7 @@ static const char* MATERIAL_NAMES[] = {
 
 material_correction_t color_math_get_material_correction(material_type_t material)
 {
-    if (material >= 0 && material <= MATERIAL_DEFAULT)
+    if (material <= MATERIAL_DEFAULT)
     {
         return MATERIAL_CORRECTIONS[material];
     }
@@ -751,6 +751,9 @@ material_type_t color_math_classify_material(const sensor_reading_t* reading,
     // Extract sensor characteristics for classification heuristics
     // Based on ChatGPT discussion: use variance, saturation, reflectance patterns
     
+    // Minimum sensor value to prevent division by zero
+    static const float MIN_SENSOR_VALUE = 1.0f;
+    
     // Calculate approximate saturation from raw channel ratios
     // Higher X relative to Y suggests redder, higher Z relative to Y suggests bluer
     float x_norm = (float)reading->x;
@@ -759,8 +762,8 @@ material_type_t color_math_classify_material(const sensor_reading_t* reading,
     float clear = (float)reading->clear;
     
     // Avoid division by zero
-    if (y_norm < 1.0f) y_norm = 1.0f;
-    if (clear < 1.0f) clear = 1.0f;
+    if (y_norm < MIN_SENSOR_VALUE) y_norm = MIN_SENSOR_VALUE;
+    if (clear < MIN_SENSOR_VALUE) clear = MIN_SENSOR_VALUE;
     
     // Reflectance indicator: ratio of clear to sum of color channels
     // High clear relative to XYZ suggests specular reflection (metal/plastic)
@@ -842,7 +845,7 @@ material_type_t color_math_classify_material(const sensor_reading_t* reading,
 
 const char* color_math_material_name(material_type_t material)
 {
-    if (material >= 0 && material <= MATERIAL_DEFAULT)
+    if (material <= MATERIAL_DEFAULT)
     {
         return MATERIAL_NAMES[material];
     }

@@ -1640,7 +1640,9 @@ esp_err_t color_pipeline_set_params(const color_calib_params_t* params)
 
 esp_err_t color_pipeline_set_material(material_type_t material)
 {
-    if (material > MATERIAL_DEFAULT)
+    // Only FABRIC, PLASTIC, METAL, or DEFAULT are valid assumed materials
+    // UNKNOWN should not be explicitly set as the assumed material
+    if (material < MATERIAL_FABRIC || material > MATERIAL_DEFAULT)
     {
         return ESP_ERR_INVALID_ARG;
     }
