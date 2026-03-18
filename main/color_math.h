@@ -202,6 +202,69 @@ extern const float BRADFORD_MA[3][3];
  */
 extern const float BRADFORD_MA_INV[3][3];
 
+//===========================================================================
+// MATERIAL-AWARE COLOR CORRECTION
+//===========================================================================
+
+/**
+ * @brief Get the default correction parameters for a material type
+ * 
+ * Returns the pre-defined correction factors for compensating measurement
+ * bias introduced by different surface physics:
+ * 
+ * - FABRIC: L' = L*1.10 + 2, a' = a*1.05, b' = b*1.05
+ *   (lifts shadows, restores muted chroma from fiber scattering)
+ * 
+ * - PLASTIC: L' = L*0.98
+ *   (mild correction for semi-gloss specular bias)
+ * 
+ * - METAL: L' = L*0.90, a' = a*0.95, b' = b*0.95
+ *   (suppresses specular reflection bias)
+ * 
+ * - DEFAULT/UNKNOWN: identity (no correction)
+ * 
+ * @param material Material type to get correction for
+ * @return Correction factors for the specified material
+ */
+material_correction_t color_math_get_material_correction(material_type_t material);
+
+/**
+ * @brief Apply material-specific correction to Lab values
+ * 
+ * Transforms Lab values using material-specific correction factors to
+ * compensate for systematic measurement bias introduced by surface physics.
+ * 
+ * @param lab Input Lab color to correct
+ * @param correction Correction factors to apply
+ * @return Corrected Lab color
+ */
+lab_t color_math_apply_material_correction(const lab_t* lab, const material_correction_t* correction);
+
+/**
+ * @brief Classify material type from raw sensor data
+ * 
+ * Uses heuristics based on sensor signal characteristics to infer
+ * material type without requiring machine learning:
+ * 
+ * - Variance across samples: Fabrics have high variance due to thread texture
+ * - Intensity vs saturation ratio: Metals have high reflectance, low saturation
+ * - Channel ratios: Different materials have characteristic R/G/B balance
+ * 
+ * @param reading Raw sensor reading with X, Y, Z, IR, Clear channels
+ * @param variance_xyz Optional XYZ variance from multiple samples (can be NULL)
+ * @return Classified material type
+ */
+material_type_t color_math_classify_material(const sensor_reading_t* reading,
+                                             const xyz_t* variance_xyz);
+
+/**
+ * @brief Get the name of a material type as a string
+ * 
+ * @param material Material type
+ * @return Human-readable material name
+ */
+const char* color_math_material_name(material_type_t material);
+
 #ifdef __cplusplus
 }
 #endif

@@ -213,6 +213,47 @@ typedef struct
 } sensor_reading_t;
 
 /**
+ * @brief Material type identifier for per-material color correction
+ * 
+ * Different materials reflect light differently, causing systematic measurement
+ * bias that can be compensated with material-specific correction factors.
+ * 
+ * - FABRIC: Fibers scatter light (subsurface + directional), shadows between threads
+ *           lead to darker and more desaturated readings than perceived.
+ * - PLASTIC: Semi-gloss surfaces may have specular highlights biasing toward white.
+ * - METAL: Strong specular reflection, color depends heavily on angle, often reads
+ *          artificially bright or washed out.
+ * - DEFAULT: No material-specific correction applied (identity transform).
+ */
+typedef enum
+{
+    MATERIAL_UNKNOWN = 0,   //< Material not yet classified
+    MATERIAL_FABRIC,        //< Fabric/textile materials (cotton, silk, etc.)
+    MATERIAL_PLASTIC,       //< Plastic/polymer surfaces
+    MATERIAL_METAL,         //< Metallic surfaces
+    MATERIAL_DEFAULT        //< Default (no correction)
+} material_type_t;
+
+/**
+ * @brief Per-material Lab correction factors
+ * 
+ * These factors are applied to Lab values before ΔE matching to compensate
+ * for systematic measurement bias introduced by different surface physics.
+ * 
+ * Correction formula:
+ *   L' = L * l_scale + l_offset
+ *   a' = a * a_scale
+ *   b' = b * b_scale
+ */
+typedef struct
+{
+    float l_scale;      //< Lightness multiplier (1.0 = no change)
+    float l_offset;     //< Lightness offset (0.0 = no change)
+    float a_scale;      //< a* chrominance multiplier (1.0 = no change)
+    float b_scale;      //< b* chrominance multiplier (1.0 = no change)
+} material_correction_t;
+
+/**
  * @brief Illuminant type identifier
  */
 typedef enum

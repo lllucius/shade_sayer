@@ -58,6 +58,10 @@ typedef struct
     uint16_t kona_id;                //< Matched Kona swatch identifier (0 when not matched)
     bool kona_matched;               //< True when match came from Kona reference table
 
+    // Material classification
+    material_type_t material;        //< Detected/assumed material type
+    lab_t corrected_lab;             //< Lab after material correction (used for matching)
+
     // Timestamp
     uint64_t timestamp_us;           //< Reading timestamp (64-bit to avoid overflow)
 } color_result_t;
@@ -92,6 +96,11 @@ typedef struct
     float gray_threshold;            //< Chroma below this is gray (default 5.0)
     float color_threshold;           //< Chroma above this is vivid (default 60.0)
     float saturation_boost;          //< Boost factor for vivid colors (default 2.5)
+
+    // Material correction
+    bool use_material_correction;    //< Enable material-aware Lab correction (default: true)
+    material_type_t assumed_material; //< Default material type when auto-detect disabled (default: FABRIC)
+    bool auto_detect_material;       //< Auto-detect material from sensor heuristics (default: false)
 } color_pipeline_config_t;
 
 /**
@@ -104,6 +113,44 @@ typedef struct
  * @return ESP_OK on success
  */
 esp_err_t color_pipeline_set_params(const color_calib_params_t* params);
+
+/**
+ * @brief Set the assumed material type for color correction
+ *
+ * This overrides the default material type used when auto-detection is disabled.
+ * Material type affects Lab correction before ΔE matching:
+ * - FABRIC: Compensates for light scattering/shadow in fiber materials
+ * - PLASTIC: Mild correction for specular highlights
+ * - METAL: Suppresses specular reflection bias
+ * - DEFAULT: No material-specific correction
+ *
+ * @param material Material type to assume for subsequent measurements
+ * @return ESP_OK on success
+ */
+esp_err_t color_pipeline_set_material(material_type_t material);
+
+/**
+ * @brief Enable or disable material auto-detection
+ *
+ * When enabled, the pipeline analyzes sensor signal characteristics
+ * to infer material type. When disabled, uses the assumed material
+ * set by color_pipeline_set_material().
+ *
+ * @param enable True to enable auto-detection, false to use assumed material
+ * @return ESP_OK on success
+ */
+esp_err_t color_pipeline_set_material_auto_detect(bool enable);
+
+/**
+ * @brief Enable or disable material correction
+ *
+ * Material correction compensates for systematic measurement bias introduced
+ * by different surface physics (fabric vs plastic vs metal).
+ *
+ * @param enable True to enable material correction
+ * @return ESP_OK on success
+ */
+esp_err_t color_pipeline_set_material_correction(bool enable);
 
 /**
  * @brief Initialize color processing pipeline

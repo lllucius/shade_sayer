@@ -105,6 +105,99 @@ void test_scan_lab_no_boost()
     std::printf("scan_lab no-boost test PASSED\n");
 }
 
+// Test per-material color correction
+// Verifies that material correction is applied correctly and affects matching
+void test_material_correction()
+{
+    std::printf("\n=== Material correction test ===\n");
+
+    // Test 1: Verify material correction factors
+    material_correction_t fabric_corr = color_math_get_material_correction(MATERIAL_FABRIC);
+    assert(fabsf(fabric_corr.l_scale - 1.10f) < 0.001f && "Fabric L scale should be 1.10");
+    assert(fabsf(fabric_corr.l_offset - 2.0f) < 0.001f && "Fabric L offset should be 2.0");
+    assert(fabsf(fabric_corr.a_scale - 1.05f) < 0.001f && "Fabric a scale should be 1.05");
+    assert(fabsf(fabric_corr.b_scale - 1.05f) < 0.001f && "Fabric b scale should be 1.05");
+    std::printf("Fabric correction: L*=%.2f+%.1f, a*=%.2f, b*=%.2f\n",
+                fabric_corr.l_scale, fabric_corr.l_offset, fabric_corr.a_scale, fabric_corr.b_scale);
+
+    material_correction_t metal_corr = color_math_get_material_correction(MATERIAL_METAL);
+    assert(fabsf(metal_corr.l_scale - 0.90f) < 0.001f && "Metal L scale should be 0.90");
+    assert(fabsf(metal_corr.a_scale - 0.95f) < 0.001f && "Metal a scale should be 0.95");
+    std::printf("Metal correction: L*=%.2f+%.1f, a*=%.2f, b*=%.2f\n",
+                metal_corr.l_scale, metal_corr.l_offset, metal_corr.a_scale, metal_corr.b_scale);
+
+    material_correction_t default_corr = color_math_get_material_correction(MATERIAL_DEFAULT);
+    assert(fabsf(default_corr.l_scale - 1.0f) < 0.001f && "Default L scale should be 1.0");
+    assert(fabsf(default_corr.l_offset - 0.0f) < 0.001f && "Default L offset should be 0.0");
+    std::printf("Default correction: L*=%.2f+%.1f, a*=%.2f, b*=%.2f\n",
+                default_corr.l_scale, default_corr.l_offset, default_corr.a_scale, default_corr.b_scale);
+
+    // Test 2: Verify correction application
+    lab_t input_lab = {50.0f, 40.0f, 30.0f};
+    lab_t corrected = color_math_apply_material_correction(&input_lab, &fabric_corr);
+    
+    // Expected: L = 50*1.10 + 2 = 57, a = 40*1.05 = 42, b = 30*1.05 = 31.5
+    assert(fabsf(corrected.l - 57.0f) < 0.1f && "Fabric-corrected L should be ~57");
+    assert(fabsf(corrected.a - 42.0f) < 0.1f && "Fabric-corrected a should be ~42");
+    assert(fabsf(corrected.b - 31.5f) < 0.1f && "Fabric-corrected b should be ~31.5");
+    std::printf("Input Lab: (%.1f, %.1f, %.1f) -> Fabric-corrected: (%.1f, %.1f, %.1f)\n",
+                input_lab.l, input_lab.a, input_lab.b,
+                corrected.l, corrected.a, corrected.b);
+
+    // Test 3: Verify that pipeline applies material correction
+    color_pipeline_config_t cfg{};
+    cfg.min_luminance = 5.0f;
+    cfg.max_delta_e = 12.0f;
+    cfg.num_samples = 1;
+    cfg.sample_delay_ms = 1;
+    cfg.gray_threshold = 5.0f;
+    cfg.color_threshold = 60.0f;
+    cfg.saturation_boost = 1.5f;
+    cfg.use_material_correction = true;
+    cfg.assumed_material = MATERIAL_FABRIC;
+    cfg.auto_detect_material = false;
+    assert(color_pipeline_init(&cfg) == ESP_OK);
+
+    // Process a test XYZ value
+    xyz_t test_xyz{80.0f, 70.0f, 50.0f};
+    color_result_t result{};
+    assert(color_pipeline_process_xyz(&test_xyz, true, &result) == ESP_OK);
+
+    // Verify that corrected_lab differs from scan_lab (material correction was applied)
+    // For FABRIC: L should be higher, a and b should be slightly boosted
+    std::printf("scan_lab: (%.2f, %.2f, %.2f)\n",
+                result.scan_lab.l, result.scan_lab.a, result.scan_lab.b);
+    std::printf("corrected_lab: (%.2f, %.2f, %.2f)\n",
+                result.corrected_lab.l, result.corrected_lab.a, result.corrected_lab.b);
+    std::printf("material: %s\n", color_math_material_name(result.material));
+
+    assert(result.material == MATERIAL_FABRIC && "Material should be FABRIC");
+    assert(result.corrected_lab.l > result.scan_lab.l && 
+           "Fabric-corrected L should be higher than scan_lab L");
+    
+    // Test 4: Verify that disabling material correction gives identity
+    cfg.use_material_correction = false;
+    assert(color_pipeline_init(&cfg) == ESP_OK);
+
+    color_result_t result_nocorr{};
+    assert(color_pipeline_process_xyz(&test_xyz, true, &result_nocorr) == ESP_OK);
+
+    // With correction disabled, corrected_lab should equal scan_lab
+    assert(fabsf(result_nocorr.corrected_lab.l - result_nocorr.scan_lab.l) < 0.001f &&
+           "With correction disabled, corrected_lab.l should equal scan_lab.l");
+    assert(fabsf(result_nocorr.corrected_lab.a - result_nocorr.scan_lab.a) < 0.001f &&
+           "With correction disabled, corrected_lab.a should equal scan_lab.a");
+    std::printf("No correction: corrected_lab == scan_lab (%.2f, %.2f, %.2f)\n",
+                result_nocorr.corrected_lab.l, result_nocorr.corrected_lab.a, result_nocorr.corrected_lab.b);
+
+    // Test 5: Verify material name function
+    assert(strcmp(color_math_material_name(MATERIAL_FABRIC), "Fabric") == 0);
+    assert(strcmp(color_math_material_name(MATERIAL_METAL), "Metal") == 0);
+    assert(strcmp(color_math_material_name(MATERIAL_PLASTIC), "Plastic") == 0);
+
+    std::printf("Material correction test PASSED\n");
+}
+
 int main()
 {
     color_pipeline_config_t cfg{};
@@ -115,6 +208,9 @@ int main()
     cfg.gray_threshold = 5.0f;
     cfg.color_threshold = 60.0f;
     cfg.saturation_boost = 1.5f;
+    cfg.use_material_correction = true;
+    cfg.assumed_material = MATERIAL_FABRIC;
+    cfg.auto_detect_material = false;
     assert(color_pipeline_init(&cfg) == ESP_OK);
 
     // Basic pipeline sanity: orange-hued XYZ produces a valid color name.
@@ -165,6 +261,9 @@ int main()
 
     // Run the CANTALOUPE scenario test from issue #41.
     test_cantaloupe_scenario();
+
+    // Run material correction tests
+    test_material_correction();
 
     std::printf("All Kona matching tests passed!\n");
     return 0;
