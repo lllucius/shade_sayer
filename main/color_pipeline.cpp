@@ -104,6 +104,12 @@ static bool s_matrix_valid = false;
 static bool s_matrix_for_led = true;  //< True if matrix is for LED calibration
 static bool s_kona_reference_ready = false;
 
+// Cached sensor reading for auto-detect material feature.
+// When auto_detect_material is enabled, color_pipeline_identify_from_reading stores
+// the sensor reading here so color_pipeline_process_xyz can classify the material.
+static sensor_reading_t s_last_sensor_reading;
+static bool s_has_sensor_reading = false;
+
 // Categories struct (unchanged) ...
 typedef struct
 {
@@ -887,6 +893,13 @@ esp_err_t color_pipeline_identify_from_reading(const sensor_reading_t* reading,
 
     memset(result, 0, sizeof(color_result_t));
 
+    // Cache sensor reading for auto-detect material feature
+    if (s_config.auto_detect_material)
+    {
+        s_last_sensor_reading = *reading;
+        s_has_sensor_reading = true;
+    }
+
     xyz_t corrected_xyz;
     esp_err_t ret = apply_sensor_correction(reading, &corrected_xyz);
     if (ret != ESP_OK)
@@ -1310,8 +1323,18 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         // This correction is applied BEFORE ΔE2000 matching to bring measurements
         // closer to ideal viewing conditions.
         //
-        // Default: FABRIC correction (primary use case is quilting fabric)
-        result->material = s_config.assumed_material;
+        // Determine material type:
+        // - If auto_detect_material is enabled and we have sensor data, classify from heuristics
+        // - Otherwise use assumed_material (default: FABRIC for quilting fabric use case)
+        if (s_config.auto_detect_material && s_has_sensor_reading)
+        {
+            result->material = color_math_classify_material(&s_last_sensor_reading, nullptr);
+            TCS_LOGD(TAG, "Auto-detected material: %s", color_math_material_name(result->material));
+        }
+        else
+        {
+            result->material = s_config.assumed_material;
+        }
         
         if (s_config.use_material_correction)
         {
@@ -1472,6 +1495,9 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
                      s_params.saturation_boost, effective_boost);
         }
     }
+
+    // Clear cached sensor reading after use to avoid stale data in next call
+    s_has_sensor_reading = false;
 
     color_math_lab_to_rgb(result->lab, &result->rgb[0], &result->rgb[1], &result->rgb[2]);
     return ESP_OK;

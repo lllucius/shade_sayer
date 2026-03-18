@@ -198,6 +198,66 @@ void test_material_correction()
     std::printf("Material correction test PASSED\n");
 }
 
+// Test auto-detect material feature
+void test_auto_detect_material()
+{
+    std::printf("\n=== Auto-detect material test ===\n");
+
+    // Test that auto_detect_material actually uses classification
+    color_pipeline_config_t cfg{};
+    cfg.min_luminance = 5.0f;
+    cfg.max_delta_e = 12.0f;
+    cfg.num_samples = 1;
+    cfg.sample_delay_ms = 1;
+    cfg.gray_threshold = 5.0f;
+    cfg.color_threshold = 60.0f;
+    cfg.saturation_boost = 1.5f;
+    cfg.use_material_correction = true;
+    cfg.assumed_material = MATERIAL_METAL;  // Set assumed to METAL
+    cfg.auto_detect_material = true;         // Enable auto-detect
+    assert(color_pipeline_init(&cfg) == ESP_OK);
+
+    // Use a raw sensor reading that should classify as FABRIC
+    // (low clear ratio, moderate chroma - typical fabric characteristics)
+    sensor_reading_t raw{};
+    raw.x = 11418369;
+    raw.y = 7791616;
+    raw.z = 2225664;
+    raw.ir = 619520;
+    raw.clear = 11418369 + 7791616 + 2225664;  // Total ~21M
+    raw.gain = 5;
+    raw.integration_ms = 100;
+    raw.saturated = false;
+    
+    color_result_t result{};
+    assert(color_pipeline_identify_from_reading(&raw, true, &result) == ESP_OK);
+    
+    // The material should be auto-detected (likely FABRIC since that's the default fallback)
+    // Not METAL which was the assumed_material
+    std::printf("auto_detect_material=true: detected material=%s (assumed was METAL)\n",
+                color_math_material_name(result.material));
+    
+    // Verify the classification function works
+    material_type_t classified = color_math_classify_material(&raw, nullptr);
+    std::printf("Direct classification result: %s\n", color_math_material_name(classified));
+    assert(result.material == classified && 
+           "Pipeline should use classification result when auto_detect is enabled");
+    
+    // Test with auto_detect disabled - should use assumed_material
+    cfg.auto_detect_material = false;
+    assert(color_pipeline_init(&cfg) == ESP_OK);
+    
+    color_result_t result_no_auto{};
+    assert(color_pipeline_identify_from_reading(&raw, true, &result_no_auto) == ESP_OK);
+    
+    std::printf("auto_detect_material=false: material=%s (assumed=METAL)\n",
+                color_math_material_name(result_no_auto.material));
+    assert(result_no_auto.material == MATERIAL_METAL && 
+           "Pipeline should use assumed_material when auto_detect is disabled");
+
+    std::printf("Auto-detect material test PASSED\n");
+}
+
 int main()
 {
     color_pipeline_config_t cfg{};
@@ -264,6 +324,9 @@ int main()
 
     // Run material correction tests
     test_material_correction();
+
+    // Run auto-detect material test
+    test_auto_detect_material();
 
     std::printf("All Kona matching tests passed!\n");
     return 0;
