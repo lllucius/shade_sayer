@@ -213,6 +213,11 @@ def generate_synthetics(
     results: List[SyntheticEntry] = []
 
     for swatch in swatches:
+        # Track clamped target L* values to avoid duplicate entries when
+        # multiple steps clamp to the same boundary (e.g. both +15 and +30
+        # clamping to max_l for colors near the L* ceiling)
+        seen_target_l: set = set()
+
         for variant_index, step in enumerate(sorted_steps):
             target_l = swatch.l + step
             variant = generate_variant(
@@ -222,6 +227,13 @@ def generate_synthetics(
                 continue
 
             vl, va, vb = variant
+
+            # Skip if a previous step already produced this clamped L*
+            rounded_l = round(vl, 6)
+            if rounded_l in seen_target_l:
+                continue
+            seen_target_l.add(rounded_l)
+
             prefix = prefixes[variant_index]
 
             # Determine variant type label
