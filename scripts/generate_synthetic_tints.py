@@ -216,7 +216,7 @@ def generate_synthetics(
         # Track clamped target L* values to avoid duplicate entries when
         # multiple steps clamp to the same boundary (e.g. both +15 and +30
         # clamping to max_l for colors near the L* ceiling)
-        seen_target_l: set = set()
+        seen_target_l: set[float] = set()
 
         for variant_index, step in enumerate(sorted_steps):
             target_l = swatch.l + step
@@ -229,6 +229,7 @@ def generate_synthetics(
             vl, va, vb = variant
 
             # Skip if a previous step already produced this clamped L*
+            # (matches the rounding precision used for output on line 256)
             rounded_l = round(vl, 6)
             if rounded_l in seen_target_l:
                 continue
