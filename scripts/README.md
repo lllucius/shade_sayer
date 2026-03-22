@@ -37,26 +37,149 @@ python3 kona_scanner_gui.py --port /dev/ttyACM0 --data ../kona_captures.json
 - Tkinter (usually included with Python)
 - pyserial (`pip install pyserial`)
 
+### generate_synthetic_tints.py
+
+**Standalone script** that generates synthetic tint and shade variants from the
+365 measured Kona swatches in `kona_captures.json`.  The resulting
+`kona_synthetic_tints.json` expands coverage into lighter and darker regions
+where Kona has no real swatches.
+
+**Usage:**
+```bash
+# Generate with default steps (-30, -15, +15, +30 L* offsets)
+python3 generate_synthetic_tints.py
+
+# Specify paths explicitly
+python3 generate_synthetic_tints.py \
+    --input ../kona_captures.json \
+    --output ../kona_synthetic_tints.json
+
+# Custom L* offset steps
+python3 generate_synthetic_tints.py --steps -30,-15,15,30
+
+# Preview without writing output
+python3 generate_synthetic_tints.py --dry-run
+```
+
+**Options:**
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--input` | `../kona_captures.json` | Source of measured Lab values |
+| `--output` | `../kona_synthetic_tints.json` | Destination JSON file |
+| `--steps` | `-30,-15,15,30` | Comma-separated L* offsets to apply |
+| `--min-l` | `5.0` | Minimum allowed L* for output entries |
+| `--max-l` | `95.0` | Maximum allowed L* for output entries |
+| `--dry-run` | off | Print summary without writing file |
+
+**Algorithm — tint/shade generation:**
+
+For each measured swatch (L, a, b), a variant is generated at
+`target_L = L + offset`:
+
+- **Tints** (positive offset, lighter): chroma is reduced proportionally to how
+  far the variant moves toward white.  At `L*=100` chroma would reach zero.
+- **Shades** (negative offset, darker): chroma undergoes a smaller reduction as
+  the variant approaches black.
+
+Variants are skipped when they would be too close to the original
+(|ΔL*| < 5) or when the source is already in the target region (e.g., a
+"light" variant of an already very light color).
+
+**Naming:**
+
+The four default step positions map to the following prefixes:
+
+| Step | Prefix | Example |
+|------|--------|---------|
+| −30  | Deep   | Deep CORAL |
+| −15  | Dark   | Dark CORAL |
+| +15  | Light  | Light CORAL |
+| +30  | Pale   | Pale CORAL |
+
+**Synthetic IDs:**
+
+Synthetic entries use IDs ≥ 10000, computed as:
+
+```
+synthetic_id = 10000 + source_kona_id × 10 + variant_index
+```
+
+This keeps IDs deterministic, unique, and traceable back to the source swatch.
+Real Kona IDs (7–1898) never collide with this range.
+
+**Typical output:**
+
+```
+Reading source swatches from: ../kona_captures.json
+  Found 365 measured swatches
+Generating synthetic variants with L* steps: [-30, -15, 15, 30]
+  Generated 1420 synthetic entries (710 shades + 710 tints) from 365 source swatches
+Wrote 1420 synthetic entries to: ../kona_synthetic_tints.json
+```
+
+**Workflow:**
+
+```bash
+cd scripts
+
+# 1. Generate synthetic tints from existing scans
+python3 generate_synthetic_tints.py
+
+# 2. Next firmware build automatically picks them up
+#    (CMakeLists.txt passes --synthetic if the file exists)
+idf.py build
+```
+
+The build system passes `--synthetic ../kona_synthetic_tints.json` to
+`generate_kona_table.py` automatically when the file exists.  Real scanned
+entries always take priority over synthetic entries in case of ID collision.
+
 ### generate_kona_table.py
 
 Generates a Kona table source file (default: `main/konaref_generated.cpp`) from
-`kona_captures.json`.
+`kona_captures.json`.  Optionally merges synthetic tint/shade entries from
+`kona_synthetic_tints.json` (produced by `generate_synthetic_tints.py`).
 
 Also provides the shared `render_cpp`, `KonaEntry`, and `crc32_entries` helpers
 used by `kona_scanner_gui.py` to export C++ from the GUI.
 
 **Usage:**
 ```bash
+# Normal build (real swatches only)
 python3 generate_kona_table.py --input ../kona_captures.json --output ../main/konaref_generated.cpp
+
+# With synthetic tints merged in
+python3 generate_kona_table.py \
+    --input ../kona_captures.json \
+    --output ../main/konaref_generated.cpp \
+    --synthetic ../kona_synthetic_tints.json
 ```
 
 **Features:**
 - Reads cached `lab` values from the `swatches` array in kona_captures.json
 - Only includes entries where `measured=true` and all Lab values are present
+- Optionally merges synthetic entries from `kona_synthetic_tints.json`; real entries always win
 - Deduplicates by `id` (last entry wins), sorted by numeric swatch id
 - Emits `kona_table_t kona_reference` with schema version, entry count, and CRC32
-- Caps table size to 365 entries for firmware flash layout compatibility
+- **Generates a VP-tree** alongside the reference table for O(log n) matching (vs O(n) linear scan)
+- Supports up to 2048 entries (365 real + up to ~1,460 synthetic)
 - Shared by `kona_scanner_gui.py` for C++ export
+
+**VP-tree details:**
+
+The generator builds a Vantage Point Tree over all entries using CIEDE2000 as the
+distance metric.  The tree is emitted as two additional symbols in the generated
+C++ file:
+
+| Symbol | Description |
+|--------|-------------|
+| `kona_vptree_node_count` | Number of VP-tree nodes (= entry count) |
+| `kona_vptree_nodes[]` | Flat node array; root at index 0 |
+
+Each node stores an `entry_index` into `kona_reference.entries[]`, a
+`median_distance` partitioning threshold, and left/right child indices.
+Search complexity is **O(log n)** (~10–15 CIEDE2000 calculations for 1,141
+entries, vs ~1,141 for a linear scan).
 
 ### regenerate_kona_lab.py *(new)*
 

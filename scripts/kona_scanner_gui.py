@@ -70,6 +70,10 @@ class SwatchData:
     raw_clear: Optional[int] = None
     raw_gain: Optional[int] = None
     raw_integration_ms: Optional[int] = None
+    # Synthetic tint/shade fields — populated from kona_synthetic_tints.json
+    synthetic: bool = False
+    source_id: Optional[int] = None     # Parent real swatch ID
+    variant: Optional[str] = None       # "deep" | "dark" | "light" | "pale"
 
 
 # Display gamma adjustment for monitor compensation.
@@ -394,12 +398,15 @@ class SerialConnection:
 class KonaScannerApp:
     """Main application class for Kona Swatch Scanner GUI."""
 
-    def __init__(self, root: tk.Tk, data_path: str, serial_port: str, debug: bool = False):
+    def __init__(self, root: tk.Tk, data_path: str, serial_port: str,
+                 synthetic_path: Optional[str] = None, debug: bool = False):
         self.root = root
         self.data_path = pathlib.Path(data_path)
+        self.synthetic_path = pathlib.Path(synthetic_path) if synthetic_path else None
         self.serial_port = serial_port
         self.debug = debug
         self.swatches: Dict[int, SwatchData] = {}
+        self.synthetic_swatches: Dict[int, SwatchData] = {}  # keyed by synthetic ID
         self.scan_queue: List[int] = []
         self.scanning = False
         self.scan_thread: Optional[threading.Thread] = None
@@ -507,6 +514,14 @@ class KonaScannerApp:
                        command=self._on_filter_change).pack(side=tk.LEFT)
         ttk.Radiobutton(filter_frame, text="Not Scanned", variable=self.show_var, value="not_scanned",
                        command=self._on_filter_change).pack(side=tk.LEFT)
+
+        # Synthetic tints checkbox — only visible when synthetic data is loaded
+        self.show_synthetic_var = tk.BooleanVar(value=False)
+        self.synthetic_cb = ttk.Checkbutton(
+            filter_frame, text="Synthetics",
+            variable=self.show_synthetic_var,
+            command=self._on_filter_change)
+        # Packed later by _load_synthetic_json() when data is available
 
         # Vertical PanedWindow so the treeview and console are resizable
         left_pane = ttk.PanedWindow(left_frame, orient=tk.VERTICAL)
@@ -902,10 +917,11 @@ class KonaScannerApp:
         # Alt+F to focus filter entry
         self.root.bind("<Alt-f>", self._on_focus_filter)
         
-        # Alt+1/2/3 for filter radio buttons
+        # Alt+1/2/3 for filter radio buttons, Alt+4 toggles synthetics
         self.root.bind("<Alt-Key-1>", lambda e: self._set_show_filter("all"))
         self.root.bind("<Alt-Key-2>", lambda e: self._set_show_filter("scanned"))
         self.root.bind("<Alt-Key-3>", lambda e: self._set_show_filter("not_scanned"))
+        self.root.bind("<Alt-Key-4>", lambda e: self._toggle_synthetic())
         
         # Alt+T to focus treeview (swatch list)
         self.root.bind("<Alt-t>", self._on_focus_treeview)
@@ -1178,9 +1194,15 @@ class KonaScannerApp:
         self.show_var.set(value)
         self._on_filter_change()
 
+    def _toggle_synthetic(self):
+        """Toggle the Synthetics checkbox and refresh the treeview."""
+        self.show_synthetic_var.set(not self.show_synthetic_var.get())
+        self._on_filter_change()
+
     def _load_data(self):
-        """Load swatch data from kona_captures.json."""
+        """Load swatch data from kona_captures.json and optional synthetic tints."""
         self._load_json()
+        self._load_synthetic_json()
 
     def _save_data(self) -> bool:
         """Save swatch data to kona_captures.json."""
@@ -1252,6 +1274,68 @@ class KonaScannerApp:
             self._log_console(f"Loaded {len(self.swatches)} swatches from {self.data_path}")
         except Exception as e:
             self._log_console(f"Error loading JSON: {e}")
+
+    def _load_synthetic_json(self):
+        """Load synthetic tint/shade entries from kona_synthetic_tints.json.
+
+        Synthetic entries are stored separately from real swatches and only
+        displayed when the "Synthetics" checkbox is enabled. Each entry is
+        linked to its parent real swatch via source_id.
+        """
+        self.synthetic_swatches.clear()
+
+        if self.synthetic_path is None or not self.synthetic_path.exists():
+            return
+
+        try:
+            with self.synthetic_path.open(encoding="utf-8") as f:
+                data = json.load(f)
+
+            for entry in data.get("swatches", []):
+                try:
+                    synth_id = int(entry.get("id", 0))
+                    if synth_id == 0:
+                        continue
+
+                    lab = entry.get("lab") or {}
+                    L = float(lab["l"]) if lab.get("l") is not None else None
+                    a = float(lab["a"]) if lab.get("a") is not None else None
+                    b = float(lab["b"]) if lab.get("b") is not None else None
+
+                    source_id = int(entry.get("source_id", 0))
+                    variant = str(entry.get("variant", ""))
+
+                    # Inherit panel/panel_index from parent real swatch if available
+                    parent = self.swatches.get(source_id)
+                    panel = parent.panel if parent else ""
+                    panel_index = parent.panel_index if parent else 0
+
+                    self.synthetic_swatches[synth_id] = SwatchData(
+                        panel=panel,
+                        panel_index=panel_index,
+                        id=synth_id,
+                        name=str(entry.get("name", "")),
+                        L=L,
+                        a=a,
+                        b=b,
+                        measured=False,
+                        notes=str(entry.get("notes", "")),
+                        synthetic=True,
+                        source_id=source_id,
+                        variant=variant,
+                    )
+                except (ValueError, KeyError, TypeError, AttributeError) as e:
+                    if self.debug:
+                        self._log_console(f"Skipping invalid synthetic entry: {entry} ({e})")
+
+            self._log_console(f"Loaded {len(self.synthetic_swatches)} synthetic tints "
+                              f"from {self.synthetic_path}")
+
+            # Show the Synthetics checkbox now that data is available
+            self.synthetic_cb.pack(side=tk.LEFT, padx=(5, 0))
+
+        except Exception as e:
+            self._log_console(f"Error loading synthetic JSON: {e}")
 
     def _save_json(self) -> bool:
         """Save swatch data to a kona_captures.json file.
@@ -1338,41 +1422,86 @@ class KonaScannerApp:
             return False
 
     def _populate_treeview(self):
-        """Populate the treeview with swatch data."""
+        """Populate the treeview with swatch data.
+
+        When the Synthetics checkbox is enabled, synthetic tint/shade entries
+        are inserted immediately after their parent real swatch, sorted by
+        variant order (deep → dark → light → pale).
+        """
         # Clear existing items
         for item in self.tree.get_children():
             self.tree.delete(item)
 
         filter_text = self.filter_var.get().lower()
         show_mode = self.show_var.get()
+        show_synthetic = self.show_synthetic_var.get()
+
+        # Build a lookup of synthetic entries grouped by source_id
+        synthetics_by_source: Dict[int, List[SwatchData]] = {}
+        if show_synthetic:
+            variant_order = {"deep": 0, "dark": 1, "light": 2, "pale": 3}
+            for s in self.synthetic_swatches.values():
+                if s.source_id is not None:
+                    synthetics_by_source.setdefault(s.source_id, []).append(s)
+            # Sort each group by variant order
+            for group in synthetics_by_source.values():
+                group.sort(key=lambda x: variant_order.get(x.variant or "", 99))
 
         # Sort by panel, then panel_index
         sorted_swatches = sorted(self.swatches.values(),
                                 key=lambda s: (s.panel, s.panel_index))
 
         for s in sorted_swatches:
-            # Apply filters
+            # Apply text filter to real swatch
+            matches_filter = True
             if filter_text:
                 if (filter_text not in s.name.lower() and
                     filter_text not in s.panel.lower() and
                     filter_text not in str(s.id)):
-                    continue
+                    matches_filter = False
 
             if show_mode == "scanned" and not s.measured:
-                continue
+                if not show_synthetic or s.id not in synthetics_by_source:
+                    continue
             if show_mode == "not_scanned" and s.measured:
-                continue
+                if not show_synthetic or s.id not in synthetics_by_source:
+                    continue
 
-            measured_str = "✓" if s.measured else ""
-            L_str = f"{s.L:.1f}" if s.L is not None else "-"
-            a_str = f"{s.a:.1f}" if s.a is not None else "-"
-            b_str = f"{s.b:.1f}" if s.b is not None else "-"
+            if matches_filter:
+                measured_str = "✓" if s.measured else ""
+                L_str = f"{s.L:.1f}" if s.L is not None else "-"
+                a_str = f"{s.a:.1f}" if s.a is not None else "-"
+                b_str = f"{s.b:.1f}" if s.b is not None else "-"
 
-            # Use swatch ID as item identifier
-            self.tree.insert("", tk.END, iid=str(s.id),
-                            values=(s.panel, s.panel_index, s.id, s.name,
-                                   measured_str, L_str, a_str, b_str))
-        
+                self.tree.insert("", tk.END, iid=str(s.id),
+                                values=(s.panel, s.panel_index, s.id, s.name,
+                                       measured_str, L_str, a_str, b_str))
+
+            # Insert synthetic children right after the parent
+            if show_synthetic and s.id in synthetics_by_source:
+                for syn in synthetics_by_source[s.id]:
+                    # Apply text filter to synthetic entries too
+                    if filter_text:
+                        if (filter_text not in syn.name.lower() and
+                            filter_text not in s.panel.lower() and
+                            filter_text not in str(syn.id) and
+                            filter_text not in str(s.id)):
+                            continue
+
+                    L_str = f"{syn.L:.1f}" if syn.L is not None else "-"
+                    a_str = f"{syn.a:.1f}" if syn.a is not None else "-"
+                    b_str = f"{syn.b:.1f}" if syn.b is not None else "-"
+
+                    # Use "syn_" prefix for unique iid to avoid collision
+                    self.tree.insert("", tk.END, iid=f"syn_{syn.id}",
+                                    values=(s.panel, s.panel_index, syn.id,
+                                           f"  ↳ {syn.name}",
+                                           "~", L_str, a_str, b_str),
+                                    tags=("synthetic",))
+
+        # Style synthetic rows with a distinct foreground color
+        self.tree.tag_configure("synthetic", foreground="#888888")
+
         self._update_stats()
 
     def _update_stats(self):
@@ -1389,7 +1518,7 @@ class KonaScannerApp:
         
         # Determine sort type
         try:
-            items = [(float(v) if v and v != "-" and v != "✓" else 0, k) for v, k in items]
+            items = [(float(v) if v and v not in ("-", "✓", "~") else 0, k) for v, k in items]
         except ValueError:
             pass
         
@@ -1408,9 +1537,13 @@ class KonaScannerApp:
             self._clear_color_info()
             return
 
-        # Show info for first selected item
-        swatch_id = int(selection[0])
-        swatch = self.swatches.get(swatch_id)
+        # Show info for first selected item — resolve synthetic IDs
+        item_id = selection[0]
+        if item_id.startswith("syn_"):
+            synth_id = int(item_id[4:])
+            swatch = self.synthetic_swatches.get(synth_id)
+        else:
+            swatch = self.swatches.get(int(item_id))
         if swatch:
             # During scanning, preserve the last captured color in the canvas
             # so the user can verify the captured color matches the swatch.
@@ -1515,9 +1648,17 @@ class KonaScannerApp:
             messagebox.showwarning("Warning", "No swatches selected")
             return
 
-        # Build scan queue from selection and store original selection
-        self.scan_queue = [int(item_id) for item_id in selection]
-        self._scan_original_selection = list(selection)  # Store original selection
+        # Build scan queue from selection — exclude synthetic entries (not scannable)
+        real_selection = [item_id for item_id in selection
+                          if not item_id.startswith("syn_")]
+        if not real_selection:
+            messagebox.showwarning("Warning",
+                "Synthetic color variations cannot be scanned.\n"
+                "Please select a real swatch.")
+            return
+
+        self.scan_queue = [int(item_id) for item_id in real_selection]
+        self._scan_original_selection = list(real_selection)  # Store original selection
         self.scanning = True
         self._update_scan_ui()
 
@@ -1971,6 +2112,8 @@ def parse_args() -> argparse.Namespace:
                        help="Serial port for device communication")
     parser.add_argument("--data", default="kona_captures.json",
                        help="kona_captures.json data file path")
+    parser.add_argument("--synthetic", default=None,
+                       help="kona_synthetic_tints.json file path (auto-detected if omitted)")
     parser.add_argument("--debug", action="store_true",
                        help="Enable extra verbose debug logging in the console")
     return parser.parse_args()
@@ -1981,14 +2124,30 @@ def main() -> int:
     args = parse_args()
 
     # Make data path relative to repository root (one level up from scripts directory)
+    script_dir = pathlib.Path(__file__).parent  # scripts directory
+    repo_root = script_dir.parent               # repository root
+
     data_path = args.data
     if not os.path.isabs(data_path):
-        script_dir = pathlib.Path(__file__).parent  # scripts directory
-        repo_root = script_dir.parent               # repository root
         data_path = repo_root / data_path
 
+    # Resolve synthetic tints path: explicit arg > auto-detect beside data file > repo root
+    synthetic_path = None
+    if args.synthetic is not None:
+        sp = pathlib.Path(args.synthetic)
+        synthetic_path = sp if sp.is_absolute() else repo_root / sp
+    else:
+        # Auto-detect: look beside the data file, then at repo root
+        for candidate in [pathlib.Path(data_path).parent / "kona_synthetic_tints.json",
+                          repo_root / "kona_synthetic_tints.json"]:
+            if candidate.exists():
+                synthetic_path = candidate
+                break
+
     root = tk.Tk()
-    app = KonaScannerApp(root, str(data_path), args.port, debug=args.debug)
+    app = KonaScannerApp(root, str(data_path), args.port,
+                         synthetic_path=str(synthetic_path) if synthetic_path else None,
+                         debug=args.debug)
     root.mainloop()
 
     return 0

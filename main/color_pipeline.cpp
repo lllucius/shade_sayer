@@ -172,6 +172,21 @@ static esp_err_t apply_sensor_correction(const sensor_reading_t* reading, xyz_t*
  * @note Default threshold is 2.0 ΔE (just noticeable difference).
  * @note Falls through to legacy VP-Tree matcher if no Kona match found.
  */
+
+// Synthetic entry ID threshold: real Kona IDs are 7–1898, synthetics use 10000+
+static constexpr uint32_t KONA_SYNTHETIC_ID_BASE = 10000u;
+
+// Wider ΔE acceptance window for synthetic entries: they are Lab approximations
+// derived from real scans, not actual measurements, so a 40% wider window
+// prevents them from being rejected when the perceptual distance is slightly
+// larger than the nominal threshold.
+static constexpr float SYNTHETIC_THRESHOLD_MULTIPLIER = 1.4f;
+
+// Confidence penalty for synthetic matches relative to real scanned matches.
+// A value of 0.85 means a synthetic match at ΔE=0 scores 0.85 vs 1.0 for a
+// real match, reflecting the inherent approximation error.
+static constexpr float SYNTHETIC_CONFIDENCE_FACTOR = 0.85f;
+
 static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
 {
     if (!s_kona_reference_ready)
@@ -184,29 +199,17 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
         return false;
     }
 
-    const kona_ref_t* entries = kona_ref_entries();
     const size_t count = kona_ref_entry_count();
 
     // Diagnostic: log input Lab values for debugging CIEDE2000 discrepancy
     ESP_LOGI(TAG, "Kona input: measured Lab L=%.4f a=%.4f b=%.4f (count=%zu)",
              lab->l, lab->a, lab->b, count);
 
-    // Linear search for closest match (O(n) for up to 365 entries)
+    // VP-tree search — O(log n) for up to 2048 entries
     float best_delta_e = FLT_MAX;
-    const kona_ref_t* best_entry = nullptr;
     size_t best_index = 0;
-
-    for (size_t i = 0; i < count; ++i)
-    {
-        const lab_t entry_lab = {entries[i].l, entries[i].a, entries[i].b};
-        const float de = color_math_delta_e_ciede2000(lab, &entry_lab);
-        if (de < best_delta_e)
-        {
-            best_delta_e = de;
-            best_entry = &entries[i];
-            best_index = i;
-        }
-    }
+    const kona_ref_t* best_entry = kona_ref_find_closest(
+        lab->l, lab->a, lab->b, &best_delta_e, &best_index);
 
     // Diagnostic: log the best match entry details for debugging
     if (best_entry)
@@ -216,16 +219,77 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
                  best_delta_e);
     }
 
-    ESP_LOGI(TAG, "Kona result: best_entry %p best_delta %f max delta %f",
-             best_entry, best_delta_e, s_config.kona_max_delta_e);
+    // Use a wider threshold for synthetic entries (IDs >= KONA_SYNTHETIC_ID_BASE) because
+    // synthetic references are approximations and need a broader acceptance window.
+    const bool is_synthetic = best_entry && (best_entry->kona_id >= KONA_SYNTHETIC_ID_BASE);
+    const float effective_threshold = is_synthetic
+        ? s_config.kona_max_delta_e * SYNTHETIC_THRESHOLD_MULTIPLIER
+        : s_config.kona_max_delta_e;
+
+    ESP_LOGI(TAG, "Kona result: best_entry %p best_delta %f max delta %f%s",
+             best_entry, best_delta_e, effective_threshold,
+             is_synthetic ? " (synthetic)" : "");
+
     // Reject if no match or distance exceeds threshold
-    if (!best_entry || best_delta_e >= s_config.kona_max_delta_e)
+    if (!best_entry || best_delta_e >= effective_threshold)
     {
         return false;
     }
 
     // Look up swatch metadata (name, panel info)
     const kona_swatch_info_t* info = kona_metadata_find_by_id(best_entry->kona_id);
+
+    if (!info && is_synthetic)
+    {
+        // Synthetic tint/shade entry — derive name from the source swatch.
+        // Synthetic IDs encode: synthetic_id = KONA_SYNTHETIC_ID_BASE + source_id * 10 + variant_index
+        // variant_index is positional in the sorted steps list:
+        //   0 = "Deep"  (L* -30), 1 = "Dark"  (L* -15)
+        //   2 = "Light" (L* +15), 3 = "Pale"  (L* +30)
+        const uint32_t encoded = static_cast<uint32_t>(best_entry->kona_id) - KONA_SYNTHETIC_ID_BASE;
+        const uint16_t source_id = static_cast<uint16_t>(encoded / 10u);
+        const uint8_t  variant   = static_cast<uint8_t>(encoded % 10u);
+
+        const kona_swatch_info_t* source_info = kona_metadata_find_by_id(source_id);
+
+        const char* prefix;
+        switch (variant)
+        {
+            case 0:  prefix = "Deep";     break;
+            case 1:  prefix = "Dark";     break;
+            case 2:  prefix = "Light";    break;
+            case 3:  prefix = "Pale";     break;
+            default: prefix = "Shade of"; break;
+        }
+
+        // Safe to use a static buffer here: color measurements are single-threaded
+        // (driven by a single button press), so this function is never re-entered
+        // concurrently. The result->color_name pointer is consumed before the next
+        // call to try_match_kona_reference().
+        static char s_synthetic_name[64];
+        if (source_info && source_info->name)
+        {
+            snprintf(s_synthetic_name, sizeof(s_synthetic_name),
+                     "%s %s", prefix, source_info->name);
+        }
+        else
+        {
+            snprintf(s_synthetic_name, sizeof(s_synthetic_name),
+                     "%s Kona #%u", prefix, static_cast<unsigned>(source_id));
+        }
+
+        result->kona_matched = true;
+        result->kona_id      = best_entry->kona_id;
+        result->delta_e      = best_delta_e;
+        result->color_name   = s_synthetic_name;
+
+        // Apply SYNTHETIC_CONFIDENCE_FACTOR multiplier for synthetic matches — they are
+        // approximations and should rank below real scanned matches.
+        result->confidence = fmaxf(0.0f,
+            1.0f - (best_delta_e / effective_threshold)) * SYNTHETIC_CONFIDENCE_FACTOR;
+
+        return true;
+    }
 
     // Populate result with match information
     result->kona_matched = true;
