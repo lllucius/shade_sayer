@@ -120,6 +120,53 @@ static bool s_kona_reference_ready = false;
 // the sensor reading here so color_pipeline_process_xyz can classify the material.
 static sensor_reading_t s_last_sensor_reading;
 static bool s_has_sensor_reading = false;
+static xyz_t s_last_variance_xyz = {};
+static bool s_has_variance_xyz = false;
+
+/**
+ * @brief Clear cached sensor/variance context used by material auto-detection.
+ */
+static void clear_material_context()
+{
+    s_has_sensor_reading = false;
+    s_has_variance_xyz = false;
+}
+
+/**
+ * @brief Cache a sensor reading and variance for later material classification.
+ *
+ * Clears the cache when auto-detect is disabled or the reading is null.
+ */
+static void cache_material_context_from_reading(const sensor_reading_t* reading,
+                                                const xyz_t* variance_xyz)
+{
+    if (!s_config.auto_detect_material || !reading)
+    {
+        clear_material_context();
+        return;
+    }
+
+    s_last_sensor_reading = *reading;
+    s_has_sensor_reading = true;
+
+    if (variance_xyz)
+    {
+        s_last_variance_xyz = *variance_xyz;
+        s_has_variance_xyz = true;
+    }
+    else
+    {
+        s_has_variance_xyz = false;
+    }
+}
+
+/**
+ * @brief Cache a sensor reading with no variance context.
+ */
+static void cache_material_context_from_reading(const sensor_reading_t* reading)
+{
+    cache_material_context_from_reading(reading, nullptr);
+}
 
 // Categories struct (unchanged) ...
 typedef struct
@@ -207,6 +254,52 @@ static constexpr float SYNTHETIC_THRESHOLD_MULTIPLIER = 1.4f;
 // A value of 0.85 means a synthetic match at ΔE=0 scores 0.85 vs 1.0 for a
 // real match, reflecting the inherent approximation error.
 static constexpr float SYNTHETIC_CONFIDENCE_FACTOR = 0.85f;
+
+/**
+ * @brief Return the runtime saturation boost used by both display boost passes.
+ */
+static float runtime_saturation_boost()
+{
+    // The display path already uses s_config.{gray_threshold,color_threshold} for the
+    // initial saturation pass, so the confidence-scaled reboost must use the same
+    // runtime setting to avoid divergent display results within a single measurement.
+    return s_config.saturation_boost;
+}
+
+#ifdef ESP_PLATFORM
+/**
+ * @brief Cache material-classification context reconstructed from capture stats.
+ */
+static void cache_material_context_from_stats(const color_capture_stats_t* stats)
+{
+    if (!s_config.auto_detect_material || !stats)
+    {
+        clear_material_context();
+        return;
+    }
+
+    sensor_reading_t reading = {};
+    reading.x = stats->raw_x;
+    reading.y = stats->raw_y;
+    reading.z = stats->raw_z;
+    reading.ir = stats->raw_ir;
+    reading.clear = stats->raw_clear;
+    reading.gain = stats->gain_code;
+    reading.integration_ms = stats->integration_ms;
+    reading.status2 = stats->status2;
+    reading.status6 = stats->status6;
+    reading.saturated = stats->any_saturated;
+
+    // color_math_classify_material() expects variance, while capture stats store stddev.
+    xyz_t variance_xyz = {
+        stats->stddev_xyz.x * stats->stddev_xyz.x,
+        stats->stddev_xyz.y * stats->stddev_xyz.y,
+        stats->stddev_xyz.z * stats->stddev_xyz.z,
+    };
+
+    cache_material_context_from_reading(&reading, &variance_xyz);
+}
+#endif
 
 static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
 {
@@ -968,12 +1061,9 @@ esp_err_t color_pipeline_identify_from_reading(const sensor_reading_t* reading,
 
     memset(result, 0, sizeof(color_result_t));
 
-    // Cache sensor reading for auto-detect material feature
-    if (s_config.auto_detect_material)
-    {
-        s_last_sensor_reading = *reading;
-        s_has_sensor_reading = true;
-    }
+    // Cache sensor reading for auto-detect material feature.
+    // No variance data is available in this single-reading replay path.
+    cache_material_context_from_reading(reading);
 
     xyz_t corrected_xyz;
     esp_err_t ret = apply_sensor_correction(reading, &corrected_xyz);
@@ -1036,6 +1126,7 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
     result->xyz = capture_stats.mean_xyz;
     clamp_xyz_floor(&result->xyz);
     result->timestamp_us = tcs_time_us();
+    cache_material_context_from_stats(&capture_stats);
 
     ESP_LOGI(TAG, "Measure XYZ (IR+Black Cor): X=%.2f Y=%.2f Z=%.2f",
              result->xyz.x, result->xyz.y, result->xyz.z);
@@ -1082,6 +1173,7 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
                 merged_result.saturated = capture_stats.any_saturated || extra_stats.any_saturated;
                 merged_result.flicker_detected = capture_stats.flicker_detected || extra_stats.flicker_detected;
                 merged_result.timestamp_us = tcs_time_us();
+                cache_material_context_from_stats(&capture_stats);
 
                 esp_err_t merge_ret = color_pipeline_process_xyz(&merged_result.xyz, led_enabled, &merged_result);
                 if (merge_ret == ESP_OK)
@@ -1149,6 +1241,7 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
                     retry_result.saturated = retry_stats.any_saturated;
                     retry_result.flicker_detected = retry_stats.flicker_detected;
                     retry_result.timestamp_us = tcs_time_us();
+                    cache_material_context_from_stats(&retry_stats);
 
                     set_ret = color_pipeline_process_xyz(&retry_result.xyz, led_enabled, &retry_result);
                     if (set_ret == ESP_OK && (!retry_result.low_light || retry_result.luminance > result->luminance))
@@ -1204,6 +1297,7 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
                     retry_result.saturated = retry_stats.any_saturated;
                     retry_result.flicker_detected = retry_stats.flicker_detected;
                     retry_result.timestamp_us = tcs_time_us();
+                    cache_material_context_from_stats(&retry_stats);
 
                     set_ret = color_pipeline_process_xyz(&retry_result.xyz, led_enabled, &retry_result);
                     if (set_ret == ESP_OK && (!retry_result.saturated || retry_result.luminance < result->luminance))
@@ -1268,6 +1362,7 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
             step_result.saturated = step_stats.any_saturated;
             step_result.flicker_detected = step_stats.flicker_detected;
             step_result.timestamp_us = tcs_time_us();
+            cache_material_context_from_stats(&step_stats);
 
             set_ret = color_pipeline_process_xyz(&step_result.xyz, led_enabled, &step_result);
             if (set_ret != ESP_OK)
@@ -1442,7 +1537,8 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         // - Otherwise use assumed_material (default: FABRIC for quilting fabric use case)
         if (s_config.auto_detect_material && s_has_sensor_reading)
         {
-            result->material = color_math_classify_material(&s_last_sensor_reading, nullptr);
+            result->material = color_math_classify_material(&s_last_sensor_reading,
+                                                            s_has_variance_xyz ? &s_last_variance_xyz : nullptr);
             TCS_LOGD(TAG, "Auto-detected material: %s", color_math_material_name(result->material));
         }
         else
@@ -1517,10 +1613,11 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
     float pre_boost_a = result->lab.a;
     float pre_boost_b = result->lab.b;
 
+    const float runtime_boost_setting = runtime_saturation_boost();
     float enhanced_chroma = color_math_enhance_saturation(&result->lab,
                             s_config.gray_threshold,
                             s_config.color_threshold,
-                            s_config.saturation_boost);
+                            runtime_boost_setting);
 
     result->saturation = enhanced_chroma / 100.0f;
 
@@ -1590,8 +1687,8 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         // uncertain readings (e.g., from textured surfaces) into an incorrect vivid color name.
         // At confidence=1.0 the full boost is applied; at confidence=0.0 no boost is applied.
         float confidence_factor = fmaxf(0.0f, fminf(1.0f, result->confidence));
-        float effective_boost = 1.0f + (s_params.saturation_boost - 1.0f) * confidence_factor;
-        if (effective_boost < s_params.saturation_boost - 0.01f)
+        float effective_boost = 1.0f + (runtime_boost_setting - 1.0f) * confidence_factor;
+        if (effective_boost < runtime_boost_setting - 0.01f)
         {
             // Restore pre-boost a*/b* and reapply with the lower effective boost.
             result->lab.a = pre_boost_a;
@@ -1606,12 +1703,12 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
             TCS_LOGD(TAG,
                      "Confidence-scaled boost: confidence=%.2f factor=%.2f boost=%.2f->%.2f",
                      result->confidence, confidence_factor,
-                     s_params.saturation_boost, effective_boost);
+                     runtime_boost_setting, effective_boost);
         }
     }
 
     // Clear cached sensor reading after use to avoid stale data in next call
-    s_has_sensor_reading = false;
+    clear_material_context();
 
     color_math_lab_to_rgb(result->lab, &result->rgb[0], &result->rgb[1], &result->rgb[2]);
     return ESP_OK;

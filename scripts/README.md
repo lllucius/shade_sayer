@@ -183,7 +183,7 @@ entries, vs ~1,141 for a linear scan).
 
 ### regenerate_kona_lab.py *(new)*
 
-**Pipeline replay script** — rebuilds cached Lab values in `kona_captures.json` from
+**Pipeline replay script** — rebuilds cached scan_lab values in `kona_captures.json` from
 raw sensor data after the color pipeline changes.
 
 **Usage:**
@@ -204,13 +204,18 @@ python3 regenerate_kona_lab.py --binary ../host/build/kona_regenerate
 **Workflow after a pipeline change:**
 1. Edit pipeline parameters (PCCM, responsivity, IR compensation, etc.)
 2. Run `python3 regenerate_kona_lab.py` — it builds the host binary and replays raw data
-3. Review the printed summary of Lab changes (ΔE per swatch)
+3. Review the printed summary of scan_lab changes (ΔE per swatch)
 4. Commit the updated `kona_captures.json`
 5. Normal builds pick up the new Lab values automatically
 
 **Requirements:**
 - CMake and a C++ compiler (for building the `kona_regenerate` host binary)
 - `kona_captures.json` with swatches containing raw sensor data in the `raw` field
+
+**Important:** replay regenerates the same `scan_lab` values returned by the firmware
+`SCAN` command (pre-Z-floor, pre-saturation-boost Lab). For multi-sample scans, the
+stored `raw` ADC values describe the representative winning measurement context and are
+not a lossless encoding of the final averaged scan result.
 
 ## JSON Capture Format: kona_captures.json
 

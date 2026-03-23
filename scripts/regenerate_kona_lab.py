@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-"""Regenerate Lab values in kona_captures.json from raw sensor data.
+"""Regenerate scan_lab values in kona_captures.json from raw sensor data.
 
 Reads the raw sensor readings stored in kona_captures.json, passes each one
 through the host build's color pipeline (kona_regenerate binary), and writes
-the updated Lab values back to the JSON file.
+the updated scan_lab values back to the JSON file.
 
 Run this after any change to the color pipeline (PCCM coefficients, responsivity
 constants, IR compensation, lightness correction, etc.) to update the cached Lab
 values without requiring a physical rescan of all 365 swatches.
+
+Note: the replay path preserves the firmware SCAN/Kona capture semantics by
+writing `scan_lab` (pre-Z-floor, pre-saturation-boost Lab). For multi-sample
+SCANNED captures, the stored raw ADC values are representative of the winning
+measurement context, not a lossless serialization of the averaged XYZ result.
 
 Workflow:
     1.  Edit pipeline parameters in main/color_pipeline.cpp or calibration headers.
@@ -97,7 +102,7 @@ def regenerate(json_path: pathlib.Path, binary: pathlib.Path, dry_run: bool = Fa
     """Run the regeneration pipeline.
 
     Feeds swatches with raw sensor data through the kona_regenerate binary and
-    updates the Lab values in the JSON file.
+    updates the cached scan_lab values in the JSON file.
 
     Returns the number of swatches updated.
     """
@@ -118,8 +123,7 @@ def regenerate(json_path: pathlib.Path, binary: pathlib.Path, dry_run: bool = Fa
 
     if not eligible:
         print("No swatches with raw sensor data found. Nothing to regenerate.")
-        print("Capture raw data via the GUI (when the device protocol is extended to "
-              "return raw sensor values) or via the firmware kona scan mode.")
+        print("Capture raw data via the GUI or the firmware kona scan mode.")
         return 0
 
     print(f"Processing {len(eligible)} swatches with raw data ...")

@@ -658,7 +658,10 @@ static void enter_serial_scan_mode(void)
                                 s_last_result = result;
                                 s_has_last_result = true;
 
-                                // Store raw capture stats for retrieval via the RAWDATA command
+                                // Store representative raw capture stats for retrieval via the
+                                // RAWDATA command. Multi-sample scans may average/retry before
+                                // producing the final scan_lab result, so these counts are not a
+                                // lossless encoding of the returned Lab value.
                                 s_last_scan_stats = scan_stats;
                                 s_has_last_scan_stats = true;
                             }
@@ -669,7 +672,9 @@ static void enter_serial_scan_mode(void)
                     }
                     else if (strcmp(cmd_buffer, "RAWDATA") == 0)
                     {
-                        // Return raw ADC sensor values from the most recent SCAN for pipeline replay.
+                        // Return representative raw ADC sensor values from the most recent SCAN
+                        // for pipeline replay. For averaged/retried scans this is the winning
+                        // measurement context, not an exact encoding of the returned scan_lab.
                         // Format: OK:RAWDATA:x,y,z,ir,clear,gain,integration_ms
                         if (!s_has_last_scan_stats)
                         {

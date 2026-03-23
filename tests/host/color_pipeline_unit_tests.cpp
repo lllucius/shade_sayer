@@ -258,6 +258,36 @@ void test_auto_detect_material()
     std::printf("Auto-detect material test PASSED\n");
 }
 
+// Test that the material classifier uses variance when it is available.
+// A highly reflective low-chroma reading would normally classify as plastic/metal,
+// but strong inter-sample variance should force a fabric classification.
+void test_material_classification_uses_variance()
+{
+    std::printf("\n=== Material variance classification test ===\n");
+
+    sensor_reading_t raw{};
+    raw.x = 100;
+    raw.y = 100;
+    raw.z = 100;
+    raw.ir = 0;
+    raw.clear = 390;  // clear/(x+y+z) = 390/300 = 1.30, above the PLASTIC threshold
+
+    xyz_t high_variance{9.0f, 9.0f, 9.0f};  // mean variance / Y = 0.09 > 0.05 threshold
+
+    material_type_t without_variance = color_math_classify_material(&raw, nullptr);
+    material_type_t with_variance = color_math_classify_material(&raw, &high_variance);
+
+    std::printf("without variance: %s\n", color_math_material_name(without_variance));
+    std::printf("with variance: %s\n", color_math_material_name(with_variance));
+
+    assert(without_variance == MATERIAL_PLASTIC &&
+           "Without variance this reflective low-chroma sample should classify as PLASTIC");
+    assert(with_variance == MATERIAL_FABRIC &&
+           "High variance should force FABRIC classification");
+
+    std::printf("Material variance classification test PASSED\n");
+}
+
 int main()
 {
     color_pipeline_config_t cfg{};
@@ -327,6 +357,9 @@ int main()
 
     // Run auto-detect material test
     test_auto_detect_material();
+
+    // Run variance-aware classification test
+    test_material_classification_uses_variance();
 
     std::printf("All Kona matching tests passed!\n");
     return 0;

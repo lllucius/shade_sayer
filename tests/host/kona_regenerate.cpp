@@ -3,7 +3,7 @@
  * @brief Host utility to re-process raw Kona swatch sensor readings through the color pipeline.
  *
  * Reads sensor readings from stdin in a simple text format, runs each reading through
- * color_pipeline_identify_from_reading(), and writes Lab results to stdout.
+ * color_pipeline_identify_from_reading(), and writes scan_lab results to stdout.
  *
  * Used by regenerate_kona_lab.py to replay captured raw data through the current pipeline
  * after pipeline changes (PCCM coefficients, responsivity constants, IR compensation, etc.)
@@ -114,9 +114,9 @@ int main()
         {
             std::printf("OK %d %.6f %.6f %.6f\n",
                         swatch_id,
-                        static_cast<double>(result.lab.l),
-                        static_cast<double>(result.lab.a),
-                        static_cast<double>(result.lab.b));
+                        static_cast<double>(result.scan_lab.l),
+                        static_cast<double>(result.scan_lab.a),
+                        static_cast<double>(result.scan_lab.b));
         }
         std::fflush(stdout);
     }
