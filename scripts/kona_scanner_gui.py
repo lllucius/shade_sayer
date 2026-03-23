@@ -1639,19 +1639,28 @@ class KonaScannerApp:
 
     def _on_scan_selected(self):
         """Start scanning selected swatches."""
+        self._log_console("[SCAN] Button clicked")
+        
         if not self.serial.is_connected():
+            self._log_console("[SCAN] Not connected - showing warning")
             messagebox.showwarning("Warning", "Not connected to device")
             return
 
         selection = self.tree.selection()
+        self._log_console(f"[SCAN] Selection: {len(selection)} item(s)")
+        
         if not selection:
+            self._log_console("[SCAN] No selection - showing warning")
             messagebox.showwarning("Warning", "No swatches selected")
             return
 
         # Build scan queue from selection — exclude synthetic entries (not scannable)
         real_selection = [item_id for item_id in selection
                           if not item_id.startswith("syn_")]
+        self._log_console(f"[SCAN] Real selection (non-synthetic): {len(real_selection)} item(s)")
+        
         if not real_selection:
+            self._log_console("[SCAN] Only synthetic items selected - showing warning")
             messagebox.showwarning("Warning",
                 "Synthetic color variations cannot be scanned.\n"
                 "Please select a real swatch.")
@@ -1660,6 +1669,13 @@ class KonaScannerApp:
         self.scan_queue = [int(item_id) for item_id in real_selection]
         self._scan_original_selection = list(real_selection)  # Store original selection
         self.scanning = True
+        
+        # Update progress bar to indicate scan session started
+        count = len(self.scan_queue)
+        swatch_word = "swatch" if count == 1 else "swatches"
+        self.progress_var.set(f"Scan session started: {count} {swatch_word}")
+        self._log_console(f"[SCAN] Session started with {count} {swatch_word}")
+        
         self._update_scan_ui()
 
     def _update_scan_ui(self):
@@ -1681,6 +1697,8 @@ class KonaScannerApp:
                 self.scan_button.config(state=tk.NORMAL)
                 self.skip_button.config(state=tk.NORMAL)
                 
+                self._log_console(f"[SCAN] Ready to scan: {swatch.name} ({remaining} remaining)")
+                
                 # Update selection to show only remaining items to scan
                 # This deselects items as they are scanned
                 remaining_selection = [str(item_id) for item_id in self.scan_queue
@@ -1692,6 +1710,7 @@ class KonaScannerApp:
                 self.tree.focus(str(current_id))
                 self.tree.see(str(current_id))
             else:
+                self._log_console(f"[SCAN] Swatch ID {current_id} not found in swatches dict - skipping")
                 self._advance_scan()
         else:
             self.scan_vars["Status"].set("Not scanning")
