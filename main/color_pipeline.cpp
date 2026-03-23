@@ -120,6 +120,62 @@ static bool s_kona_reference_ready = false;
 // the sensor reading here so color_pipeline_process_xyz can classify the material.
 static sensor_reading_t s_last_sensor_reading;
 static bool s_has_sensor_reading = false;
+static xyz_t s_last_sensor_variance;
+static bool s_has_sensor_variance = false;
+
+static void clear_material_classifier_input()
+{
+    s_has_sensor_reading = false;
+    s_has_sensor_variance = false;
+}
+
+static void cache_material_classifier_input(const sensor_reading_t* reading,
+                                            const xyz_t* variance_xyz)
+{
+    if (!reading)
+    {
+        clear_material_classifier_input();
+        return;
+    }
+
+    s_last_sensor_reading = *reading;
+    s_has_sensor_reading = true;
+
+    if (variance_xyz)
+    {
+        s_last_sensor_variance = *variance_xyz;
+        s_has_sensor_variance = true;
+    }
+    else
+    {
+        s_has_sensor_variance = false;
+    }
+}
+
+#ifdef ESP_PLATFORM
+static void cache_material_classifier_input_from_capture_stats(const color_capture_stats_t* stats)
+{
+    if (!stats)
+    {
+        clear_material_classifier_input();
+        return;
+    }
+
+    sensor_reading_t reading = {};
+    reading.x = stats->raw_x;
+    reading.y = stats->raw_y;
+    reading.z = stats->raw_z;
+    reading.ir = stats->raw_ir;
+    reading.clear = stats->raw_clear;
+    reading.gain = stats->gain_code;
+    reading.integration_ms = stats->integration_ms;
+    reading.status2 = stats->status2;
+    reading.status6 = stats->status6;
+    reading.saturated = stats->any_saturated;
+
+    cache_material_classifier_input(&reading, &stats->stddev_xyz);
+}
+#endif
 
 // Categories struct (unchanged) ...
 typedef struct
@@ -971,8 +1027,11 @@ esp_err_t color_pipeline_identify_from_reading(const sensor_reading_t* reading,
     // Cache sensor reading for auto-detect material feature
     if (s_config.auto_detect_material)
     {
-        s_last_sensor_reading = *reading;
-        s_has_sensor_reading = true;
+        cache_material_classifier_input(reading, nullptr);
+    }
+    else
+    {
+        clear_material_classifier_input();
     }
 
     xyz_t corrected_xyz;
@@ -1040,6 +1099,11 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
     ESP_LOGI(TAG, "Measure XYZ (IR+Black Cor): X=%.2f Y=%.2f Z=%.2f",
              result->xyz.x, result->xyz.y, result->xyz.z);
 
+    if (s_config.auto_detect_material)
+    {
+        cache_material_classifier_input_from_capture_stats(&capture_stats);
+    }
+
     ret = color_pipeline_process_xyz(&result->xyz, led_enabled, result);
 
     // === TEXTURE VARIANCE RETRY ===
@@ -1079,13 +1143,18 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
                 color_result_t merged_result = {};
                 merged_result.xyz = merged_xyz;
                 clamp_xyz_floor(&merged_result.xyz);
-                merged_result.saturated = capture_stats.any_saturated || extra_stats.any_saturated;
-                merged_result.flicker_detected = capture_stats.flicker_detected || extra_stats.flicker_detected;
-                merged_result.timestamp_us = tcs_time_us();
+                 merged_result.saturated = capture_stats.any_saturated || extra_stats.any_saturated;
+                 merged_result.flicker_detected = capture_stats.flicker_detected || extra_stats.flicker_detected;
+                 merged_result.timestamp_us = tcs_time_us();
 
-                esp_err_t merge_ret = color_pipeline_process_xyz(&merged_result.xyz, led_enabled, &merged_result);
-                if (merge_ret == ESP_OK)
-                {
+                 if (s_config.auto_detect_material)
+                 {
+                     cache_material_classifier_input_from_capture_stats(&capture_stats);
+                 }
+
+                 esp_err_t merge_ret = color_pipeline_process_xyz(&merged_result.xyz, led_enabled, &merged_result);
+                 if (merge_ret == ESP_OK)
+                 {
                     *result = merged_result;
                     // Update capture_stats to reflect the merged total sample count.
                     capture_stats.accepted_samples += extra_stats.accepted_samples;
@@ -1146,13 +1215,18 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
                     color_result_t retry_result = {};
                     retry_result.xyz = retry_stats.mean_xyz;
                     clamp_xyz_floor(&retry_result.xyz);
-                    retry_result.saturated = retry_stats.any_saturated;
-                    retry_result.flicker_detected = retry_stats.flicker_detected;
-                    retry_result.timestamp_us = tcs_time_us();
+                     retry_result.saturated = retry_stats.any_saturated;
+                     retry_result.flicker_detected = retry_stats.flicker_detected;
+                     retry_result.timestamp_us = tcs_time_us();
 
-                    set_ret = color_pipeline_process_xyz(&retry_result.xyz, led_enabled, &retry_result);
-                    if (set_ret == ESP_OK && (!retry_result.low_light || retry_result.luminance > result->luminance))
-                    {
+                     if (s_config.auto_detect_material)
+                     {
+                         cache_material_classifier_input_from_capture_stats(&retry_stats);
+                     }
+
+                     set_ret = color_pipeline_process_xyz(&retry_result.xyz, led_enabled, &retry_result);
+                     if (set_ret == ESP_OK && (!retry_result.low_light || retry_result.luminance > result->luminance))
+                     {
                         *result = retry_result;
                         winning_stats = retry_stats;
                     }
@@ -1201,13 +1275,18 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
                     color_result_t retry_result = {};
                     retry_result.xyz = retry_stats.mean_xyz;
                     clamp_xyz_floor(&retry_result.xyz);
-                    retry_result.saturated = retry_stats.any_saturated;
-                    retry_result.flicker_detected = retry_stats.flicker_detected;
-                    retry_result.timestamp_us = tcs_time_us();
+                     retry_result.saturated = retry_stats.any_saturated;
+                     retry_result.flicker_detected = retry_stats.flicker_detected;
+                     retry_result.timestamp_us = tcs_time_us();
 
-                    set_ret = color_pipeline_process_xyz(&retry_result.xyz, led_enabled, &retry_result);
-                    if (set_ret == ESP_OK && (!retry_result.saturated || retry_result.luminance < result->luminance))
-                    {
+                     if (s_config.auto_detect_material)
+                     {
+                         cache_material_classifier_input_from_capture_stats(&retry_stats);
+                     }
+
+                     set_ret = color_pipeline_process_xyz(&retry_result.xyz, led_enabled, &retry_result);
+                     if (set_ret == ESP_OK && (!retry_result.saturated || retry_result.luminance < result->luminance))
+                     {
                         *result = retry_result;
                         winning_stats = retry_stats;
                     }
@@ -1268,6 +1347,11 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
             step_result.saturated = step_stats.any_saturated;
             step_result.flicker_detected = step_stats.flicker_detected;
             step_result.timestamp_us = tcs_time_us();
+
+            if (s_config.auto_detect_material)
+            {
+                cache_material_classifier_input_from_capture_stats(&step_stats);
+            }
 
             set_ret = color_pipeline_process_xyz(&step_result.xyz, led_enabled, &step_result);
             if (set_ret != ESP_OK)
@@ -1442,7 +1526,8 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         // - Otherwise use assumed_material (default: FABRIC for quilting fabric use case)
         if (s_config.auto_detect_material && s_has_sensor_reading)
         {
-            result->material = color_math_classify_material(&s_last_sensor_reading, nullptr);
+            const xyz_t* variance_xyz = s_has_sensor_variance ? &s_last_sensor_variance : nullptr;
+            result->material = color_math_classify_material(&s_last_sensor_reading, variance_xyz);
             TCS_LOGD(TAG, "Auto-detected material: %s", color_math_material_name(result->material));
         }
         else
@@ -1517,10 +1602,11 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
     float pre_boost_a = result->lab.a;
     float pre_boost_b = result->lab.b;
 
+    const float display_saturation_boost = s_config.saturation_boost;
     float enhanced_chroma = color_math_enhance_saturation(&result->lab,
                             s_config.gray_threshold,
                             s_config.color_threshold,
-                            s_config.saturation_boost);
+                            display_saturation_boost);
 
     result->saturation = enhanced_chroma / 100.0f;
 
@@ -1590,8 +1676,8 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         // uncertain readings (e.g., from textured surfaces) into an incorrect vivid color name.
         // At confidence=1.0 the full boost is applied; at confidence=0.0 no boost is applied.
         float confidence_factor = fmaxf(0.0f, fminf(1.0f, result->confidence));
-        float effective_boost = 1.0f + (s_params.saturation_boost - 1.0f) * confidence_factor;
-        if (effective_boost < s_params.saturation_boost - 0.01f)
+        float effective_boost = 1.0f + (display_saturation_boost - 1.0f) * confidence_factor;
+        if (effective_boost < display_saturation_boost - 0.01f)
         {
             // Restore pre-boost a*/b* and reapply with the lower effective boost.
             result->lab.a = pre_boost_a;
@@ -1606,12 +1692,12 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
             TCS_LOGD(TAG,
                      "Confidence-scaled boost: confidence=%.2f factor=%.2f boost=%.2f->%.2f",
                      result->confidence, confidence_factor,
-                     s_params.saturation_boost, effective_boost);
+                     display_saturation_boost, effective_boost);
         }
     }
 
     // Clear cached sensor reading after use to avoid stale data in next call
-    s_has_sensor_reading = false;
+    clear_material_classifier_input();
 
     color_math_lab_to_rgb(result->lab, &result->rgb[0], &result->rgb[1], &result->rgb[2]);
     return ESP_OK;

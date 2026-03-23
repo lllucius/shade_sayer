@@ -658,7 +658,10 @@ static void enter_serial_scan_mode(void)
                                 s_last_result = result;
                                 s_has_last_result = true;
 
-                                // Store raw capture stats for retrieval via the RAWDATA command
+                                // Store representative raw capture stats for retrieval via the
+                                // RAWDATA command. These values come from the accepted scan path,
+                                // but are not a byte-for-byte serialization of every averaged or
+                                // retried inner sample.
                                 s_last_scan_stats = scan_stats;
                                 s_has_last_scan_stats = true;
                             }
@@ -669,7 +672,9 @@ static void enter_serial_scan_mode(void)
                     }
                     else if (strcmp(cmd_buffer, "RAWDATA") == 0)
                     {
-                        // Return raw ADC sensor values from the most recent SCAN for pipeline replay.
+                        // Return representative raw ADC sensor values from the most recent SCAN for
+                        // pipeline replay. These values are suitable for replay/regeneration, but
+                        // scans that used averaging or retries are still only replayed approximately.
                         // Format: OK:RAWDATA:x,y,z,ir,clear,gain,integration_ms
                         if (!s_has_last_scan_stats)
                         {

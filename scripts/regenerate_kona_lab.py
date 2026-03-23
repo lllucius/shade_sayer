@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-"""Regenerate Lab values in kona_captures.json from raw sensor data.
+"""Regenerate stored scan-space Lab values in kona_captures.json from raw sensor data.
 
-Reads the raw sensor readings stored in kona_captures.json, passes each one
-through the host build's color pipeline (kona_regenerate binary), and writes
-the updated Lab values back to the JSON file.
+Reads the representative raw sensor readings stored in kona_captures.json,
+passes each one through the host build's color pipeline (kona_regenerate
+binary), and writes the updated scan-space Lab values back to the JSON file.
 
 Run this after any change to the color pipeline (PCCM coefficients, responsivity
-constants, IR compensation, lightness correction, etc.) to update the cached Lab
-values without requiring a physical rescan of all 365 swatches.
+constants, IR compensation, lightness correction, etc.) to update the cached
+scan-space Lab values without requiring a physical rescan of all 365 swatches.
+
+Note: the stored RAWDATA values are representative capture data from the scan,
+not a byte-for-byte serialization of every accepted sample. Replay therefore
+tracks the captured scan closely, but it is still an approximation for scans
+that used averaging or retry logic in firmware.
 
 Workflow:
     1.  Edit pipeline parameters in main/color_pipeline.cpp or calibration headers.
@@ -97,7 +102,7 @@ def regenerate(json_path: pathlib.Path, binary: pathlib.Path, dry_run: bool = Fa
     """Run the regeneration pipeline.
 
     Feeds swatches with raw sensor data through the kona_regenerate binary and
-    updates the Lab values in the JSON file.
+    updates the stored scan-space Lab values in the JSON file.
 
     Returns the number of swatches updated.
     """

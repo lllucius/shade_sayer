@@ -334,12 +334,14 @@ class SerialConnection:
     def scan(self) -> Optional[Tuple]:
         """Request a scan and return Lab, RGB, and raw sensor values.
 
-        Sends SCAN to get Lab+RGB, then RAWDATA to retrieve the raw ADC counts
-        from the same measurement for pipeline replay.
+        Sends SCAN to get Lab+RGB, then RAWDATA to retrieve representative raw
+        ADC counts from the same scan for pipeline replay.
 
         Returns tuple (L, a, b, R, G, B, raw_x, raw_y, raw_z, raw_ir, raw_clear,
         raw_gain, raw_integration_ms) or None on error.
         raw_* values are None when RAWDATA is unavailable or returns an error.
+        For averaged/retried firmware scans, RAWDATA is representative replay data,
+        not a perfect serialization of every inner sample.
         """
         response = self.send_command("SCAN", timeout=20.0)
         if response is None:
@@ -361,9 +363,9 @@ class SerialConnection:
                 self._log(f"Parse error: {e}, response: {response}")
                 return None
 
-            # Retrieve raw ADC values from the just-completed scan via RAWDATA command.
-            # These values are used by regenerate_kona_lab.py to replay the measurement
-            # through the color pipeline after pipeline parameter changes.
+            # Retrieve representative raw ADC values from the just-completed scan via
+            # RAWDATA. These values are used by regenerate_kona_lab.py to replay the
+            # measurement through the color pipeline after pipeline parameter changes.
             raw_x = raw_y = raw_z = raw_ir = raw_clear = raw_gain = raw_int_ms = None
             raw_resp = self.send_command("RAWDATA", timeout=2.0)
             if raw_resp and raw_resp.startswith("OK:RAWDATA:"):

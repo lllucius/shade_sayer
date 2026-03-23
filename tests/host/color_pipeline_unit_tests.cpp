@@ -242,6 +242,13 @@ void test_auto_detect_material()
     std::printf("Direct classification result: %s\n", color_math_material_name(classified));
     assert(result.material == classified && 
            "Pipeline should use classification result when auto_detect is enabled");
+
+    xyz_t high_variance = {1000000.0f, 1000000.0f, 1000000.0f};
+    material_type_t variance_classified = color_math_classify_material(&raw, &high_variance);
+    std::printf("Variance-assisted classification result: %s\n",
+                color_math_material_name(variance_classified));
+    assert(variance_classified == MATERIAL_FABRIC &&
+           "High variance input should classify as fabric");
     
     // Test with auto_detect disabled - should use assumed_material
     cfg.auto_detect_material = false;
@@ -256,6 +263,54 @@ void test_auto_detect_material()
            "Pipeline should use assumed_material when auto_detect is disabled");
 
     std::printf("Auto-detect material test PASSED\n");
+}
+
+void test_confidence_scaled_boost_uses_config_saturation()
+{
+    std::printf("\n=== Confidence-scaled saturation source test ===\n");
+
+    color_pipeline_config_t cfg{};
+    cfg.min_luminance = 5.0f;
+    cfg.max_delta_e = 12.0f;
+    cfg.num_samples = 1;
+    cfg.sample_delay_ms = 1;
+    cfg.gray_threshold = 5.0f;
+    cfg.color_threshold = 60.0f;
+    cfg.saturation_boost = 1.10f;
+    cfg.use_material_correction = true;
+    cfg.assumed_material = MATERIAL_FABRIC;
+    cfg.auto_detect_material = false;
+    assert(color_pipeline_init(&cfg) == ESP_OK);
+
+    xyz_t xyz{80.0f, 70.0f, 50.0f};
+    color_result_t result{};
+    assert(color_pipeline_process_xyz(&xyz, true, &result) == ESP_OK);
+    assert(result.confidence > 0.0f && result.confidence < 1.0f &&
+           "Test input must exercise the partial-confidence saturation path");
+
+    const float effective_boost =
+        1.0f + (cfg.saturation_boost - 1.0f) * result.confidence;
+
+    lab_t expected = result.scan_lab;
+    color_math_enhance_saturation(&expected,
+                                  cfg.gray_threshold,
+                                  cfg.color_threshold,
+                                  effective_boost);
+    expected.a = fminf(fmaxf(expected.a, -110.0f), 110.0f);
+    expected.b = fminf(fmaxf(expected.b, -110.0f), 110.0f);
+
+    std::printf("confidence=%.3f effective_boost=%.4f\n",
+                result.confidence, effective_boost);
+    std::printf("expected lab=(%.4f, %.4f, %.4f)\n",
+                expected.l, expected.a, expected.b);
+    std::printf("actual   lab=(%.4f, %.4f, %.4f)\n",
+                result.lab.l, result.lab.a, result.lab.b);
+
+    assert(fabsf(result.lab.l - expected.l) < 0.001f);
+    assert(fabsf(result.lab.a - expected.a) < 0.01f);
+    assert(fabsf(result.lab.b - expected.b) < 0.01f);
+
+    std::printf("Confidence-scaled saturation source test PASSED\n");
 }
 
 int main()
@@ -327,6 +382,9 @@ int main()
 
     // Run auto-detect material test
     test_auto_detect_material();
+
+    // Verify confidence-scaled reboost uses the configured saturation source.
+    test_confidence_scaled_boost_uses_config_saturation();
 
     std::printf("All Kona matching tests passed!\n");
     return 0;
