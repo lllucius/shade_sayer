@@ -112,11 +112,15 @@ int main()
         }
         else
         {
+            // Use scan_lab (no Z floor, no saturation boost, no ±110 clamp)
+            // because the Kona reference table is built from scan_lab values.
+            // Using result.lab would include display-path transforms that
+            // collapse distinct vivid swatches into identical clamped values.
             std::printf("OK %d %.6f %.6f %.6f\n",
                         swatch_id,
-                        static_cast<double>(result.lab.l),
-                        static_cast<double>(result.lab.a),
-                        static_cast<double>(result.lab.b));
+                        static_cast<double>(result.scan_lab.l),
+                        static_cast<double>(result.scan_lab.a),
+                        static_cast<double>(result.scan_lab.b));
         }
         std::fflush(stdout);
     }

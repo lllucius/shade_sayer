@@ -121,6 +121,13 @@ static bool s_kona_reference_ready = false;
 static sensor_reading_t s_last_sensor_reading;
 static bool s_has_sensor_reading = false;
 
+// Cached capture variance for auto-detect material feature.
+// When color_pipeline_identify captures multiple samples, the stddev is converted
+// to variance and stored here so that color_math_classify_material can use it
+// for variance-based heuristics (e.g., fabric detection via high-variance reads).
+static xyz_t s_capture_variance;
+static bool s_has_capture_variance = false;
+
 // Categories struct (unchanged) ...
 typedef struct
 {
@@ -1317,6 +1324,16 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
         }
     }
 
+    // Cache the capture variance for the material auto-detect classifier.
+    // Convert stddev to variance (stddev²) since the classifier uses variance_xyz.
+    if (s_config.auto_detect_material && winning_stats.accepted_samples >= 2)
+    {
+        s_capture_variance.x = winning_stats.stddev_xyz.x * winning_stats.stddev_xyz.x;
+        s_capture_variance.y = winning_stats.stddev_xyz.y * winning_stats.stddev_xyz.y;
+        s_capture_variance.z = winning_stats.stddev_xyz.z * winning_stats.stddev_xyz.z;
+        s_has_capture_variance = true;
+    }
+
     if (stats_out)
     {
         *stats_out = winning_stats;
@@ -1442,7 +1459,9 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         // - Otherwise use assumed_material (default: FABRIC for quilting fabric use case)
         if (s_config.auto_detect_material && s_has_sensor_reading)
         {
-            result->material = color_math_classify_material(&s_last_sensor_reading, nullptr);
+            result->material = color_math_classify_material(
+                &s_last_sensor_reading,
+                s_has_capture_variance ? &s_capture_variance : nullptr);
             TCS_LOGD(TAG, "Auto-detected material: %s", color_math_material_name(result->material));
         }
         else
@@ -1589,9 +1608,11 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         // Reduce the saturation boost for low-confidence matches to prevent over-boosting
         // uncertain readings (e.g., from textured surfaces) into an incorrect vivid color name.
         // At confidence=1.0 the full boost is applied; at confidence=0.0 no boost is applied.
+        // Uses s_config.saturation_boost (same source as the initial boost above) to ensure
+        // consistent behavior regardless of whether auto-calibration loaded different params.
         float confidence_factor = fmaxf(0.0f, fminf(1.0f, result->confidence));
-        float effective_boost = 1.0f + (s_params.saturation_boost - 1.0f) * confidence_factor;
-        if (effective_boost < s_params.saturation_boost - 0.01f)
+        float effective_boost = 1.0f + (s_config.saturation_boost - 1.0f) * confidence_factor;
+        if (effective_boost < s_config.saturation_boost - 0.01f)
         {
             // Restore pre-boost a*/b* and reapply with the lower effective boost.
             result->lab.a = pre_boost_a;
@@ -1606,12 +1627,13 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
             TCS_LOGD(TAG,
                      "Confidence-scaled boost: confidence=%.2f factor=%.2f boost=%.2f->%.2f",
                      result->confidence, confidence_factor,
-                     s_params.saturation_boost, effective_boost);
+                     s_config.saturation_boost, effective_boost);
         }
     }
 
-    // Clear cached sensor reading after use to avoid stale data in next call
+    // Clear cached sensor reading and variance after use to avoid stale data in next call
     s_has_sensor_reading = false;
+    s_has_capture_variance = false;
 
     color_math_lab_to_rgb(result->lab, &result->rgb[0], &result->rgb[1], &result->rgb[2]);
     return ESP_OK;
