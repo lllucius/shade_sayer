@@ -34,6 +34,10 @@ static const float DARK_AUTO_GAIN_TARGET_LUMINANCE = 15.0f;
 // which testing showed provides good dark-color discrimination.
 static const uint8_t AUTO_GAIN_MAX_CODE = 9u;  // 256×
 
+// Small tolerance used when deciding whether the confidence-scaled saturation
+// boost meaningfully differs from the already-applied configured boost.
+static constexpr float CONFIDENCE_BOOST_EPSILON = 0.01f;
+
 // Number of gain steps to boost during low-light retries.
 // Each step doubles the gain, so 2 steps = 4x more signal.
 static const uint8_t DARK_RETRY_GAIN_BOOST_STEPS = 2u;
@@ -1602,11 +1606,11 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
     float pre_boost_a = result->lab.a;
     float pre_boost_b = result->lab.b;
 
-    const float display_saturation_boost = s_config.saturation_boost;
+    const float configured_saturation_boost = s_config.saturation_boost;
     float enhanced_chroma = color_math_enhance_saturation(&result->lab,
                             s_config.gray_threshold,
                             s_config.color_threshold,
-                            display_saturation_boost);
+                            configured_saturation_boost);
 
     result->saturation = enhanced_chroma / 100.0f;
 
@@ -1676,8 +1680,8 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         // uncertain readings (e.g., from textured surfaces) into an incorrect vivid color name.
         // At confidence=1.0 the full boost is applied; at confidence=0.0 no boost is applied.
         float confidence_factor = fmaxf(0.0f, fminf(1.0f, result->confidence));
-        float effective_boost = 1.0f + (display_saturation_boost - 1.0f) * confidence_factor;
-        if (effective_boost < display_saturation_boost - 0.01f)
+        float effective_boost = 1.0f + (configured_saturation_boost - 1.0f) * confidence_factor;
+        if (effective_boost < configured_saturation_boost - CONFIDENCE_BOOST_EPSILON)
         {
             // Restore pre-boost a*/b* and reapply with the lower effective boost.
             result->lab.a = pre_boost_a;
@@ -1692,7 +1696,7 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
             TCS_LOGD(TAG,
                      "Confidence-scaled boost: confidence=%.2f factor=%.2f boost=%.2f->%.2f",
                      result->confidence, confidence_factor,
-                     display_saturation_boost, effective_boost);
+                     configured_saturation_boost, effective_boost);
         }
     }
 

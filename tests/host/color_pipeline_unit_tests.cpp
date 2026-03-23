@@ -243,6 +243,8 @@ void test_auto_detect_material()
     assert(result.material == classified && 
            "Pipeline should use classification result when auto_detect is enabled");
 
+    // variance_score = mean_variance / raw.y, so 1e6 is comfortably above the
+    // fabric threshold for this ~7.8e6 Y-channel sample while remaining easy to read.
     xyz_t high_variance = {1000000.0f, 1000000.0f, 1000000.0f};
     material_type_t variance_classified = color_math_classify_material(&raw, &high_variance);
     std::printf("Variance-assisted classification result: %s\n",
