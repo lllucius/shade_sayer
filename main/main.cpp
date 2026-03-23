@@ -671,6 +671,14 @@ static void enter_serial_scan_mode(void)
                     {
                         // Return raw ADC sensor values from the most recent SCAN for pipeline replay.
                         // Format: OK:RAWDATA:x,y,z,ir,clear,gain,integration_ms
+                        //
+                        // NOTE: These raw values are representative, not an exact replay source.
+                        // When num_samples > 1, the SCAN result may come from a trimmed mean,
+                        // a merged texture retry, a low-light retry, a saturation retry, or a
+                        // progressive auto-gain step. The raw values stored here come from the
+                        // first accepted sensor reading of the winning capture round, so
+                        // replaying them through the pipeline will produce an approximation
+                        // of the original SCAN result, not an exact reproduction.
                         if (!s_has_last_scan_stats)
                         {
                             printf("ERR:NO_RAWDATA\n");
