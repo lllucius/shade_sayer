@@ -60,7 +60,11 @@ static color_pipeline_config_t s_config =
     .sample_delay_ms = 80,
     .gray_threshold = 5.0f,
     .color_threshold = 60.0f,
-    .saturation_boost = 1.5f
+    .saturation_boost = 1.5f,
+    // Material correction: enabled by default, assume fabric (primary use case)
+    .use_material_correction = true,
+    .assumed_material = MATERIAL_FABRIC,
+    .auto_detect_material = false
 };
 
 static color_calib_params_t s_params = {
@@ -110,6 +114,12 @@ static float s_cached_adaptation_matrix[3][3] = {{1.0f, 0.0f, 0.0f},
 static bool s_matrix_valid = false;
 static bool s_matrix_for_led = true;  //< True if matrix is for LED calibration
 static bool s_kona_reference_ready = false;
+
+// Cached sensor reading for auto-detect material feature.
+// When auto_detect_material is enabled, color_pipeline_identify_from_reading stores
+// the sensor reading here so color_pipeline_process_xyz can classify the material.
+static sensor_reading_t s_last_sensor_reading;
+static bool s_has_sensor_reading = false;
 
 // Categories struct (unchanged) ...
 typedef struct
@@ -958,6 +968,13 @@ esp_err_t color_pipeline_identify_from_reading(const sensor_reading_t* reading,
 
     memset(result, 0, sizeof(color_result_t));
 
+    // Cache sensor reading for auto-detect material feature
+    if (s_config.auto_detect_material)
+    {
+        s_last_sensor_reading = *reading;
+        s_has_sensor_reading = true;
+    }
+
     xyz_t corrected_xyz;
     esp_err_t ret = apply_sensor_correction(reading, &corrected_xyz);
     if (ret != ESP_OK)
@@ -1413,6 +1430,41 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         // No saturation boost and no clamp — preserve natural Lab values so that
         // highly-saturated swatches remain distinguishable in kona_captures.json.
         result->scan_lab = scan_lab;
+
+        // === MATERIAL-AWARE CORRECTION ===
+        // Apply per-material Lab correction to compensate for systematic measurement
+        // bias introduced by different surface physics (fabric vs plastic vs metal).
+        // This correction is applied BEFORE ΔE2000 matching to bring measurements
+        // closer to ideal viewing conditions.
+        //
+        // Determine material type:
+        // - If auto_detect_material is enabled and we have sensor data, classify from heuristics
+        // - Otherwise use assumed_material (default: FABRIC for quilting fabric use case)
+        if (s_config.auto_detect_material && s_has_sensor_reading)
+        {
+            result->material = color_math_classify_material(&s_last_sensor_reading, nullptr);
+            TCS_LOGD(TAG, "Auto-detected material: %s", color_math_material_name(result->material));
+        }
+        else
+        {
+            result->material = s_config.assumed_material;
+        }
+        
+        if (s_config.use_material_correction)
+        {
+            material_correction_t correction = color_math_get_material_correction(result->material);
+            result->corrected_lab = color_math_apply_material_correction(&scan_lab, &correction);
+            
+            TCS_LOGD(TAG, "Material correction (%s): scan_lab L=%.2f a=%.2f b=%.2f -> corrected L=%.2f a=%.2f b=%.2f",
+                     color_math_material_name(result->material),
+                     scan_lab.l, scan_lab.a, scan_lab.b,
+                     result->corrected_lab.l, result->corrected_lab.a, result->corrected_lab.b);
+        }
+        else
+        {
+            // No material correction: use scan_lab directly
+            result->corrected_lab = scan_lab;
+        }
     }
 
     // === DISPLAY LAB PATH (with Z floor) ===
@@ -1487,8 +1539,10 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
     {
         // Use scan_lab (Y-normalized, no Z floor, no saturation boost) for Kona matching.
         // The Kona reference table is built from kona_captures.json values that were
-        // captured using this same scan_lab computation, so matching against scan_lab
-        // ensures accurate deltaE between measured colors and stored references.
+        // captured using this same scan_lab computation (from actual fabric scans),
+        // so matching against scan_lab ensures accurate deltaE between measured colors
+        // and stored references. Material correction is NOT applied for Kona matching
+        // since the reference table already reflects fabric measurement characteristics.
         // Using pre-boost values keeps highly saturated swatches (e.g., CARROT, TORCH)
         // distinguishable where boost+clamp would otherwise collapse them to identical
         // a*=110, b*=110 values.
@@ -1502,9 +1556,11 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         }
         else
         {
-            // Use corrected Lab for fallback database matching.
-            // The general color database expects perceptually-corrected values.
-            result->color_name = color_matcher_find_closest(&result->lab, &result->delta_e);
+            // Use material-corrected Lab for fallback database matching.
+            // The general color database contains theoretical/reference Lab values,
+            // so material correction helps compensate for measurement bias.
+            // If material correction is disabled, corrected_lab equals scan_lab.
+            result->color_name = color_matcher_find_closest(&result->corrected_lab, &result->delta_e);
             if (result->color_name)
             {
                 // Description is generated on-demand via color_description_generate()
@@ -1553,6 +1609,9 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
                      s_params.saturation_boost, effective_boost);
         }
     }
+
+    // Clear cached sensor reading after use to avoid stale data in next call
+    s_has_sensor_reading = false;
 
     color_math_lab_to_rgb(result->lab, &result->rgb[0], &result->rgb[1], &result->rgb[2]);
     return ESP_OK;
@@ -1715,6 +1774,37 @@ esp_err_t color_pipeline_set_params(const color_calib_params_t* params)
     {
         ESP_LOGI(TAG, "Pipeline parameters updated (no black level calibration)");
     }
+    
+    return ESP_OK;
+}
+
+esp_err_t color_pipeline_set_material(material_type_t material)
+{
+    // Only FABRIC, PLASTIC, METAL, or DEFAULT are valid assumed materials
+    // UNKNOWN should not be explicitly set as the assumed material
+    if (material < MATERIAL_FABRIC || material > MATERIAL_DEFAULT)
+    {
+        return ESP_ERR_INVALID_ARG;
+    }
+    
+    s_config.assumed_material = material;
+    ESP_LOGI(TAG, "Material type set to: %s", color_math_material_name(material));
+    
+    return ESP_OK;
+}
+
+esp_err_t color_pipeline_set_material_auto_detect(bool enable)
+{
+    s_config.auto_detect_material = enable;
+    ESP_LOGI(TAG, "Material auto-detection: %s", enable ? "enabled" : "disabled");
+    
+    return ESP_OK;
+}
+
+esp_err_t color_pipeline_set_material_correction(bool enable)
+{
+    s_config.use_material_correction = enable;
+    ESP_LOGI(TAG, "Material correction: %s", enable ? "enabled" : "disabled");
     
     return ESP_OK;
 }

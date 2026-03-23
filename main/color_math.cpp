@@ -662,3 +662,192 @@ esp_err_t color_math_xyz_to_rgb_float(const xyz_t* xyz, rgb_t* rgb)
 
     return ESP_OK;
 }
+
+//===========================================================================
+// MATERIAL-AWARE COLOR CORRECTION
+//===========================================================================
+
+/**
+ * @brief Default correction factors for each material type
+ * 
+ * Empirically derived from the ChatGPT discussion on material-aware correction:
+ * 
+ * - FABRIC: Fibers scatter light (subsurface + directional), shadows between
+ *   threads lead to darker and more desaturated readings than perceived.
+ *   Correction: L *= 1.10, L += 2, a *= 1.05, b *= 1.05
+ * 
+ * - PLASTIC: Semi-gloss surfaces may have specular highlights biasing toward
+ *   white, causing slightly elevated lightness readings.
+ *   Correction: L *= 0.98 (mild reduction)
+ * 
+ * - METAL: Strong specular reflection makes colors read artificially bright
+ *   or washed out.
+ *   Correction: L *= 0.90, a *= 0.95, b *= 0.95
+ */
+static const material_correction_t MATERIAL_CORRECTIONS[] = {
+    // MATERIAL_UNKNOWN - identity (no correction)
+    { .l_scale = 1.0f, .l_offset = 0.0f, .a_scale = 1.0f, .b_scale = 1.0f },
+    
+    // MATERIAL_FABRIC - lift shadows, restore muted chroma
+    { .l_scale = 1.10f, .l_offset = 2.0f, .a_scale = 1.05f, .b_scale = 1.05f },
+    
+    // MATERIAL_PLASTIC - mild lightness reduction
+    { .l_scale = 0.98f, .l_offset = 0.0f, .a_scale = 1.0f, .b_scale = 1.0f },
+    
+    // MATERIAL_METAL - suppress specular bias
+    { .l_scale = 0.90f, .l_offset = 0.0f, .a_scale = 0.95f, .b_scale = 0.95f },
+    
+    // MATERIAL_DEFAULT - identity (no correction)
+    { .l_scale = 1.0f, .l_offset = 0.0f, .a_scale = 1.0f, .b_scale = 1.0f },
+};
+
+static const char* MATERIAL_NAMES[] = {
+    "Unknown",
+    "Fabric",
+    "Plastic",
+    "Metal",
+    "Default"
+};
+
+material_correction_t color_math_get_material_correction(material_type_t material)
+{
+    if (material <= MATERIAL_DEFAULT)
+    {
+        return MATERIAL_CORRECTIONS[material];
+    }
+    // Fallback to identity if out of range
+    return MATERIAL_CORRECTIONS[MATERIAL_DEFAULT];
+}
+
+lab_t color_math_apply_material_correction(const lab_t* lab, const material_correction_t* correction)
+{
+    lab_t result;
+    
+    if (!lab || !correction)
+    {
+        ESP_LOGE(TAG, "color_math_apply_material_correction: null pointer argument");
+        return (lab_t){0.0f, 0.0f, 0.0f};
+    }
+    
+    // Apply correction: L' = L * scale + offset, a' = a * scale, b' = b * scale
+    result.l = lab->l * correction->l_scale + correction->l_offset;
+    result.a = lab->a * correction->a_scale;
+    result.b = lab->b * correction->b_scale;
+    
+    // Clamp lightness to valid range
+    result.l = fminf(fmaxf(result.l, 0.0f), 100.0f);
+    
+    return result;
+}
+
+material_type_t color_math_classify_material(const sensor_reading_t* reading,
+                                             const xyz_t* variance_xyz)
+{
+    if (!reading)
+    {
+        return MATERIAL_DEFAULT;
+    }
+    
+    // Extract sensor characteristics for classification heuristics
+    // Based on ChatGPT discussion: use variance, saturation, reflectance patterns
+    
+    // Minimum sensor value to prevent division by zero
+    static const float MIN_SENSOR_VALUE = 1.0f;
+    
+    // Calculate approximate saturation from raw channel ratios
+    // Higher X relative to Y suggests redder, higher Z relative to Y suggests bluer
+    float x_norm = (float)reading->x;
+    float y_norm = (float)reading->y;
+    float z_norm = (float)reading->z;
+    float clear = (float)reading->clear;
+    
+    // Avoid division by zero
+    if (y_norm < MIN_SENSOR_VALUE) y_norm = MIN_SENSOR_VALUE;
+    if (clear < MIN_SENSOR_VALUE) clear = MIN_SENSOR_VALUE;
+    
+    // Reflectance indicator: ratio of clear to sum of color channels
+    // High clear relative to XYZ suggests specular reflection (metal/plastic)
+    float total_color = x_norm + y_norm + z_norm;
+    float clear_ratio = clear / total_color;
+    
+    // IR ratio: high IR relative to clear suggests some materials
+    float ir_ratio = (float)reading->ir / clear;
+    
+    // Chroma indicator: deviation from neutral (equal X:Y:Z)
+    float x_ratio = x_norm / y_norm;
+    float z_ratio = z_norm / y_norm;
+    float max_ratio = fmaxf(x_ratio, z_ratio);
+    float min_ratio = fminf(x_ratio, z_ratio);
+    float chroma_spread = max_ratio - min_ratio;
+    
+    // Variance-based classification (if variance is provided)
+    float variance_score = 0.0f;
+    if (variance_xyz)
+    {
+        // High variance suggests textured surface (fabric)
+        // Normalize variance by mean for scale-invariant comparison
+        float mean_variance = (variance_xyz->x + variance_xyz->y + variance_xyz->z) / 3.0f;
+        variance_score = mean_variance / y_norm;
+    }
+    
+    // Classification heuristics based on ChatGPT discussion:
+    // 
+    // Fabric: 
+    //   - High variance across samples (fiber texture)
+    //   - Lower saturation than perceived (muted by scattering)
+    //   - Moderate clear ratio
+    //
+    // Metal:
+    //   - Very high clear ratio (strong specular reflection)
+    //   - Low chroma spread (washed out colors)
+    //   - Low variance (smooth surface)
+    //
+    // Plastic:
+    //   - Moderate to high clear ratio
+    //   - Moderate chroma
+    //   - Low variance
+    
+    // Thresholds (empirically tuned, may need adjustment based on real data)
+    const float VARIANCE_FABRIC_THRESHOLD = 0.05f;   // High variance -> fabric
+    const float CLEAR_METAL_THRESHOLD = 1.5f;        // Very high clear ratio -> metal
+    const float CLEAR_PLASTIC_THRESHOLD = 1.2f;      // Moderately high clear ratio -> plastic
+    const float CHROMA_METAL_THRESHOLD = 0.3f;       // Low chroma spread -> metal candidate
+    
+    // Priority-based classification:
+    // 1. High variance strongly suggests fabric
+    if (variance_score > VARIANCE_FABRIC_THRESHOLD)
+    {
+        TCS_LOGD(TAG, "Material classified as FABRIC (variance_score=%.4f)", variance_score);
+        return MATERIAL_FABRIC;
+    }
+    
+    // 2. Very high clear ratio + low chroma suggests metal
+    if (clear_ratio > CLEAR_METAL_THRESHOLD && chroma_spread < CHROMA_METAL_THRESHOLD)
+    {
+        TCS_LOGD(TAG, "Material classified as METAL (clear_ratio=%.4f, chroma_spread=%.4f)",
+                 clear_ratio, chroma_spread);
+        return MATERIAL_METAL;
+    }
+    
+    // 3. Moderately high clear ratio suggests plastic
+    if (clear_ratio > CLEAR_PLASTIC_THRESHOLD)
+    {
+        TCS_LOGD(TAG, "Material classified as PLASTIC (clear_ratio=%.4f)", clear_ratio);
+        return MATERIAL_PLASTIC;
+    }
+    
+    // 4. Default: assume fabric for this quilting fabric device
+    // Since the primary use case is Kona Cotton quilting fabrics,
+    // defaulting to fabric correction is appropriate when uncertain
+    TCS_LOGD(TAG, "Material defaulting to FABRIC (primary use case)");
+    return MATERIAL_FABRIC;
+}
+
+const char* color_math_material_name(material_type_t material)
+{
+    if (material <= MATERIAL_DEFAULT)
+    {
+        return MATERIAL_NAMES[material];
+    }
+    return "Unknown";
+}
