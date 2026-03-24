@@ -351,6 +351,7 @@ static constexpr float k_capture_min_accepted_y = static_cast<float>(CONFIG_CAPT
 static constexpr float k_capture_min_accepted_y = CAPTURE_MIN_ACCEPTED_Y;
 #endif
 
+#ifdef ESP_PLATFORM
 static void clamp_xyz_floor(xyz_t* xyz)
 {
     if (!xyz)
@@ -362,7 +363,6 @@ static void clamp_xyz_floor(xyz_t* xyz)
     xyz->z = fmaxf(0.01f, xyz->z);
 }
 
-#ifdef ESP_PLATFORM
 static esp_err_t capture_averaged_xyz(TCS3530* sensor,
                                       bool led_enabled,
                                       color_capture_stats_t* stats)
