@@ -1815,17 +1815,6 @@ int color_pipeline_describe(const color_result_t* result, char* buffer, size_t b
         }
     }
 
-    // Add lightness and saturation qualifiers in one pass
-    const char* quality = (result->lab.l < 30.0f) ? "It's quite dark. " :
-                          (result->lab.l > 80.0f) ? "It's quite light. " :
-                          (result->saturation > 0.8f) ? "It's very vivid and saturated. " :
-                          (result->saturation > 0.1f && result->saturation < 0.3f) ? "It's a muted, grayish tone. " : "";
-
-    if (quality[0] && len < (int)buffer_size - 1)
-    {
-        len += snprintf(buffer + len, buffer_size - len, "%s", quality);
-    }
-
     return len;
 }
 
