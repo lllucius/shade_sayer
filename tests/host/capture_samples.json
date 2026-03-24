@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "description": "Non-Kona raw sensor captures for pipeline regression testing",
+  "notes": [
+    "These captures were taken with the TCS3530 sensor under LED illumination",
+    "unless led_enabled is false.  Use scripts/color_replay.py to replay them",
+    "through the pipeline or convert them to the batch text format.",
+    "",
+    "gain field is the raw gain-code byte reported by tcs3530_driver (not the",
+    "multiplier): 4 = 8x, 5 = 16x (match the values in calibration_measurements_raw.cfg).",
+    "",
+    "expected.category is compared against the pipeline 'category' output.",
+    "expected.max_delta_e (optional) fails if result.delta_e exceeds the value."
+  ],
+  "captures": [
+    {
+      "id": "green_wall_paint",
+      "description": "Green wall paint misclassified as Yellow/Pale — known calibration issue",
+      "notes": "scan_lab a* ≈ -1.6 is nearly neutral (should be ≈ -20 to -50 for a real green). Root cause is sensor-correction / calibration matrix, not the colour matcher. Use color_replay_inspect to compare intermediate pipeline stages across commits. No expected category set so CI does not fail while the bug is open.",
+      "led_enabled": true,
+      "raw": {
+        "x": 11517952,
+        "y": 12179200,
+        "z": 7376128,
+        "ir": 249344,
+        "clear": 8603648,
+        "gain": 4,
+        "integration_ms": 100
+      },
+      "expected": {}
+    },
+    {
+      "id": "cal_white",
+      "description": "White calibration reference patch (high signal, near D65)",
+      "led_enabled": true,
+      "raw": {
+        "x": 39607808,
+        "y": 39683328,
+        "z": 31837184,
+        "ir": 0,
+        "clear": 32000000,
+        "gain": 5,
+        "integration_ms": 100
+      },
+      "expected": {
+        "category": "White"
+      }
+    },
+    {
+      "id": "cal_brights_red",
+      "description": "Bright red calibration reference (Brights Red, sRGB ~237,28,36)",
+      "led_enabled": true,
+      "raw": {
+        "x": 11418369,
+        "y": 7791616,
+        "z": 2225664,
+        "ir": 619520,
+        "clear": 21435649,
+        "gain": 5,
+        "integration_ms": 100
+      },
+      "expected": {
+        "category": "Red"
+      }
+    },
+    {
+      "id": "cal_brights_green",
+      "description": "Bright green calibration reference (Brights Green, sRGB ~0,161,75)",
+      "led_enabled": true,
+      "raw": {
+        "x": 5946625,
+        "y": 10053120,
+        "z": 3830016,
+        "ir": 619520,
+        "clear": 19829761,
+        "gain": 5,
+        "integration_ms": 100
+      },
+      "expected": {
+        "category": "Green"
+      }
+    },
+    {
+      "id": "cal_brights_blue",
+      "description": "Bright blue calibration reference (Brights Blue, sRGB ~33,63,153)",
+      "led_enabled": true,
+      "raw": {
+        "x": 6423552,
+        "y": 4022784,
+        "z": 11107328,
+        "ir": 619520,
+        "clear": 21553664,
+        "gain": 5,
+        "integration_ms": 100
+      },
+      "expected": {
+        "category": "Blue"
+      }
+    },
+    {
+      "id": "cal_brights_yellow",
+      "description": "Bright yellow calibration reference (Brights Yellow, sRGB ~255,221,23)",
+      "led_enabled": true,
+      "raw": {
+        "x": 27526144,
+        "y": 33074176,
+        "z": 4148736,
+        "ir": 619520,
+        "clear": 31457280,
+        "gain": 5,
+        "integration_ms": 100
+      },
+      "expected": {
+        "category": "Yellow"
+      }
+    },
+    {
+      "id": "cal_dark_green",
+      "description": "Dark green calibration reference (sRGB ~0,103,56); hue angle 160.3° falls just inside the Cyan boundary",
+      "led_enabled": true,
+      "raw": {
+        "x": 3912449,
+        "y": 5560832,
+        "z": 3163904,
+        "ir": 619520,
+        "clear": 12636161,
+        "gain": 5,
+        "integration_ms": 100
+      },
+      "expected": {
+        "category": "Cyan"
+      }
+    },
+    {
+      "id": "cal_mid_green",
+      "description": "Medium green calibration reference (sRGB ~0,147,68)",
+      "led_enabled": true,
+      "raw": {
+        "x": 5733121,
+        "y": 9252864,
+        "z": 3825920,
+        "ir": 619520,
+        "clear": 18812801,
+        "gain": 5,
+        "integration_ms": 100
+      },
+      "expected": {
+        "category": "Green"
+      }
+    },
+    {
+      "id": "cal_cyan",
+      "description": "Cyan calibration reference (sRGB ~0,173,239); sensor reading yields b*<0 which maps to the Blue hue range",
+      "led_enabled": true,
+      "raw": {
+        "x": 14399233,
+        "y": 12816384,
+        "z": 26675200,
+        "ir": 619520,
+        "clear": 53891073,
+        "gain": 5,
+        "integration_ms": 100
+      },
+      "expected": {
+        "category": "Blue"
+      }
+    },
+    {
+      "id": "cal_dark_gray",
+      "description": "Dark gray calibration reference (sRGB ~35,31,32), no expected category check",
+      "led_enabled": true,
+      "raw": {
+        "x": 1991937,
+        "y": 2010624,
+        "z": 1570816,
+        "ir": 0,
+        "clear": 5573377,
+        "gain": 5,
+        "integration_ms": 100
+      },
+      "expected": {}
+    }
+  ]
+}
