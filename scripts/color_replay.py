@@ -14,6 +14,10 @@ Single-capture inspection (verbose):
           --id green_wall_paint \\
           --build /tmp/shade_sayer_host_build
 
+Single-capture with replay controls (isolate pipeline stages):
+  python3 scripts/color_replay.py inspect --json tests/host/capture_samples.json \\
+          --id green_wall_paint --no-auto-cal --no-black-cal --bypass-pccm
+
 Batch / regression run (CSV output + pass/fail):
   python3 scripts/color_replay.py batch --json tests/host/capture_samples.json \\
           --build /tmp/shade_sayer_host_build
@@ -27,8 +31,21 @@ Batch / regression run (CSV output + pass/fail):
   python3 scripts/color_replay.py batch --json tests/host/capture_samples.json \\
           --build /tmp/shade_sayer_host_build --check
 
+  # Batch with replay flags to test a pipeline variant:
+  python3 scripts/color_replay.py batch --json tests/host/capture_samples.json \\
+          --no-auto-cal --no-material --check
+
 Text-format conversion only (generate a .cfg file for color_replay_batch):
   python3 scripts/color_replay.py dump --json tests/host/capture_samples.json
+
+Pipeline control flags (inspect and batch subcommands):
+  --no-auto-cal        Skip NVS auto-calibration load; use firmware defaults.
+  --no-black-cal       Skip black-level subtraction.
+  --no-d65-scale       Skip D65 white-point pre-scale step.
+  --no-ir-comp         Skip IR-channel crosstalk compensation.
+  --no-material        Skip material-specific Lab correction.
+  --material=NAME      Override material: default, fabric, plastic, metal.
+  --bypass-pccm        Replace PCCM with identity matrix (DIAGNOSTIC MODE).
 
 Environment
 -----------
@@ -143,6 +160,52 @@ def _capture_to_text_line(cap: dict) -> str | None:
     return " ".join(str(v) for v in parts)
 
 
+# Replay flags accepted by both inspect and batch subcommands.
+_REPLAY_FLAGS = [
+    "--no-auto-cal",
+    "--no-black-cal",
+    "--no-d65-scale",
+    "--no-ir-comp",
+    "--no-material",
+    "--bypass-pccm",
+]
+
+
+def _collect_replay_flags(args: argparse.Namespace) -> list[str]:
+    """Build the list of replay-flag CLI args to pass to the C++ binary."""
+    flags = []
+    for flag in _REPLAY_FLAGS:
+        attr = flag.lstrip("-").replace("-", "_")
+        if getattr(args, attr, False):
+            flags.append(flag)
+    if getattr(args, "material", None):
+        flags.append(f"--material={args.material}")
+    return flags
+
+
+def _add_replay_flag_args(parser: argparse.ArgumentParser) -> None:
+    """Add replay flag arguments to an argument parser (inspect or batch)."""
+    grp = parser.add_argument_group(
+        "pipeline control",
+        "Selectively disable pipeline stages to isolate hue-shift root causes."
+        " Combine freely; each flag is independent.",
+    )
+    grp.add_argument("--no-auto-cal",  action="store_true",
+                     help="Skip NVS/host auto-calibration load; use firmware defaults.")
+    grp.add_argument("--no-black-cal", action="store_true",
+                     help="Skip black-level subtraction.")
+    grp.add_argument("--no-d65-scale", action="store_true",
+                     help="Skip D65 white-point pre-scale step.")
+    grp.add_argument("--no-ir-comp",   action="store_true",
+                     help="Skip IR-channel crosstalk compensation.")
+    grp.add_argument("--no-material",  action="store_true",
+                     help="Skip material-specific Lab correction.")
+    grp.add_argument("--material",     metavar="NAME",
+                     help="Override material: default, fabric, plastic, metal.")
+    grp.add_argument("--bypass-pccm",  action="store_true",
+                     help="Replace PCCM with identity matrix (DIAGNOSTIC MODE).")
+
+
 # ---------------------------------------------------------------------------
 # Sub-commands
 # ---------------------------------------------------------------------------
@@ -167,9 +230,10 @@ def cmd_inspect(args: argparse.Namespace) -> int:
     raw = target.get("raw", {})
     led = 1 if target.get("led_enabled", True) else 0
 
-    # Build CLI args for color_replay_inspect.
-    cli_args = [
-        binary,
+    replay_flags = _collect_replay_flags(args)
+
+    # Build CLI args: binary [replay_flags...] x y z ir clear gain int_ms led [label]
+    cli_args = [binary] + replay_flags + [
         str(raw.get("x",   0)),
         str(raw.get("y",   0)),
         str(raw.get("z",   0)),
@@ -202,8 +266,10 @@ def cmd_batch(args: argparse.Namespace) -> int:
 
     batch_input = "\n".join(lines) + "\n"
 
+    replay_flags = _collect_replay_flags(args)
+
     result = subprocess.run(
-        [binary],
+        [binary] + replay_flags,
         input=batch_input,
         capture_output=False if args.output == "-" else True,
         text=True,
@@ -266,6 +332,9 @@ def main() -> int:
                             help="Path to the captures JSON file.")
     p_inspect.add_argument("--id", metavar="ID",
                             help="ID of the capture to inspect (default: first capture).")
+    p_inspect.add_argument("--build", metavar="DIR",
+                            help="Override the top-level --build directory for this run.")
+    _add_replay_flag_args(p_inspect)
 
     # --- batch ---
     p_batch = sub.add_parser("batch",
@@ -276,6 +345,9 @@ def main() -> int:
                           help="Write CSV output to FILE instead of stdout.")
     p_batch.add_argument("--check", action="store_true",
                           help="Exit non-zero if any expected category fails (CI mode).")
+    p_batch.add_argument("--build", metavar="DIR",
+                          help="Override the top-level --build directory for this run.")
+    _add_replay_flag_args(p_batch)
 
     # --- dump ---
     p_dump = sub.add_parser("dump",
@@ -284,6 +356,10 @@ def main() -> int:
                          help="Path to the captures JSON file.")
 
     args = parser.parse_args()
+
+    # Allow subcommand --build to override the top-level --build.
+    if not hasattr(args, "build") or args.build is None:
+        args.build = getattr(parser.parse_known_args()[0], "build", None)
 
     dispatch = {
         "inspect": cmd_inspect,

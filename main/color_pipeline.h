@@ -153,6 +153,70 @@ esp_err_t color_pipeline_set_material_auto_detect(bool enable);
 esp_err_t color_pipeline_set_material_correction(bool enable);
 
 /**
+ * @defgroup ReplayFlags Replay / diagnostic pipeline bypass flags
+ *
+ * These flags selectively disable individual pipeline stages for host-side
+ * replay and regression analysis.  They are intended for diagnostic use only
+ * and have no effect on the normal device firmware path (all flags default to 0).
+ *
+ * Use color_pipeline_set_replay_flags() to activate one or more flags before
+ * calling color_pipeline_init().  The flags are applied during the same init
+ * call and remain active until color_pipeline_set_replay_flags(0) is called.
+ *
+ * @{
+ */
+
+/** Skip NVS / host-file auto-calibration load; use firmware defaults instead. */
+#define REPLAY_NO_AUTO_CAL      (1u << 0)
+
+/** Skip black-level subtraction even when a calibrated black level is loaded. */
+#define REPLAY_NO_BLACK_CAL     (1u << 1)
+
+/** Skip the D65 white-point pre-scale step (the ~0.95 / 1.00 / 1.09 factors). */
+#define REPLAY_NO_D65_SCALE     (1u << 2)
+
+/** Skip IR-channel crosstalk compensation. */
+#define REPLAY_NO_IR_COMP       (1u << 3)
+
+/** Skip material-specific Lab correction regardless of config setting. */
+#define REPLAY_NO_MATERIAL_COR  (1u << 4)
+
+/**
+ * Replace the loaded PCCM with a 3×10 identity matrix so the pipeline
+ * operates on raw RESP-normalised (and optionally D65-scaled / gain-scaled)
+ * linear XYZ without any polynomial cross-channel correction.
+ * Useful for isolating whether a hue shift originates in the PCCM or upstream.
+ *
+ * @note DIAGNOSTIC MODE ONLY.  The output XYZ will not match real-world
+ *       colorimetry; this flag is purely for root-cause analysis.
+ */
+#define REPLAY_BYPASS_PCCM      (1u << 5)
+
+/** @} */
+
+/**
+ * @brief Set diagnostic replay flags for the pipeline.
+ *
+ * Activates one or more REPLAY_* stage-bypass flags.  Call before
+ * color_pipeline_init() so that the init path (including the auto-cal load)
+ * respects the flags.  Pass 0 to clear all flags and restore normal behavior.
+ *
+ * This function is designed for host-side replay tools and has no effect in
+ * normal firmware operation (flags default to 0).
+ *
+ * @param flags Bitwise OR of any REPLAY_* constants, or 0 to clear.
+ * @return ESP_OK always.
+ */
+esp_err_t color_pipeline_set_replay_flags(uint32_t flags);
+
+/**
+ * @brief Get the current diagnostic replay flags.
+ *
+ * @return Current bitmask of active REPLAY_* flags.
+ */
+uint32_t color_pipeline_get_replay_flags(void);
+
+/**
  * @brief Initialize color processing pipeline
  *
  * @param config Pipeline configuration
