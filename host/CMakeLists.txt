@@ -63,3 +63,15 @@ add_executable(test_delta_e ${CMAKE_SOURCE_DIR}/../tests/host/test_delta_e.cpp $
 # kona_regenerate: reads raw sensor readings from stdin, runs pipeline, writes Lab to stdout.
 # Used by regenerate_kona_lab.py to replay captured raw data after pipeline changes.
 add_executable(kona_regenerate ${CMAKE_SOURCE_DIR}/../tests/host/kona_regenerate.cpp ${CORE_SRCS})
+
+# color_replay_inspect: single-capture verbose pipeline inspection.
+# Accepts one sensor reading (CLI args or stdin) and prints all intermediate pipeline values.
+# Used for diagnosing individual misclassifications without hardware.
+add_executable(color_replay_inspect ${CMAKE_SOURCE_DIR}/../tests/host/color_replay_inspect.cpp ${CORE_SRCS})
+
+# color_replay_batch: batch/regression pipeline replay.
+# Reads multiple sensor readings from stdin (id x y z ir clear gain int_ms led [expected_category]).
+# Outputs a CSV with all key intermediate and final pipeline values.
+# Exits non-zero when any expected-category expectation fails — suitable for CI regression tests.
+# Use scripts/color_replay.py to drive both tools from a JSON captures file.
+add_executable(color_replay_batch ${CMAKE_SOURCE_DIR}/../tests/host/color_replay_batch.cpp ${CORE_SRCS})
