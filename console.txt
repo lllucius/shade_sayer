@@ -1,97 +1,327 @@
-I (11223) main: Starting color measurement
-I (11223) main: UI: Indicating measurement in progress
-I (11223) tcs3530: Internal LED turned ON
-I (11223) main: LED: Illumination ON
-I (11223) tts: Speak: Measuring
-I (11226) main: Sensor: Using Fixed Balanced Gains (X8/Y128/Z512)
-I (11226) main: Sensor: Taking XYZ measurement...
-I (11229) tcs3530: FIFO before clear: 260 bytes
-I (11229) tcs3530: FIFO after clear: 0 bytes
-I (11230) tcs3530: Measurement triggered
-I (11387) tcs3530: SAI_ACTIVE detected (elapsed: 157 ms)
-I (11388) tcs3530: FIFO Status: 260 bytes available
-I (11400) tcs3530: Raw: X=11517952 Y=12179200 Z=7376128 IR=249344
-I (11400) tcs3530: Measurement complete (gain=8x, int=100ms, sat=0)
-I (11401) color_pipe: SensorCorr: raw X=11517952 Y=12179200 Z=7376128 clear=8603648 IR=249344 gain=4 int_ms=100
-I (11401) color_pipe: SensorCorr: gain_mult=8.0 time_scale=1.0000 base_scale=0.125000
-I (11401) color_pipe: SensorCorr: RESP-norm x_in=4964.6343 y_in=5074.6665 z_in=3688.0640 (pre-black-sub)
-I (11402) color_pipe: SensorCorr: black subtraction: black_x=353.3796 black_y=345.9200 black_z=321.6960 (clamped to 40%)
-I (11402) color_pipe: SensorCorr: after black sub: x_in=4611.2549 y_in=4728.7466 z_in=3366.3679
-I (11402) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
-I (11402) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
-I (11403) color_pipe: After D65 scaling: x_in=4382.859 y_in=4728.747 z_in=3665.402
-I (11403) color_pipe: lightness_scale (gain): 0.077
-I (11403) color_pipe: After gain scaling: x_in=335.725 y_in=362.220 z_in=280.768
-I (11403) color_pipe: SensorCorr: after PCCM+scale: X=49.8068 Y=52.5494 Z=42.4758
-I (11403) color_pipe: IRComp: clear_ir_ratio=34.505 t=1.000 ir_normalized=0.8754 (x gain=0.077)
-I (11404) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
-I (11404) color_pipe: IRComp: sub_x=0.3064 sub_y=0.2188 sub_z=0.0438
-I (11404) color_pipe: IRComp: XYZ pre-IR: X=49.8068 Y=52.5494 Z=42.4758
-I (11404) color_pipe: IRComp: XYZ post-sub=49.5004/52.3306/42.4320 post-clamp=49.5004/52.3306/42.4320
-I (11405) color_pipe: After CCM+IR: X=49.5 Y=52.3 Z=42.4
-I (11458) tcs3530: FIFO before clear: 0 bytes
-I (11458) tcs3530: FIFO after clear: 0 bytes
-I (11459) tcs3530: Measurement triggered
-I (11568) tcs3530: SINT_MEASUREMENT_SEQUENCER detected (elapsed: 109 ms)
-I (11569) tcs3530: FIFO Status: 260 bytes available
-I (11581) tcs3530: Raw: X=11533824 Y=12192512 Z=7395840 IR=249856
-I (11581) tcs3530: Measurement complete (gain=8x, int=100ms, sat=0)
-I (11581) color_pipe: SensorCorr: raw X=11533824 Y=12192512 Z=7395840 clear=8617728 IR=249856 gain=4 int_ms=100
-I (11582) color_pipe: SensorCorr: gain_mult=8.0 time_scale=1.0000 base_scale=0.125000
-I (11582) color_pipe: SensorCorr: RESP-norm x_in=4971.4761 y_in=5080.2134 z_in=3697.9199 (pre-black-sub)
-I (11582) color_pipe: SensorCorr: black subtraction: black_x=353.3796 black_y=345.9200 black_z=321.6960 (clamped to 40%)
-I (11583) color_pipe: SensorCorr: after black sub: x_in=4618.0967 y_in=4734.2935 z_in=3376.2239
-I (11583) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
-I (11583) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
-I (11583) color_pipe: After D65 scaling: x_in=4389.362 y_in=4734.293 z_in=3676.134
-I (11584) color_pipe: lightness_scale (gain): 0.077
-I (11584) color_pipe: After gain scaling: x_in=336.223 y_in=362.645 z_in=281.590
-I (11584) color_pipe: SensorCorr: after PCCM+scale: X=49.8661 Y=52.6087 Z=42.5979
-I (11584) color_pipe: IRComp: clear_ir_ratio=34.491 t=1.000 ir_normalized=0.8772 (x gain=0.077)
-I (11585) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
-I (11585) color_pipe: IRComp: sub_x=0.3070 sub_y=0.2193 sub_z=0.0439
-I (11585) color_pipe: IRComp: XYZ pre-IR: X=49.8661 Y=52.6087 Z=42.5979
-I (11585) color_pipe: IRComp: XYZ post-sub=49.5590/52.3894/42.5541 post-clamp=49.5590/52.3894/42.5541
-I (11586) color_pipe: After CCM+IR: X=49.6 Y=52.4 Z=42.6
-I (11645) tcs3530: FIFO before clear: 0 bytes
-I (11645) tcs3530: FIFO after clear: 0 bytes
-I (11653) tcs3530: Measurement triggered
-I (11773) tcs3530: SAI_ACTIVE detected (elapsed: 119 ms)
-I (11774) tcs3530: FIFO Status: 260 bytes available
-I (11788) tcs3530: Raw: X=11533056 Y=12191744 Z=7398144 IR=249856
-I (11788) tcs3530: Measurement complete (gain=8x, int=100ms, sat=0)
-I (11789) color_pipe: SensorCorr: raw X=11533056 Y=12191744 Z=7398144 clear=8617728 IR=249856 gain=4 int_ms=100
-I (11789) color_pipe: SensorCorr: gain_mult=8.0 time_scale=1.0000 base_scale=0.125000
-I (11789) color_pipe: SensorCorr: RESP-norm x_in=4971.1450 y_in=5079.8936 z_in=3699.0720 (pre-black-sub)
-I (11790) color_pipe: SensorCorr: black subtraction: black_x=353.3796 black_y=345.9200 black_z=321.6960 (clamped to 40%)
-I (11790) color_pipe: SensorCorr: after black sub: x_in=4617.7656 y_in=4733.9736 z_in=3377.3760
-I (11790) color_pipe: D65 constants: X=95.047 Y=100.000 Z=108.883
-I (11790) color_pipe: D65 scaling factors: X/100=0.950 Y/100=1.000 Z/100=1.089
-I (11791) color_pipe: After D65 scaling: x_in=4389.047 y_in=4733.974 z_in=3677.388
-I (11791) color_pipe: lightness_scale (gain): 0.077
-I (11791) color_pipe: After gain scaling: x_in=336.199 y_in=362.620 z_in=281.686
-I (11791) color_pipe: SensorCorr: after PCCM+scale: X=49.8603 Y=52.6061 Z=42.6121
-I (11791) color_pipe: IRComp: clear_ir_ratio=34.491 t=1.000 ir_normalized=0.8772 (x gain=0.077)
-I (11792) color_pipe: IRComp: ir_factor_x=0.3500 ir_factor_y=0.2500 ir_factor_z=0.0500
-I (11792) color_pipe: IRComp: sub_x=0.3070 sub_y=0.2193 sub_z=0.0439
-I (11792) color_pipe: IRComp: XYZ pre-IR: X=49.8603 Y=52.6061 Z=42.6121
-I (11792) color_pipe: IRComp: XYZ post-sub=49.5533/52.3868/42.5682 post-clamp=49.5533/52.3868/42.5682
-I (11793) color_pipe: After CCM+IR: X=49.6 Y=52.4 Z=42.6
-I (11793) color_pipe: Measure XYZ (IR+Black Cor): X=49.54 Y=52.37 Z=42.52
-I (11793) color_pipe: Lightness correction: raw_L=77.5 -> corrected_L=80.6 (gamma=0.8000, scale=0.0766, offset=0.00)
-I (11794) color_pipe: Gate: raw_L=77.50 corrected_L=80.60 min_luminance=5.00 lightness_scale=0.0766 effective_min=0.38 low_light=0
-I (11794) color_pipe: Pre-enhance Lab: L=80.6 a=-0.6 b=15.0 chroma=15.0
-I (11795) color_pipe: Kona input: measured Lab L=80.5988 a=-0.6420 b=15.0240 (count=1134)
-I (11804) color_pipe: Kona best: [951] id=22681 ref Lab L=83.5000 a=2.5224 b=14.8236 dE=4.4155
-I (11805) color_pipe: Kona result: best_entry 0x3c0847bc best_delta 4.415462 max delta 7.000000 (synthetic)
-I (11805) color_pipe: Kona match: id=22681 name=Dark OYSTER dE=4.415
-I (11805) color_pipe: Confidence-scaled boost: confidence=0.31 factor=0.31 boost=1.50->1.16
-I (11806) tcs3530: Internal LED turned OFF
-I (11806) main: LED: Illumination OFF
-I (11806) main: Result: Dark OYSTER [Kona 22681] (category: Yellow, dE=4.42, conf=31%)
-I (11806) main: XYZ: X=49.54 Y=52.37 Z=42.52
-I (11807) main: Lab: L=80.6 a=-0.7 b=15.3
-I (11807) main: RGB: R=210 G=199 B=172
-I (11807) main: Description: This appears to be a shade of Yellow. It's quite light.
-I (11807) tts: Speak: This appears to be a shade of Yellow. It's quite light.
-I (16391) main: Measurement complete
+
+=== Color Replay Inspection: green_wall_paint ===
+
+--- Raw Input ---
+  x=11517952      y=12179200      z=7376128     
+  ir=249344       clear=8603648  
+  gain=4    integration_ms=100    led=yes
+
+--- Pipeline Stages (see stderr for full pipeline logs) ---
+  RESP-norm (pre-black-sub):  x=4964.6343  y=5074.6665  z=3688.0640
+  (gain_mult=8.0  base_scale=0.125000)
+  [see stderr for: post-black-sub, post-D65, post-gain, post-PCCM, IR comp]
+
+--- Pipeline Result ---
+  XYZ:           X= 52.9610  Y= 56.3797  Z= 45.6808
+  scan_lab:      L= 82.5622  a= -1.6151  b= 15.5004  (pre-saturation-boost; used for Kona matching)
+  corrected_lab: L= 92.8184  a= -1.6958  b= 16.2754  (post-material correction; used for fallback matching)
+  lab (display): L= 82.5622  a= -1.7023  b= 16.3373  (post-saturation-boost; used for display/speech)
+  RGB:           R=215   G=205   B=175 
+
+--- Classification ---
+  category:    Yellow
+  color_name:  Pale
+  kona_matched: no  (fell back to color-database match)
+  delta_e:     4.4473
+  confidence:  0.7776  (77.8%)
+
+--- Material ---
+  material:               Fabric
+  material_correction:    enabled
+
+--- Sensor Flags ---
+  saturated:       no
+  low_light:       no
+  flicker_detected: no
+  luminance:       82.5622
+  saturation:      0.1643
+
+
+=== Color Replay Inspection: green_wall_paint ===
+
+--- Replay Overrides Active ---
+  --no-auto-cal       NVS auto-calibration skipped (firmware defaults used)
+
+--- Raw Input ---
+  x=11517952      y=12179200      z=7376128     
+  ir=249344       clear=8603648  
+  gain=4    integration_ms=100    led=yes
+
+--- Pipeline Stages (see stderr for full pipeline logs) ---
+  RESP-norm (pre-black-sub):  x=4964.6343  y=5074.6665  z=3688.0640
+  (gain_mult=8.0  base_scale=0.125000)
+  [see stderr for: post-black-sub, post-D65, post-gain, post-PCCM, IR comp]
+
+--- Pipeline Result ---
+  XYZ:           X=484.3785  Y=512.9302  Z=383.2334
+  scan_lab:      L= 98.5000  a= -1.0779  b= 23.5947  (pre-saturation-boost; used for Kona matching)
+  corrected_lab: L=100.0000  a= -1.1318  b= 24.7744  (post-material correction; used for fallback matching)
+  lab (display): L= 98.5000  a= -1.1457  b= 25.0784  (post-saturation-boost; used for display/speech)
+  RGB:           R=255   G=250   B=202 
+
+--- Classification ---
+  category:    Yellow
+  color_name:  CHAMPAGNE
+  kona_matched: yes
+  kona_id:     1069
+  delta_e:     2.9926
+  confidence:  0.4015  (40.1%)
+
+--- Material ---
+  material:               Fabric
+  material_correction:    enabled
+
+--- Sensor Flags ---
+  saturated:       no
+  low_light:       no
+  flicker_detected: no
+  luminance:       98.5000
+  saturation:      0.2510
+
+
+=== Color Replay Inspection: green_wall_paint ===
+
+--- Replay Overrides Active ---
+  --no-black-cal      Black-level subtraction skipped
+
+--- Raw Input ---
+  x=11517952      y=12179200      z=7376128     
+  ir=249344       clear=8603648  
+  gain=4    integration_ms=100    led=yes
+
+--- Pipeline Stages (see stderr for full pipeline logs) ---
+  RESP-norm (pre-black-sub):  x=4964.6343  y=5074.6665  z=3688.0640
+  (gain_mult=8.0  base_scale=0.125000)
+  [see stderr for: post-black-sub, post-D65, post-gain, post-PCCM, IR comp]
+
+--- Pipeline Result ---
+  XYZ:           X= 56.0585  Y= 59.7945  Z= 49.5725
+  scan_lab:      L= 84.2280  a= -1.9219  b= 14.6345  (pre-saturation-boost; used for Kona matching)
+  corrected_lab: L= 94.6508  a= -2.0180  b= 15.3662  (post-material correction; used for fallback matching)
+  lab (display): L= 84.2280  a= -2.0176  b= 15.3633  (post-saturation-boost; used for display/speech)
+  RGB:           R=218   G=210   B=181 
+
+--- Classification ---
+  category:    Yellow
+  color_name:  Pale
+  kona_matched: no  (fell back to color-database match)
+  delta_e:     3.9224
+  confidence:  0.8039  (80.4%)
+
+--- Material ---
+  material:               Fabric
+  material_correction:    enabled
+
+--- Sensor Flags ---
+  saturated:       no
+  low_light:       no
+  flicker_detected: no
+  luminance:       84.2280
+  saturation:      0.1550
+
+
+=== Color Replay Inspection: green_wall_paint ===
+
+--- Replay Overrides Active ---
+  --no-d65-scale      D65 white-point pre-scale skipped
+
+--- Raw Input ---
+  x=11517952      y=12179200      z=7376128     
+  ir=249344       clear=8603648  
+  gain=4    integration_ms=100    led=yes
+
+--- Pipeline Stages (see stderr for full pipeline logs) ---
+  RESP-norm (pre-black-sub):  x=4964.6343  y=5074.6665  z=3688.0640
+  (gain_mult=8.0  base_scale=0.125000)
+  [see stderr for: post-black-sub, post-D65, post-gain, post-PCCM, IR comp]
+
+--- Pipeline Result ---
+  XYZ:           X= 56.7146  Y= 56.2694  Z= 42.0415
+  scan_lab:      L= 82.5072  a=  8.1535  b= 19.4791  (pre-saturation-boost; used for Kona matching)
+  corrected_lab: L= 92.7579  a=  8.5612  b= 20.4531  (post-material correction; used for fallback matching)
+  lab (display): L= 82.5072  a=  8.5336  b= 20.3872  (post-saturation-boost; used for display/speech)
+  RGB:           R=235   G=199   B=168 
+
+--- Classification ---
+  category:    Orange
+  color_name:  COBBLESTONE
+  kona_matched: yes
+  kona_id:     486
+  delta_e:     3.1668
+  confidence:  0.3666  (36.7%)
+
+--- Material ---
+  material:               Fabric
+  material_correction:    enabled
+
+--- Sensor Flags ---
+  saturated:       no
+  low_light:       no
+  flicker_detected: no
+  luminance:       82.5072
+  saturation:      0.2210
+
+
+=== Color Replay Inspection: green_wall_paint ===
+
+--- Replay Overrides Active ---
+  --no-ir-comp        IR-channel compensation skipped
+
+--- Raw Input ---
+  x=11517952      y=12179200      z=7376128     
+  ir=249344       clear=8603648  
+  gain=4    integration_ms=100    led=yes
+
+--- Pipeline Stages (see stderr for full pipeline logs) ---
+  RESP-norm (pre-black-sub):  x=4964.6343  y=5074.6665  z=3688.0640
+  (gain_mult=8.0  base_scale=0.125000)
+  [see stderr for: post-black-sub, post-D65, post-gain, post-PCCM, IR comp]
+
+--- Pipeline Result ---
+  XYZ:           X= 53.2866  Y= 56.6122  Z= 45.7273
+  scan_lab:      L= 82.6779  a= -1.3409  b= 15.6764  (pre-saturation-boost; used for Kona matching)
+  corrected_lab: L= 92.9457  a= -1.4079  b= 16.4602  (post-material correction; used for fallback matching)
+  lab (display): L= 82.6779  a= -1.4141  b= 16.5332  (post-saturation-boost; used for display/speech)
+  RGB:           R=216   G=206   B=175 
+
+--- Classification ---
+  category:    Yellow
+  color_name:  Pale
+  kona_matched: no  (fell back to color-database match)
+  delta_e:     4.5669
+  confidence:  0.7717  (77.2%)
+
+--- Material ---
+  material:               Fabric
+  material_correction:    enabled
+
+--- Sensor Flags ---
+  saturated:       no
+  low_light:       no
+  flicker_detected: no
+  luminance:       82.6779
+  saturation:      0.1659
+
+
+=== Color Replay Inspection: green_wall_paint ===
+
+--- Replay Overrides Active ---
+  --no-material       Material-specific Lab correction skipped
+
+--- Raw Input ---
+  x=11517952      y=12179200      z=7376128     
+  ir=249344       clear=8603648  
+  gain=4    integration_ms=100    led=yes
+
+--- Pipeline Stages (see stderr for full pipeline logs) ---
+  RESP-norm (pre-black-sub):  x=4964.6343  y=5074.6665  z=3688.0640
+  (gain_mult=8.0  base_scale=0.125000)
+  [see stderr for: post-black-sub, post-D65, post-gain, post-PCCM, IR comp]
+
+--- Pipeline Result ---
+  XYZ:           X= 52.9610  Y= 56.3797  Z= 45.6808
+  scan_lab:      L= 82.5622  a= -1.6151  b= 15.5004  (pre-saturation-boost; used for Kona matching)
+  corrected_lab: L= 82.5622  a= -1.6151  b= 15.5004  (post-material correction; used for fallback matching)
+  lab (display): L= 82.5622  a= -1.6896  b= 16.2153  (post-saturation-boost; used for display/speech)
+  RGB:           R=215   G=205   B=175 
+
+--- Classification ---
+  category:    Yellow
+  color_name:  Beige
+  kona_matched: no  (fell back to color-database match)
+  delta_e:     6.7144
+  confidence:  0.6643  (66.4%)
+
+--- Material ---
+  material:               Fabric
+  material_correction:    disabled (--no-material)
+
+--- Sensor Flags ---
+  saturated:       no
+  low_light:       no
+  flicker_detected: no
+  luminance:       82.5622
+  saturation:      0.1630
+
+
+=== Color Replay Inspection: green_wall_paint ===
+
+--- Replay Overrides Active ---
+  --material=Default   Material type forced
+
+--- Raw Input ---
+  x=11517952      y=12179200      z=7376128     
+  ir=249344       clear=8603648  
+  gain=4    integration_ms=100    led=yes
+
+--- Pipeline Stages (see stderr for full pipeline logs) ---
+  RESP-norm (pre-black-sub):  x=4964.6343  y=5074.6665  z=3688.0640
+  (gain_mult=8.0  base_scale=0.125000)
+  [see stderr for: post-black-sub, post-D65, post-gain, post-PCCM, IR comp]
+
+--- Pipeline Result ---
+  XYZ:           X= 52.9610  Y= 56.3797  Z= 45.6808
+  scan_lab:      L= 82.5622  a= -1.6151  b= 15.5004  (pre-saturation-boost; used for Kona matching)
+  corrected_lab: L= 82.5622  a= -1.6151  b= 15.5004  (post-material correction; used for fallback matching)
+  lab (display): L= 82.5622  a= -1.6896  b= 16.2153  (post-saturation-boost; used for display/speech)
+  RGB:           R=215   G=205   B=175 
+
+--- Classification ---
+  category:    Yellow
+  color_name:  Beige
+  kona_matched: no  (fell back to color-database match)
+  delta_e:     6.7144
+  confidence:  0.6643  (66.4%)
+
+--- Material ---
+  material:               Default
+  material_correction:    enabled
+
+--- Sensor Flags ---
+  saturated:       no
+  low_light:       no
+  flicker_detected: no
+  luminance:       82.5622
+  saturation:      0.1630
+
+
+=== Color Replay Inspection: green_wall_paint ===
+
+--- Replay Overrides Active ---
+  --bypass-pccm       PCCM replaced with identity matrix [DIAGNOSTIC]
+
+--- Raw Input ---
+  x=11517952      y=12179200      z=7376128     
+  ir=249344       clear=8603648  
+  gain=4    integration_ms=100    led=yes
+
+--- Pipeline Stages (see stderr for full pipeline logs) ---
+  RESP-norm (pre-black-sub):  x=4964.6343  y=5074.6665  z=3688.0640
+  (gain_mult=8.0  base_scale=0.125000)
+  [see stderr for: post-black-sub, post-D65, post-gain, post-PCCM, IR comp]
+
+--- Pipeline Result ---
+  XYZ:           X= 39.1779  Y= 42.3844  Z= 33.0317
+  scan_lab:      L= 74.8487  a= -3.4730  b= 15.8472  (pre-saturation-boost; used for Kona matching)
+  corrected_lab: L= 84.3336  a= -3.6466  b= 16.6396  (post-material correction; used for fallback matching)
+  lab (display): L= 74.8487  a= -3.6613  b= 16.7063  (post-saturation-boost; used for display/speech)
+  RGB:           R=190   G=185   B=154 
+
+--- Classification ---
+  category:    Yellow
+  color_name:  Beige
+  kona_matched: no  (fell back to color-database match)
+  delta_e:     5.6307
+  confidence:  0.7185  (71.8%)
+
+--- Material ---
+  material:               Fabric
+  material_correction:    enabled
+
+--- Sensor Flags ---
+  saturated:       no
+  low_light:       no
+  flicker_detected: no
+  luminance:       74.8487
+  saturation:      0.1710
+
