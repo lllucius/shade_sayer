@@ -131,6 +131,12 @@ static bool initPipeline(const ReplayOptions& opts)
 
 /**
  * @brief Parse eight numeric fields (x y z ir clear gain int_ms led) from a string array.
+ *
+ * @param tokens  Pointer to array of C-strings starting at the first field.
+ * @param n       Number of tokens available (must be ≥ 8).
+ * @param reading Output sensor reading (populated on success).
+ * @param led_out Set to true when the led token is non-zero.
+ * @return True on successful parse.
  */
 static bool parseReading(const char* const* tokens, int n,
                          sensor_reading_t& reading, bool& led_out)

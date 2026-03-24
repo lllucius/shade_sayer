@@ -172,6 +172,10 @@ static void printHeader(const ReplayOptions& opts)
 
 /**
  * @brief Escape a string for safe inclusion in a CSV field.
+ *
+ * If the value contains commas, double-quotes, or newlines it is wrapped in
+ * double-quotes and any internal double-quotes are doubled (RFC 4180 quoting).
+ * Writes the escaped result into @p out (at most @p size bytes including NUL).
  */
 static void csvEscape(const char* in, char* out, size_t size)
 {
