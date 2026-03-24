@@ -170,10 +170,8 @@ static void printRow(const char*             id,
                 pass_str);
 }
 
-int main(int argc, char* /*argv*/[])
+int main(int /*argc*/, char* /*argv*/[])
 {
-    (void)argc;
-
     if (!initPipeline())
     {
         std::fprintf(stderr, "color_replay_batch: color_pipeline_init() failed\n");
