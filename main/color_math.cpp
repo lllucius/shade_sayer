@@ -770,9 +770,6 @@ material_type_t color_math_classify_material(const sensor_reading_t* reading,
     float total_color = x_norm + y_norm + z_norm;
     float clear_ratio = clear / total_color;
     
-    // IR ratio: high IR relative to clear suggests some materials
-    float ir_ratio = (float)reading->ir / clear;
-    
     // Chroma indicator: deviation from neutral (equal X:Y:Z)
     float x_ratio = x_norm / y_norm;
     float z_ratio = z_norm / y_norm;

@@ -4,6 +4,10 @@ set(CMAKE_CXX_STANDARD 17)
 add_compile_definitions(TCS_HOST_BUILD=1)
 include_directories(${CMAKE_SOURCE_DIR}/../main)
 
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-Wall -Wextra -Wunused-function -Wunused-variable)
+endif()
+
 # Generate Kona reference table from kona_captures.json.
 # Only swatches with measured=true and valid Lab values are included.
 set(KONA_REF_TABLE_SRC "${CMAKE_SOURCE_DIR}/../main/konaref_default.cpp")
