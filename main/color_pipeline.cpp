@@ -182,6 +182,15 @@ typedef struct
 static ir_coefficients_t s_ir_coeff_led = {0.35f, 0.25f, 0.05f};           // LED-dominant
 static ir_coefficients_t s_ir_coeff_incandescent = {0.60f, 0.45f, 0.15f};  // Incandescent
 
+/**
+ * @brief Active diagnostic replay flags.
+ *
+ * Set via color_pipeline_set_replay_flags() before color_pipeline_init().
+ * Zero by default — no effect on normal device operation.
+ * Each bit maps to a REPLAY_* constant defined in color_pipeline.h.
+ */
+static uint32_t s_replay_flags = 0;
+
 static esp_err_t apply_sensor_correction(const sensor_reading_t* reading, xyz_t* xyz);
 
 /**
@@ -750,7 +759,7 @@ static esp_err_t apply_sensor_correction(const sensor_reading_t* reading, xyz_t*
     // BLACK LEVEL SUBTRACTION - Remove sensor offset/crosstalk
     // Black level is stored in raw RESP-normalized form (before D65 scaling)
     // Subtract before D65 scaling and CCM to remove systematic offset
-    if (s_params.has_black_calibration)
+    if (s_params.has_black_calibration && !(s_replay_flags & REPLAY_NO_BLACK_CAL))
     {
         // Guard against over-subtraction from stale or aggressive black calibration.
         // Keep at least a small fraction of each channel so normal surfaces are not
@@ -774,19 +783,31 @@ static esp_err_t apply_sensor_correction(const sensor_reading_t* reading, xyz_t*
         
         TCS_LOGD(TAG, "SensorCorr: after black sub: x_in=%.4f y_in=%.4f z_in=%.4f", x_in, y_in, z_in);
     }
+    else if (s_replay_flags & REPLAY_NO_BLACK_CAL)
+    {
+        TCS_LOGD(TAG, "SensorCorr: black subtraction SKIPPED (REPLAY_NO_BLACK_CAL)");
+    }
 
     // APPLY D65 SCALING - Scale to D65 white point before PCCM
     // PCCM was calibrated with D65-normalized inputs (0.95:1.00:1.08 ratio)
     // RESP normalization produces ~1:1:1, so we apply D65 scaling here
-    TCS_LOGD(TAG, "D65 constants: X=%.3f Y=%.3f Z=%.3f", D65_X, D65_Y, D65_Z);
-    TCS_LOGD(TAG, "D65 scaling factors: X/100=%.3f Y/100=%.3f Z/100=%.3f", 
-             D65_X / 100.0f, D65_Y / 100.0f, D65_Z / 100.0f);
+    if (!(s_replay_flags & REPLAY_NO_D65_SCALE))
+    {
+        TCS_LOGD(TAG, "D65 constants: X=%.3f Y=%.3f Z=%.3f", D65_X, D65_Y, D65_Z);
+        TCS_LOGD(TAG, "D65 scaling factors: X/100=%.3f Y/100=%.3f Z/100=%.3f", 
+                 D65_X / 100.0f, D65_Y / 100.0f, D65_Z / 100.0f);
     
-    x_in *= (D65_X / 100.0f);
-    y_in *= (D65_Y / 100.0f);
-    z_in *= (D65_Z / 100.0f);
+        x_in *= (D65_X / 100.0f);
+        y_in *= (D65_Y / 100.0f);
+        z_in *= (D65_Z / 100.0f);
     
-    TCS_LOGD(TAG, "After D65 scaling: x_in=%.3f y_in=%.3f z_in=%.3f", x_in, y_in, z_in);
+        TCS_LOGD(TAG, "After D65 scaling: x_in=%.3f y_in=%.3f z_in=%.3f", x_in, y_in, z_in);
+    }
+    else
+    {
+        TCS_LOGD(TAG, "D65 pre-scale SKIPPED (REPLAY_NO_D65_SCALE): x_in=%.3f y_in=%.3f z_in=%.3f",
+                 x_in, y_in, z_in);
+    }
 
     // APPLY GLOBAL GAIN (lightness_scale) in linear space before PCCM
     // This ensures the polynomial operates on properly scaled data
@@ -801,7 +822,24 @@ static esp_err_t apply_sensor_correction(const sensor_reading_t* reading, xyz_t*
 
     // APPLY 3x10 POLYNOMIAL COLOR CORRECTION MATRIX using shared function
     xyz_t xyz_in = {x_in, y_in, z_in};
-    *xyz = color_math_apply_pccm(&xyz_in, s_params.pccm);
+
+    if (s_replay_flags & REPLAY_BYPASS_PCCM)
+    {
+        // Identity PCCM: pass XYZ through unchanged for diagnostic purposes.
+        // Terms: [R, G, B, R², G², B², RG, RB, GB, 1]
+        static const float identity_pccm[3][10] =
+        {
+            { 1.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f },
+            { 0.0f, 1.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f },
+            { 0.0f, 0.0f, 1.0f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f }
+        };
+        *xyz = color_math_apply_pccm(&xyz_in, identity_pccm);
+        TCS_LOGD(TAG, "SensorCorr: PCCM BYPASSED (identity matrix, REPLAY_BYPASS_PCCM)");
+    }
+    else
+    {
+        *xyz = color_math_apply_pccm(&xyz_in, s_params.pccm);
+    }
 
     // Soft floor for Z prevents total blue loss (essential when using subtraction matrices)
     xyz->z = fmaxf(MIN_Z_VALUE, xyz->z);
@@ -815,7 +853,7 @@ static esp_err_t apply_sensor_correction(const sensor_reading_t* reading, xyz_t*
              xyz->x, xyz->y, xyz->z);
 
     // IR COMPENSATION
-    if (reading->ir > 0 && reading->clear > 0)
+    if (reading->ir > 0 && reading->clear > 0 && !(s_replay_flags & REPLAY_NO_IR_COMP))
     {
         float ir_val = (float)reading->ir; 
         float ir_normalized = (ir_val * base_scale) / TCS3530_RESP_Y * XYZ_OUTPUT_SCALE;
@@ -861,6 +899,10 @@ static esp_err_t apply_sensor_correction(const sensor_reading_t* reading, xyz_t*
                  xyz_post_sub_y != xyz->y ? " [Y clamped]" : "",
                  xyz_post_sub_z != xyz->z ? " [Z clamped]" : "");
     }
+    else if (s_replay_flags & REPLAY_NO_IR_COMP)
+    {
+        TCS_LOGD(TAG, "IRComp: SKIPPED (REPLAY_NO_IR_COMP)");
+    }
 
     TCS_LOGD(TAG, "After CCM+IR: X=%.1f Y=%.1f Z=%.1f", xyz->x, xyz->y, xyz->z);
 
@@ -886,7 +928,12 @@ esp_err_t color_pipeline_init(const color_pipeline_config_t* config)
         return ESP_FAIL;
     }
 
-    // Attempt to load auto-calibration params
+    // Attempt to load auto-calibration params (skipped when REPLAY_NO_AUTO_CAL is set)
+    if (s_replay_flags & REPLAY_NO_AUTO_CAL)
+    {
+        ESP_LOGI(TAG, "Auto-calibration load SKIPPED (REPLAY_NO_AUTO_CAL) — using firmware defaults");
+    }
+    else
     {
         size_t size = sizeof(color_calib_params_t);
         color_calib_params_t loaded_params;
@@ -1469,7 +1516,7 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
             result->material = s_config.assumed_material;
         }
         
-        if (s_config.use_material_correction)
+        if ((s_config.use_material_correction) && !(s_replay_flags & REPLAY_NO_MATERIAL_COR))
         {
             material_correction_t correction = color_math_get_material_correction(result->material);
             result->corrected_lab = color_math_apply_material_correction(&scan_lab, &correction);
@@ -1829,4 +1876,30 @@ esp_err_t color_pipeline_set_material_correction(bool enable)
     ESP_LOGI(TAG, "Material correction: %s", enable ? "enabled" : "disabled");
     
     return ESP_OK;
+}
+
+esp_err_t color_pipeline_set_replay_flags(uint32_t flags)
+{
+    s_replay_flags = flags;
+    if (flags)
+    {
+        ESP_LOGI(TAG, "Replay flags set: 0x%02x%s%s%s%s%s%s",
+                 (unsigned)flags,
+                 (flags & REPLAY_NO_AUTO_CAL)     ? " NO_AUTO_CAL"     : "",
+                 (flags & REPLAY_NO_BLACK_CAL)    ? " NO_BLACK_CAL"    : "",
+                 (flags & REPLAY_NO_D65_SCALE)    ? " NO_D65_SCALE"    : "",
+                 (flags & REPLAY_NO_IR_COMP)      ? " NO_IR_COMP"      : "",
+                 (flags & REPLAY_NO_MATERIAL_COR) ? " NO_MATERIAL_COR" : "",
+                 (flags & REPLAY_BYPASS_PCCM)     ? " BYPASS_PCCM"     : "");
+    }
+    else
+    {
+        ESP_LOGI(TAG, "Replay flags cleared — normal pipeline behavior restored");
+    }
+    return ESP_OK;
+}
+
+uint32_t color_pipeline_get_replay_flags(void)
+{
+    return s_replay_flags;
 }
