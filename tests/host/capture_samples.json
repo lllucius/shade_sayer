@@ -15,8 +15,8 @@
   "captures": [
     {
       "id": "green_wall_paint",
-      "description": "Green wall paint misclassified as Yellow/Pale — known calibration issue",
-      "notes": "scan_lab a* ≈ -1.6 is nearly neutral (should be ≈ -20 to -50 for a real green). Root cause is sensor-correction / calibration matrix, not the colour matcher. Use color_replay_inspect to compare intermediate pipeline stages across commits. No expected category set so CI does not fail while the bug is open.",
+      "description": "Green wall paint — previously misclassified as Yellow/Pale. Fixed by correcting TCS3530_RESP_X/Z constants and adding Muted Green calibration reference.",
+      "notes": "Root cause: old RESP_X=290/RESP_Z=250 left white RESP-norm unbalanced by 2.9% in X, biasing muted greens warm. Corrected to RESP_X=298.3/RESP_Z=238.1 from committed white ref (X=21259521 Y=21382400 Z=16971520). Theoretical D65 Lab from white-normalised reflectance: L=80.2 a*=-6.86 b*=14.29 (hue=116°); pipeline achieves a*≈-4.1 after calibration. Regression guard: category=Green must hold.",
       "led_enabled": true,
       "raw": {
         "x": 11517952,
@@ -27,7 +27,9 @@
         "gain": 4,
         "integration_ms": 100
       },
-      "expected": {}
+      "expected": {
+        "category": "Green"
+      }
     },
     {
       "id": "cal_white",

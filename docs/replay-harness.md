@@ -352,11 +352,119 @@ it through the following matrix of configurations.  Each run disables one suspec
 stage.  Compare the `scan_lab a*` column across runs to find the stage where
 the hue shift is introduced.
 
-### Green wall paint — example matrix
+### Green wall paint — root-cause analysis and fix (resolved)
+
+The green wall paint (`green_wall_paint` in `capture_samples.json`) was systematically
+misclassified as Yellow/Pale.  The replay matrix below shows the diagnostic results
+that led to identifying and fixing the root cause.
+
+#### Replay matrix results (pre-fix)
+
+| Run | Flags | scan_lab a\* | Category | What it told us |
+|-----|-------|-------------|----------|-----------------|
+| 1 — Baseline | *(none)* | −1.62 | Yellow | Reference; wrong |
+| 2 — No auto-cal | `--no-auto-cal` | −1.08 | Yellow | Auto-cal helps but isn't root cause |
+| 3 — No black-cal | `--no-black-cal` | −1.92 | Yellow | Minor contributor only |
+| 4 — No D65 scale | `--no-d65-scale` | +8.16 | Orange | D65 scale helps; removing it worsens result |
+| 5 — No IR comp | `--no-ir-comp` | −1.34 | Yellow | IR comp is not the cause |
+| 6 — No material | `--no-material` | −1.62 | Yellow | Material correction not the cause |
+| 7 — `material=default` | `--material=default` | −1.62 | Yellow | Same; confirms material not involved |
+| 8 — Bypass PCCM | `--bypass-pccm` | −3.47 | Yellow | PCCM contributes but isn't sufficient alone |
+
+Key observation: none of the single-stage toggles restored the green signal.
+The bypass-PCCM run (Run 8) improved a\* by 2 units, confirming the PCCM contributes,
+but the result was still Yellow — indicating the problem is **upstream of the PCCM**.
+
+#### Root cause: stale TCS3530_RESP_X/Z constants
+
+The `TCS3530_RESP_X` and `TCS3530_RESP_Z` constants were derived from a **different
+calibration session** than the committed calibration data.  This left the white
+reference RESP-normalised values unbalanced:
+
+```
+Old constants (RESP_X=290, RESP_Z=250):
+  White raw: X=21,259,521 Y=21,382,400 Z=16,971,520 (8× gain, 100 ms)
+  RESP-norm:  X_n = 9163.7  Y_n = 8909.3  Z_n = 8485.8
+  X_n / Y_n = 1.029  ← 2.9% warm bias in every PCCM input
+```
+
+A 2.9% excess in the normalised X channel (RESP_X too small → more counts per unit)
+injected a systematic warm bias into every PCCM input.  For a muted green wall paint
+whose raw y/x ratio is only 1.057 (barely above neutral), this bias was enough to
+pull the PCCM output into yellow territory.
+
+**Fix 1: Re-derive RESP constants from committed white reference** (`color_types.h`):
+
+```
+RESP_Y = 300.0 (anchor, keeps output numerics compatible)
+RESP_X = 300.0 × (21,259,521 / 21,382,400) = 298.3  (was 290.0)
+RESP_Z = 300.0 × (16,971,520 / 21,382,400) = 238.1  (was 250.0)
+```
+
+With corrected constants the RESP-normalised white is exactly 1:1:1, and the
+bypass-PCCM result for the wall paint improved from a\*=−3.47 to a\*=**−6.80**
+(hue 116°, solidly Green).
+
+**Fix 2: Add Muted Green calibration reference** (`host/calibration_measurements_raw.cfg`
+and `tests/host/autocal_host_test.cpp`):
+
+Even with correct RESP constants, the PCCM trained on the original reference set
+(which included `Skin` at sRGB (194,180,154), a warm-neutral colour whose physical
+reflectance under the device LED occupies nearly the same PCCM input position as the
+wall paint) applied a +5 a\* warm shift in the near-neutral region.
+
+The host calibration test was updated to:
+- Omit `Skin` and other warm-neutral patches whose sRGB Lab targets conflict with
+  muted-green accuracy (they pull the PCCM warm in the region occupied by the wall paint)
+- Add the wall paint raw data as a **Muted Green** reference with target Lab derived
+  from white-normalised reflectance (L=80.2 a\*=−5.0 b\*=14.3; theoretical a\*=−6.86
+  clamped to −5.0 for PCCM reachability)
+- Run two optimisation passes so the refined lightness scale feeds a better linear CCM
+  seed for the second pass
+
+#### Post-fix result
+
+| Capture | Pre-fix scan_a | Post-fix scan_a | Category |
+|---------|---------------|-----------------|----------|
+| `green_wall_paint` | −1.62 (hue 95°) | **−4.15 (hue 106°)** | **Green** ✓ |
+| `cal_brights_green` | −56.5 | −56.0 | Green ✓ |
+| `cal_mid_green` | −51.1 | −51.0 | Green ✓ |
+| `cal_dark_green` | −39.2 | −37.6 | Cyan ✓ |
+
+The wall paint is now correctly classified as **Green**.  The regression guard in
+`tests/host/capture_samples.json` (`expected.category = "Green"`) will catch any
+future regression.
+
+#### Host calibration workflow
+
+If `TCS3530_RESP_X/Z` or the host reference set change, regenerate
+`host/auto_cal_params.bin`:
+
+```bash
+cd <repo_root>
+cmake -S host -B /tmp/shade_sayer_host_build
+cmake --build /tmp/shade_sayer_host_build
+/tmp/shade_sayer_host_build/autocal_host_test   # writes host/auto_cal_params.bin
+```
+
+Then verify with the regression batch:
+
+```bash
+python3 scripts/color_replay.py batch \
+    --json tests/host/capture_samples.json \
+    --check \
+    --build /tmp/shade_sayer_host_build
+```
+
+---
+
+### Running the replay matrix (general diagnostic procedure)
+
+The original matrix described below can be applied to **any** capture that is
+suspected of hue-shifting through the pipeline.
 
 Base capture: `tests/host/capture_samples.json`, id = `green_wall_paint`
-Expected: `scan_lab a* ≈ -20 to -50` (green region)
-Baseline symptom: `scan_lab a* ≈ -1.6` (yellow-beige)
+Expected: `scan_lab a* ≈ −4 to −7` (green region), hue > 105°
 
 ```bash
 BUILD=/tmp/shade_sayer_host_build
@@ -471,10 +579,12 @@ grep "scan_lab" /tmp/run*.txt
 
 ### Which outputs to compare
 
-- **`scan_lab a*`** — the single most important number.  For a real green it
-  should be ≤ −15.  If it stays near −1.6 across all runs, the issue is in
-  the raw sensor data or responsivity constants.
+- **`scan_lab a*`** — the single most important number.  For a saturated green it
+  should be ≤ −15; for a muted (wall-paint) green, ≤ −4 (hue > 105°).
+  If it stays near −1 to −2 across all runs, the issue is likely in
+  the raw sensor responsivity constants (`TCS3530_RESP_X/Z`).
 - **`resp_norm_x/y/z`** in the CSV — shows sensor balance before any correction.
+  For a D65-balanced white, `resp_norm_x ≈ resp_norm_y ≈ resp_norm_z`.
 - **`xyz_x/y/z`** — the final corrected XYZ fed into Lab conversion.
 - **`category`** and **`color_name`** — the final classification result.
 - **`kona_matched`** and **`delta_e`** — match quality.

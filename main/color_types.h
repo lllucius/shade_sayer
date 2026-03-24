@@ -92,19 +92,35 @@ extern "C" {
  * @defgroup TCS3530_Responsivity TCS3530 Spectral Responsivity Constants
  * @brief Responsivity factors for TCS3530 sensor channels
  *
- * DERIVED FROM ACTUAL CALIBRATION DATA (White Reference Raw Values):
- *   X Raw = 32.2M  -> 290.0 (0.9667× Y anchor)
- *   Y Raw = 33.4M  -> 300.0 (Anchor)
- *   Z Raw = 27.9M  -> 250.0 (0.8333× Y anchor)
+ * WHITE-BALANCED FROM COMMITTED CALIBRATION DATA (host/calibration_measurements_raw.cfg):
+ *   White reference raw (8× gain, 100 ms): X=21,259,521  Y=21,382,400  Z=16,971,520
+ *   RESP_Y = 300.0 (anchor, keeps output numerics compatible)
+ *   RESP_X = 300 × (21,259,521 / 21,382,400) = 298.3  (was 290.0)
+ *   RESP_Z = 300 × (16,971,520 / 21,382,400) = 238.1  (was 250.0)
  *
- * These values ensure that normalized white light produces X≈Y≈Z (1:1:1 ratio).
- * Previous Z value of 1150.0 was too high, causing Z to be severely under-represented
- * and leading to green colors being misidentified as red (Z→0 after CCM clamping).
+ * These constants ensure that RESP-normalization of the committed white reference
+ * produces an EXACT 1:1:1 ratio (X_norm = Y_norm = Z_norm).  After white-balancing,
+ * the D65 pre-scaling step (× D65_X/100, × D65_Z/100) correctly maps the sensor
+ * response to D65 proportions, and the PCCM input accurately encodes surface
+ * reflectance relative to white.
+ *
+ * Why this matters for muted greens
+ * ----------------------------------
+ * The previous constants were derived from a different measurement session and left
+ * the white reference slightly unbalanced (X_norm/Y_norm ≈ 1.029).  That 2.9 %
+ * excess in the X channel biased every PCCM input warm; for a muted green wall paint
+ * (raw y/x ≈ 1.06, barely above neutral) the PCCM produced scan_lab a* ≈ −1 instead
+ * of the theoretically correct a* ≈ −7 (hue 116°, Green category).  After
+ * white-balancing the PCCM input correctly encodes the chromatic ratio, and the
+ * retrained PCCM generalises the calibration-patch green data to muted greens.
+ *
+ * To regenerate host/auto_cal_params.bin after changing these constants:
+ *   cd <repo_root> && /tmp/shade_sayer_host_build/autocal_host_test
  * @{
  */
-#define TCS3530_RESP_X 290.0f
+#define TCS3530_RESP_X 298.3f
 #define TCS3530_RESP_Y 300.0f
-#define TCS3530_RESP_Z 250.0f
+#define TCS3530_RESP_Z 238.1f
 //@}
 
 /**
