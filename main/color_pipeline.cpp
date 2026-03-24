@@ -322,8 +322,11 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
 
         // Apply SYNTHETIC_CONFIDENCE_FACTOR multiplier for synthetic matches — they are
         // approximations and should rank below real scanned matches.
-        result->confidence = fmaxf(0.0f,
-            1.0f - (best_delta_e / effective_threshold)) * SYNTHETIC_CONFIDENCE_FACTOR;
+        // Uses quadratic scaling consistent with real Kona confidence formula.
+        {
+            float ratio = best_delta_e / effective_threshold;
+            result->confidence = fmaxf(0.0f, 1.0f - (ratio * ratio)) * SYNTHETIC_CONFIDENCE_FACTOR;
+        }
 
         return true;
     }
@@ -334,11 +337,15 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
     result->delta_e = best_delta_e;
     result->color_name = info ? info->name : COLOR_NAME_UNKNOWN;
 
-    // Confidence: linear scaling from 1.0 (exact match) to 0.0 (at threshold)
-    // Formula: confidence = 1.0 - (deltaE / max_deltaE)
-    // This assumes perceptual difference scales roughly linearly within the
-    // small range of 0-2 ΔE units typical for Kona matching.
-    result->confidence = fmaxf(0.0f, 1.0f - (best_delta_e / s_config.kona_max_delta_e));
+    // Confidence: quadratic scaling from 1.0 (exact match) to 0.0 (at threshold)
+    // Formula: confidence = 1.0 - (deltaE / max_deltaE)²
+    // Quadratic scaling better reflects CIEDE2000 perceptual reality: small ΔE
+    // values (< 2.0) are barely noticeable and should yield high confidence,
+    // while confidence drops steeply as ΔE approaches the acceptance threshold.
+    {
+        float ratio = best_delta_e / s_config.kona_max_delta_e;
+        result->confidence = fmaxf(0.0f, 1.0f - (ratio * ratio));
+    }
 
     return true;
 }
@@ -1781,10 +1788,13 @@ int color_pipeline_describe(const color_result_t* result, char* buffer, size_t b
         return len;
     }
 
-    // Build description based on confidence
-    // For low-confidence matches (below CONFIDENCE_MEDIUM), report the color family/category
-    // instead of a specific name that may be wrong (e.g., due to texture variance).
-    if (result->confidence <= CONFIDENCE_MEDIUM && result->category &&
+    // Build description based on confidence and match type.
+    // Kona matches always announce the swatch name since the match already
+    // passed the ΔE acceptance threshold — the name is meaningful even at
+    // lower confidence levels.  For non-Kona (color-database) matches, fall
+    // back to the generic category when confidence is too low.
+    if (!result->kona_matched &&
+        result->confidence <= CONFIDENCE_MEDIUM && result->category &&
         result->category[0] != '\0')
     {
         len += snprintf(buffer + len, buffer_size - len,
