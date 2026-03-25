@@ -1231,11 +1231,6 @@ class KonaScannerApp:
                     a = float(lab["a"]) if lab.get("a") is not None else None
                     b = float(lab["b"]) if lab.get("b") is not None else None
 
-                    rgb = entry.get("rgb") or {}
-                    R = int(rgb["r"]) if rgb.get("r") is not None else None
-                    G = int(rgb["g"]) if rgb.get("g") is not None else None
-                    B = int(rgb["b"]) if rgb.get("b") is not None else None
-
                     raw = entry.get("raw") or {}
                     raw_x = int(raw["x"]) if raw.get("x") is not None else None
                     raw_y = int(raw["y"]) if raw.get("y") is not None else None
@@ -1255,9 +1250,6 @@ class KonaScannerApp:
                         L=L,
                         a=a,
                         b=b,
-                        R=R,
-                        G=G,
-                        B=B,
                         measured=measured,
                         notes=str(entry.get("notes", "")),
                         raw_x=raw_x,
@@ -1391,11 +1383,6 @@ class KonaScannerApp:
                         "l": round(s.L, 6) if s.L is not None else None,
                         "a": round(s.a, 6) if s.a is not None else None,
                         "b": round(s.b, 6) if s.b is not None else None,
-                    },
-                    "rgb": {
-                        "r": s.R,
-                        "g": s.G,
-                        "b": s.B,
                     },
                     "notes": s.notes,
                 }

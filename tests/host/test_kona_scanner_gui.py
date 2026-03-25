@@ -480,11 +480,6 @@ def _swatch_to_json_entry(s: SwatchData) -> dict:
             "a": round(s.a, 6) if s.a is not None else None,
             "b": round(s.b, 6) if s.b is not None else None,
         },
-        "rgb": {
-            "r": s.R,
-            "g": s.G,
-            "b": s.B,
-        },
         "notes": s.notes,
     }
 
@@ -499,7 +494,6 @@ def _load_json_swatches(path: pathlib.Path) -> dict:
         if swatch_id == 0:
             continue
         lab = entry.get("lab") or {}
-        rgb = entry.get("rgb") or {}
         raw = entry.get("raw") or {}
         swatches[swatch_id] = SwatchData(
             panel=str(entry.get("panel", "")),
@@ -509,9 +503,6 @@ def _load_json_swatches(path: pathlib.Path) -> dict:
             L=float(lab["l"]) if lab.get("l") is not None else None,
             a=float(lab["a"]) if lab.get("a") is not None else None,
             b=float(lab["b"]) if lab.get("b") is not None else None,
-            R=int(rgb["r"]) if rgb.get("r") is not None else None,
-            G=int(rgb["g"]) if rgb.get("g") is not None else None,
-            B=int(rgb["b"]) if rgb.get("b") is not None else None,
             measured=bool(entry.get("measured", False)),
             notes=str(entry.get("notes", "")),
             raw_x=int(raw["x"]) if raw.get("x") is not None else None,
@@ -533,7 +524,6 @@ def test_json_roundtrip_lab_values():
         original = SwatchData(
             panel="yellow_orange_red", panel_index=1, id=449, name="SUNNY",
             L=98.5, a=26.026400, b=110.0,
-            R=255, G=228, B=0,
             measured=True, notes="test",
             raw_x=32200000, raw_y=33400000, raw_z=27900000,
             raw_ir=619520, raw_clear=21435649, raw_gain=5, raw_integration_ms=100,
@@ -551,7 +541,6 @@ def test_json_roundtrip_lab_values():
         assert abs(s.L - 98.5) < 1e-5, f"L mismatch: {s.L}"
         assert abs(s.a - 26.0264) < 1e-3, f"a mismatch: {s.a}"
         assert abs(s.b - 110.0) < 1e-5, f"b mismatch: {s.b}"
-        assert s.R == 255
         assert s.raw_x == 32200000
         assert s.raw_gain == 5
         assert s.raw_integration_ms == 100

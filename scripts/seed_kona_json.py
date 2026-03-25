@@ -22,44 +22,25 @@ import sys
 
 
 def load_csv(csv_path):
-    """Read all swatch rows from the CSV file and return a list of dicts."""
+    """Read all swatch rows from the CSV file and return a list of dicts.
+
+    The CSV contains only immutable metadata (panel, panel_index, id, name,
+    notes).  Lab values and the measured flag live exclusively in
+    kona_captures.json and are computed from raw sensor data via the color
+    pipeline.
+    """
     swatches = []
     with open(csv_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            measured = row.get("measured", "false").strip().lower() == "true"
-
-            lab = None
-            rgb = None
-
-            if measured:
-                try:
-                    l_val = float(row["L"]) if row.get("L", "").strip() else None
-                    a_val = float(row["a"]) if row.get("a", "").strip() else None
-                    b_val = float(row["b"]) if row.get("b", "").strip() else None
-                    if l_val is not None and a_val is not None and b_val is not None:
-                        lab = {"l": l_val, "a": a_val, "b": b_val}
-                except (ValueError, KeyError) as e:
-                    print(f"  Warning: could not parse Lab for id={row.get('id')}: {e}", file=sys.stderr)
-
-                try:
-                    r_val = int(row["R"]) if row.get("R", "").strip() else None
-                    g_val = int(row["G"]) if row.get("G", "").strip() else None
-                    b_rgb = int(row["B"]) if row.get("B", "").strip() else None
-                    if r_val is not None and g_val is not None and b_rgb is not None:
-                        rgb = {"r": r_val, "g": g_val, "b": b_rgb}
-                except (ValueError, KeyError) as e:
-                    print(f"  Warning: could not parse RGB for id={row.get('id')}: {e}", file=sys.stderr)
-
             swatches.append(
                 {
                     "panel": row.get("panel", "").strip(),
                     "panel_index": int(row.get("panel_index", 0)),
                     "id": int(row.get("id", 0)),
                     "name": row.get("name", "").strip(),
-                    "measured": measured,
-                    "lab": lab,
-                    "rgb": rgb,
+                    "measured": False,
+                    "lab": None,
                     "raw": None,
                     "notes": row.get("notes", "").strip(),
                 }
@@ -86,7 +67,7 @@ def merge_swatches(csv_swatches, existing_swatches):
     Merge CSV swatches with existing JSON swatches.
 
     For each CSV swatch:
-    - If an existing JSON entry has the same id, preserve its raw/lab/rgb/notes
+    - If an existing JSON entry has the same id, preserve its raw/lab/notes
       (but update panel/panel_index/name from the CSV master list).
     - Otherwise, use the CSV entry as-is.
     """
@@ -105,7 +86,6 @@ def merge_swatches(csv_swatches, existing_swatches):
                     "name": csv_entry["name"],
                     "measured": existing.get("measured", csv_entry["measured"]),
                     "lab": existing.get("lab", csv_entry["lab"]),
-                    "rgb": existing.get("rgb", csv_entry["rgb"]),
                     "raw": existing.get("raw", csv_entry["raw"]),
                     "notes": existing.get("notes", csv_entry["notes"]),
                 }
