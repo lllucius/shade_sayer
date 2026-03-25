@@ -82,13 +82,13 @@ python3 annotate_nearest_colors.py --no-meodai
 | `--dry-run` | off | Print matches without writing output |
 
 **Reference databases (in priority order):**
-1. **Resene** — `resene_colors.json` (~3,290 colours, Lab values pre-computed)
-2. **xkcd**   — `xkcd_colors.json`  (~949 colours, Lab values pre-computed)
-3. **meodai/color-names** — downloaded from
-   `https://unpkg.com/color-name-list/dist/colornames.json` (~30,000 colours).
-   Hex values are converted to Lab using the same D65 pipeline as the other
-   import scripts.  The result is cached in `meodai_colors_cache.json` so
-   subsequent runs skip the download.
+1. **meodai/color-names** — downloaded from the upstream CSV at
+   `https://github.com/meodai/color-names/blob/main/src/colornames.csv`
+   (~30,000+ colours).  Hex values are converted to Lab using the same D65
+   pipeline as the other import scripts.  The result is cached in
+   `meodai_colors_cache.json` so subsequent runs skip the download.
+2. **Resene** — `resene_colors.json` (~3,290 colours, Lab values pre-computed)
+3. **xkcd**   — `xkcd_colors.json`  (~949 colours, Lab values pre-computed)
 
 **Requirements:**
 - Python 3.8+

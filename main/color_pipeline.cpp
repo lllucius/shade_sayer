@@ -278,44 +278,57 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
 
     if (!info && is_synthetic)
     {
-        // Synthetic tint/shade/tone entry — derive name from the source swatch.
-        // Synthetic IDs encode: synthetic_id = KONA_SYNTHETIC_ID_BASE + source_id * 10 + variant_index
-        // variant_index is positional in the sorted steps list:
-        //   0 = "Deep"  (L* -30), 1 = "Dark"  (L* -15)
-        //   2 = "Light" (L* +15), 3 = "Pale"  (L* +30)
-        //   4 = "Muted" (chroma ×0.6), 5 = "Dusty" (chroma ×0.3)
-        const uint32_t encoded = static_cast<uint32_t>(best_entry->kona_id) - KONA_SYNTHETIC_ID_BASE;
-        const uint16_t source_id = static_cast<uint16_t>(encoded / 10u);
-        const uint8_t  variant   = static_cast<uint8_t>(encoded % 10u);
-
-        const kona_swatch_info_t* source_info = kona_metadata_find_by_id(source_id);
-
-        const char* prefix;
-        switch (variant)
-        {
-            case 0:  prefix = "Deep";     break;
-            case 1:  prefix = "Dark";     break;
-            case 2:  prefix = "Light";    break;
-            case 3:  prefix = "Pale";     break;
-            case 4:  prefix = "Muted";    break;
-            case 5:  prefix = "Dusty";    break;
-            default: prefix = "Shade of"; break;
-        }
+        // Synthetic tint/shade/tone entry — prefer the nearest real-world colour
+        // name (from meodai/Resene/xkcd databases) when available, falling back
+        // to the derived "Prefix SourceName" form.
+        const char* nearest = kona_ref_synthetic_name(best_entry->kona_id);
 
         // Safe to use a static buffer here: color measurements are single-threaded
         // (driven by a single button press), so this function is never re-entered
         // concurrently. The result->color_name pointer is consumed before the next
         // call to try_match_kona_reference().
         static char s_synthetic_name[64];
-        if (source_info && source_info->name)
+
+        if (nearest)
         {
-            snprintf(s_synthetic_name, sizeof(s_synthetic_name),
-                     "%s %s", prefix, source_info->name);
+            snprintf(s_synthetic_name, sizeof(s_synthetic_name), "%s", nearest);
         }
         else
         {
-            snprintf(s_synthetic_name, sizeof(s_synthetic_name),
-                     "%s Kona #%u", prefix, static_cast<unsigned>(source_id));
+            // Derive name from the source swatch.
+            // Synthetic IDs encode: synthetic_id = KONA_SYNTHETIC_ID_BASE + source_id * 10 + variant_index
+            // variant_index is positional in the sorted steps list:
+            //   0 = "Deep"  (L* -30), 1 = "Dark"  (L* -15)
+            //   2 = "Light" (L* +15), 3 = "Pale"  (L* +30)
+            //   4 = "Muted" (chroma ×0.6), 5 = "Dusty" (chroma ×0.3)
+            const uint32_t encoded = static_cast<uint32_t>(best_entry->kona_id) - KONA_SYNTHETIC_ID_BASE;
+            const uint16_t source_id = static_cast<uint16_t>(encoded / 10u);
+            const uint8_t  variant   = static_cast<uint8_t>(encoded % 10u);
+
+            const kona_swatch_info_t* source_info = kona_metadata_find_by_id(source_id);
+
+            const char* prefix;
+            switch (variant)
+            {
+                case 0:  prefix = "Deep";     break;
+                case 1:  prefix = "Dark";     break;
+                case 2:  prefix = "Light";    break;
+                case 3:  prefix = "Pale";     break;
+                case 4:  prefix = "Muted";    break;
+                case 5:  prefix = "Dusty";    break;
+                default: prefix = "Shade of"; break;
+            }
+
+            if (source_info && source_info->name)
+            {
+                snprintf(s_synthetic_name, sizeof(s_synthetic_name),
+                         "%s %s", prefix, source_info->name);
+            }
+            else
+            {
+                snprintf(s_synthetic_name, sizeof(s_synthetic_name),
+                         "%s Kona #%u", prefix, static_cast<unsigned>(source_id));
+            }
         }
 
         result->kona_matched = true;

@@ -12,3 +12,9 @@ const uint16_t kona_vptree_node_count = 0;
 const kona_vptree_node_t kona_vptree_nodes[1] = {
     { 0, 0.0f, -1, -1 },  // placeholder — never accessed when count == 0
 };
+
+const uint16_t kona_synthetic_name_count = 0;
+
+const kona_synthetic_name_t kona_synthetic_names[1] = {
+    { 0, nullptr },  // placeholder — never accessed when count == 0
+};
