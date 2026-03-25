@@ -12,7 +12,8 @@ JSON_FILES = (
     REPO_ROOT / "kona_synthetic_tints.json",
 )
 SENTENCE_END_RE = re.compile(r"[.?!]")
-FORBIDDEN_TERMS = (
+COMPARISON_RE = re.compile(r"\blike\b")
+FORBIDDEN_TECHNICAL_TERMS = (
     "rgb",
     "lab",
     "hex",
@@ -43,7 +44,9 @@ def test_descriptions_exist_and_are_single_sentence():
             assert description.strip() == description, f"{path.name} swatch {swatch_id} description has extra whitespace"
             assert description.endswith("."), f"{path.name} swatch {swatch_id} description must end with a period"
             assert "\n" not in description, f"{path.name} swatch {swatch_id} description must stay on one line"
-            assert " like " in description, f"{path.name} swatch {swatch_id} description must use a familiar comparison"
+            assert COMPARISON_RE.search(description), (
+                f"{path.name} swatch {swatch_id} description must use a familiar comparison"
+            )
             assert len(SENTENCE_END_RE.findall(description)) == 1, (
                 f"{path.name} swatch {swatch_id} description must be exactly one sentence"
             )
@@ -55,7 +58,7 @@ def test_descriptions_avoid_technical_jargon():
         for swatch in _load_swatches(path):
             description = swatch["description"].lower()
             swatch_id = swatch.get("id")
-            for term in FORBIDDEN_TERMS:
+            for term in FORBIDDEN_TECHNICAL_TERMS:
                 assert term not in description, (
                     f"{path.name} swatch {swatch_id} description should not include '{term}'"
                 )
