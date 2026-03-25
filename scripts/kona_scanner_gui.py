@@ -74,6 +74,7 @@ class SwatchData:
     synthetic: bool = False
     source_id: Optional[int] = None     # Parent real swatch ID
     variant: Optional[str] = None       # "deep"|"dark"|"light"|"pale"|"muted"|"dusty"
+    nearest_name: Optional[str] = None  # Nearest real-world colour name (meodai/resene/xkcd)
 
 
 # Display gamma adjustment for monitor compensation.
@@ -683,6 +684,15 @@ class KonaScannerApp:
                               font=mono_font, justify=tk.LEFT)
         hex_entry.grid(row=2, column=1, columnspan=5, sticky=tk.W, pady=1)
         self.info_entries["Hex"] = hex_var
+
+        # Nearest name row for synthetic swatches (row 3)
+        ttk.Label(info_frame, text="Near:", font=label_font, anchor=tk.W).grid(
+            row=3, column=0, sticky=tk.W, padx=(5, 2), pady=1)
+        nearest_var = tk.StringVar(value="-")
+        nearest_entry = ttk.Entry(info_frame, textvariable=nearest_var, width=20, state="readonly",
+                                  font=mono_font, justify=tk.LEFT)
+        nearest_entry.grid(row=3, column=1, columnspan=5, sticky=tk.W, pady=1)
+        self.info_entries["Near"] = nearest_var
 
         # Configure column weights for proper resizing
         for c in (1, 3, 5):
@@ -1315,6 +1325,7 @@ class KonaScannerApp:
                         synthetic=True,
                         source_id=source_id,
                         variant=variant,
+                        nearest_name=str(entry.get("nearest_name", "")).strip() or None,
                     )
                 except (ValueError, KeyError, TypeError, AttributeError) as e:
                     if self.debug:
@@ -1484,9 +1495,12 @@ class KonaScannerApp:
                     b_str = f"{syn.b:.1f}" if syn.b is not None else "-"
 
                     # Use "syn_" prefix for unique iid to avoid collision
+                    display_name = syn.name
+                    if syn.nearest_name:
+                        display_name = f"{syn.name} ({syn.nearest_name})"
                     self.tree.insert("", tk.END, iid=f"syn_{syn.id}",
                                     values=(s.panel, s.panel_index, syn.id,
-                                           f"  ↳ {syn.name}",
+                                           f"  ↳ {display_name}",
                                            "~", L_str, a_str, b_str),
                                     tags=("synthetic",))
 
@@ -1575,6 +1589,9 @@ class KonaScannerApp:
                 self.info_entries[key].set("-")
             if update_canvas:
                 self.color_canvas.config(bg="#404040")
+
+        # Show nearest real-world colour name for synthetic swatches
+        self.info_entries["Near"].set(swatch.nearest_name if swatch.nearest_name else "-")
 
     def _clear_color_info(self):
         """Clear color information display."""

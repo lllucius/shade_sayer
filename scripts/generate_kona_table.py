@@ -27,7 +27,7 @@ import zlib
 from typing import Iterable, List, Optional
 
 SCHEMA_VERSION = 1
-MAX_ENTRIES = 2048
+MAX_ENTRIES = 2560
 
 
 @dataclasses.dataclass(frozen=True)
