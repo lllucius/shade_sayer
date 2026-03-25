@@ -340,9 +340,16 @@ def render_cpp(entries: List[KonaEntry], source_path: pathlib.Path, source_scrip
     syn_name_rows = []
     for e in sorted_entries:
         if e.nearest_name:
-            escaped = e.nearest_name.replace('\\', '\\\\').replace('"', '\\"')
+            # Sanitize for C++ string literal: escape special chars and strip
+            # any characters that could break the literal.
+            sanitized = e.nearest_name
+            sanitized = sanitized.replace('\\', '\\\\')
+            sanitized = sanitized.replace('"', '\\"')
+            sanitized = sanitized.replace('\n', ' ')
+            sanitized = sanitized.replace('\r', '')
+            sanitized = sanitized.replace('\0', '')
             syn_name_rows.append(
-                '    { %d, "%s" },' % (e.kona_id, escaped)
+                '    { %d, "%s" },' % (e.kona_id, sanitized)
             )
 
     generated_at = dt.datetime.now(dt.timezone.utc).isoformat()
