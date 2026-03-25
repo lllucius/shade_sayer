@@ -160,7 +160,7 @@ def generate_tone(
     """
     chroma = math.sqrt(original_a * original_a + original_b * original_b)
 
-    # Skip near-achromatic colours — desaturating them further is meaningless
+    # Skip near-achromatic colors — desaturating them further is meaningless
     if chroma < MIN_CHROMA_FOR_TONE:
         return None
 
@@ -314,7 +314,7 @@ def generate_synthetics(
 
     # ── Tone generation ──────────────────────────────────────────────
     if tone_scales:
-        # Sort largest-first so the least-reduced tone gets the lowest index
+        # Sort largest-first so the most-saturated tone gets the lowest index
         sorted_tone_scales = sorted(tone_scales, reverse=True)
         num_tones = len(sorted_tone_scales)
 
