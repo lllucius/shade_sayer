@@ -234,3 +234,15 @@ const kona_ref_t* kona_ref_find_closest(float query_l, float query_a, float quer
     }
     return &kona_reference.entries[best_i];
 }
+
+const char* kona_ref_synthetic_name(uint16_t kona_id)
+{
+    for (uint16_t i = 0; i < kona_synthetic_name_count; ++i)
+    {
+        if (kona_synthetic_names[i].kona_id == kona_id)
+        {
+            return kona_synthetic_names[i].nearest_name;
+        }
+    }
+    return nullptr;
+}

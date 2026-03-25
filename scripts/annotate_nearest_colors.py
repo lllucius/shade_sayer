@@ -12,13 +12,13 @@ each swatch entry:
 - ``nearest_delta_e``   — the CIEDE2000 distance (rounded to 2 decimal places)
 
 Reference databases (searched in this priority order):
-1. **Resene** — ``scripts/resene_colors.json`` (pre-computed Lab values)
-2. **xkcd**   — ``scripts/xkcd_colors.json``  (pre-computed Lab values)
-3. **meodai/color-names** (optional, fetched from
-   https://unpkg.com/color-name-list/dist/colornames.json).  Hex values are
-   converted to Lab via the same sRGB→XYZ→Lab D65 pipeline used by the other
-   import scripts.  The result is cached locally so subsequent runs skip the
-   download.  Pass ``--no-meodai`` to skip entirely.
+1. **meodai/color-names** (fetched from the upstream CSV at
+   https://github.com/meodai/color-names/blob/main/src/colornames.csv).
+   Hex values are converted to Lab via the same sRGB→XYZ→Lab D65 pipeline
+   used by the other import scripts.  The result is cached locally so
+   subsequent runs skip the download.  Pass ``--no-meodai`` to skip entirely.
+2. **Resene** — ``scripts/resene_colors.json`` (pre-computed Lab values)
+3. **xkcd**   — ``scripts/xkcd_colors.json``  (pre-computed Lab values)
 
 Usage::
 
@@ -39,6 +39,8 @@ Usage::
 """
 
 import argparse
+import csv
+import io
 import json
 import math
 import os
@@ -62,8 +64,8 @@ REF_X = 0.95047
 REF_Y = 1.00000
 REF_Z = 1.08883
 
-# URL for meodai/color-names database
-MEODAI_URL = "https://unpkg.com/color-name-list/dist/colornames.json"
+# URL for meodai/color-names database (upstream CSV)
+MEODAI_URL = "https://raw.githubusercontent.com/meodai/color-names/main/src/colornames.csv"
 
 # ---------------------------------------------------------------------------
 # sRGB → XYZ → Lab conversion (same as import_xkcd_colors.py)
@@ -236,9 +238,9 @@ def load_lab_json(path: str, source_tag: str) -> List[Tuple[str, float, float, f
 def load_meodai(cache_path: str) -> List[Tuple[str, float, float, float, str]]:
     """Download (or load from cache) the meodai/color-names database.
 
-    The downloaded JSON is ``[{"name": "...", "hex": "#rrggbb"}, ...]``.
-    Hex values are converted to Lab using the D65 pipeline above.
-    Results are cached to ``cache_path`` to avoid repeated downloads.
+    The upstream CSV has columns ``name,hex,good name``.  Hex values are
+    converted to Lab using the D65 pipeline above.  Results are cached to
+    ``cache_path`` to avoid repeated downloads.
 
     @param cache_path  Path for the local cache file.
     @returns           List of ``(name, L, a, b, "meodai")`` tuples, or an
@@ -261,7 +263,7 @@ def load_meodai(cache_path: str) -> List[Tuple[str, float, float, float, str]]:
         except Exception as exc:
             print(f"  Warning: could not read meodai cache ({exc}); re-downloading")
 
-    # Download
+    # Download upstream CSV
     print(f"  Downloading meodai/color-names from {MEODAI_URL} ...")
     try:
         req = urllib.request.Request(
@@ -270,7 +272,8 @@ def load_meodai(cache_path: str) -> List[Tuple[str, float, float, float, str]]:
         )
         with urllib.request.urlopen(req, timeout=30) as resp:
             raw = resp.read().decode('utf-8')
-        color_list = json.loads(raw)
+        reader = csv.DictReader(io.StringIO(raw))
+        color_list = list(reader)
     except Exception as exc:
         print(f"  Warning: meodai download failed ({exc}); skipping")
         return []
@@ -364,8 +367,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
             "Annotate kona_synthetic_tints.json swatches with the nearest "
-            "real colour name from Resene, xkcd, and optionally "
-            "meodai/color-names databases using CIEDE2000."
+            "real colour name from meodai/color-names, Resene, and xkcd "
+            "databases using CIEDE2000."
         )
     )
     parser.add_argument(
@@ -437,10 +440,15 @@ def main() -> int:
     print(f"  Found {len(swatches):,} swatches")
 
     # ------------------------------------------------------------------
-    # Load reference databases
+    # Load reference databases (meodai first for priority)
     # ------------------------------------------------------------------
     print("\nLoading reference colour databases:")
     databases: List[List[Tuple[str, float, float, float, str]]] = []
+
+    if not args.no_meodai:
+        meodai_entries = load_meodai(args.meodai_cache)
+        if meodai_entries:
+            databases.append(meodai_entries)
 
     if os.path.exists(args.resene):
         databases.append(load_lab_json(args.resene, 'resene'))
@@ -451,11 +459,6 @@ def main() -> int:
         databases.append(load_lab_json(args.xkcd, 'xkcd'))
     else:
         print(f"  Warning: xkcd database not found: {args.xkcd}")
-
-    if not args.no_meodai:
-        meodai_entries = load_meodai(args.meodai_cache)
-        if meodai_entries:
-            databases.append(meodai_entries)
 
     if not databases:
         print("Error: no reference databases could be loaded.", file=sys.stderr)
@@ -526,7 +529,7 @@ def main() -> int:
 
     if source_counts:
         print(f"\n  Breakdown by source:")
-        for src in ('resene', 'xkcd', 'meodai'):
+        for src in ('meodai', 'resene', 'xkcd'):
             count = source_counts.get(src, 0)
             if count:
                 print(f"    {src:<10}: {count:,}")
