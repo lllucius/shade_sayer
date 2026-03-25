@@ -39,14 +39,14 @@ python3 kona_scanner_gui.py --port /dev/ttyACM0 --data ../kona_captures.json
 
 ### generate_synthetic_tints.py
 
-**Standalone script** that generates synthetic tint and shade variants from the
-365 measured Kona swatches in `kona_captures.json`.  The resulting
-`kona_synthetic_tints.json` expands coverage into lighter and darker regions
-where Kona has no real swatches.
+**Standalone script** that generates synthetic tint, shade, and tone variants
+from the 365 measured Kona swatches in `kona_captures.json`.  The resulting
+`kona_synthetic_tints.json` expands coverage into lighter, darker, and
+desaturated regions where Kona has no real swatches.
 
 **Usage:**
 ```bash
-# Generate with default steps (-30, -15, +15, +30 L* offsets)
+# Generate with default steps and tones
 python3 generate_synthetic_tints.py
 
 # Specify paths explicitly
@@ -56,6 +56,12 @@ python3 generate_synthetic_tints.py \
 
 # Custom L* offset steps
 python3 generate_synthetic_tints.py --steps -30,-15,15,30
+
+# Custom tone chroma scales
+python3 generate_synthetic_tints.py --tone-scales 0.6,0.3
+
+# Disable tone generation (tints and shades only)
+python3 generate_synthetic_tints.py --no-tones
 
 # Preview without writing output
 python3 generate_synthetic_tints.py --dry-run
@@ -69,32 +75,38 @@ python3 generate_synthetic_tints.py --dry-run
 | `--steps` | `-30,-15,15,30` | Comma-separated L* offsets to apply |
 | `--min-l` | `5.0` | Minimum allowed L* for output entries |
 | `--max-l` | `95.0` | Maximum allowed L* for output entries |
+| `--tone-scales` | `0.6,0.3` | Comma-separated chroma scale factors (0–1) |
+| `--no-tones` | off | Disable tone generation |
 | `--dry-run` | off | Print summary without writing file |
 
-**Algorithm — tint/shade generation:**
+**Algorithm — tint/shade/tone generation:**
 
-For each measured swatch (L, a, b), a variant is generated at
-`target_L = L + offset`:
+For each measured swatch (L, a, b):
 
-- **Tints** (positive offset, lighter): chroma is reduced proportionally to how
-  far the variant moves toward white.  At `L*=100` chroma would reach zero.
-- **Shades** (negative offset, darker): chroma undergoes a smaller reduction as
-  the variant approaches black.
+- **Tints** (positive L* offset, lighter): chroma is reduced proportionally to
+  how far the variant moves toward white.  At `L*=100` chroma would reach zero.
+- **Shades** (negative L* offset, darker): chroma undergoes a smaller reduction
+  as the variant approaches black.
+- **Tones** (chroma reduction at same L*): a* and b* are scaled by the given
+  factor while L* is unchanged, simulating the addition of gray.  Swatches with
+  chroma below 5.0 (near-achromatic) are skipped.
 
-Variants are skipped when they would be too close to the original
+Tint/shade variants are skipped when they would be too close to the original
 (|ΔL*| < 5) or when the source is already in the target region (e.g., a
 "light" variant of an already very light color).
 
 **Naming:**
 
-The four default step positions map to the following prefixes:
+The default step and tone positions map to the following prefixes:
 
-| Step | Prefix | Example |
-|------|--------|---------|
-| −30  | Deep   | Deep CORAL |
-| −15  | Dark   | Dark CORAL |
-| +15  | Light  | Light CORAL |
-| +30  | Pale   | Pale CORAL |
+| Variant | Prefix | Example |
+|---------|--------|---------|
+| L* −30  | Deep   | Deep CORAL |
+| L* −15  | Dark   | Dark CORAL |
+| L* +15  | Light  | Light CORAL |
+| L* +30  | Pale   | Pale CORAL |
+| Chroma ×0.6 | Muted | Muted CORAL |
+| Chroma ×0.3 | Dusty | Dusty CORAL |
 
 **Synthetic IDs:**
 
@@ -113,8 +125,9 @@ Real Kona IDs (7–1898) never collide with this range.
 Reading source swatches from: ../kona_captures.json
   Found 365 measured swatches
 Generating synthetic variants with L* steps: [-30, -15, 15, 30]
-  Generated 1420 synthetic entries (710 shades + 710 tints) from 365 source swatches
-Wrote 1420 synthetic entries to: ../kona_synthetic_tints.json
+  Tone chroma scales: [0.6, 0.3]
+  Generated 1886 synthetic entries (723 shades + 473 tints + 690 tones) from 365 source swatches
+Wrote 1886 synthetic entries to: ../kona_synthetic_tints.json
 ```
 
 **Workflow:**
@@ -137,7 +150,7 @@ entries always take priority over synthetic entries in case of ID collision.
 ### generate_kona_table.py
 
 Generates a Kona table source file (default: `main/konaref_generated.cpp`) from
-`kona_captures.json`.  Optionally merges synthetic tint/shade entries from
+`kona_captures.json`.  Optionally merges synthetic tint/shade/tone entries from
 `kona_synthetic_tints.json` (produced by `generate_synthetic_tints.py`).
 
 Also provides the shared `render_cpp`, `KonaEntry`, and `crc32_entries` helpers

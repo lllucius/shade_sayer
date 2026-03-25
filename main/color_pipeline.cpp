@@ -278,11 +278,12 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
 
     if (!info && is_synthetic)
     {
-        // Synthetic tint/shade entry — derive name from the source swatch.
+        // Synthetic tint/shade/tone entry — derive name from the source swatch.
         // Synthetic IDs encode: synthetic_id = KONA_SYNTHETIC_ID_BASE + source_id * 10 + variant_index
         // variant_index is positional in the sorted steps list:
         //   0 = "Deep"  (L* -30), 1 = "Dark"  (L* -15)
         //   2 = "Light" (L* +15), 3 = "Pale"  (L* +30)
+        //   4 = "Muted" (chroma ×0.6), 5 = "Dusty" (chroma ×0.3)
         const uint32_t encoded = static_cast<uint32_t>(best_entry->kona_id) - KONA_SYNTHETIC_ID_BASE;
         const uint16_t source_id = static_cast<uint16_t>(encoded / 10u);
         const uint8_t  variant   = static_cast<uint8_t>(encoded % 10u);
@@ -296,6 +297,8 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
             case 1:  prefix = "Dark";     break;
             case 2:  prefix = "Light";    break;
             case 3:  prefix = "Pale";     break;
+            case 4:  prefix = "Muted";    break;
+            case 5:  prefix = "Dusty";    break;
             default: prefix = "Shade of"; break;
         }
 
