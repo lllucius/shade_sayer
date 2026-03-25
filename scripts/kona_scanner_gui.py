@@ -70,10 +70,10 @@ class SwatchData:
     raw_clear: Optional[int] = None
     raw_gain: Optional[int] = None
     raw_integration_ms: Optional[int] = None
-    # Synthetic tint/shade fields — populated from kona_synthetic_tints.json
+    # Synthetic tint/shade/tone fields — populated from kona_synthetic_tints.json
     synthetic: bool = False
     source_id: Optional[int] = None     # Parent real swatch ID
-    variant: Optional[str] = None       # "deep" | "dark" | "light" | "pale"
+    variant: Optional[str] = None       # "deep"|"dark"|"light"|"pale"|"muted"|"dusty"
 
 
 # Display gamma adjustment for monitor compensation.
@@ -1424,9 +1424,10 @@ class KonaScannerApp:
     def _populate_treeview(self):
         """Populate the treeview with swatch data.
 
-        When the Synthetics checkbox is enabled, synthetic tint/shade entries
-        are inserted immediately after their parent real swatch, sorted by
-        variant order (deep → dark → light → pale).
+        When the Synthetics checkbox is enabled, synthetic tint/shade/tone
+        entries are inserted immediately after their parent real swatch,
+        sorted by variant order
+        (deep → dark → light → pale → muted → dusty).
         """
         # Clear existing items
         for item in self.tree.get_children():
@@ -1439,7 +1440,10 @@ class KonaScannerApp:
         # Build a lookup of synthetic entries grouped by source_id
         synthetics_by_source: Dict[int, List[SwatchData]] = {}
         if show_synthetic:
-            variant_order = {"deep": 0, "dark": 1, "light": 2, "pale": 3}
+            variant_order = {
+                "deep": 0, "dark": 1, "light": 2, "pale": 3,
+                "muted": 4, "dusty": 5,
+            }
             for s in self.synthetic_swatches.values():
                 if s.source_id is not None:
                     synthetics_by_source.setdefault(s.source_id, []).append(s)
