@@ -326,11 +326,6 @@ and cached Lab values (for fast builds).
     "a": 26.0264,
     "b": 110.0
   },
-  "rgb": {
-    "r": 255,
-    "g": 228,
-    "b": 0
-  },
   "notes": ""
 }
 ```
@@ -347,7 +342,6 @@ and cached Lab values (for fast builds).
 | `raw.gain` | TCS3530 gain code used during capture |
 | `raw.integration_ms` | Integration time in milliseconds |
 | `lab.l/a/b` | Cached Lab values from the current pipeline (used by normal builds) |
-| `rgb.r/g/b` | Display RGB values (informational) |
 
 ### Normal vs. Regeneration Build Paths
 

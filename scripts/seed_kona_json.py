@@ -25,7 +25,7 @@ def load_csv(csv_path):
     """Read all swatch rows from the CSV file and return a list of dicts.
 
     The CSV contains only immutable metadata (panel, panel_index, id, name,
-    notes).  Lab/RGB values and the measured flag live exclusively in
+    notes).  Lab values and the measured flag live exclusively in
     kona_captures.json and are computed from raw sensor data via the color
     pipeline.
     """
@@ -41,7 +41,6 @@ def load_csv(csv_path):
                     "name": row.get("name", "").strip(),
                     "measured": False,
                     "lab": None,
-                    "rgb": None,
                     "raw": None,
                     "notes": row.get("notes", "").strip(),
                 }
@@ -68,7 +67,7 @@ def merge_swatches(csv_swatches, existing_swatches):
     Merge CSV swatches with existing JSON swatches.
 
     For each CSV swatch:
-    - If an existing JSON entry has the same id, preserve its raw/lab/rgb/notes
+    - If an existing JSON entry has the same id, preserve its raw/lab/notes
       (but update panel/panel_index/name from the CSV master list).
     - Otherwise, use the CSV entry as-is.
     """
@@ -87,7 +86,6 @@ def merge_swatches(csv_swatches, existing_swatches):
                     "name": csv_entry["name"],
                     "measured": existing.get("measured", csv_entry["measured"]),
                     "lab": existing.get("lab", csv_entry["lab"]),
-                    "rgb": existing.get("rgb", csv_entry["rgb"]),
                     "raw": existing.get("raw", csv_entry["raw"]),
                     "notes": existing.get("notes", csv_entry["notes"]),
                 }
