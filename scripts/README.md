@@ -326,7 +326,8 @@ and cached Lab values (for fast builds).
     "a": 26.0264,
     "b": 110.0
   },
-  "notes": ""
+  "notes": "",
+  "description": "A warm yellow-orange like marigold petals or ripe mango with a bright, sunny look."
 }
 ```
 
@@ -342,6 +343,7 @@ and cached Lab values (for fast builds).
 | `raw.gain` | TCS3530 gain code used during capture |
 | `raw.integration_ms` | Integration time in milliseconds |
 | `lab.l/a/b` | Cached Lab values from the current pipeline (used by normal builds) |
+| `description` | One-sentence natural-language description of the swatch's overall visual impression |
 
 ### Normal vs. Regeneration Build Paths
 
