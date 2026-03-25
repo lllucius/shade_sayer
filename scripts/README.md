@@ -37,6 +37,63 @@ python3 kona_scanner_gui.py --port /dev/ttyACM0 --data ../kona_captures.json
 - Tkinter (usually included with Python)
 - pyserial (`pip install pyserial`)
 
+### annotate_nearest_colors.py
+
+**Standalone script** that annotates each synthetic swatch in
+`kona_synthetic_tints.json` with the nearest real colour name from one or
+more reference databases using the CIEDE2000 perceptual distance metric.
+
+Three new fields are written into each swatch entry:
+
+| Field | Description |
+|---|---|
+| `nearest_name` | Name of the closest colour from any database |
+| `nearest_source` | Database the match came from (`resene`, `xkcd`, or `meodai`) |
+| `nearest_delta_e` | CIEDE2000 distance (rounded to 2 decimal places) |
+
+**Usage:**
+```bash
+# Annotate kona_synthetic_tints.json in place (default)
+python3 annotate_nearest_colors.py
+
+# Dry run — print matches without modifying any file
+python3 annotate_nearest_colors.py --dry-run
+
+# Write to a separate output file
+python3 annotate_nearest_colors.py --output /tmp/annotated.json
+
+# Only annotate swatches with a match better than ΔE 5.0
+python3 annotate_nearest_colors.py --max-delta-e 5.0
+
+# Skip the optional meodai network download
+python3 annotate_nearest_colors.py --no-meodai
+```
+
+**Options:**
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--input FILE` | `../kona_synthetic_tints.json` | Input synthetic tints JSON |
+| `--output FILE` | same as `--input` | Output JSON (overwrite in place) |
+| `--resene FILE` | `resene_colors.json` in script dir | Resene colours database |
+| `--xkcd FILE` | `xkcd_colors.json` in script dir | xkcd colours database |
+| `--no-meodai` | off | Skip downloading meodai/color-names |
+| `--meodai-cache FILE` | `meodai_colors_cache.json` in script dir | Local cache for meodai download |
+| `--max-delta-e N` | no limit | Only annotate when best ΔE ≤ N |
+| `--dry-run` | off | Print matches without writing output |
+
+**Reference databases (in priority order):**
+1. **Resene** — `resene_colors.json` (~3,290 colours, Lab values pre-computed)
+2. **xkcd**   — `xkcd_colors.json`  (~949 colours, Lab values pre-computed)
+3. **meodai/color-names** — downloaded from
+   `https://unpkg.com/color-name-list/dist/colornames.json` (~30,000 colours).
+   Hex values are converted to Lab using the same D65 pipeline as the other
+   import scripts.  The result is cached in `meodai_colors_cache.json` so
+   subsequent runs skip the download.
+
+**Requirements:**
+- Python 3.8+
+- No external packages (uses only the standard library)
+
 ### generate_synthetic_tints.py
 
 **Standalone script** that generates synthetic tint, shade, and tone variants
