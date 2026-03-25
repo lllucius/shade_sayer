@@ -62,6 +62,8 @@ def _is_low_chroma(chroma: float) -> bool:
 _HUE_FAMILIES = [
     # (start, end, family)  — hue angles in degrees.
     # Boundaries calibrated against Kona swatch measurements in CIE Lab space.
+    # Convention: start is inclusive, end is exclusive (start <= h < end).
+    # Red wraps around 0° and is split into two entries.
     (0, 35, "red"),
     (35, 63, "orange"),
     (63, 93, "yellow"),
