@@ -139,39 +139,12 @@ static void speak_battery_status(void)
         return;
     }
 
-    // Get estimated time to full charge
-    int time_to_full = power_get_time_to_full_charge_minutes();
-    
     int battery_mv = power_get_battery_voltage_mv();
-    ESP_LOGI(TAG, "Battery level: %d%% (%dmV), estimated %d minutes to full", 
-             battery_level, battery_mv, time_to_full);
+    ESP_LOGI(TAG, "Battery level: %d%% (%dmV)", 
+             battery_level, battery_mv);
     
     // Announce current level
     tts_speak("Battery at %d percent", battery_level);
-    
-    // Announce estimated time to full if available
-    if (time_to_full > 0)
-    {
-        int hours = time_to_full / 60;
-        int minutes = time_to_full % 60;
-
-        if (hours > 0 && minutes > 0)
-        {
-            tts_speak("Estimated %d hour%s and %d minute%s to full charge",
-                      hours, (hours == 1) ? "" : "s",
-                      minutes, (minutes == 1) ? "" : "s");
-        }
-        else if (hours > 0)
-        {
-            tts_speak("Estimated %d hour%s to full charge",
-                      hours, (hours == 1) ? "" : "s");
-        }
-        else
-        {
-            tts_speak("Estimated %d minute%s to full charge",
-                      time_to_full, (time_to_full == 1) ? "" : "s");
-        }
-    }
 }
 
 /**
