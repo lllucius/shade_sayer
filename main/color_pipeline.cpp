@@ -1637,7 +1637,7 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         // a*=110, b*=110 values.
         if (try_match_kona_reference(&result->scan_lab, result))
         {
-            result->description = nullptr;
+            result->description = kona_ref_description(result->kona_id);
             TCS_LOGD(TAG, "Kona match: id=%u name=%s dE=%.3f",
                      (unsigned int)result->kona_id,
                      result->color_name,

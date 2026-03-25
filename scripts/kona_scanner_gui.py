@@ -75,6 +75,7 @@ class SwatchData:
     source_id: Optional[int] = None     # Parent real swatch ID
     variant: Optional[str] = None       # "deep"|"dark"|"light"|"pale"|"muted"|"dusty"
     nearest_name: Optional[str] = None  # Nearest real-world colour name (meodai/resene/xkcd)
+    description: str = ""                # One-sentence natural-language colour description
 
 
 # Display gamma adjustment for monitor compensation.
@@ -694,6 +695,15 @@ class KonaScannerApp:
         nearest_entry.grid(row=3, column=1, columnspan=5, sticky=tk.W, pady=1)
         self.info_entries["Near"] = nearest_var
 
+        # Description row (row 4)
+        ttk.Label(info_frame, text="Desc:", font=label_font, anchor=tk.W).grid(
+            row=4, column=0, sticky=tk.NW, padx=(5, 2), pady=1)
+        desc_var = tk.StringVar(value="-")
+        desc_entry = ttk.Entry(info_frame, textvariable=desc_var, width=40, state="readonly",
+                               font=mono_font, justify=tk.LEFT)
+        desc_entry.grid(row=4, column=1, columnspan=5, sticky=tk.W, pady=1)
+        self.info_entries["Desc"] = desc_var
+
         # Configure column weights for proper resizing
         for c in (1, 3, 5):
             info_frame.columnconfigure(c, weight=1)
@@ -1269,6 +1279,7 @@ class KonaScannerApp:
                         raw_clear=raw_clear,
                         raw_gain=raw_gain,
                         raw_integration_ms=raw_integration_ms,
+                        description=str(entry.get("description", "")),
                     )
                 except (ValueError, KeyError, TypeError, AttributeError) as e:
                     self._log_console(f"Skipping invalid JSON swatch entry: {entry} ({e})")
@@ -1326,6 +1337,7 @@ class KonaScannerApp:
                         source_id=source_id,
                         variant=variant,
                         nearest_name=entry.get("nearest_name") or None,
+                        description=str(entry.get("description", "")),
                     )
                 except (ValueError, KeyError, TypeError, AttributeError) as e:
                     if self.debug:
@@ -1396,6 +1408,7 @@ class KonaScannerApp:
                         "b": round(s.b, 6) if s.b is not None else None,
                     },
                     "notes": s.notes,
+                    "description": s.description,
                 }
                 swatch_entries.append(entry)
 
@@ -1592,6 +1605,9 @@ class KonaScannerApp:
 
         # Show nearest real-world colour name for synthetic swatches
         self.info_entries["Near"].set(swatch.nearest_name if swatch.nearest_name else "-")
+
+        # Show description
+        self.info_entries["Desc"].set(swatch.description if swatch.description else "-")
 
     def _clear_color_info(self):
         """Clear color information display."""

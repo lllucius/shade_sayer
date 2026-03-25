@@ -232,6 +232,7 @@ python3 generate_kona_table.py \
 - Deduplicates by `id` (last entry wins), sorted by numeric swatch id
 - Emits `kona_table_t kona_reference` with schema version, entry count, and CRC32
 - **Generates a VP-tree** alongside the reference table for O(log n) matching (vs O(n) linear scan)
+- **Generates a description table** mapping swatch IDs to natural-language colour descriptions
 - Supports up to 2048 entries (365 real + up to ~1,460 synthetic)
 - Shared by `kona_scanner_gui.py` for C++ export
 
@@ -245,6 +246,8 @@ C++ file:
 |--------|-------------|
 | `kona_vptree_node_count` | Number of VP-tree nodes (= entry count) |
 | `kona_vptree_nodes[]` | Flat node array; root at index 0 |
+| `kona_description_count` | Number of description entries |
+| `kona_descriptions[]` | Sorted array of `{ kona_id, description }` pairs |
 
 Each node stores an `entry_index` into `kona_reference.entries[]`, a
 `median_distance` partitioning threshold, and left/right child indices.
