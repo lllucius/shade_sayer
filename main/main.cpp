@@ -159,18 +159,28 @@ static void speak_color_description(void)
         return;
     }
 
-    char desc_buffer[TTS_DESCRIPTION_BUFFER_SIZE];
-    int len = color_description_generate(&s_last_result.lab, desc_buffer, sizeof(desc_buffer));
-
-    if (len > 0)
+    // Prefer the stored description (from JSON) when available; fall back to
+    // the runtime description generator based on Lab values.
+    if (s_last_result.description)
     {
-        ESP_LOGI(TAG, "Color description: %s", desc_buffer);
-        tts_speak("%s is %s", s_last_result.color_name, desc_buffer);
+        ESP_LOGI(TAG, "Color description (stored): %s", s_last_result.description);
+        tts_speak("%s is %s", s_last_result.color_name, s_last_result.description);
     }
     else
     {
-        ESP_LOGW(TAG, "Failed to generate color description");
-        tts_speak("Could not generate a description for this color.");
+        char desc_buffer[TTS_DESCRIPTION_BUFFER_SIZE];
+        int len = color_description_generate(&s_last_result.lab, desc_buffer, sizeof(desc_buffer));
+
+        if (len > 0)
+        {
+            ESP_LOGI(TAG, "Color description (generated): %s", desc_buffer);
+            tts_speak("%s is %s", s_last_result.color_name, desc_buffer);
+        }
+        else
+        {
+            ESP_LOGW(TAG, "Failed to generate color description");
+            tts_speak("Could not generate a description for this color.");
+        }
     }
 }
 

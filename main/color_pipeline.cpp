@@ -5,6 +5,7 @@
 
 #include "color_pipeline.h"
 #include "color_math.h"
+#include "color_description.h"
 #include "konaref.h"
 #include "kona_metadata.h"
 #include "tcs_glue.h"
@@ -1824,10 +1825,20 @@ int color_pipeline_describe(const color_result_t* result, char* buffer, size_t b
 
         len += snprintf(buffer + len, buffer_size - len, "%s%s. ", prefix, result->color_name);
 
-        // Add description if available
+        // Use stored description if available (from JSON); otherwise fall back
+        // to the runtime description generator based on Lab values.
         if (result->description && len < (int)buffer_size - 1)
         {
             len += snprintf(buffer + len, buffer_size - len, "%s ", result->description);
+        }
+        else if (len < (int)buffer_size - 1)
+        {
+            int gen = color_description_generate(&result->lab, buffer + len,
+                                                 buffer_size - len);
+            if (gen > 0)
+            {
+                len += gen;
+            }
         }
     }
 
