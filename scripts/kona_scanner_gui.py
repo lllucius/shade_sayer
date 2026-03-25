@@ -1325,7 +1325,7 @@ class KonaScannerApp:
                         synthetic=True,
                         source_id=source_id,
                         variant=variant,
-                        nearest_name=str(entry.get("nearest_name", "")).strip() or None,
+                        nearest_name=entry.get("nearest_name") or None,
                     )
                 except (ValueError, KeyError, TypeError, AttributeError) as e:
                     if self.debug:
