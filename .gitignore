@@ -70,3 +70,4 @@ __pycache__/
 # Log and data dump files
 errors
 results
+scripts/meodai_colors_cache.json
