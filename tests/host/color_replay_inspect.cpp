@@ -259,6 +259,7 @@ static void printInspection(const char* label,
     }
     std::printf("  delta_e:     %.4f\n", result.delta_e);
     std::printf("  confidence:  %.4f  (%.1f%%)\n", result.confidence, result.confidence * 100.0f);
+    std::printf("  description: %s\n", result.description ? result.description : "(none)");
 
     // --- Material ---
     std::printf("\n--- Material ---\n");

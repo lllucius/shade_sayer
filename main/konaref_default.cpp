@@ -18,3 +18,9 @@ const uint16_t kona_synthetic_name_count = 0;
 const kona_synthetic_name_t kona_synthetic_names[1] = {
     { 0, nullptr },  // placeholder — never accessed when count == 0
 };
+
+const uint16_t kona_description_count = 0;
+
+const kona_description_t kona_descriptions[1] = {
+    { 0, nullptr },  // placeholder — never accessed when count == 0
+};

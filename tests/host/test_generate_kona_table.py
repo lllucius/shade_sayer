@@ -199,6 +199,52 @@ def test_name_comment_in_output():
         assert "// 59 CANTALOUPE" in cpp, "Missing name comment in output"
 
 
+def test_description_table_in_output():
+    """Test that rendered C++ includes a description table when descriptions are present."""
+    with tempfile.TemporaryDirectory() as tmp:
+        json_path = pathlib.Path(tmp) / "kona_captures.json"
+        _write_json(json_path, [
+            {"id": 59, "name": "CANTALOUPE", "panel": "t", "panel_index": 1,
+             "measured": True, "raw": {},
+             "lab": {"l": 98.5, "a": 66.3088, "b": 90.0752},
+             "rgb": {}, "notes": "",
+             "description": "A warm orange like ripe cantaloupe with a bright, sunny look."},
+            {"id": 120, "name": "AZURE", "panel": "t", "panel_index": 2,
+             "measured": True, "raw": {},
+             "lab": {"l": 44.0, "a": 2.0, "b": 3.0},
+             "rgb": {}, "notes": "",
+             "description": "A medium blue like a clear morning sky with a crisp, cool look."},
+        ])
+
+        entries = parse_json_captures(json_path)
+        assert entries[0].description == "A warm orange like ripe cantaloupe with a bright, sunny look."
+        assert entries[1].description == "A medium blue like a clear morning sky with a crisp, cool look."
+
+        cpp = render_cpp(entries, json_path)
+        assert "kona_description_count = 2" in cpp
+        assert "kona_description_t" in cpp
+        assert '"A warm orange like ripe cantaloupe with a bright, sunny look."' in cpp
+        assert '"A medium blue like a clear morning sky with a crisp, cool look."' in cpp
+
+
+def test_description_table_empty_when_no_descriptions():
+    """Test that rendered C++ has empty description table when no descriptions are present."""
+    with tempfile.TemporaryDirectory() as tmp:
+        json_path = pathlib.Path(tmp) / "kona_captures.json"
+        _write_json(json_path, [
+            {"id": 59, "name": "CANTALOUPE", "panel": "t", "panel_index": 1,
+             "measured": True, "raw": {},
+             "lab": {"l": 98.5, "a": 66.3088, "b": 90.0752},
+             "rgb": {}, "notes": ""},
+        ])
+
+        entries = parse_json_captures(json_path)
+        assert entries[0].description == ""
+
+        cpp = render_cpp(entries, json_path)
+        assert "kona_description_count = 0" in cpp
+
+
 if __name__ == "__main__":
     test_struct_size()
     test_parse_json_basic()
@@ -207,4 +253,6 @@ if __name__ == "__main__":
     test_json_duplicate_id()
     test_entry_limit()
     test_name_comment_in_output()
+    test_description_table_in_output()
+    test_description_table_empty_when_no_descriptions()
     print("generate_kona_table tests passed")

@@ -5,6 +5,7 @@
 
 #include "color_pipeline.h"
 #include "color_math.h"
+#include "color_description.h"
 #include "konaref.h"
 #include "kona_metadata.h"
 #include "tcs_glue.h"
@@ -1637,7 +1638,7 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         // a*=110, b*=110 values.
         if (try_match_kona_reference(&result->scan_lab, result))
         {
-            result->description = nullptr;
+            result->description = kona_ref_description(result->kona_id);
             TCS_LOGD(TAG, "Kona match: id=%u name=%s dE=%.3f",
                      (unsigned int)result->kona_id,
                      result->color_name,
@@ -1824,10 +1825,20 @@ int color_pipeline_describe(const color_result_t* result, char* buffer, size_t b
 
         len += snprintf(buffer + len, buffer_size - len, "%s%s. ", prefix, result->color_name);
 
-        // Add description if available
+        // Use stored description if available (from JSON); otherwise fall back
+        // to the runtime description generator based on Lab values.
         if (result->description && len < (int)buffer_size - 1)
         {
             len += snprintf(buffer + len, buffer_size - len, "%s ", result->description);
+        }
+        else if (len < (int)buffer_size - 1)
+        {
+            int gen = color_description_generate(&result->lab, buffer + len,
+                                                 buffer_size - len);
+            if (gen > 0)
+            {
+                len += gen;
+            }
         }
     }
 

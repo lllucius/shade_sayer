@@ -259,3 +259,28 @@ const char* kona_ref_synthetic_name(uint16_t kona_id)
     }
     return nullptr;
 }
+
+const char* kona_ref_description(uint16_t kona_id)
+{
+    // Binary search — the table is sorted by kona_id at build time.
+    int lo = 0;
+    int hi = static_cast<int>(kona_description_count) - 1;
+    while (lo <= hi)
+    {
+        int mid = lo + (hi - lo) / 2;
+        uint16_t mid_id = kona_descriptions[mid].kona_id;
+        if (mid_id == kona_id)
+        {
+            return kona_descriptions[mid].description;
+        }
+        else if (mid_id < kona_id)
+        {
+            lo = mid + 1;
+        }
+        else
+        {
+            hi = mid - 1;
+        }
+    }
+    return nullptr;
+}
