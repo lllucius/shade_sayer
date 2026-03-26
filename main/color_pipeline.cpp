@@ -1824,22 +1824,6 @@ int color_pipeline_describe(const color_result_t* result, char* buffer, size_t b
                              "This might be ";
 
         len += snprintf(buffer + len, buffer_size - len, "%s%s. ", prefix, result->color_name);
-
-        // Use stored description if available (from JSON); otherwise fall back
-        // to the runtime description generator based on Lab values.
-        if (result->description && len < (int)buffer_size - 1)
-        {
-            len += snprintf(buffer + len, buffer_size - len, "%s ", result->description);
-        }
-        else if (len < (int)buffer_size - 1)
-        {
-            int gen = color_description_generate(&result->lab, buffer + len,
-                                                 buffer_size - len);
-            if (gen > 0)
-            {
-                len += gen;
-            }
-        }
     }
 
     return len;
