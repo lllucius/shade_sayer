@@ -64,6 +64,16 @@ esp_err_t ui_init(const ui_config_t* config, bool from_button_wake);
  */
 ui_event_t ui_wait_event(uint32_t timeout_ms);
 
+/**
+ * @brief Check if button is currently pressed (non-blocking)
+ *
+ * Returns the instantaneous button state without blocking or debouncing.
+ * Useful for polling during interruptible operations (e.g., speech playback).
+ *
+ * @return true if the button is currently pressed, false otherwise or if not initialized
+ */
+bool ui_is_button_pressed(void);
+
 #ifdef __cplusplus
 }
 #endif

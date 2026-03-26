@@ -111,6 +111,10 @@ static char s_description_buffer[TTS_DESCRIPTION_BUFFER_SIZE];
 static color_result_t s_last_result;
 static bool s_has_last_result = false;
 
+// Flag indicating speech was interrupted by a button press.
+// When true, the main loop skips sleep and immediately handles the pending button event.
+static bool s_speech_interrupted = false;
+
 // Raw capture statistics from the most recent SCAN command, for pipeline replay.
 // Updated only by the SCAN command handler and queried by the RAWDATA command.
 // Persists across multiple RAWDATA queries until the next SCAN.
@@ -118,16 +122,50 @@ static color_capture_stats_t s_last_scan_stats = {};
 static bool s_has_last_scan_stats = false;
 
 /**
- * @brief Announce battery level and estimated time to full
+ * @brief Speak text interruptibly
+ *
+ * Queues text for asynchronous speech and polls for completion while
+ * monitoring the button.  If the user presses the button during playback,
+ * speech is stopped immediately and the function returns true so the
+ * caller (and the main loop) can handle the pending button event.
+ *
+ * @param text  Pre-formatted text to speak
+ * @return true if speech was interrupted by a button press
  */
-static void speak_battery_status(void)
+static bool speak_interruptible(const char *text)
+{
+    esp_err_t ret = tts_speak_async("%s", text);
+    if (ret != ESP_OK)
+    {
+        return false;
+    }
+
+    // Poll for speech completion or button press (~100 ms cadence)
+    while (tts_wait_for_completion(pdMS_TO_TICKS(100)) != ESP_OK)
+    {
+        if (ui_is_button_pressed())
+        {
+            ESP_LOGI(TAG, "Speech interrupted by button press");
+            tts_stop();
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief Announce battery level and estimated time to full
+ *
+ * @return true if speech was interrupted by a button press
+ */
+static bool speak_battery_status(void)
 {
     // Check if battery is connected
     if (!power_is_battery_connected())
     {
         ESP_LOGW(TAG, "No battery detected");
         tts_speak("No battery detected");
-        return;
+        return false;
     }
 
     // Get battery level
@@ -136,52 +174,59 @@ static void speak_battery_status(void)
     {
         ESP_LOGW(TAG, "Battery level unavailable");
         tts_speak("Battery level unavailable");
-        return;
+        return false;
     }
 
     int battery_mv = power_get_battery_voltage_mv();
     ESP_LOGI(TAG, "Battery level: %d%% (%dmV)", 
              battery_level, battery_mv);
     
-    // Announce current level
-    tts_speak("Battery at %d percent", battery_level);
+    // Announce current level (interruptible)
+    char buf[64];
+    snprintf(buf, sizeof(buf), "Battery at %d percent", battery_level);
+    return speak_interruptible(buf);
 }
 
 /**
  * @brief Speak the generated description for the last measured color
+ *
+ * @return true if speech was interrupted by a button press
  */
-static void speak_color_description(void)
+static bool speak_color_description(void)
 {
     if (!s_has_last_result)
     {
         ESP_LOGI(TAG, "No color measured yet");
-        tts_speak("No color has been measured yet. Press the button to take a measurement.");
-        return;
+        return speak_interruptible("No color has been measured yet. Press the button to take a measurement.");
     }
 
     // Prefer the stored description (from JSON) when available; fall back to
     // the runtime description generator based on Lab values.
+    char buf[TTS_DESCRIPTION_BUFFER_SIZE];
+
     if (s_last_result.description)
     {
         ESP_LOGI(TAG, "Color description (stored): %s", s_last_result.description);
-        tts_speak("%s is %s", s_last_result.color_name, s_last_result.description);
+        snprintf(buf, sizeof(buf), "%s is %s", s_last_result.color_name, s_last_result.description);
     }
     else
     {
-        char desc_buffer[TTS_DESCRIPTION_BUFFER_SIZE];
-        int len = color_description_generate(&s_last_result.lab, desc_buffer, sizeof(desc_buffer));
+        char desc[TTS_DESCRIPTION_BUFFER_SIZE];
+        int len = color_description_generate(&s_last_result.lab, desc, sizeof(desc));
 
         if (len > 0)
         {
-            ESP_LOGI(TAG, "Color description (generated): %s", desc_buffer);
-            tts_speak("%s is %s", s_last_result.color_name, desc_buffer);
+            ESP_LOGI(TAG, "Color description (generated): %s", desc);
+            snprintf(buf, sizeof(buf), "%s is %s", s_last_result.color_name, desc);
         }
         else
         {
             ESP_LOGW(TAG, "Failed to generate color description");
-            tts_speak("Could not generate a description for this color.");
+            snprintf(buf, sizeof(buf), "Could not generate a description for this color.");
         }
     }
+
+    return speak_interruptible(buf);
 }
 
 /**
@@ -395,8 +440,10 @@ static void perform_auto_calibration(void)
 
 /**
  * @brief Perform color measurement and speak the result
+ *
+ * @return true if speech was interrupted by a button press
  */
-static void perform_measurement(void)
+static bool perform_measurement(void)
 {
     color_result_t result;
 
@@ -420,7 +467,7 @@ static void perform_measurement(void)
     {
         ESP_LOGE(TAG, "Measurement failed: %s", esp_err_to_name(ret));
         tts_speak("An error occurred");
-        return;
+        return false;
     }
 
     s_last_result = result;
@@ -455,10 +502,13 @@ static void perform_measurement(void)
     if (len > 0)
     {
         ESP_LOGI(TAG, "Description: %s", s_description_buffer);
-        tts_speak(s_description_buffer);
+        bool interrupted = speak_interruptible(s_description_buffer);
+        ESP_LOGI(TAG, "Measurement complete");
+        return interrupted;
     }
 
     ESP_LOGI(TAG, "Measurement complete");
+    return false;
 }
 
 /**
@@ -897,7 +947,7 @@ extern "C" void app_main(void)
     if (wake_cause == POWER_WAKE_BUTTON)
     {
         ESP_LOGI(TAG, "Woke from button press - taking immediate measurement");
-        perform_measurement();
+        s_speech_interrupted = perform_measurement();
     }
     else if (wake_cause == POWER_WAKE_USB)
     {
@@ -907,90 +957,107 @@ extern "C" void app_main(void)
         // Turn off the power LED when USB is connected
         power_disable_onboard_led();
 
-        speak_battery_status();
+        s_speech_interrupted = speak_battery_status();
     }
     else
     {
         // Fresh boot on battery - this is like a button wake, take measurement
         // The user pressed the button to turn on the device
         ESP_LOGI(TAG, "Fresh boot on battery - taking initial measurement");
-        perform_measurement();
+        s_speech_interrupted = perform_measurement();
     }
 
     // Unified main loop: handles button events consistently
     while (1)
     {
-        // Small delay after speech completes before entering sleep
-        // This ensures audio has fully finished and gives a buffer for the user
-        vTaskDelay(pdMS_TO_TICKS(100));
-
-        // Enter light sleep with timer
-        // Will return on button press, or enter deep sleep on timer
-        ESP_LOGI(TAG, "Entering sleep mode...");
-        power_wake_cause_t sleep_wake = power_enter_sleep();
-
-        if (sleep_wake == POWER_WAKE_USB)
+        // Skip sleep when speech was interrupted by a button press.
+        // The button press that interrupted speech becomes the next event to handle.
+        if (!s_speech_interrupted)
         {
-            // USB was plugged in during light sleep - announce charging status
-            ESP_LOGI(TAG, "USB connected during sleep - announcing charging status");
+            // Small delay after speech completes before entering sleep
+            // This ensures audio has fully finished and gives a buffer for the user
+            vTaskDelay(pdMS_TO_TICKS(100));
 
-            // Turn off the power LED when USB is connected
-            power_disable_onboard_led();
+            // Enter light sleep with timer
+            // Will return on button press, or enter deep sleep on timer
+            ESP_LOGI(TAG, "Entering sleep mode...");
+            power_wake_cause_t sleep_wake = power_enter_sleep();
 
-            audio_renderer_tone_ready();
-            speak_battery_status();
-        }
-        else if (sleep_wake == POWER_WAKE_BUTTON)
-        {
-            // Wait for button event to determine action type
-            ui_event_t event = ui_wait_event(BUTTON_EVENT_TIMEOUT_MS);
-
-            switch (event)
+            if (sleep_wake == POWER_WAKE_USB)
             {
-            case UI_EVENT_BUTTON_PRESS:
-                ESP_LOGI(TAG, "Button pressed - taking measurement");
-                perform_measurement();
-                break;
+                // USB was plugged in during light sleep - announce charging status
+                ESP_LOGI(TAG, "USB connected during sleep - announcing charging status");
 
-            case UI_EVENT_BUTTON_LONG_PRESS:
-                ESP_LOGI(TAG, "Long press - starting automatic calibration");
-                perform_auto_calibration();
-                break;
+                // Turn off the power LED when USB is connected
+                power_disable_onboard_led();
 
-            case UI_EVENT_BUTTON_DOUBLE:
-                ESP_LOGI(TAG, "Double press - speaking color description");
-                speak_color_description();
-                break;
-
-            case UI_EVENT_BUTTON_TRIPLE:
-                ESP_LOGI(TAG, "Triple press - announcing battery status");
-                speak_battery_status();
-                break;
-
-            case UI_EVENT_BUTTON_QUAD:
-                if (!power_is_usb_connected())
-                {
-                    ESP_LOGI(TAG, "Quad press ignored (not on USB power)");
-                    tts_speak("Serial mode requires USB power");
-                    break;
-                }
-
-                ESP_LOGI(TAG, "Quad press on USB power - enter serial scan mode");
-                enter_serial_scan_mode();
-                break;
-
-            case UI_EVENT_NONE:
-                // Timeout waiting for button classification
-                // Just do a single press action
-                ESP_LOGI(TAG, "Button event timeout - taking measurement");
-                perform_measurement();
-                break;
-
-            default:
-                ESP_LOGW(TAG, "Unhandled UI event: %d", event);
-                break;
+                audio_renderer_tone_ready();
+                s_speech_interrupted = speak_battery_status();
+                continue;
+            }
+            else if (sleep_wake != POWER_WAKE_BUTTON)
+            {
+                // Not a button wake - loop back to sleep
+                continue;
             }
         }
-        // If power_enter_sleep returned for any other reason, loop back
+
+        // Track whether we arrived here from a speech interruption
+        bool from_interrupt = s_speech_interrupted;
+        s_speech_interrupted = false;
+
+        // Wait for button event to determine action type
+        ui_event_t event = ui_wait_event(BUTTON_EVENT_TIMEOUT_MS);
+
+        switch (event)
+        {
+        case UI_EVENT_BUTTON_PRESS:
+            ESP_LOGI(TAG, "Button pressed - taking measurement");
+            s_speech_interrupted = perform_measurement();
+            break;
+
+        case UI_EVENT_BUTTON_LONG_PRESS:
+            ESP_LOGI(TAG, "Long press - starting automatic calibration");
+            perform_auto_calibration();
+            break;
+
+        case UI_EVENT_BUTTON_DOUBLE:
+            ESP_LOGI(TAG, "Double press - speaking color description");
+            s_speech_interrupted = speak_color_description();
+            break;
+
+        case UI_EVENT_BUTTON_TRIPLE:
+            ESP_LOGI(TAG, "Triple press - announcing battery status");
+            s_speech_interrupted = speak_battery_status();
+            break;
+
+        case UI_EVENT_BUTTON_QUAD:
+            if (!power_is_usb_connected())
+            {
+                ESP_LOGI(TAG, "Quad press ignored (not on USB power)");
+                tts_speak("Serial mode requires USB power");
+                break;
+            }
+
+            ESP_LOGI(TAG, "Quad press on USB power - enter serial scan mode");
+            enter_serial_scan_mode();
+            break;
+
+        case UI_EVENT_NONE:
+            if (!from_interrupt)
+            {
+                // Timeout waiting for button classification after normal wake
+                // Default to a single press action
+                ESP_LOGI(TAG, "Button event timeout - taking measurement");
+                s_speech_interrupted = perform_measurement();
+            }
+            // else: timeout after speech interrupt - the user just wanted to
+            // stop speech and didn't press again; go back to sleep
+            break;
+
+        default:
+            ESP_LOGW(TAG, "Unhandled UI event: %d", event);
+            break;
+        }
     }
 }
