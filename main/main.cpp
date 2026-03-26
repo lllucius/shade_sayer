@@ -1051,8 +1051,12 @@ extern "C" void app_main(void)
                 ESP_LOGI(TAG, "Button event timeout - taking measurement");
                 s_speech_interrupted = perform_measurement();
             }
-            // else: timeout after speech interrupt - the user just wanted to
-            // stop speech and didn't press again; go back to sleep
+            else
+            {
+                // Timeout after speech interrupt - the user just wanted to
+                // stop speech and didn't press again; go back to sleep
+                ESP_LOGI(TAG, "No follow-up after speech interrupt - returning to sleep");
+            }
             break;
 
         default:
