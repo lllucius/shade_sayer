@@ -125,48 +125,95 @@ The description includes tone descriptors that indicate color characteristics:
 ## Project Structure
 
 ```
-tcs/
-├── CMakeLists.txt          # Project CMake configuration
-├── sdkconfig.defaults      # Default SDK configuration
-├── partitions.csv          # Flash partition table
+shade_sayer/
+├── CMakeLists.txt               # Project CMake configuration
+├── sdkconfig.defaults           # Default SDK configuration
+├── partitions.csv               # Flash partition table
+├── CONTRIBUTING.md              # Coding conventions and contribution guide
+├── HARDWARE.md                  # Hardware reference (schematics, BOM, PCB)
+├── LICENSE
 ├── main/
-│   ├── CMakeLists.txt      # Main component configuration
-│   ├── Kconfig.projbuild   # Menu configuration options
-│   ├── main.cpp            # Application entry point
-│   ├── tcs3530.h           # TCS3530 register definitions
-│   ├── tcs3530_driver.cpp  # TCS3530 driver implementation
-│   ├── tcs3530_driver.h    # TCS3530 driver API
-│   ├── color_pipeline.cpp  # Color processing pipeline
-│   ├── color_pipeline.h    # Pipeline API
-│   ├── color_database.cpp  # xkcd color database (generated)
-│   ├── color_database.h    # Database API
-│   ├── color_matcher.cpp   # VP-Tree color matching
-│   ├── color_matcher.h     # Matcher API
-│   ├── color_math.cpp      # Color space conversions
-│   ├── color_math.h        # Math API
-│   ├── color_types.h       # Color type definitions
-│   ├── color_description.cpp # Natural language generation
-│   ├── color_description.h   # Description API
-│   ├── vptree_data.h       # Pre-computed VP-Tree (generated)
-│   ├── user_interface.cpp  # Button/UI handling
-│   ├── user_interface.h    # UI API
-│   ├── audio_renderer.cpp  # I2S audio output
-│   ├── audio_renderer.h    # Audio API
-│   ├── tts_manager.cpp     # Text-to-speech manager
-│   ├── tts_manager.h       # TTS API
-│   ├── power_manager.cpp   # Power/sleep management
-│   ├── power_manager.h     # Power API
-│   ├── konaref.h           # Kona swatch reference table schema
-│   ├── konaref.cpp         # Kona reference helpers (validation/access)
-│   └── konaref_default.cpp # Fallback Kona reference data
+│   ├── CMakeLists.txt           # Main component configuration
+│   ├── Kconfig.projbuild        # Menu configuration options
+│   ├── main.cpp                 # Application entry point
+│   │
+│   │   # Colour Processing
+│   ├── color_types.h/.cpp       # Unified type system (XYZ, Lab, LCH, RGB)
+│   ├── color_math.h/.cpp        # Colour space conversions, CIEDE2000
+│   ├── color_pipeline.h/.cpp    # 13-stage processing pipeline
+│   ├── color_database.h/.cpp    # xkcd colour database (generated)
+│   ├── color_matcher.h/.cpp     # VP-Tree O(log n) colour matching
+│   ├── color_description.h/.cpp # Natural language description generator
+│   ├── vptree_data.h            # Pre-computed VP-Tree (generated)
+│   │
+│   │   # Kona Reference System
+│   ├── konaref.h/.cpp           # Kona table schema, validation, VP-tree search
+│   ├── konaref_default.cpp      # Fallback empty Kona table
+│   ├── kona_metadata.h/.cpp     # 365 Kona Cotton Solids swatch metadata
+│   │
+│   │   # Hardware Drivers
+│   ├── tcs3530.h                # TCS3530 register map & bitfields
+│   ├── tcs3530_driver.h/.cpp    # TCS3530 I2C sensor driver
+│   ├── max17048_driver.h/.cpp   # MAX17048 battery fuel gauge driver
+│   ├── i2c_bus_manager.h/.cpp   # Shared I2C bus management
+│   ├── hardware_pins.h          # GPIO pin definitions (from Kconfig)
+│   ├── tcs_glue.h/.cpp          # ESP-IDF / host portability layer
+│   │
+│   │   # Audio & TTS
+│   ├── audio_renderer.h/.cpp    # I2S output to MAX98357A
+│   ├── tts_manager.h/.cpp       # picotts speech synthesis queue
+│   │
+│   │   # UI & Power
+│   ├── user_interface.h/.cpp    # Button polling, multi-click detection
+│   ├── power_manager.h/.cpp     # Deep/light sleep, battery, USB detect
+│   │
+│   │   # Calibration
+│   └── auto_calibrate.h/.cpp    # Guided CCM calibration with optimiser
+│
 ├── components/
-│   └── picotts/            # picotts TTS library
-├── scripts/
-│   ├── import_xkcd_colors.py      # Import xkcd color CSV
+│   └── picotts/                 # picotts TTS library (third-party)
+│
+├── scripts/                     # Python utilities (see scripts/README.md)
+│   ├── generate_kona_table.py   # Generate Kona reference C++ source
+│   ├── generate_vptree.py       # Generate VP-Tree for xkcd database
 │   ├── generate_color_database.py # Generate color_database.cpp
-│   ├── generate_vptree.py         # Generate vptree_data.h
-│   └── generate_kona_table.py     # Generate Kona table source from kona_captures.json
-└── TCS3530_DS.txt          # Sensor datasheet extract
+│   ├── generate_synthetic_tints.py # Create tint/shade/tone variants
+│   ├── kona_scanner_gui.py      # GUI for scanning Kona swatches
+│   ├── annotate_nearest_colors.py # Nearest colour annotation
+│   ├── regenerate_kona_lab.py   # Pipeline replay for Lab regeneration
+│   ├── color_replay.py          # Batch pipeline replay driver
+│   ├── import_xkcd_colors.py    # Import xkcd colour CSV
+│   ├── import_resene_colors.py  # Import Resene paint colours
+│   ├── analyze_calibration_log.py # Calibration analysis
+│   ├── extract_calibration_config.py # Config extraction from logs
+│   └── seed_kona_json.py        # JSON initialisation utility
+│
+├── tests/host/                  # Host-side test programs
+│   ├── test_ciede2000.cpp       # CIEDE2000 regression (30 reference pairs)
+│   ├── test_delta_e.cpp         # Delta-E edge case tests
+│   ├── color_pipeline_unit_tests.cpp # Pipeline unit tests
+│   ├── color_match_host_test.cpp # Colour matching test
+│   ├── autocal_host_test.cpp    # Calibration optimiser test
+│   ├── color_replay_inspect.cpp # Single-capture verbose inspection
+│   ├── color_replay_batch.cpp   # Batch/regression replay (CI-friendly)
+│   └── kona_regenerate.cpp      # Raw data replay for Kona table regen
+│
+├── host/                        # Host build configuration
+│   ├── CMakeLists.txt           # Host CMake config (8 test executables)
+│   └── calibration_measurements_raw.cfg
+│
+├── docs/                        # Documentation
+│   ├── architecture.md          # System architecture overview
+│   ├── color-science.md         # Colour science reference
+│   ├── calibration.md           # Calibration procedures guide
+│   ├── testing.md               # Host test and validation guide
+│   ├── replay-harness.md        # Replay tool documentation
+│   └── console-log-troubleshooting.md # Debug log interpretation
+│
+├── kona_captures.json           # Measured Kona swatch data
+├── kona_synthetic_tints.json    # Generated tint/shade/tone variants
+├── kona_cotton_solids_k001.csv  # Kona 365 swatch metadata (source)
+└── TCS3530_DS.txt               # TCS3530 sensor datasheet extract
 ```
 
 ### Kona scan reference table flow
@@ -329,6 +376,19 @@ The device uses the MAX17048G+T10 fuel gauge IC for accurate battery monitoring:
 4. **Valid GPIO:** Ensure button is on a valid RTC GPIO (0-21 on ESP32-S3)
    - Default: GPIO 1 on Unexpected Maker TinyS3D
    - Any RTC GPIO (0-21) can be used
+
+## Documentation
+
+Detailed guides are available in the `docs/` directory:
+
+* **[Architecture](docs/architecture.md)** — system block diagram, data flow, source file map
+* **[Colour Science](docs/color-science.md)** — colour spaces, CIEDE2000, pipeline stages
+* **[Calibration](docs/calibration.md)** — white balance, full auto-calibration procedure
+* **[Testing](docs/testing.md)** — host build, test executables, Python tests
+* **[Replay Harness](docs/replay-harness.md)** — batch pipeline replay for debugging
+* **[Console Troubleshooting](docs/console-log-troubleshooting.md)** — interpreting log output
+
+See also: **[CONTRIBUTING.md](CONTRIBUTING.md)** for coding conventions.
 
 ## License
 
