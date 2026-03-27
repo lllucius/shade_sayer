@@ -246,3 +246,12 @@ ui_event_t ui_wait_event(uint32_t timeout_ms)
     return detect_button_event(timeout_ms);
 }
 
+bool ui_is_button_pressed(void)
+{
+    if (!s_ui.initialized)
+    {
+        return false;
+    }
+
+    return read_button_state();
+}
