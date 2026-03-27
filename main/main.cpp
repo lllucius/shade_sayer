@@ -50,6 +50,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
+#include <cstdarg>
 #include <new>
 #include <fcntl.h>
 #include <unistd.h>
@@ -103,6 +104,7 @@ static TCS3530* s_sensor = nullptr;
 
 // Buffer size for spoken color descriptions
 #define TTS_DESCRIPTION_BUFFER_SIZE  512
+#define INTERRUPTIBLE_SPEECH_POLL_MS 100
 
 // Text buffer for spoken descriptions
 static char s_description_buffer[TTS_DESCRIPTION_BUFFER_SIZE];
@@ -116,6 +118,68 @@ static bool s_has_last_result = false;
 // Persists across multiple RAWDATA queries until the next SCAN.
 static color_capture_stats_t s_last_scan_stats = {};
 static bool s_has_last_scan_stats = false;
+static bool s_speech_interrupted = false;
+
+/**
+ * @brief Speak text that can be interrupted by a new button press
+ *
+ * Starts speech asynchronously, then polls for completion so the current
+ * button press can stop speech and be handled immediately by the main loop.
+ *
+ * @param fmt printf-style format string
+ * @param ... Variable arguments for the format string
+ */
+static void speak_interruptible(const char *fmt, ...)
+{
+    if (!fmt)
+    {
+        return;
+    }
+
+    char *text = nullptr;
+    va_list args;
+    va_start(args, fmt);
+    int len = vasprintf(&text, fmt, args);
+    va_end(args);
+
+    if (len < 0 || text == nullptr)
+    {
+        ESP_LOGE(TAG, "Failed to format interruptible speech text");
+        return;
+    }
+
+    esp_err_t ret = tts_speak_async("%s", text);
+    free(text);
+
+    if (ret != ESP_OK)
+    {
+        ESP_LOGW(TAG, "Failed to queue interruptible speech: %s", esp_err_to_name(ret));
+        return;
+    }
+
+    while (true)
+    {
+        ret = tts_wait_for_completion(pdMS_TO_TICKS(INTERRUPTIBLE_SPEECH_POLL_MS));
+        if (ret == ESP_OK)
+        {
+            return;
+        }
+
+        if (ret != ESP_ERR_TIMEOUT)
+        {
+            ESP_LOGW(TAG, "Interruptible speech wait failed: %s", esp_err_to_name(ret));
+            return;
+        }
+
+        if (ui_is_button_pressed())
+        {
+            ESP_LOGI(TAG, "Button pressed during speech - interrupting");
+            tts_stop();
+            s_speech_interrupted = true;
+            return;
+        }
+    }
+}
 
 /**
  * @brief Announce battery level and estimated time to full
@@ -126,7 +190,7 @@ static void speak_battery_status(void)
     if (!power_is_battery_connected())
     {
         ESP_LOGW(TAG, "No battery detected");
-        tts_speak("No battery detected");
+        speak_interruptible("No battery detected");
         return;
     }
 
@@ -135,7 +199,7 @@ static void speak_battery_status(void)
     if (battery_level < 0)
     {
         ESP_LOGW(TAG, "Battery level unavailable");
-        tts_speak("Battery level unavailable");
+        speak_interruptible("Battery level unavailable");
         return;
     }
 
@@ -144,7 +208,7 @@ static void speak_battery_status(void)
              battery_level, battery_mv);
     
     // Announce current level
-    tts_speak("Battery at %d percent", battery_level);
+    speak_interruptible("Battery at %d percent", battery_level);
 }
 
 /**
@@ -155,7 +219,7 @@ static void speak_color_description(void)
     if (!s_has_last_result)
     {
         ESP_LOGI(TAG, "No color measured yet");
-        tts_speak("No color has been measured yet. Press the button to take a measurement.");
+        speak_interruptible("No color has been measured yet. Press the button to take a measurement.");
         return;
     }
 
@@ -164,7 +228,7 @@ static void speak_color_description(void)
     if (s_last_result.description)
     {
         ESP_LOGI(TAG, "Color description (stored): %s", s_last_result.description);
-        tts_speak("%s is %s", s_last_result.color_name, s_last_result.description);
+        speak_interruptible("%s is %s", s_last_result.color_name, s_last_result.description);
     }
     else
     {
@@ -174,12 +238,12 @@ static void speak_color_description(void)
         if (len > 0)
         {
             ESP_LOGI(TAG, "Color description (generated): %s", desc_buffer);
-            tts_speak("%s is %s", s_last_result.color_name, desc_buffer);
+            speak_interruptible("%s is %s", s_last_result.color_name, desc_buffer);
         }
         else
         {
             ESP_LOGW(TAG, "Failed to generate color description");
-            tts_speak("Could not generate a description for this color.");
+            speak_interruptible("Could not generate a description for this color.");
         }
     }
 }
@@ -455,7 +519,7 @@ static void perform_measurement(void)
     if (len > 0)
     {
         ESP_LOGI(TAG, "Description: %s", s_description_buffer);
-        tts_speak(s_description_buffer);
+        speak_interruptible("%s", s_description_buffer);
     }
 
     ESP_LOGI(TAG, "Measurement complete");
@@ -920,14 +984,25 @@ extern "C" void app_main(void)
     // Unified main loop: handles button events consistently
     while (1)
     {
-        // Small delay after speech completes before entering sleep
-        // This ensures audio has fully finished and gives a buffer for the user
-        vTaskDelay(pdMS_TO_TICKS(100));
+        bool speech_interrupted = s_speech_interrupted;
+        s_speech_interrupted = false;
 
-        // Enter light sleep with timer
-        // Will return on button press, or enter deep sleep on timer
-        ESP_LOGI(TAG, "Entering sleep mode...");
-        power_wake_cause_t sleep_wake = power_enter_sleep();
+        if (speech_interrupted)
+        {
+            ESP_LOGI(TAG, "Speech interrupted - handling pending button input");
+        }
+        else
+        {
+            // Small delay after speech completes before entering sleep
+            // This ensures audio has fully finished and gives a buffer for the user
+            vTaskDelay(pdMS_TO_TICKS(100));
+
+            // Enter light sleep with timer
+            // Will return on button press, or enter deep sleep on timer
+            ESP_LOGI(TAG, "Entering sleep mode...");
+        }
+
+        power_wake_cause_t sleep_wake = speech_interrupted ? POWER_WAKE_BUTTON : power_enter_sleep();
 
         if (sleep_wake == POWER_WAKE_USB)
         {

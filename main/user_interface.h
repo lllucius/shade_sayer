@@ -64,6 +64,14 @@ esp_err_t ui_init(const ui_config_t* config, bool from_button_wake);
  */
 ui_event_t ui_wait_event(uint32_t timeout_ms);
 
+/**
+ * @brief Read the current button level without classifying it into an event
+ *
+ * @return true when the button is currently pressed
+ * @return false when the button is not pressed or the UI is not initialized
+ */
+bool ui_is_button_pressed(void);
+
 #ifdef __cplusplus
 }
 #endif
