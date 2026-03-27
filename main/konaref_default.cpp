@@ -1,3 +1,16 @@
+/**
+ * @file konaref_default.cpp
+ * @brief Fallback (empty) Kona reference table
+ *
+ * This file provides placeholder Kona reference data used when the
+ * build system has not generated konaref_generated.cpp (e.g. the
+ * kona_captures.json file is absent or has no measured entries).
+ *
+ * At startup the pipeline validates the table via schema version and
+ * CRC32; an empty table will fail validation, causing the firmware to
+ * fall back to the legacy xkcd colour matcher.
+ */
+
 #include "konaref.h"
 
 const kona_table_t kona_reference = {

@@ -1,3 +1,15 @@
+/**
+ * @file tcs_glue.cpp
+ * @brief Platform abstraction layer implementation
+ *
+ * Provides timing, logging, and NVS-compatible persistent storage that
+ * works identically on the ESP32 target (via ESP-IDF APIs) and on a
+ * POSIX host (via the C++ standard library and the local filesystem).
+ *
+ * Host storage files are placed under the directory indicated by the
+ * TCS_HOST_STORAGE_DIR environment variable (default: "host/").
+ */
+
 #include "tcs_glue.h"
 
 #ifdef ESP_PLATFORM
@@ -34,6 +46,7 @@ void tcs_glue_log(const char* level, const char* tag, const char* fmt, ...)
     fprintf(stderr, "\n");
 }
 
+/** @brief Build a host-side file path from NVS namespace + key. */
 static std::string storage_path(const char* name_space, const char* key)
 {
     const char* base = getenv("TCS_HOST_STORAGE_DIR");
@@ -42,6 +55,7 @@ static std::string storage_path(const char* name_space, const char* key)
 }
 #endif
 
+/** @copydoc tcs_time_us */
 uint64_t tcs_time_us(void)
 {
 #ifdef ESP_PLATFORM
@@ -52,6 +66,7 @@ uint64_t tcs_time_us(void)
 #endif
 }
 
+/** @copydoc tcs_delay_ms */
 void tcs_delay_ms(uint32_t delay_ms)
 {
 #ifdef ESP_PLATFORM
@@ -61,6 +76,7 @@ void tcs_delay_ms(uint32_t delay_ms)
 #endif
 }
 
+/** @copydoc tcs_storage_load_blob */
 esp_err_t tcs_storage_load_blob(const char* name_space,
                                 const char* key,
                                 void* out_blob,
@@ -100,6 +116,7 @@ esp_err_t tcs_storage_load_blob(const char* name_space,
 #endif
 }
 
+/** @copydoc tcs_storage_save_blob */
 esp_err_t tcs_storage_save_blob(const char* name_space,
                                 const char* key,
                                 const void* blob,
