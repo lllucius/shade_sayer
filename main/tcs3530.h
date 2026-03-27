@@ -1,29 +1,33 @@
+/**
+ * @file tcs3530.h
+ * @brief TCS3530 Register Map, Bitfields, Reset Values, and Helper Functions
+ *
+ * This header provides:
+ *  - Complete register addresses for the TCS3530 true-color XYZ sensor.
+ *  - Reset values as given in the AMS datasheet.
+ *  - Key bit masks and positions.
+ *  - Simple configuration "profiles" for common modes.
+ *  - Inline helper functions to compute and program timing and thresholds.
+ *
+ * @note All registers are 8-bit.  Multi-byte quantities are little-endian
+ *       (low byte at lower address).
+ * @note Timing is derived from an internal ~720 kHz oscillator and a
+ *       "modulator clock" period of ~1.388889 µs.
+ *
+ * @warning LATCHING RULE (from datasheet): For 16-bit and 24-bit fields,
+ *          the LOW BYTE MUST BE ACCESSED FIRST.
+ *          - Reads:  read low → latches entire field, then read high.
+ *          - Writes: write low, then write high.
+ *
+ * The caller must provide low-level I²C primitives:
+ * @code
+ *   tcs3530_write8(user_ctx, reg, val)
+ *   tcs3530_read8(user_ctx, reg, &val)
+ * @endcode
+ */
+
 #ifndef TCS3530_REGS_H
 #define TCS3530_REGS_H
-// TCS3530 Register Map, Bitfields, Reset Values, and Helper Functions
-//
-// This header provides:
-//  - Complete register addresses.
-//  - Reset values as given in the datasheet.
-//  - Key bit masks and positions.
-//  - Simple configuration "profiles" for common modes.
-//  - Inline helper functions to compute and program timing and thresholds.
-//
-// NOTES:
-//  - All registers are 8-bit.
-//  - Multi-byte quantities are little-endian (low byte at lower address).
-//  - Timing is derived from an internal ~720 kHz oscillator and a
-//    "modulator clock" period of ~1.388889 us.
-//
-// IMPORTANT latching rule (from datasheet):
-//  For 16-bit and 24-bit fields, LOW BYTE MUST BE ACCESSED FIRST.
-//  - For reads: read low -> latches entire field, then read high.
-//  - For writes: write low, then write high.
-//
-// You still need to provide:
-//   tcs3530_write8(user_ctx, reg, val)
-//   tcs3530_read8(user_ctx, reg, &val)
-// or equivalent low-level I^2C primitives.
 
 // --------------------------------------------------------------------------
 // I2C ADDRESS

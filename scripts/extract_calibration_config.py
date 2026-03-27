@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+"""Extract calibration reference measurements from a console log.
+
+Parses ``calibration_run.txt`` produced by the firmware's auto-calibration
+routine and writes two config files consumed by the host test harness:
+
+* ``host/calibration_measurements.cfg``     — normalised XYZ triplets
+* ``host/calibration_measurements_raw.cfg`` — raw sensor counts with gain/integration
+"""
 import re
 from pathlib import Path
 
