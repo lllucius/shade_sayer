@@ -765,7 +765,12 @@ static esp_err_t apply_sensor_correction(const sensor_reading_t* reading, xyz_t*
     // Calculate global scaling
     float gain_mult = tcs3530_gain_code_to_multiplier(reading->gain);
     float time_scale = reading->integration_ms / REFERENCE_INTEGRATION_MS;
-    if (gain_mult == 0.0f) gain_mult = 1.0f;
+    if (gain_mult == 0.0f)
+    {
+        ESP_LOGW(TAG, "SensorCorr: invalid gain code %u (multiplier=0), falling back to 1.0",
+                 (unsigned)reading->gain);
+        gain_mult = 1.0f;
+    }
     float base_scale = 1.0f / (gain_mult * time_scale);
 
     TCS_LOGD(TAG, "SensorCorr: gain_mult=%.1f time_scale=%.4f base_scale=%.6f",
