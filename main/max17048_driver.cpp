@@ -137,6 +137,9 @@ esp_err_t MAX17048::init(const max17048_config_t* config)
     if (ret != ESP_OK)
     {
         ESP_LOGE(TAG, "Failed to communicate with MAX17048");
+        // Mirror destructor cleanup order: unregister from bus manager first
+        // so it does not retain a dangling handle, then remove from the bus.
+        i2c_bus_manager_unregister_device(m_dev_handle);
         i2c_master_bus_rm_device(m_dev_handle);
         m_dev_handle = nullptr;
         if (m_owns_bus && m_i2c_bus)
