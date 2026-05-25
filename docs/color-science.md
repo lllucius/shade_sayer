@@ -91,30 +91,29 @@ readings (analogue or digital) are discarded.
 ### Stage 2 — Responsivity Normalisation
 
 Raw ADC counts are converted to responsivity-normalised values using the
-TCS3530 datasheet constants, accounting for the configured gain and
-integration time.
+TCS3530 datasheet constants, accounting for the configured gain.
 
-### Stage 3 — Colour Correction Matrix (PCCM)
+### Stage 3 — Integration Time Normalisation
+
+Readings are normalised to a 100 ms baseline integration time so that
+calibration parameters remain valid across different exposure settings.
+
+### Stage 4 — Black Level Subtraction
+
+Residual sensor offset (stray light, LED reflections, electronic noise) is
+removed using the dark-reference measurement captured during calibration.
+
+### Stage 5 — Colour Correction Matrix (PCCM)
 
 A 3×10 polynomial CCM (or 3×3 linear CCM) maps sensor XYZ into a
 calibrated colour space.  The matrix is determined during the guided
 calibration procedure and stored in NVS.
 
-### Stage 4 — IR Compensation
+### Stage 6 — IR Compensation
 
 Infrared light leaks into the X, Y, Z channels.  The compensation step
 subtracts a fraction of the IR channel reading (scaled by per-channel IR
 factors) to remove this cross-talk.
-
-### Stage 5 — Integration Time Normalisation
-
-Readings are normalised to a 100 ms baseline integration time so that
-calibration parameters remain valid across different exposure settings.
-
-### Stage 6 — Black Level Subtraction
-
-Residual sensor offset (stray light, LED reflections, electronic noise) is
-removed using the dark-reference measurement captured during calibration.
 
 ### Stage 7 — White Balance (Chromatic Adaptation)
 
