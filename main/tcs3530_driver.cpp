@@ -164,6 +164,9 @@ TCS3530& TCS3530::operator=(TCS3530&& other) noexcept
     {
         if (m_initialized && m_i2c_dev)
         {
+            // Match destructor cleanup order: unregister from bus manager
+            // first to avoid leaving a dangling handle in its tracking list.
+            i2c_bus_manager_unregister_device(m_i2c_dev);
             i2c_master_bus_rm_device(m_i2c_dev);
         }
         m_i2c_dev = other.m_i2c_dev;
