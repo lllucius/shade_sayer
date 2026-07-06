@@ -242,20 +242,27 @@ lab_t color_math_apply_material_correction(const lab_t* lab, const material_corr
 
 /**
  * @brief Classify material type from raw sensor data
- * 
+ *
  * Uses heuristics based on sensor signal characteristics to infer
  * material type without requiring machine learning:
- * 
+ *
  * - Variance across samples: Fabrics have high variance due to thread texture
  * - Intensity vs saturation ratio: Metals have high reflectance, low saturation
  * - Channel ratios: Different materials have characteristic R/G/B balance
- * 
+ *
+ * The variance test is a coefficient of variation: sqrt(mean variance) of the
+ * corrected XYZ divided by the corrected mean Y. Both variance_xyz and
+ * mean_xyz must therefore come from the same corrected-XYZ capture statistics
+ * (they must share a domain — never mix corrected values with raw ADC counts).
+ *
  * @param reading Raw sensor reading with X, Y, Z, IR, Clear channels
- * @param variance_xyz Optional XYZ variance from multiple samples (can be NULL)
+ * @param variance_xyz Optional corrected-XYZ variance from multiple samples (can be NULL)
+ * @param mean_xyz Corrected-XYZ mean of the same samples (required when variance_xyz is set)
  * @return Classified material type
  */
 material_type_t color_math_classify_material(const sensor_reading_t* reading,
-                                             const xyz_t* variance_xyz);
+                                             const xyz_t* variance_xyz,
+                                             const xyz_t* mean_xyz);
 
 /**
  * @brief Get the name of a material type as a string

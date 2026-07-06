@@ -122,11 +122,13 @@ static bool s_kona_reference_ready = false;
 static sensor_reading_t s_last_sensor_reading;
 static bool s_has_sensor_reading = false;
 
-// Cached capture variance for auto-detect material feature.
+// Cached capture variance and mean for auto-detect material feature.
 // When color_pipeline_identify captures multiple samples, the stddev is converted
-// to variance and stored here so that color_math_classify_material can use it
-// for variance-based heuristics (e.g., fabric detection via high-variance reads).
+// to variance and stored here (with the matching mean from the same statistics)
+// so that color_math_classify_material can compute a coefficient of variation
+// entirely in the corrected-XYZ domain (fabric detection via high-variance reads).
 static xyz_t s_capture_variance;
+static xyz_t s_capture_mean;
 static bool s_has_capture_variance = false;
 
 // Categories struct (unchanged) ...
@@ -370,6 +372,20 @@ static bool try_match_kona_reference(const lab_t* lab, color_result_t* result)
 // Clear/IR ratio thresholds for interpolation
 static const float IR_RATIO_LED_THRESHOLD = 5.0f;           // Above this = mostly LED
 static const float IR_RATIO_INCANDESCENT_THRESHOLD = 2.0f;  // Below this = mostly incandescent
+
+void color_pipeline_get_ir_coefficients(float clear_ir_ratio,
+                                        float* kx, float* ky, float* kz)
+{
+    float t;
+    if (clear_ir_ratio >= IR_RATIO_LED_THRESHOLD) t = 1.0f;
+    else if (clear_ir_ratio <= IR_RATIO_INCANDESCENT_THRESHOLD) t = 0.0f;
+    else t = (clear_ir_ratio - IR_RATIO_INCANDESCENT_THRESHOLD) /
+             (IR_RATIO_LED_THRESHOLD - IR_RATIO_INCANDESCENT_THRESHOLD);
+
+    if (kx) *kx = math_lerp(s_ir_coeff_incandescent.x, s_ir_coeff_led.x, t);
+    if (ky) *ky = math_lerp(s_ir_coeff_incandescent.y, s_ir_coeff_led.y, t);
+    if (kz) *kz = math_lerp(s_ir_coeff_incandescent.z, s_ir_coeff_led.z, t);
+}
 
 
 // Minimum corrected luminance (Y, CIE 0-100) required for an inner sample to
@@ -891,19 +907,12 @@ static esp_err_t apply_sensor_correction(const sensor_reading_t* reading, xyz_t*
         ir_normalized *= gain;
 
         float clear_ir_ratio = (float)reading->clear / (float)reading->ir;
-        float t;
-        
-        if (clear_ir_ratio >= IR_RATIO_LED_THRESHOLD) t = 1.0f;
-        else if (clear_ir_ratio <= IR_RATIO_INCANDESCENT_THRESHOLD) t = 0.0f;
-        else t = (clear_ir_ratio - IR_RATIO_INCANDESCENT_THRESHOLD) /
-                 (IR_RATIO_LED_THRESHOLD - IR_RATIO_INCANDESCENT_THRESHOLD);
+        float ir_factor_x, ir_factor_y, ir_factor_z;
+        color_pipeline_get_ir_coefficients(clear_ir_ratio,
+                                           &ir_factor_x, &ir_factor_y, &ir_factor_z);
 
-        float ir_factor_x = math_lerp(s_ir_coeff_incandescent.x, s_ir_coeff_led.x, t);
-        float ir_factor_y = math_lerp(s_ir_coeff_incandescent.y, s_ir_coeff_led.y, t);
-        float ir_factor_z = math_lerp(s_ir_coeff_incandescent.z, s_ir_coeff_led.z, t);
-
-        TCS_LOGD(TAG, "IRComp: clear_ir_ratio=%.3f t=%.3f ir_normalized=%.4f (x gain=%.3f)",
-                 clear_ir_ratio, t, ir_normalized, gain);
+        TCS_LOGD(TAG, "IRComp: clear_ir_ratio=%.3f ir_normalized=%.4f (x gain=%.3f)",
+                 clear_ir_ratio, ir_normalized, gain);
         TCS_LOGD(TAG, "IRComp: ir_factor_x=%.4f ir_factor_y=%.4f ir_factor_z=%.4f",
                  ir_factor_x, ir_factor_y, ir_factor_z);
         TCS_LOGD(TAG, "IRComp: sub_x=%.4f sub_y=%.4f sub_z=%.4f",
@@ -969,7 +978,17 @@ esp_err_t color_pipeline_init(const color_pipeline_config_t* config)
         esp_err_t blob_err = tcs_storage_load_blob("auto_cal", "params", &loaded_params, &size);
         if (blob_err == ESP_OK && size == sizeof(color_calib_params_t))
         {
-            loaded_params.lightness_offset = 0.0f;
+            // Sanitize exactly as color_pipeline_set_params() does so the pipeline
+            // behaves identically whether params arrive fresh from the optimizer
+            // or from NVS after a reboot. The calibrated lightness_offset is a
+            // legitimate optimized parameter and must be preserved; only the PCCM
+            // constant/bias terms are cleared (they would destroy the tiny signal
+            // from near-black surfaces — black-level subtraction is the correct
+            // place for additive offsets).
+            for (int i = 0; i < 3; i++)
+            {
+                loaded_params.pccm[i][9] = 0.0f;
+            }
             s_params = loaded_params;
             ESP_LOGI(TAG, "Loaded auto-calibration params");
             ESP_LOGI(TAG, "  lightness: scale=%.4f offset=%.2f gamma=%.4f",
@@ -1407,6 +1426,9 @@ esp_err_t color_pipeline_identify(TCS3530* sensor, color_result_t* result,
         s_capture_variance.x = winning_stats.stddev_xyz.x * winning_stats.stddev_xyz.x;
         s_capture_variance.y = winning_stats.stddev_xyz.y * winning_stats.stddev_xyz.y;
         s_capture_variance.z = winning_stats.stddev_xyz.z * winning_stats.stddev_xyz.z;
+        // Cache the mean from the SAME statistics so the classifier can form a
+        // dimensionally-consistent coefficient of variation (both corrected-XYZ).
+        s_capture_mean = winning_stats.mean_xyz;
         s_has_capture_variance = true;
     }
 
@@ -1537,7 +1559,8 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         {
             result->material = color_math_classify_material(
                 &s_last_sensor_reading,
-                s_has_capture_variance ? &s_capture_variance : nullptr);
+                s_has_capture_variance ? &s_capture_variance : nullptr,
+                s_has_capture_variance ? &s_capture_mean : nullptr);
             TCS_LOGD(TAG, "Auto-detected material: %s", color_math_material_name(result->material));
         }
         else
@@ -1597,12 +1620,14 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
              raw_L, result->lab.l, s_params.lightness_gamma, s_params.lightness_scale, s_params.lightness_offset);
 
     result->luminance = result->lab.l;
-    float effective_min_luminance = s_config.min_luminance * fmaxf(s_params.lightness_scale, 0.01f);
-    result->low_light = result->lab.l < effective_min_luminance;
+    // Compare directly against min_luminance: the corrected L* already includes
+    // lightness_scale (applied in linear XYZ space in apply_sensor_correction),
+    // so scaling the threshold by lightness_scale again would double-compensate
+    // and make the low-light cutoff depend on calibration gain.
+    result->low_light = result->lab.l < s_config.min_luminance;
 
-    TCS_LOGD(TAG, "Gate: raw_L=%.2f corrected_L=%.2f min_luminance=%.2f lightness_scale=%.4f effective_min=%.2f low_light=%d",
-             raw_L, result->lab.l, s_config.min_luminance, s_params.lightness_scale,
-             effective_min_luminance, (int)result->low_light);
+    TCS_LOGD(TAG, "Gate: raw_L=%.2f corrected_L=%.2f min_luminance=%.2f low_light=%d",
+             raw_L, result->lab.l, s_config.min_luminance, (int)result->low_light);
 
     float raw_chroma = color_math_chroma(&result->lab);
     TCS_LOGD(TAG, "Pre-enhance Lab: L=%.1f a=%.1f b=%.1f chroma=%.1f",
@@ -1612,10 +1637,14 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
     float pre_boost_a = result->lab.a;
     float pre_boost_b = result->lab.b;
 
+    // Use the calibrated saturation parameters (s_params). The auto-calibration
+    // optimizer tunes and persists these; the similarly-named s_config fields
+    // are legacy firmware defaults that calibration never updates and must not
+    // override the calibrated values.
     float enhanced_chroma = color_math_enhance_saturation(&result->lab,
-                            s_config.gray_threshold,
-                            s_config.color_threshold,
-                            s_config.saturation_boost);
+                            s_params.gray_threshold,
+                            s_params.color_threshold,
+                            s_params.saturation_boost);
 
     result->saturation = enhanced_chroma / 100.0f;
 
@@ -1684,18 +1713,18 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
         // Reduce the saturation boost for low-confidence matches to prevent over-boosting
         // uncertain readings (e.g., from textured surfaces) into an incorrect vivid color name.
         // At confidence=1.0 the full boost is applied; at confidence=0.0 no boost is applied.
-        // Uses s_config.saturation_boost (same source as the initial boost above) to ensure
-        // consistent behavior regardless of whether auto-calibration loaded different params.
+        // Uses s_params.saturation_boost (same source as the initial boost above) so the
+        // calibrated value governs both applications consistently.
         float confidence_factor = fmaxf(0.0f, fminf(1.0f, result->confidence));
-        float effective_boost = 1.0f + (s_config.saturation_boost - 1.0f) * confidence_factor;
-        if (effective_boost < s_config.saturation_boost - 0.01f)
+        float effective_boost = 1.0f + (s_params.saturation_boost - 1.0f) * confidence_factor;
+        if (effective_boost < s_params.saturation_boost - 0.01f)
         {
             // Restore pre-boost a*/b* and reapply with the lower effective boost.
             result->lab.a = pre_boost_a;
             result->lab.b = pre_boost_b;
             enhanced_chroma = color_math_enhance_saturation(&result->lab,
-                              s_config.gray_threshold,
-                              s_config.color_threshold,
+                              s_params.gray_threshold,
+                              s_params.color_threshold,
                               effective_boost);
             result->saturation = enhanced_chroma / 100.0f;
             result->lab.a = fminf(fmaxf(result->lab.a, -110.0f), 110.0f);
@@ -1703,7 +1732,7 @@ esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_r
             TCS_LOGD(TAG,
                      "Confidence-scaled boost: confidence=%.2f factor=%.2f boost=%.2f->%.2f",
                      result->confidence, confidence_factor,
-                     s_config.saturation_boost, effective_boost);
+                     s_params.saturation_boost, effective_boost);
         }
     }
 
@@ -1839,9 +1868,11 @@ esp_err_t color_pipeline_set_params(const color_calib_params_t* params)
     if (!params) return ESP_ERR_INVALID_ARG;
     s_params = *params;
 
-    // Clear any constant-offset bias in PCCM term[9] (see NVS load path for
-    // full explanation).  This covers the path where calibration is applied
-    // directly (e.g., from auto_calibrate) rather than loaded from NVS.
+    // Clear any constant-offset bias in PCCM term[9]. A non-zero constant
+    // offset destroys the tiny Y/Z signal from near-black surfaces; additive
+    // offsets belong in black-level subtraction. The NVS load path in
+    // color_pipeline_init() applies the same sanitization so both paths
+    // produce identical pipeline state for identical params.
     for (int i = 0; i < 3; i++)
     {
         s_params.pccm[i][9] = 0.0f;

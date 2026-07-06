@@ -64,6 +64,11 @@ add_executable(test_ciede2000 ${CMAKE_SOURCE_DIR}/../tests/host/test_ciede2000.c
 
 add_executable(test_delta_e ${CMAKE_SOURCE_DIR}/../tests/host/test_delta_e.cpp ${CORE_SRCS})
 
+# detection_fixes_test: regression tests for the detection-algorithm fixes
+# (matcher brute-force parity, optimizer/scan_lab space parity, material
+# classifier variance branch, calibration measurement-file ordering guard).
+add_executable(detection_fixes_test ${CMAKE_SOURCE_DIR}/../tests/host/detection_fixes_test.cpp ${CORE_SRCS})
+
 # kona_regenerate: reads raw sensor readings from stdin, runs pipeline, writes Lab to stdout.
 # Used by regenerate_kona_lab.py to replay captured raw data after pipeline changes.
 add_executable(kona_regenerate ${CMAKE_SOURCE_DIR}/../tests/host/kona_regenerate.cpp ${CORE_SRCS})

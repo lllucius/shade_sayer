@@ -378,6 +378,22 @@ const cal_reference_t* auto_cal_get_current_ref(auto_cal_ctx_t* ctx);
 const color_calib_params_t* auto_cal_get_params(auto_cal_ctx_t* ctx);
 
 /**
+ * @brief Apply calibration parameters to a RESP-normalized XYZ measurement
+ *
+ * This is the optimizer's objective transform. It mirrors the runtime
+ * scan/matching Lab computation (black-level subtraction, D65 scaling +
+ * exposure gain, PCCM, Y normalization, lightness correction — no saturation
+ * boost, no Z display floor) so the optimizer minimizes error in the same
+ * color space the matcher consumes. Exposed for host testing, which verifies
+ * it stays in lock-step with color_pipeline_process_xyz's scan_lab path.
+ *
+ * @param xyz RESP-normalized measurement (as submitted to auto_cal_submit_measurement)
+ * @param params Calibration parameters to apply
+ * @return Lab value in the matching color space
+ */
+lab_t auto_cal_apply_calibration(const xyz_t* xyz, const color_calib_params_t* params);
+
+/**
  * @brief Apply calibration results to color pipeline
  *
  * Updates the global color pipeline configuration with optimized parameters.

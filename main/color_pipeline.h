@@ -311,6 +311,22 @@ esp_err_t color_pipeline_identify_from_reading(const sensor_reading_t* reading,
 esp_err_t color_pipeline_process_xyz(const xyz_t* xyz, bool use_led_cal, color_result_t* result);
 
 /**
+ * @brief Get the IR crosstalk compensation coefficients for a clear/IR ratio
+ *
+ * Interpolates between the incandescent-dominant and LED-dominant coefficient
+ * sets based on the clear/IR channel ratio, exactly as the runtime sensor
+ * correction does. Shared with the calibration flow so that calibration
+ * measurements and runtime measurements use identical IR compensation.
+ *
+ * @param clear_ir_ratio Ratio of clear channel to IR channel counts
+ * @param kx Output X-channel crosstalk factor
+ * @param ky Output Y-channel crosstalk factor
+ * @param kz Output Z-channel crosstalk factor
+ */
+void color_pipeline_get_ir_coefficients(float clear_ir_ratio,
+                                        float* kx, float* ky, float* kz);
+
+/**
  * @brief Get a simple color category from Lab values
  *
  * Returns basic categories like "Red", "Green", "Blue", "Yellow", etc.

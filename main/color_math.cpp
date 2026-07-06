@@ -741,55 +741,65 @@ lab_t color_math_apply_material_correction(const lab_t* lab, const material_corr
 }
 
 material_type_t color_math_classify_material(const sensor_reading_t* reading,
-                                             const xyz_t* variance_xyz)
+                                             const xyz_t* variance_xyz,
+                                             const xyz_t* mean_xyz)
 {
     if (!reading)
     {
         return MATERIAL_DEFAULT;
     }
-    
+
     // Extract sensor characteristics for classification heuristics
     // Based on ChatGPT discussion: use variance, saturation, reflectance patterns
-    
+
     // Minimum sensor value to prevent division by zero
     static const float MIN_SENSOR_VALUE = 1.0f;
-    
+
     // Calculate approximate saturation from raw channel ratios
     // Higher X relative to Y suggests redder, higher Z relative to Y suggests bluer
     float x_norm = (float)reading->x;
     float y_norm = (float)reading->y;
     float z_norm = (float)reading->z;
     float clear = (float)reading->clear;
-    
+
     // Avoid division by zero
     if (y_norm < MIN_SENSOR_VALUE) y_norm = MIN_SENSOR_VALUE;
     if (clear < MIN_SENSOR_VALUE) clear = MIN_SENSOR_VALUE;
-    
-    // Reflectance indicator: ratio of clear to sum of color channels
-    // High clear relative to XYZ suggests specular reflection (metal/plastic)
-    float total_color = x_norm + y_norm + z_norm;
-    float clear_ratio = clear / total_color;
-    
+
+    // Reflectance indicator: ratio of clear to sum of color channels, with all
+    // channels normalized by their spectral responsivities so the comparison is
+    // in a common irradiance domain (raw counts per channel are not comparable
+    // because each channel has a different responsivity). The clear channel has
+    // no dedicated RESP constant; RESP_Y is used as a proxy.
+    // NOTE: the metal/plastic thresholds below are provisional pending
+    // characterization with real material measurements.
+    float total_color = (x_norm / TCS3530_RESP_X) +
+                        (y_norm / TCS3530_RESP_Y) +
+                        (z_norm / TCS3530_RESP_Z);
+    float clear_ratio = (clear / TCS3530_RESP_Y) / total_color;
+
     // Chroma indicator: deviation from neutral (equal X:Y:Z)
     float x_ratio = x_norm / y_norm;
     float z_ratio = z_norm / y_norm;
     float max_ratio = fmaxf(x_ratio, z_ratio);
     float min_ratio = fminf(x_ratio, z_ratio);
     float chroma_spread = max_ratio - min_ratio;
-    
-    // Variance-based classification (if variance is provided)
+
+    // Variance-based classification (if capture statistics are provided).
+    // Compute a coefficient of variation entirely in the corrected-XYZ domain:
+    // sqrt(mean channel variance) / mean Y. Both inputs must come from the
+    // same capture statistics — dividing a corrected-domain variance by the
+    // raw ADC count would produce a meaningless near-zero score.
     float variance_score = 0.0f;
-    if (variance_xyz)
+    if (variance_xyz && mean_xyz && mean_xyz->y > 0.01f)
     {
-        // High variance suggests textured surface (fabric)
-        // Normalize variance by mean for scale-invariant comparison
         float mean_variance = (variance_xyz->x + variance_xyz->y + variance_xyz->z) / 3.0f;
-        variance_score = mean_variance / y_norm;
+        variance_score = sqrtf(fmaxf(0.0f, mean_variance)) / mean_xyz->y;
     }
-    
+
     // Classification heuristics based on ChatGPT discussion:
-    // 
-    // Fabric: 
+    //
+    // Fabric:
     //   - High variance across samples (fiber texture)
     //   - Lower saturation than perceived (muted by scattering)
     //   - Moderate clear ratio
@@ -803,13 +813,16 @@ material_type_t color_math_classify_material(const sensor_reading_t* reading,
     //   - Moderate to high clear ratio
     //   - Moderate chroma
     //   - Low variance
-    
+
     // Thresholds (empirically tuned, may need adjustment based on real data)
-    const float VARIANCE_FABRIC_THRESHOLD = 0.05f;   // High variance -> fabric
-    const float CLEAR_METAL_THRESHOLD = 1.5f;        // Very high clear ratio -> metal
-    const float CLEAR_PLASTIC_THRESHOLD = 1.2f;      // Moderately high clear ratio -> plastic
+    // VARIANCE_FABRIC_THRESHOLD matches the pipeline's texture-detection CoV
+    // threshold (TEXTURE_CV_THRESHOLD in color_pipeline.cpp): flat swatches
+    // measure < 5% CoV, textured fabrics 20-40%.
+    const float VARIANCE_FABRIC_THRESHOLD = 0.15f;   // High CoV -> fabric
+    const float CLEAR_METAL_THRESHOLD = 1.5f;        // Very high clear ratio -> metal (provisional)
+    const float CLEAR_PLASTIC_THRESHOLD = 1.2f;      // Moderately high clear ratio -> plastic (provisional)
     const float CHROMA_METAL_THRESHOLD = 0.3f;       // Low chroma spread -> metal candidate
-    
+
     // Priority-based classification:
     // 1. High variance strongly suggests fabric
     if (variance_score > VARIANCE_FABRIC_THRESHOLD)
@@ -817,7 +830,7 @@ material_type_t color_math_classify_material(const sensor_reading_t* reading,
         TCS_LOGD(TAG, "Material classified as FABRIC (variance_score=%.4f)", variance_score);
         return MATERIAL_FABRIC;
     }
-    
+
     // 2. Very high clear ratio + low chroma suggests metal
     if (clear_ratio > CLEAR_METAL_THRESHOLD && chroma_spread < CHROMA_METAL_THRESHOLD)
     {
@@ -825,18 +838,20 @@ material_type_t color_math_classify_material(const sensor_reading_t* reading,
                  clear_ratio, chroma_spread);
         return MATERIAL_METAL;
     }
-    
+
     // 3. Moderately high clear ratio suggests plastic
     if (clear_ratio > CLEAR_PLASTIC_THRESHOLD)
     {
         TCS_LOGD(TAG, "Material classified as PLASTIC (clear_ratio=%.4f)", clear_ratio);
         return MATERIAL_PLASTIC;
     }
-    
+
     // 4. Default: assume fabric for this quilting fabric device
     // Since the primary use case is Kona Cotton quilting fabrics,
     // defaulting to fabric correction is appropriate when uncertain
-    TCS_LOGD(TAG, "Material defaulting to FABRIC (primary use case)");
+    ESP_LOGI(TAG, "Material classifier fell through to FABRIC default "
+             "(variance_score=%.4f clear_ratio=%.4f chroma_spread=%.4f)",
+             variance_score, clear_ratio, chroma_spread);
     return MATERIAL_FABRIC;
 }
 

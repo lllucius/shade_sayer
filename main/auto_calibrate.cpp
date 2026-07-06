@@ -33,6 +33,13 @@ static const char* TAG = "auto_cal";
 /** Minimum improvement to continue (ΔE reduction per iteration) */
 #define MIN_IMPROVEMENT 1.0e-5f         // 0.00001 - finer resolution for final polish
 
+/** Consecutive sub-MIN_IMPROVEMENT iterations required before declaring convergence.
+ *  Adam is momentum-based: single near-zero-improvement iterations are routine
+ *  while the moment estimates warm up or when traversing a plateau, so breaking
+ *  on the FIRST flat iteration would abort spuriously and bypass the
+ *  stall/warm-restart machinery. */
+#define MAX_FLAT_ITERATIONS 25
+
 /** Maximum iterations without improvement before triggering a warm restart */
 #define MAX_STALL_ITERATIONS 100        // Enough patience for Adam to warm up and converge
 
@@ -420,15 +427,21 @@ static void apply_constraints(color_calib_params_t* params, const cal_constraint
 /**
  * @brief Apply calibration parameters to XYZ measurement
  *
- * This function has been updated to EXACTLY match the runtime color pipeline.
- * Steps:
+ * Mirrors the runtime SCAN/MATCHING path (the Lab space that
+ * try_match_kona_reference and the color-database fallback actually consume):
  * 1. Black Level Subtraction
  * 2. D65 Scaling + Exposure Gain (Linear Space)
  * 3. PCCM (Polynomial Color Correction Matrix)
- * 4. Lightness Correction (Gamma/Offset)
- * 5. Saturation Boost
+ * 4. Y normalization when luminance exceeds the D65 white reference
+ * 5. Lightness Correction (Gamma/Offset)
+ *
+ * Deliberately NO saturation boost and NO Z display floor: the runtime
+ * scan_lab computation omits both (see color_pipeline_process_xyz), so
+ * including them here would let the optimizer meet chroma targets by
+ * "spending" boost instead of fixing the PCCM, leaving the matcher with
+ * under-corrected chroma.
  */
-static lab_t apply_calibration(const xyz_t* xyz, const color_calib_params_t* params)
+lab_t auto_cal_apply_calibration(const xyz_t* xyz, const color_calib_params_t* params)
 {
     xyz_t input = *xyz;
 
@@ -468,30 +481,36 @@ static lab_t apply_calibration(const xyz_t* xyz, const color_calib_params_t* par
     corrected_xyz.x *= XYZ_OUTPUT_SCALE;
     corrected_xyz.y *= XYZ_OUTPUT_SCALE;
     corrected_xyz.z *= XYZ_OUTPUT_SCALE;
-    
-    // 4. Convert to Lab
+
+    // 4. Normalize XYZ when luminance exceeds the D65 white reference, exactly
+    // as the runtime does before Lab conversion. Scales all channels
+    // proportionally to preserve chromaticity.
+    if (corrected_xyz.y > D65_Y)
+    {
+        float scale = D65_Y / corrected_xyz.y;
+        corrected_xyz.x *= scale;
+        corrected_xyz.y *= scale;
+        corrected_xyz.z *= scale;
+    }
+
+    // 5. Convert to Lab
     lab_t lab = color_math_xyz_to_lab(corrected_xyz);
-    
-    // 5. Apply Lightness Correction (Gamma/Offset ONLY)
+
+    // 6. Apply Lightness Correction (Gamma/Offset ONLY)
     // CRITICAL: We create a temp params struct with scale=1.0 to prevent double-scaling.
     // The scale was already applied in step 2 (linear space).
     color_calib_params_t temp_params = *params;
-    temp_params.lightness_scale = 1.0f; 
+    temp_params.lightness_scale = 1.0f;
     lab.l = color_math_correct_lightness(lab.l, &temp_params);
-    
-    // 6. Apply saturation enhancement with the same gray/color thresholds as runtime.
-    // This keeps the optimizer objective aligned with the runtime pipeline, especially
-    // for near-neutral references (Gray 50 / mid chroma colors) where the scale is not
-    // simply a uniform multiplier.
-    color_math_enhance_saturation(&lab,
-                                  params->gray_threshold,
-                                  params->color_threshold,
-                                  params->saturation_boost);
+
+    // No saturation enhancement here — the matching path consumes unboosted
+    // Lab (scan_lab), so the optimizer objective must be computed in the same
+    // space (see function doc comment).
 
     // Clamp L to valid range
     if (lab.l < 0.0f) lab.l = 0.0f;
     if (lab.l > 100.0f) lab.l = 100.0f;
-    
+
     return lab;
 }
 
@@ -523,7 +542,7 @@ static float calculate_average_error(auto_cal_ctx_t* ctx)
                 continue;
             }
             
-            lab_t measured_lab = apply_calibration(&ctx->measurements[i].measured_xyz, &ctx->params);
+            lab_t measured_lab = auto_cal_apply_calibration(&ctx->measurements[i].measured_xyz, &ctx->params);
             float error = color_math_delta_e_ciede2000(&measured_lab, &ctx->measurements[i].target_lab);
             
             // Apply weight based on color type
@@ -645,11 +664,10 @@ static void init_ccm_from_measurements(auto_cal_ctx_t* ctx)
         A[n][1] = fmaxf(xyz.y - by, 0.0f) * (D65_Y / 100.0f) * ls / 100.0f;
         A[n][2] = fmaxf(xyz.z - bz, 0.0f) * (D65_Z / 100.0f) * ls / 100.0f;
 
-        // 2. Invert pipeline to get target PCCM output XYZ
+        // 2. Invert pipeline to get target PCCM output XYZ.
+        // No saturation-boost inversion: the objective (auto_cal_apply_calibration)
+        // is computed in the unboosted scan/matching Lab space.
         lab_t tlab = ctx->measurements[i].target_lab;
-        // Undo saturation boost
-        float sat = ctx->params.saturation_boost;
-        if (sat > 0.0f) { tlab.a /= sat; tlab.b /= sat; }
         // Undo lightness correction: find the L value that xyz_to_lab must produce
         float L_xyz = invert_lightness_correction(tlab.l, &ctx->params);
         tlab.l = L_xyz;
@@ -1232,6 +1250,8 @@ esp_err_t auto_cal_run_optimization(auto_cal_ctx_t* ctx)
     // Gradient descent loop
     // Adam warm-restart counter — allows one finer search from best params after stall
     int warm_restarts_remaining = MAX_WARM_RESTARTS;
+    // Consecutive flat (sub-MIN_IMPROVEMENT) iterations — see MAX_FLAT_ITERATIONS
+    int flat_iterations = 0;
 
     for (int iter = 0; iter < MAX_ITERATIONS; iter++)
     {
@@ -1273,8 +1293,12 @@ esp_err_t auto_cal_run_optimization(auto_cal_ctx_t* ctx)
             lightness_transition_grad = estimate_gradient(ctx, &ctx->params.lightness_transition);
         }
         
-        // Estimate gradients for saturation and blue-lightness correction
-        float saturation_grad = estimate_gradient(ctx, &ctx->params.saturation_boost);
+        // Saturation boost is display-only cosmetic: the objective
+        // (auto_cal_apply_calibration) is computed in the unboosted matching
+        // space, so its gradient is identically zero — skip the two objective
+        // evaluations rather than feed a guaranteed-zero gradient to Adam.
+        float saturation_grad = 0.0f;
+        // Estimate gradients for blue-lightness correction
         float blue_correction_magnitude_grad = estimate_gradient(ctx, &ctx->params.blue_correction_magnitude);
         float blue_correction_center_grad = estimate_gradient(ctx, &ctx->params.blue_correction_center);
         float blue_correction_width_grad = estimate_gradient(ctx, &ctx->params.blue_correction_width);
@@ -1368,7 +1392,7 @@ esp_err_t auto_cal_run_optimization(auto_cal_ctx_t* ctx)
                 // Skip black reference - only used for black level capture, not color accuracy
                 if (ctx->references[i].flags & CAL_REF_FLAG_IS_BLACK) continue;
                 
-                lab_t measured_lab = apply_calibration(&ctx->measurements[i].measured_xyz, &ctx->params);
+                lab_t measured_lab = auto_cal_apply_calibration(&ctx->measurements[i].measured_xyz, &ctx->params);
                 float de = color_math_delta_e_ciede2000(&measured_lab, &ctx->measurements[i].target_lab);
                 
                 // Track the bright primary colors specifically (use exact "Brights" prefix
@@ -1416,6 +1440,7 @@ esp_err_t auto_cal_run_optimization(auto_cal_ctx_t* ctx)
                 ctx->adam_beta2_t = ADAM_BETA2;
                 ctx->learning_rate = ADAM_ALPHA_RESTART;
                 ctx->status.stall_count = 0;
+                flat_iterations = 0;
                 ESP_LOGI(TAG, "Stalled at iter %d (avg ΔE=%.2f) — warm restart #%d with α=%.4f",
                          iter, ctx->status.best_error,
                          MAX_WARM_RESTARTS - warm_restarts_remaining,
@@ -1429,8 +1454,17 @@ esp_err_t auto_cal_run_optimization(auto_cal_ctx_t* ctx)
         
         if (improvement < MIN_IMPROVEMENT && improvement >= 0)
         {
-            ESP_LOGI(TAG, "Minimal improvement: %.6f at iteration %d", improvement, iter);
-            break;
+            flat_iterations++;
+            if (flat_iterations >= MAX_FLAT_ITERATIONS)
+            {
+                ESP_LOGI(TAG, "Converged: improvement < %.6f for %d consecutive iterations (iter %d)",
+                         (double)MIN_IMPROVEMENT, flat_iterations, iter);
+                break;
+            }
+        }
+        else
+        {
+            flat_iterations = 0;
         }
     }
     
@@ -1476,7 +1510,7 @@ esp_err_t auto_cal_run_optimization(auto_cal_ctx_t* ctx)
             // Skip black reference - only used for black level capture, not color accuracy
             if (ctx->references[i].flags & CAL_REF_FLAG_IS_BLACK) continue;
             
-            lab_t measured_lab = apply_calibration(&ctx->measurements[i].measured_xyz, &ctx->params);
+            lab_t measured_lab = auto_cal_apply_calibration(&ctx->measurements[i].measured_xyz, &ctx->params);
             float de = color_math_delta_e_ciede2000(&measured_lab, &ctx->measurements[i].target_lab);
             ESP_LOGI(TAG, "  %-12s: ΔE=%5.2f (target L=%.1f a=%.1f b=%.1f)",
                      ctx->references[i].name, de,
@@ -1604,14 +1638,29 @@ esp_err_t auto_cal_submit_measurements_from_file(auto_cal_ctx_t* ctx, const char
         {
             continue;
         }
-        for (int i = 0; i < ctx->num_references; i++)
+
+        if (ctx->status.state != CAL_STATE_MEASURING)
         {
-            if (strcmp(ctx->references[i].name, name) == 0)
-            {
-                xyz_t xyz = {.x = x, .y = y, .z = z};
-                auto_cal_submit_measurement(ctx, &xyz);
-                break;
-            }
+            break;
+        }
+
+        // auto_cal_submit_measurement() always stores at the CURRENT reference
+        // index, so only accept the line matching the current reference name.
+        // Submitting a name-matched line out of sequence would silently
+        // attribute the measurement to the wrong swatch.
+        const char* current = auto_cal_get_current_ref_name(ctx);
+        if (!current || strcmp(current, name) != 0)
+        {
+            ESP_LOGW(TAG, "Skipping line for '%s' (expected '%s')", name, current ? current : "<none>");
+            continue;
+        }
+
+        xyz_t xyz = {.x = x, .y = y, .z = z};
+        esp_err_t ret = auto_cal_submit_measurement(ctx, &xyz);
+        if (ret != ESP_OK)
+        {
+            fclose(f);
+            return ret;
         }
     }
     fclose(f);

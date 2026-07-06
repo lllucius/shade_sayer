@@ -98,14 +98,14 @@ static_assert(sizeof(kona_ref_t) == KONA_REF_T_SIZE,
 extern const kona_table_t kona_reference;
 
 /**
- * @brief VP-tree node for O(log n) nearest-neighbour search.
+ * @brief VP-tree node (RETAINED FOR GENERATED-DATA COMPATIBILITY ONLY).
  *
- * Each node references an entry in kona_reference.entries[] by index and
- * stores the median CIEDE2000 distance used to partition left (closer)
- * and right (farther) subtrees.
- *
- * The node array is generated alongside the reference table by
- * scripts/generate_kona_table.py and lives in Flash (const).
+ * The runtime no longer searches this tree: VP-tree pruning requires the
+ * triangle inequality, which CIEDE2000 does not satisfy, so tree search
+ * could return a non-nearest swatch. kona_ref_find_closest() now performs
+ * an exhaustive linear scan. The node array is still emitted by
+ * scripts/generate_kona_table.py, so the declarations remain to keep the
+ * generated sources linking.
  */
 typedef struct
 {

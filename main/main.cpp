@@ -51,6 +51,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdarg>
+#include <cmath>
 #include <new>
 #include <fcntl.h>
 #include <unistd.h>
@@ -370,46 +371,114 @@ static void perform_auto_calibration(void)
             return;
         }
         
-        // Take measurement with LED on
+        // Take measurements with LED on.
+        //
+        // Calibration defines the parameters every later scan depends on, so it
+        // uses the same defenses as the runtime identify path: multiple samples,
+        // saturated samples rejected, and the mean of the accepted samples
+        // submitted. A single unchecked sample here previously allowed a
+        // saturated white reference to silently corrupt the whole calibration.
+        static const int CAL_SAMPLES_PER_REFERENCE = 5;
+        static const uint32_t CAL_SAMPLE_DELAY_MS = 80;
+
         s_sensor->setLed(true);
         ESP_LOGI(TAG, "LED: Illumination ON for calibration measurement");
-        
+
         vTaskDelay(pdMS_TO_TICKS(100));
-        
-        sensor_reading_t reading;
-        ret = s_sensor->measure(&reading);
-        
+
+        float sum_x = 0.0f, sum_y = 0.0f, sum_z = 0.0f;
+        int accepted = 0;
+        int saturated = 0;
+
+        for (int sample = 0; sample < CAL_SAMPLES_PER_REFERENCE; sample++)
+        {
+            sensor_reading_t reading;
+            ret = s_sensor->measure(&reading);
+            if (ret != ESP_OK)
+            {
+                ESP_LOGW(TAG, "Sample %d read failed: %s", sample, esp_err_to_name(ret));
+                continue;
+            }
+
+            if (reading.saturated)
+            {
+                saturated++;
+                ESP_LOGW(TAG, "Sample %d saturated, rejecting", sample);
+                continue;
+            }
+
+            // Normalize raw counts using RESP factors
+            float gain_multiplier = tcs3530_gain_code_to_multiplier(reading.gain);
+            float integration_scale = (float)reading.integration_ms / 100.0f;
+
+            if (gain_multiplier < 0.1f) gain_multiplier = 1.0f;
+            if (integration_scale < 0.01f) integration_scale = 1.0f;
+
+            // RESP-normalized values (sensor-relative)
+            float resp_x = (float)reading.x / (TCS3530_RESP_X * gain_multiplier * integration_scale);
+            float resp_y = (float)reading.y / (TCS3530_RESP_Y * gain_multiplier * integration_scale);
+            float resp_z = (float)reading.z / (TCS3530_RESP_Z * gain_multiplier * integration_scale);
+
+            // IR crosstalk compensation, mirroring the runtime pipeline so the
+            // optimizer is fit to the same data the pipeline produces. Runtime
+            // subtracts IR after the PCCM in the scaled XYZ domain; subtracting
+            // the RESP-normalized equivalent here (pre-PCCM) is an approximation
+            // of that step — the residual difference is the PCCM's mixing of the
+            // subtracted components, which is small for near-diagonal PCCMs.
+            if (reading.ir > 0 && reading.clear > 0)
+            {
+                float resp_ir = (float)reading.ir / (TCS3530_RESP_Y * gain_multiplier * integration_scale);
+                float clear_ir_ratio = (float)reading.clear / (float)reading.ir;
+                float ir_kx, ir_ky, ir_kz;
+                color_pipeline_get_ir_coefficients(clear_ir_ratio, &ir_kx, &ir_ky, &ir_kz);
+
+                resp_x = fmaxf(0.0f, resp_x - resp_ir * ir_kx);
+                resp_y = fmaxf(0.0f, resp_y - resp_ir * ir_ky);
+                resp_z = fmaxf(0.0f, resp_z - resp_ir * ir_kz);
+            }
+
+            ESP_LOGI(TAG, "Sample %d raw: X=%lu Y=%lu Z=%lu (gain=%.1fx, int=%dms) RESP+IR: X=%.2f Y=%.2f Z=%.2f",
+                     sample,
+                     (unsigned long)reading.x, (unsigned long)reading.y,
+                     (unsigned long)reading.z, gain_multiplier, reading.integration_ms,
+                     resp_x, resp_y, resp_z);
+
+            sum_x += resp_x;
+            sum_y += resp_y;
+            sum_z += resp_z;
+            accepted++;
+
+            if (sample + 1 < CAL_SAMPLES_PER_REFERENCE)
+            {
+                vTaskDelay(pdMS_TO_TICKS(CAL_SAMPLE_DELAY_MS));
+            }
+        }
+
         s_sensor->setLed(false);
         ESP_LOGI(TAG, "LED: Illumination OFF");
-        
-        if (ret != ESP_OK)
+
+        if (accepted == 0)
         {
-            ESP_LOGE(TAG, "Failed to read sensor");
-            tts_speak("Sensor read failed.  Try again.");
+            if (saturated > 0)
+            {
+                ESP_LOGE(TAG, "All %d samples saturated for %s", saturated, ref_name);
+                tts_speak("Measurement saturated.  Move away from bright light and try again.");
+            }
+            else
+            {
+                ESP_LOGE(TAG, "Failed to read sensor");
+                tts_speak("Sensor read failed.  Try again.");
+            }
             continue;
         }
-        
-        // Normalize raw counts using RESP factors
-        float gain_multiplier = tcs3530_gain_code_to_multiplier(reading.gain);
-        float integration_scale = (float)reading.integration_ms / 100.0f;
-        
-        if (gain_multiplier < 0.1f) gain_multiplier = 1.0f;
-        if (integration_scale < 0.01f) integration_scale = 1.0f;
-        
-        // RESP-normalized values (sensor-relative)
-        float resp_x = (float)reading.x / (TCS3530_RESP_X * gain_multiplier * integration_scale);
-        float resp_y = (float)reading.y / (TCS3530_RESP_Y * gain_multiplier * integration_scale);
-        float resp_z = (float)reading.z / (TCS3530_RESP_Z * gain_multiplier * integration_scale);
-        
-        ESP_LOGI(TAG, "Raw: X=%lu Y=%lu Z=%lu (gain=%.1fx, int=%dms)",
-                 (unsigned long)reading.x, (unsigned long)reading.y, 
-                 (unsigned long)reading.z, gain_multiplier, reading.integration_ms);
-        ESP_LOGI(TAG, "RESP normalized: X=%.2f Y=%.2f Z=%.2f", resp_x, resp_y, resp_z);
-        
+
         xyz_t xyz;
-        xyz.x = resp_x;
-        xyz.y = resp_y;
-        xyz.z = resp_z;
+        xyz.x = sum_x / (float)accepted;
+        xyz.y = sum_y / (float)accepted;
+        xyz.z = sum_z / (float)accepted;
+
+        ESP_LOGI(TAG, "Averaged %d/%d samples (%d saturated): X=%.2f Y=%.2f Z=%.2f",
+                 accepted, CAL_SAMPLES_PER_REFERENCE, saturated, xyz.x, xyz.y, xyz.z);
 
         ret = auto_cal_submit_measurement(cal_ctx, &xyz);
         if (ret != ESP_OK)
@@ -472,7 +541,7 @@ static void perform_measurement(void)
 
     tts_speak_async("Measuring");
 
-    ESP_LOGI(TAG, "Sensor: Using Fixed Balanced Gains (X8/Y128/Z512)");
+    ESP_LOGI(TAG, "Sensor: Using uniform gain (X8 on all channels)");
 
     ESP_LOGI(TAG, "Sensor: Taking XYZ measurement...");
     esp_err_t ret = color_pipeline_identify(s_sensor, &result);

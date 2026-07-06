@@ -238,7 +238,7 @@ void test_auto_detect_material()
                 color_math_material_name(result.material));
     
     // Verify the classification function works
-    material_type_t classified = color_math_classify_material(&raw, nullptr);
+    material_type_t classified = color_math_classify_material(&raw, nullptr, nullptr);
     std::printf("Direct classification result: %s\n", color_math_material_name(classified));
     assert(result.material == classified && 
            "Pipeline should use classification result when auto_detect is enabled");
